@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="dark scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YGGDRASIL | 世界树 - 全自动分布式网络订阅中枢</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        obsidian: '#05070a',
+                        gold: {
+                            400: '#f5e298',
+                            500: '#d4af37',
+                            600: '#a38422'
+                        },
+                        cyber: {
+                            cyan: '#00f2fe',
+                            blue: '#4facfe'
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['Cinzel', 'Georgia', 'serif'],
+                        sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Three.js & GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <style>
+        body {
+            background-color: #05070a;
+            color: #e2e8f0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
+        }
+        .cinzel { font-family: 'Cinzel', serif; }
+        
+        /* Glassmorphism */
+        .glass-panel {
+            background: rgba(10, 14, 23, 0.65);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(212, 175, 55, 0.18);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .glass-card:hover {
+            border-color: rgba(212, 175, 55, 0.4);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(0, 242, 254, 0.15);
+        }
+
+        /* Gold & Cyber Gradient Text */
+        .text-gold-gradient {
+            background: linear-gradient(135deg, #FFF5C0 0%, #D4AF37 50%, #AA8C2C 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .text-cyber-gradient {
+            background: linear-gradient(135deg, #00F2FE 0%, #4FACFE 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Canvas background */
+        #webgl-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 0;
+        }
+    </style>
+</head>
+<body class="relative antialiased selection:bg-gold-500 selection:text-black">
+
+    <!-- WebGL Background Canvas -->
+    <canvas id="webgl-canvas"></canvas>
+
+    <!-- Navigation Header -->
+    <header class="fixed top-0 left-0 right-0 z-50 px-6 py-5 transition-all duration-300 backdrop-blur-md bg-obsidian/40 border-b border-white/5">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-3 cursor-pointer">
+                <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-gold-500 to-cyber-cyan p-[1px] flex items-center justify-center shadow-lg shadow-gold-500/20">
+                    <div class="w-full h-full bg-obsidian rounded-full flex items-center justify-center">
+                        <i class="fa-solid font-bold text-gold-400 text-sm">Y</i>
+                    </div>
+                </div>
+                <span class="cinzel text-xl font-bold tracking-widest text-gold-gradient">YGGDRASIL</span>
+            </div>
+
+            <nav class="hidden md:flex items-center space-x-8 text-sm font-medium tracking-wide text-gray-300">
+                <a href="#section-hero" class="hover:text-gold-400 transition-colors">起源</a>
+                <a href="#section-breakthrough" class="hover:text-cyber-cyan transition-colors">深根</a>
+                <a href="#section-modular" class="hover:text-gold-400 transition-colors">节点叶群</a>
+                <a href="#section-autonomous" class="hover:text-cyber-cyan transition-colors">进化</a>
+            </nav>
+
+            <div class="flex items-center space-x-4">
+                <button onclick="copySubscription()" class="relative group overflow-hidden px-5 py-2.5 rounded-full text-xs font-semibold tracking-wider uppercase bg-gradient-to-r from-gold-500 to-gold-600 text-obsidian shadow-lg hover:shadow-gold-500/30 transition-all duration-300 transform active:scale-95">
+                    <span class="relative z-10 flex items-center gap-2">
+                        <i class="fa-solid fa-bolt"></i> 复制订阅链接
+                    </span>
+                    <div class="absolute inset-0 bg-white/30 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Scroll Content Container -->
+    <main id="scroll-container" class="relative z-10">
+
+        <!-- SECTION 1: HERO / ORIGIN -->
+        <section id="section-hero" class="min-h-screen flex items-center justify-center px-6 relative pt-20">
+            <div class="max-w-4xl mx-auto text-center space-y-6">
+                <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-card text-xs font-medium tracking-wider text-gold-400 uppercase">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                    全自动化分布式网络订阅中枢
+                </div>
+                
+                <h1 class="cinzel text-5xl md:text-7xl lg:text-8xl font-black tracking-tight leading-tight text-gold-gradient">
+                    YGGDRASIL
+                </h1>
+                
+                <p class="text-lg md:text-xl text-gray-300 font-light tracking-wide max-w-2xl mx-auto leading-relaxed">
+                    突破重力，重塑网络边界。<br>
+                    以参天世界树之名，将庞大节点融汇为生生不息的无界网络。
+                </p>
+
+                <div class="pt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+                    <a href="#section-breakthrough" class="w-full sm:w-auto px-8 py-3.5 rounded-full glass-panel border border-gold-500/40 text-gold-400 font-medium text-sm tracking-wider uppercase hover:bg-gold-500/10 hover:border-gold-400 transition-all text-center">
+                        探索拓扑架构 <i class="fa-solid fa-arrow-down ml-2 text-xs"></i>
+                    </a>
+                    <button onclick="copySubscription()" class="w-full sm:w-auto px-8 py-3.5 rounded-full bg-gradient-to-r from-cyber-cyan to-cyber-blue text-obsidian font-bold text-sm tracking-wider uppercase shadow-lg shadow-cyber-cyan/20 hover:opacity-90 transition-all">
+                        获取订阅链接
+                    </button>
+                </div>
+
+                <div class="pt-16 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto">
+                    <div class="glass-card p-4 rounded-xl text-center">
+                        <div class="text-2xl font-bold text-gold-gradient cinzel">99.99%</div>
+                        <div class="text-xs text-gray-400 mt-1">节点高可用率</div>
+                    </div>
+                    <div class="glass-card p-4 rounded-xl text-center">
+                        <div class="text-2xl font-bold text-cyber-gradient cinzel">&lt; 15ms</div>
+                        <div class="text-xs text-gray-400 mt-1">智能优选延迟</div>
+                    </div>
+                    <div class="glass-card p-4 rounded-xl text-center">
+                        <div class="text-2xl font-bold text-gold-gradient cinzel">分布式</div>
+                        <div class="text-xs text-gray-400 mt-1">无单点故障风险</div>
+                    </div>
+                    <div class="glass-card p-4 rounded-xl text-center">
+                        <div class="text-2xl font-bold text-cyber-gradient cinzel">全自动</div>
+                        <div class="text-xs text-gray-400 mt-1">云端实时自愈更新</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: BREAKTHROUGH -->
+        <section id="section-breakthrough" class="min-h-screen flex items-center justify-end px-6 md:px-20 relative">
+            <div class="max-w-xl space-y-6 glass-panel p-8 md:p-12 rounded-3xl relative overflow-hidden">
+                <div class="absolute -top-10 -right-10 w-40 h-40 bg-gold-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="text-xs font-semibold text-gold-400 tracking-widest uppercase flex items-center gap-2">
+                    <span class="w-8 h-[1px] bg-gold-400"></span> 01 / DEEP ROOT SYSTEM
+                </div>
+                <h2 class="cinzel text-3xl md:text-5xl font-bold text-white leading-tight">
+                    无界 · 穿透
+                </h2>
+                <p class="text-gray-300 leading-relaxed font-light">
+                    深扎于数字大地的地下根系。在复杂网络封锁与干扰下，Yggdrasil 的庞大根系能自动探测并穿透屏障，以极具鲁棒性的底层路由策略，确保数据如养分般源源不断流向枝叶。
+                </p>
+                <ul class="space-y-3 text-sm text-gray-300">
+                    <li class="flex items-center gap-3">
+                        <i class="fa-solid fa-shield-halved text-cyber-cyan"></i>
+                        <span>底层抗封锁算法与多重隐蔽传输</span>
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <i class="fa-solid fa-network-wired text-cyber-cyan"></i>
+                        <span>全球 Anycast 边缘拓扑感知</span>
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <i class="fa-solid fa-lock text-cyber-cyan"></i>
+                        <span>端到端零日志高强度安全防护</span>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- SECTION 3: MODULAR (ZOOM INTO LEAF NODES) -->
+        <section id="section-modular" class="min-h-screen flex items-center justify-start px-6 md:px-20 relative">
+            <div class="max-w-xl space-y-6 glass-panel p-8 md:p-12 rounded-3xl relative overflow-hidden">
+                <div class="absolute -bottom-10 -left-10 w-40 h-40 bg-cyber-cyan/10 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="text-xs font-semibold text-cyber-cyan tracking-widest uppercase flex items-center gap-2">
+                    <span class="w-8 h-[1px] bg-cyber-cyan"></span> 02 / LEAF NODE CLUSTERS
+                </div>
+                <h2 class="cinzel text-3xl md:text-5xl font-bold text-white leading-tight">
+                    解构 · 节点集群
+                </h2>
+                <p class="text-gray-300 leading-relaxed font-light">
+                    镜头深入树冠微观世界。树叶上繁星般的每一个光点，都是一个分布于全球的独立节点。分布式模块化设计将节点集群、分流策略与规则引擎完美解构。
+                </p>
+                <div class="grid grid-cols-2 gap-4 pt-2">
+                    <div class="glass-card p-4 rounded-xl border-l-2 border-l-gold-500">
+                        <div class="font-bold text-white text-sm">高度可维护</div>
+                        <div class="text-xs text-gray-400 mt-1">单一节点故障无感切用，集群热插拔替换</div>
+                    </div>
+                    <div class="glass-card p-4 rounded-xl border-l-2 border-l-cyber-cyan">
+                        <div class="font-bold text-white text-sm">无缝兼容</div>
+                        <div class="text-xs text-gray-400 mt-1">适配 Surge, Stash, Loon, Quantumult X 等高性能客户端</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: AUTONOMOUS -->
+        <section id="section-autonomous" class="min-h-screen flex items-center justify-center px-6 relative py-20">
+            <div class="max-w-3xl mx-auto text-center space-y-8 glass-panel p-10 md:p-16 rounded-3xl relative">
+                <div class="inline-block p-3 rounded-2xl bg-gold-500/10 border border-gold-500/20 text-gold-400 mb-2">
+                    <i class="fa-solid fa-dna text-3xl"></i>
+                </div>
+                <div class="text-xs font-semibold text-gold-400 tracking-widest uppercase">
+                    03 / AUTONOMOUS ECOSYSTEM
+                </div>
+                <h2 class="cinzel text-3xl md:text-6xl font-bold text-gold-gradient">
+                    进化 · 自治
+                </h2>
+                <p class="text-gray-300 text-lg leading-relaxed font-light max-w-xl mx-auto">
+                    可升级，全自动，全自主。配置实时拉取与智能优选在静默中自发迭代。Yggdrasil，不仅是订阅中枢，更是会呼吸的网络生命体。
+                </p>
+
+                <!-- Subscription Action Box -->
+                <div class="p-4 rounded-2xl bg-black/60 border border-white/10 max-w-2xl mx-auto space-y-4">
+                    <div class="flex items-center justify-between text-xs text-gray-400 px-2">
+                        <span><i class="fa-solid fa-link text-gold-500 mr-1"></i> Yggdrasil 统一订阅地址</span>
+                        <span class="text-emerald-400 flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> 智能负载均衡已激活</span>
+                    </div>
+                    <div class="flex items-center gap-2 bg-obsidian p-2 rounded-xl border border-white/5">
+                        <input id="sub-url-input" type="text" readonly value="https://yggdrasil.network/sub/yggdrasil.yaml" class="bg-transparent text-gray-300 text-sm px-3 w-full focus:outline-none font-mono">
+                        <button onclick="copySubscription()" class="px-6 py-2.5 rounded-lg bg-gold-500 hover:bg-gold-600 text-obsidian font-bold text-xs uppercase tracking-wider transition-all whitespace-nowrap">
+                            复制
+                        </button>
+                    </div>
+                </div>
+
+                <div class="text-xs text-gray-400 flex flex-wrap items-center justify-center gap-6 pt-4">
+                    <span><i class="fa-solid fa-check text-gold-500 mr-1"></i> 支持 Surge</span>
+                    <span><i class="fa-solid fa-check text-gold-500 mr-1"></i> 支持 Stash</span>
+                    <span><i class="fa-solid fa-check text-gold-500 mr-1"></i> 支持 Loon</span>
+                    <span><i class="fa-solid fa-check text-gold-500 mr-1"></i> 支持 Quantumult X</span>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="relative z-10 border-t border-white/5 py-8 px-6 bg-obsidian/80 backdrop-blur-md text-xs text-gray-500 text-center">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="cinzel text-gray-400 font-semibold tracking-widest">YGGDRASIL NETWORK SYSTEM</div>
+            <div>Powered by Distributed Autonomous Network &bull; MIT Licensed</div>
+            <div>&copy; 2026 Yggdrasil Project. All rights reserved.</div>
+        </div>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-8 right-8 z-50 transform translate-y-20 opacity-0 transition-all duration-300 glass-panel px-6 py-4 rounded-xl border border-gold-500/30 flex items-center gap-3 text-sm text-white shadow-2xl">
+        <i class="fa-solid fa-circle-check text-gold-400 text-lg"></i>
+        <span id="toast-msg">订阅链接已成功复制至剪贴板</span>
+    </div>
+
+    <!-- WebGL & Interactive Script -->
+    <script>
+        function copySubscription() {
+            const input = document.getElementById('sub-url-input');
+            navigator.clipboard.writeText(input.value).then(() => {
+                showToast("Yggdrasil 订阅链接已复制！");
+            }).catch(() => {
+                input.select();
+                document.execCommand('copy');
+                showToast("Yggdrasil 订阅链接已复制！");
+            });
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        // --- THREE.JS 3D GRAND TREE SETUP ---
+        const canvas = document.getElementById('webgl-canvas');
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x05070a, 0.018);
+
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 2, 28);
+
+        const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+        const treeGroup = new THREE.Group();
+        scene.add(treeGroup);
+
+        // Materials
+        const trunkMaterial = new THREE.LineBasicMaterial({
+            color: 0xd4af37,
+            transparent: true,
+            opacity: 0.55,
+            blending: THREE.AdditiveBlending
+        });
+
+        const branchMaterial = new THREE.LineBasicMaterial({
+            color: 0xe8cc6c,
+            transparent: true,
+            opacity: 0.45,
+            blending: THREE.AdditiveBlending
+        });
+
+        const rootMaterial = new THREE.LineBasicMaterial({
+            color: 0x00f2fe,
+            transparent: true,
+            opacity: 0.35,
+            blending: THREE.AdditiveBlending
+        });
+
+        const leafPositions = [];
+
+        // 1. Spiral Intertwined Massive Trunk
+        const TRUNK_STRANDS = 18;
+        const TRUNK_HEIGHT = 14;
+        for (let i = 0; i < TRUNK_STRANDS; i++) {
+            const points = [];
+            const angleOffset = (i / TRUNK_STRANDS) * Math.PI * 2;
+            const strandRadius = 1.8;
+
+            for (let y = -8; y <= TRUNK_HEIGHT; y += 0.5) {
+                const progress = (y + 8) / (TRUNK_HEIGHT + 8);
+                const currentRadius = strandRadius * (1 - progress * 0.4) + Math.sin(y * 0.5 + angleOffset) * 0.2;
+                const angle = angleOffset + y * 0.25;
+
+                const x = Math.cos(angle) * currentRadius;
+                const z = Math.sin(angle) * currentRadius;
+                points.push(new THREE.Vector3(x, y, z));
+            }
+
+            const curve = new THREE.CatmullRomCurve3(points);
+            const geometry = new THREE.BufferGeometry().setFromPoints(curve.getPoints(60));
+            const line = new THREE.Line(geometry, trunkMaterial);
+            treeGroup.add(line);
+        }
+
+        // 2. Dense Recursive Branch System
+        function buildBranch(start, direction, length, depth) {
+            if (depth <= 0) {
+                for (let l = 0; l < 15; l++) {
+                    leafPositions.push(new THREE.Vector3(
+                        start.x + (Math.random() - 0.5) * 2.5,
+                        start.y + (Math.random() - 0.5) * 2.5,
+                        start.z + (Math.random() - 0.5) * 2.5
+                    ));
+                }
+                return;
+            }
+
+            const end = start.clone().add(direction.clone().multiplyScalar(length));
+            const mid = start.clone().add(end).multiplyScalar(0.5);
+            mid.x += (Math.random() - 0.5) * length * 0.4;
+            mid.z += (Math.random() - 0.5) * length * 0.4;
+
+            const curve = new THREE.QuadraticBezierCurve3(start, mid, end);
+            const geometry = new THREE.BufferGeometry().setFromPoints(curve.getPoints(12));
+            const line = new THREE.Line(geometry, branchMaterial);
+            treeGroup.add(line);
+
+            const subBranches = depth > 3 ? 3 : 4;
+            for (let i = 0; i < subBranches; i++) {
+                const nextDir = direction.clone();
+                nextDir.x += (Math.random() - 0.5) * 1.2;
+                nextDir.y += Math.random() * 0.5 + 0.1;
+                nextDir.z += (Math.random() - 0.5) * 1.2;
+                nextDir.normalize();
+
+                buildBranch(end, nextDir, length * 0.68, depth - 1);
+            }
+        }
+
+        const MAIN_BRANCH_COUNT = 8;
+        for (let b = 0; b < MAIN_BRANCH_COUNT; b++) {
+            const angle = (b / MAIN_BRANCH_COUNT) * Math.PI * 2;
+            const dir = new THREE.Vector3(
+                Math.cos(angle) * 0.8,
+                Math.random() * 0.4 + 0.4,
+                Math.sin(angle) * 0.8
+            ).normalize();
+
+            const branchStart = new THREE.Vector3(
+                Math.cos(angle) * 1.2,
+                TRUNK_HEIGHT * 0.7,
+                Math.sin(angle) * 1.2
+            );
+
+            buildBranch(branchStart, dir, 5.5, 4);
+        }
+
+        // 3. Spreading Massive Root System
+        function buildRoot(start, direction, length, depth) {
+            if (depth <= 0) return;
+            const end = start.clone().add(direction.clone().multiplyScalar(length));
+            const mid = start.clone().add(end).multiplyScalar(0.5);
+            mid.x += (Math.random() - 0.5) * length * 0.5;
+            mid.z += (Math.random() - 0.5) * length * 0.5;
+
+            const curve = new THREE.QuadraticBezierCurve3(start, mid, end);
+            const geometry = new THREE.BufferGeometry().setFromPoints(curve.getPoints(10));
+            const line = new THREE.Line(geometry, rootMaterial);
+            treeGroup.add(line);
+
+            for (let i = 0; i < 2; i++) {
+                const nextDir = direction.clone();
+                nextDir.x += (Math.random() - 0.5) * 1.1;
+                nextDir.y -= Math.random() * 0.4 + 0.3;
+                nextDir.z += (Math.random() - 0.5) * 1.1;
+                nextDir.normalize();
+
+                buildRoot(end, nextDir, length * 0.75, depth - 1);
+            }
+        }
+
+        for (let r = 0; r < 10; r++) {
+            const angle = (r / 10) * Math.PI * 2;
+            const dir = new THREE.Vector3(
+                Math.cos(angle),
+                -0.8,
+                Math.sin(angle)
+            ).normalize();
+            buildRoot(new THREE.Vector3(0, -8, 0), dir, 5.0, 4);
+        }
+
+        // 4. Massive Leaf Star-Cloud Particles
+        const particlesGeo = new THREE.BufferGeometry();
+        const pPositions = [];
+        const pColors = [];
+
+        leafPositions.forEach(pos => {
+            pPositions.push(pos.x, pos.y, pos.z);
+            const isGold = Math.random() > 0.35;
+            if (isGold) {
+                pColors.push(0.96, 0.85, 0.4);
+            } else {
+                pColors.push(0.0, 0.95, 0.99);
+            }
+        });
+
+        for (let i = 0; i < 1200; i++) {
+            pPositions.push(
+                (Math.random() - 0.5) * 50,
+                (Math.random() - 0.5) * 40 + 5,
+                (Math.random() - 0.5) * 50
+            );
+            pColors.push(0.85, 0.75, 0.4);
+        }
+
+        particlesGeo.setAttribute('position', new THREE.Float32BufferAttribute(pPositions, 3));
+        particlesGeo.setAttribute('color', new THREE.Float32BufferAttribute(pColors, 3));
+
+        function createParticleTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 64;
+            canvas.height = 64;
+            const ctx = canvas.getContext('2d');
+            const grad = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+            grad.addColorStop(0, 'rgba(255,255,255,1)');
+            grad.addColorStop(0.25, 'rgba(212,175,55,0.85)');
+            grad.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, 64, 64);
+            return new THREE.CanvasTexture(canvas);
+        }
+
+        const pMaterial = new THREE.PointsMaterial({
+            size: 0.55,
+            vertexColors: true,
+            map: createParticleTexture(),
+            transparent: true,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false
+        });
+
+        const particleSystem = new THREE.Points(particlesGeo, pMaterial);
+        treeGroup.add(particleSystem);
+
+        // Render loop
+        let clock = new THREE.Clock();
+        function animate() {
+            requestAnimationFrame(animate);
+            const elapsedTime = clock.getElapsedTime();
+            treeGroup.rotation.y = elapsedTime * 0.035;
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // --- GSAP SCROLLTRIGGER: CAMERA ZOOM INTO LEAF CLUSTERS ---
+        gsap.registerPlugin(ScrollTrigger);
+
+        const timeline = gsap.timeline({
+            scrollTrigger: {
+                trigger: "#scroll-container",
+                start: "top top",
+                end: "bottom bottom",
+                scrub: 1.2
+            }
+        });
+
+        // Section 1 -> 2: Shift down to focus on Deep Roots
+        timeline.to(treeGroup.position, {
+            y: 10,
+            z: 6,
+            duration: 2,
+            ease: "power2.inOut"
+        }, 0)
+        .to(treeGroup.rotation, {
+            x: 0.25,
+            duration: 2
+        }, 0);
+
+        // Section 2 -> 3: CAMERA ZOOM INTO LEAF CLUSTER NODES
+        timeline.to(treeGroup.position, {
+            x: 6,
+            y: -11,
+            z: 18,
+            duration: 2,
+            ease: "power2.inOut"
+        }, 2)
+        .to(treeGroup.rotation, {
+            x: -0.2,
+            z: 0.2,
+            duration: 2
+        }, 2);
+
+        // Section 3 -> 4: Lift up to Canopy Zenith
+        timeline.to(treeGroup.position, {
+            x: 0,
+            y: -3,
+            z: 4,
+            duration: 2,
+            ease: "power2.inOut"
+        }, 4)
+        .to(treeGroup.scale, {
+            x: 1.15,
+            y: 1.15,
+            z: 1.15,
+            duration: 2
+        }, 4);
+
+    </script>
+</body>
+</html>
