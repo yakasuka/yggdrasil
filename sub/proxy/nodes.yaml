@@ -1,0 +1,22 @@
+proxies:
+
+  - name: "TEST-HK"
+    type: ss
+    server: example.com
+    port: 443
+    cipher: aes-256-gcm
+    password: test123456
+
+  - name: "TEST-JP"
+    type: ss
+    server: example.com
+    port: 443
+    cipher: aes-256-gcm
+    password: test123456
+
+  - name: "TEST-US"
+    type: ss
+    server: example.com
+    port: 443
+    cipher: aes-256-gcm
+    password: test123456
