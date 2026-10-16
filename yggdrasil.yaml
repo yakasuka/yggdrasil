@@ -3,13 +3,13 @@
 # 1. 机场订阅 Proxy Providers
 # =======================================================
 
-proxy-providers:
-  xyang:                                                                                    # 订阅链接，如需多个订阅请复制整段 并修改 provider1 字段 保证唯一性
-    url: "https://xxx.xxx/sub?token=xxxx"
-    type: http
-    interval: 86400
-    health-check: {enable: true, lazy: true, url: "https://www.gstatic.com/generate_204",interval: 3600}
-    proxy: DIRECT
+# proxy-providers:
+#   xyang:                                                                                    # 订阅链接，如需多个订阅请复制整段 并修改 provider1 字段 保证唯一性
+#     url: "https://xxx.xxx/sub?token=xxxx"
+#     type: http
+#     interval: 86400
+#     health-check: {enable: true, lazy: true, url: "https://www.gstatic.com/generate_204",interval: 3600}
+#     proxy: DIRECT
 
 #proxies:                                                                                       # 手动节点，如需多个手动节点请复制整段 并修改 name 字段 保证唯一性
 #  - name: "手动节点1"
