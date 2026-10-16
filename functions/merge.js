@@ -10,7 +10,7 @@ export async function onRequest(context) {
 
   try {
     const [configObj, nodesObj] = await Promise.all([
-      env.CONFIG.get("config.yaml"),
+      env.CONFIG.get("yggdrasil.yaml"),
       env.CONFIG.get("nodes.yaml")
     ]);
 
