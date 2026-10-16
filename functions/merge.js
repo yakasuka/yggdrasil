@@ -124,7 +124,7 @@ export async function onRequest({ request, env }) {
       headers: {
         "Content-Type": "text/yaml; charset=utf-8",
         "Cache-Control": "no-store",
-        "Content-Disposition": 'attachment; filename="openclash.yaml"',
+        "Content-Disposition": 'attachment; filename="yggdrasil.yaml"',
       },
     });
   } catch (error) {
