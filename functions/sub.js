@@ -1,27 +1,24 @@
+
 export async function onRequestGet({ request, env }) {
   const url = new URL(request.url);
 
-  // 1. 验证订阅 Token
+  // 验证订阅 Token
   if (!env.TOKEN || url.searchParams.get("token") !== env.TOKEN) {
     return new Response("Unauthorized", {
       status: 401,
+      headers: { "Content-Type": "text/plain; charset=utf-8" },
     });
   }
 
-  // 2. 检查 GitHub Token
   if (!env.GH_TOKEN) {
-    return new Response("Missing GH_TOKEN environment variable", {
-      status: 500,
-    });
+    return new Response("Missing GH_TOKEN", { status: 500 });
   }
 
-  // 3. 私密仓库中的节点配置文件
   const api =
     "https://api.github.com/repos/yakasuka/yggdrasil-private/contents/nodes.yaml";
 
   try {
-    const res = await fetch(api, {
-      method: "GET",
+    const response = await fetch(api, {
       headers: {
         Authorization: `Bearer ${env.GH_TOKEN}`,
         Accept: "application/vnd.github+json",
@@ -30,56 +27,47 @@ export async function onRequestGet({ request, env }) {
       },
     });
 
-    // 4. 返回 GitHub 的具体错误，方便定位 403 原因
-    if (!res.ok) {
-      const detail = await res.text();
-
-      console.error("GitHub API error:", res.status, detail);
+    if (!response.ok) {
+      const detail = await response.text();
+      console.error("GitHub nodes.yaml error:", response.status, detail);
 
       return new Response(
-        `Failed to read node file: GitHub HTTP ${res.status}\n${detail}`,
+        `Failed to read node file: GitHub HTTP ${response.status}\n${detail}`,
         {
           status: 502,
-          headers: {
-            "Content-Type": "text/plain; charset=utf-8",
-            "Cache-Control": "no-store",
-          },
+          headers: { "Content-Type": "text/plain; charset=utf-8" },
         }
       );
     }
 
-    // 5. 解析 GitHub 返回的文件内容
-    const data = await res.json();
+    const data = await response.json();
 
     if (!data.content || data.encoding !== "base64") {
-      return new Response("Invalid GitHub file response", {
+      return new Response("Invalid nodes.yaml response from GitHub", {
         status: 502,
       });
     }
 
-    // Base64 解码，并安全转换为 UTF-8 文本
     const binary = atob(data.content.replace(/\s/g, ""));
-    const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
-    const content = new TextDecoder("utf-8").decode(bytes);
+    const bytes = Uint8Array.from(binary, (c) => c.charCodeAt(0));
+    const yaml = new TextDecoder("utf-8").decode(bytes);
 
-    // 6. 返回节点 YAML 文件
-    return new Response(content, {
+    // 浏览器直接显示，不强制下载
+    return new Response(yaml, {
       status: 200,
       headers: {
-        "Content-Type": "text/yaml; charset=utf-8",
-        "Content-Disposition": 'attachment; filename="yggdrasil.yaml"',
+        "Content-Type": "text/plain; charset=utf-8",
+        "Content-Disposition": "inline",
         "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
       },
     });
   } catch (error) {
-    console.error("Subscription error:", error);
+    console.error("sub.js error:", error);
 
     return new Response("Failed to read node file", {
       status: 502,
-      headers: {
-        "Content-Type": "text/plain; charset=utf-8",
-        "Cache-Control": "no-store",
-      },
+      headers: { "Content-Type": "text/plain; charset=utf-8" },
     });
   }
 }

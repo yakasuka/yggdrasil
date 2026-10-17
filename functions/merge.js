@@ -1,137 +1,112 @@
 
-export async function onRequest({ request, env }) {
-  const requestUrl = new URL(request.url);
-  const token = requestUrl.searchParams.get("token");
+const PRIVATE_REPO =
+  "https://api.github.com/repos/yakasuka/yggdrasil-private/contents";
 
-  // 验证访问令牌
-  if (!env.TOKEN || token !== env.TOKEN) {
-    return new Response("Forbidden", { status: 403 });
+async function readPrivateFile(env, filename) {
+  const response = await fetch(`${PRIVATE_REPO}/${filename}`, {
+    headers: {
+      Authorization: `Bearer ${env.GH_TOKEN}`,
+      Accept: "application/vnd.github+json",
+      "X-GitHub-Api-Version": "2022-11-28",
+      "User-Agent": "yggdrasil-merge",
+    },
+  });
+
+  if (!response.ok) {
+    const detail = await response.text();
+    console.error(`GitHub ${filename} error:`, response.status, detail);
+
+    throw new Error(
+      `Failed to read ${filename}: GitHub HTTP ${response.status}`
+    );
   }
 
-  // 检查环境变量
-  if (!env.GH_TOKEN || !env.PUBLIC_CONFIG_URL) {
-    console.error("Missing environment configuration:", {
-      GH_TOKEN: Boolean(env.GH_TOKEN),
-      PUBLIC_CONFIG_URL: Boolean(env.PUBLIC_CONFIG_URL),
-    });
+  const data = await response.json();
 
-    return new Response("Missing environment configuration", {
-      status: 500,
+  if (!data.content || data.encoding !== "base64") {
+    throw new Error(`Invalid GitHub response for ${filename}`);
+  }
+
+  const binary = atob(data.content.replace(/\s/g, ""));
+  const bytes = Uint8Array.from(binary, (c) => c.charCodeAt(0));
+
+  return new TextDecoder("utf-8").decode(bytes);
+}
+
+export async function onRequestGet({ request, env }) {
+  const url = new URL(request.url);
+
+  // 验证 Token
+  if (!env.TOKEN || url.searchParams.get("token") !== env.TOKEN) {
+    return new Response("Unauthorized", {
+      status: 401,
+      headers: { "Content-Type": "text/plain; charset=utf-8" },
     });
+  }
+
+  if (!env.GH_TOKEN) {
+    return new Response("Missing GH_TOKEN", { status: 500 });
+  }
+
+  if (!env.PUBLIC_CONFIG_URL) {
+    return new Response("Missing PUBLIC_CONFIG_URL", { status: 500 });
   }
 
   try {
-    // 读取公开仓库的主配置
-    const configResponse = await fetch(env.PUBLIC_CONFIG_URL, {
-      headers: {
-        "Cache-Control": "no-cache",
-      },
+    // 读取公开主配置
+    const mainResponse = await fetch(env.PUBLIC_CONFIG_URL, {
+      headers: { "User-Agent": "yggdrasil-merge" },
     });
 
-    console.log("Public config status:", configResponse.status);
-
-    if (!configResponse.ok) {
-      console.error(
-        "Public config read failed:",
-        configResponse.status,
-        configResponse.statusText
-      );
-
-      return new Response("Failed to read public config", {
-        status: 502,
-      });
-    }
-
-    // 读取私密仓库中的 providers.yaml
-    const providersUrl =
-      "https://api.github.com/repos/yakasuka/yggdrasil-private/contents/providers.yaml";
-
-    const providersResponse = await fetch(providersUrl, {
-      headers: {
-        Authorization: `Bearer ${env.GH_TOKEN}`,
-        Accept: "application/vnd.github.raw+json",
-        "X-GitHub-Api-Version": "2022-11-28",
-        "User-Agent": "yggdrasil-afx",
-      },
-    });
-
-    console.log("GitHub providers status:", providersResponse.status);
-
-    if (!providersResponse.ok) {
-      const errorBody = await providersResponse.text();
-
-      // 仅记录 GitHub 错误信息，不记录任何令牌或订阅 URL
-      console.error("Private providers read failed:", {
-        status: providersResponse.status,
-        statusText: providersResponse.statusText,
-        body: errorBody.slice(0, 500),
-      });
-
-      return new Response(
-        `Failed to read private providers (GitHub HTTP ${providersResponse.status})`,
-        { status: 502 }
+    if (!mainResponse.ok) {
+      throw new Error(
+        `Failed to read public config: HTTP ${mainResponse.status}`
       );
     }
 
-    const config = await configResponse.text();
-    const providers = await providersResponse.text();
+    let mainConfig = await mainResponse.text();
 
-    // 检查 providers.yaml 格式
-    if (!/^proxy-providers:[ \t]*$/m.test(providers)) {
-      console.error("Invalid providers.yaml: missing proxy-providers");
+    // 读取私密 provider 配置
+    const providers = await readPrivateFile(env, "providers.yaml");
 
-      return new Response(
-        "Invalid providers.yaml: missing proxy-providers",
-        { status: 500 }
-      );
-    }
-
-    // 检查主配置中的插入标记
     const startMarker = "# >>> AUTO-PROVIDERS-START";
     const endMarker = "# <<< AUTO-PROVIDERS-END";
 
-    if (
-      config.split(startMarker).length !== 2 ||
-      config.split(endMarker).length !== 2
-    ) {
-      console.error("Config must contain exactly one pair of provider markers");
+    const startIndex = mainConfig.indexOf(startMarker);
+    const endIndex = mainConfig.indexOf(endMarker);
 
-      return new Response(
-        "Config must contain exactly one pair of provider markers",
-        { status: 500 }
-      );
+    if (startIndex === -1 || endIndex === -1 || endIndex < startIndex) {
+      throw new Error("Provider markers missing or incorrectly ordered");
     }
 
-    const start = config.indexOf(startMarker);
-    const end = config.indexOf(endMarker);
+    const replaceStart = startIndex + startMarker.length;
 
-    if (start >= end) {
-      console.error("Provider markers are in the wrong order");
+    mainConfig =
+      mainConfig.slice(0, replaceStart) +
+      "\n" +
+      providers.trim() +
+      "\n" +
+      mainConfig.slice(endIndex);
 
-      return new Response("Provider markers are in the wrong order", {
-        status: 500,
-      });
-    }
-
-    // 只替换两个标记之间的内容，其他主配置保持不变
-    const before = config.slice(0, start + startMarker.length);
-    const after = config.slice(end);
-
-    const result =
-      before + "\n\n" + providers.trim() + "\n\n" + after;
-
-    return new Response(result, {
+    // 浏览器直接显示 YAML，不强制下载
+    return new Response(mainConfig, {
+      status: 200,
       headers: {
-        "Content-Type": "text/yaml; charset=utf-8",
+        "Content-Type": "text/plain; charset=utf-8",
+        "Content-Disposition": "inline",
         "Cache-Control": "no-store",
-        "Content-Disposition": 'attachment; filename="yggdrasil.yaml"',
+        "X-Content-Type-Options": "nosniff",
       },
     });
   } catch (error) {
-    console.error("Merge failed:", error);
+    console.error("merge.js error:", error);
 
-    return new Response("Internal error", {
-      status: 500,
+    return new Response(`Merge failed: ${error.message}`, {
+      status: 502,
+      headers: {
+        "Content-Type": "text/plain; charset=utf-8",
+        "Cache-Control": "no-store",
+      },
     });
   }
 }
