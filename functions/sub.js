@@ -1,58 +1,42 @@
-
-export async function onRequest(context) {
-  const { request, env } = context;
+export async function onRequestGet({ request, env }) {
   const url = new URL(request.url);
-  const token = url.searchParams.get("token");
 
-  if (!env.TOKEN || token !== env.TOKEN) {
-    return new Response("Forbidden", { status: 403 });
+  if (!env.TOKEN || url.searchParams.get("token") !== env.TOKEN) {
+    return new Response("Unauthorized", { status: 401 });
   }
 
   if (!env.GH_TOKEN) {
-    return new Response("GitHub token not configured", {
-      status: 500
-    });
+    return new Response("Missing GH_TOKEN", { status: 500 });
   }
 
+  const api =
+    "https://api.github.com/repos/yakasuka/yggdrasil-private/contents/nodes.yaml";
+
   try {
-    const response = await fetch(
-      "https://api.github.com/repos/yakasuka/yggdrasil-private/contents/nodes.yaml",
-      {
-        headers: {
-          "Authorization": `Bearer ${env.GH_TOKEN}`,
-          "Accept": "application/vnd.github.raw+json",
-          "X-GitHub-Api-Version": "2022-11-28"
-        }
-      }
-    );
+    const res = await fetch(api, {
+      headers: {
+        Authorization: `Bearer ${env.GH_TOKEN}`,
+        Accept: "application/vnd.github.raw+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+      },
+    });
 
-    if (!response.ok) {
-      console.error("GitHub read failed:", response.status);
-      return new Response("Failed to read node file", {
-        status: 502
+    if (!res.ok) {
+      return new Response(`Failed to read node file: GitHub HTTP ${res.status}`, {
+        status: 502,
       });
     }
 
-    const nodes = await response.text();
+    const content = await res.text();
 
-    if (!/^proxies:\s*$/m.test(nodes)) {
-      return new Response("Invalid nodes.yaml format", {
-        status: 500
-      });
-    }
-
-    return new Response(nodes, {
+    return new Response(content, {
       headers: {
         "Content-Type": "text/yaml; charset=utf-8",
-        "Subscription-Userinfo":
-          "upload=1073741824; download=5368709120; total=107374182400; expire=1798761600",
-        "Profile-Update-Interval": "24",
-        "Content-Disposition": 'attachment; filename="node.yaml"',
-        "Cache-Control": "no-store"
-      }
+        "Content-Disposition": 'attachment; filename="yggdrasil.yaml"',
+        "Cache-Control": "no-store",
+      },
     });
   } catch (error) {
-    console.error("Subscription error:", error);
-    return new Response("Internal error", { status: 500 });
+    return new Response("Failed to read node file", { status: 502 });
   }
 }
