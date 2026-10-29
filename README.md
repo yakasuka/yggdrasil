@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="favicon.png" width="164" alt="Yggdrasil 世界树" />
+  <img src="assets/yggdrasil-mark.png" width="216" height="216" alt="Yggdrasil 世界树透明标识" />
 </p>
 
 <h1 align="center">Yggdrasil · 世界树</h1>
@@ -162,6 +162,7 @@ Eb 版地区组统一使用 Maps；Bybit 暂用 Wallet，TapTap 暂用 Game Cent
 ├── yggdrasil.yaml           DNS / TUN / 嗅探完整模板
 ├── Ratatoskr.yaml           日常应用分流模板
 ├── Ratatosk-Eb.yaml         24 地区扩展模板
+├── assets/                 世界树品牌标识与生成说明
 ├── Rules/                  自定义补充规则
 ├── functions/              订阅与配置合并接口
 ├── icons/                  图标、面板素材与作品来源
