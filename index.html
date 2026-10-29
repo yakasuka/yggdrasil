@@ -214,9 +214,9 @@
             </nav>
 
             <div class="flex items-center space-x-4">
-                <button onclick="copySubscription()" class="relative group overflow-hidden px-5 py-2.5 rounded-full text-xs font-semibold tracking-wider uppercase bg-gradient-to-r from-gold-500 to-gold-600 text-obsidian shadow-lg hover:shadow-gold-500/30 transition-all duration-300 transform active:scale-95">
+                <button onclick="startBuilder()" class="relative group overflow-hidden px-5 py-2.5 rounded-full text-xs font-semibold tracking-wider uppercase bg-gradient-to-r from-gold-500 to-gold-600 text-obsidian shadow-lg hover:shadow-gold-500/30 transition-all duration-300 transform active:scale-95">
                     <span class="relative z-10 flex items-center gap-2">
-                        <i class="fa-solid fa-bolt"></i> 复制订阅链接
+                        <i class="fa-solid fa-bolt"></i> 定制订阅
                     </span>
                     <div class="absolute inset-0 bg-white/30 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
                 </button>
@@ -248,8 +248,8 @@
                     <a href="#section-breakthrough" class="w-full sm:w-auto px-8 py-3.5 rounded-full glass-panel border border-gold-500/40 text-gold-400 font-medium text-sm tracking-wider uppercase hover:bg-gold-500/10 hover:border-gold-400 transition-all text-center">
                         探索拓扑架构 <i class="fa-solid fa-arrow-down ml-2 text-xs"></i>
                     </a>
-                    <button onclick="copySubscription()" class="w-full sm:w-auto px-8 py-3.5 rounded-full bg-gradient-to-r from-cyber-cyan to-cyber-blue text-obsidian font-bold text-sm tracking-wider uppercase shadow-lg shadow-cyber-cyan/20 hover:opacity-90 transition-all">
-                        获取订阅链接
+                    <button onclick="startBuilder()" class="w-full sm:w-auto px-8 py-3.5 rounded-full bg-gradient-to-r from-cyber-cyan to-cyber-blue text-obsidian font-bold text-sm tracking-wider uppercase shadow-lg shadow-cyber-cyan/20 hover:opacity-90 transition-all">
+                        开始定制配置
                     </button>
                 </div>
 
@@ -349,22 +349,22 @@
                 <!-- Subscription Action Box -->
                 <div class="p-4 rounded-2xl bg-black/60 border border-white/10 max-w-2xl mx-auto space-y-4">
                     <div class="flex items-center justify-between text-xs text-gray-400 px-2">
-                        <span><i class="fa-solid fa-link text-gold-500 mr-1"></i> Yggdrasil 统一订阅地址</span>
-                        <span class="text-emerald-400 flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> 智能负载均衡已激活</span>
+                        <span><i class="fa-solid fa-link text-gold-500 mr-1"></i> Ratatoskr 配置向导</span>
+                        <span class="text-emerald-400 flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> 按需组合规则与策略</span>
                     </div>
                     <div class="flex items-center gap-2 bg-obsidian p-2 rounded-xl border border-white/5">
-                        <input id="sub-url-input" type="text" readonly value="" placeholder="当前网站域名" class="bg-transparent text-gray-300 text-sm px-3 w-full focus:outline-none font-mono">
-                        <button onclick="copySubscription()" class="px-6 py-2.5 rounded-lg bg-gold-500 hover:bg-gold-600 text-obsidian font-bold text-xs uppercase tracking-wider transition-all whitespace-nowrap">
-                            复制
+                        <input id="sub-url-input" type="text" readonly value="" placeholder="配置向导地址" class="bg-transparent text-gray-300 text-sm px-3 w-full focus:outline-none font-mono">
+                        <button onclick="startBuilder()" class="px-6 py-2.5 rounded-lg bg-gold-500 hover:bg-gold-600 text-obsidian font-bold text-xs uppercase tracking-wider transition-all whitespace-nowrap">
+                            打开向导
                         </button>
                     </div>
                 </div>
 
                 <div class="text-xs text-gray-400 flex flex-wrap items-center justify-center gap-6 pt-4">
-                    <span><i class="fa-solid fa-check text-gold-500 mr-1"></i> 支持 Surge</span>
-                    <span><i class="fa-solid fa-check text-gold-500 mr-1"></i> 支持 Stash</span>
-                    <span><i class="fa-solid fa-check text-gold-500 mr-1"></i> 支持 Loon</span>
-                    <span><i class="fa-solid fa-check text-gold-500 mr-1"></i> 支持 Quantumult X</span>
+                    <span><i class="fa-solid fa-check text-gold-500 mr-1"></i> Mihomo</span>
+                    <span><i class="fa-solid fa-check text-gold-500 mr-1"></i> Clash Meta</span>
+                    <span><i class="fa-solid fa-check text-gold-500 mr-1"></i> GeoSite / GeoIP</span>
+                    <span><i class="fa-solid fa-check text-gold-500 mr-1"></i> 模块化定制</span>
                 </div>
             </div>
         </section>
@@ -375,7 +375,7 @@
     <footer class="relative z-10 border-t border-white/5 py-8 px-6 bg-obsidian/80 backdrop-blur-md text-xs text-gray-500 text-center">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
             <div class="cinzel text-gray-400 font-semibold tracking-widest">YGGDRASIL NETWORK SYSTEM</div>
-            <div>Powered by Distributed Autonomous Network &bull; MIT Licensed</div>
+            <div>Geo-powered Configuration &bull; Permission Required</div>
             <div>&copy; 2026 Yggdrasil Project. All rights reserved.</div>
         </div>
     </footer>
@@ -388,41 +388,15 @@
 
     <!-- WebGL & Interactive Script -->
     <script>
-        function getCurrentDomain() {
-            return window.location.origin;
+        function getBuilderUrl() {
+            return new URL('./builder/', window.location.href).href;
         }
 
-        async function copySubscription() {
-            const domain = getCurrentDomain();
-            const input = document.getElementById('sub-url-input');
-            if (input) input.value = domain;
-
-            try {
-                if (navigator.clipboard && window.isSecureContext) {
-                    await navigator.clipboard.writeText(domain);
-                } else {
-                    const fallback = document.createElement('textarea');
-                    fallback.value = domain;
-                    fallback.setAttribute('readonly', '');
-                    Object.assign(fallback.style, {
-                        position: 'fixed', left: '-9999px', top: '0', opacity: '0'
-                    });
-                    document.body.appendChild(fallback);
-                    fallback.select();
-                    const ok = document.execCommand('copy');
-                    fallback.remove();
-                    if (!ok) throw new Error('Clipboard copy failed');
-                }
-                showToast('当前网站域名已复制：' + domain);
-            } catch (error) {
-                console.error('Copy failed:', error);
-                showToast('复制失败，请手动复制页面地址');
-                if (input) {
-                    input.focus();
-                    input.select();
-                }
-            }
+        function startBuilder() {
+            window.location.assign(getBuilderUrl());
         }
+
+        document.getElementById('sub-url-input').value = getBuilderUrl();
 
         function showToast(msg) {
             const toast = document.getElementById('toast');

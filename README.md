@@ -41,14 +41,17 @@ Yggdrasil 面向一站式的使用体验：使用者通过 WebUI 选择自己需
 
 <p align="center"><strong>选择所需内容 → 组装个人配置 → 获取文件或订阅 → 导入客户端</strong></p>
 
-目标体验围绕三个步骤展开：
+打开 **[Ratatoskr 配置工坊](https://yakasuka.github.io/yggdrasil/builder/)**，依次完成五步：
 
-1. **选择。** 在 WebUI 中选择应用分流、规则模块、节点策略、地区分组及其他配置项。
-2. **生成。** 将所选内容与节点订阅组合，生成对应的 Ratatoskr 配置。
-3. **订阅。** 获取生成的配置文件或统一订阅链接，让客户端从同一入口接收后续更新。
+1. **订阅来源。** 填入一个或多个机场的名称与 Mihomo / Clash 格式节点订阅。
+2. **代理分流。** 选择自动选择、故障转移、一致性哈希或轮询策略，为 36 类应用与服务启用独立出口。
+3. **规则选择。** 组合国内直连、游戏下载、通用代理与补充规则，也可添加自己的域名例外。
+4. **地区节点。** 从 24 个国家 / 地区中选择分组，决定是否保留其他地区。
+5. **生成配置。** 预览或下载 YAML，连接配置服务后生成可直接导入客户端的私密 HTTPS 订阅链接。
 
-> [!NOTE]
-> **当前实现范围**：仓库已提供配置模板、节点订阅返回和固定模板合并接口。现有首页用于项目展示与链接复制；WebUI 模块勾选、按选择组装个人配置是下一阶段能力。上方描述的是目标使用流程。
+前端由 GitHub Pages 承载，动态订阅由 **Cloudflare Worker + KV** 生成和保存。维护者先按 [部署说明](worker/README.md) 连接服务；未连接时，网页明确提示状态，仅提供预览和文件下载。配置链接有效期可选 30 / 90 / 365 天，配置加密保存，链接持有者可读取其中的机场订阅地址，请勿公开分享。
+
+网页与 Worker 共享同一个配置生成器。应用、规则与地区目录从现有模板提取，保留模板匹配顺序，生成配置仅包含所选策略和规则源。节点与 Geo 数据由客户端定期更新；修改选择需重新生成链接，旧链接保留生成时的配置快照。
 
 ## Ratatoskr · 轻量配置本体
 
@@ -105,12 +108,12 @@ Ratatoskr 将庞大的分类数据交给 Geo 数据库，将清晰的分流意�
 | 规则枝干 | `rules` 表达匹配顺序；`rule-providers` 接入额外规则集 |
 | 策略分枝 | `proxy-groups` 组织应用出口、地区分组与连接策略 |
 | 节点叶群 | `proxy-providers` / `proxies` 管理机场订阅与手动节点 |
-| 配置交付 | 接口读取模板与私有订阅，将节点来源注入约定区域 |
+| 配置交付 | 共享生成器组装选中模块，Worker 加密保存并通过私密链接交付 |
 
 - **易维护。** 共享 Geo 分类与规则锚点，减少重复配置；订阅、策略与规则分别定位。
 - **可扩展。** 新增应用、地区或规则源时，沿用现有分组与引用方式继续生长。
 - **可自定义。** 调整目标匹配、规则优先级、节点筛选和出口选择，保留自己的使用习惯。
-- **便于组合。** 为 WebUI 的按需选择与后续配置生成保留明确的模块边界。
+- **便于组合。** 配置工坊复用模板目录与共享生成器，按选择组装个人配置。
 
 ## 配置选择
 
@@ -118,7 +121,7 @@ Ratatoskr 将庞大的分类数据交给 Geo 数据库，将清晰的分流意�
 
 | 文件 | 定位 | 主要内容 |
 | :--- | :--- | :--- |
-| **[Ratatoskr](Ratatoskr.yaml)** | 日常主配置 | Geo 驱动的轻量分流，6 个常用地区与其他节点入口 |
+| **[Ratatoskr](ratatoskr.yaml)** | 日常主配置 | Geo 驱动的轻量分流，6 个常用地区与其他节点入口 |
 | **[Ratatosk · Eb](Ratatosk-Eb.yaml)** | 地区扩展 | 24 个国家 / 地区分组，使用 macOSicons 图标 |
 | **[yggdrasil.yaml](yggdrasil.yaml)** | 完整网络栈参考 | DNS、TUN、流量嗅探与详细外部规则集 |
 
@@ -129,7 +132,7 @@ Ratatoskr 将庞大的分类数据交给 Geo 数据库，将清晰的分流意�
 
 取得授权后，可下载文件或将配置地址导入客户端：
 
-- [Ratatoskr.yaml](https://raw.githubusercontent.com/yakasuka/yggdrasil/main/Ratatoskr.yaml)
+- [ratatoskr.yaml](https://raw.githubusercontent.com/yakasuka/yggdrasil/main/ratatoskr.yaml)
 - [Ratatosk-Eb.yaml](https://raw.githubusercontent.com/yakasuka/yggdrasil/main/Ratatosk-Eb.yaml)
 - [yggdrasil.yaml](https://raw.githubusercontent.com/yakasuka/yggdrasil/main/yggdrasil.yaml)
 
@@ -143,10 +146,10 @@ Ratatoskr 将庞大的分类数据交给 Geo 数据库，将清晰的分流意�
 
 ## 快速开始
 
-当前可通过模板导入或已部署的接口使用配置：
+推荐从 [配置工坊](https://yakasuka.github.io/yggdrasil/builder/) 开始；也可以手动使用模板：
 
 1. **确认授权。** 取得相应原作者或权利人的书面许可，条款见 [LICENSE](LICENSE)。
-2. **选择配置。** 日常使用从 `Ratatoskr.yaml` 开始；需要更细地区分组时选择 Eb 版。
+2. **选择配置。** 日常使用从 `ratatoskr.yaml` 开始；需要更细地区分组时选择 Eb 版。
 3. **准备节点与数据。** 在本地维护自己的 `proxy-providers` 或 `proxies`，并准备包含所用分类的 GeoSite / GeoIP 数据。
 4. **导入并选择出口。** 在 Mihomo 客户端中加载配置，按应用或地区选择策略，重新执行延迟测试。
 
@@ -154,10 +157,11 @@ Ratatoskr 将庞大的分类数据交给 Geo 数据库，将清晰的分流意�
 
 | 配置 | HTTP | SOCKS5 |
 | :--- | :--- | :--- |
-| Ratatoskr / Eb | `7890` | `7891` |
+| Ratatoskr / Eb 手动模板 | `7890` | `7891` |
+| 配置工坊生成文件 | `7890` | `7890` |
 | 完整网络栈参考 | `7890` | `7890` |
 
-完整网络栈参考使用混合端口。个人订阅地址、节点凭据与访问令牌应在本地或私有流程中维护。
+配置工坊与完整网络栈参考使用混合端口；工坊可自定义端口。个人订阅地址、节点凭据与访问令牌应在本地或私有流程中维护。
 
 ## 自定义与扩展
 
@@ -194,7 +198,7 @@ Ratatoskr 将庞大的分类数据交给 Geo 数据库，将清晰的分流意�
 
 当前代码读取 `yakasuka/yggdrasil-private`。迁移时应同步调整仓库位置、凭据和模板地址，并保留成对的 `AUTO-PROVIDERS-START` / `AUTO-PROVIDERS-END` 标记。
 
-现有 `/merge` 负责固定模板的订阅注入，WebUI 选项到规则、策略模块的动态映射仍待实现。`/sub` 的 `Subscription-Userinfo` 是模拟流量信息，不代表机场真实用量。
+现有 `/merge` 负责固定模板的订阅注入；新的配置工坊使用独立的 [Worker + KV 服务](worker/README.md)，按网页选项生成配置。`/sub` 的 `Subscription-Userinfo` 是模拟流量信息，不代表机场真实用量。
 
 </details>
 

@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="从机场订阅、应用分流到地区策略，按需生成你的 Ratatoskr。"
+    />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="referrer" content="no-referrer" />
+    <title>生长你的连接 · Yggdrasil</title>
+    <link rel="icon" href="../favicon.png" type="image/png" />
+    <link rel="stylesheet" href="./styles.css" />
+    <script type="module" src="./app.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#workspace">跳到配置内容</a>
+    <header class="site-header">
+      <a class="brand" href="../" aria-label="Yggdrasil 项目首页"
+        ><img
+          src="../assets/favicon-master.png"
+          width="40"
+          height="40"
+          alt=""
+        /><span>Yggdrasil<small>世界树 · 配置工坊</small></span></a
+      >
+      <div class="header-links">
+        <span class="engine"><i></i> 为 Mihomo 而生</span
+        ><a
+          href="https://github.com/yakasuka/yggdrasil"
+          target="_blank"
+          rel="noopener noreferrer"
+          >GitHub <span aria-hidden="true">↗</span></a
+        >
+      </div>
+    </header>
+    <main class="layout">
+      <aside class="journey" aria-label="配置进度">
+        <div class="eyebrow">GROW YOUR CONNECTION</div>
+        <h1>让连接，<br />随你生长。</h1>
+        <p class="intro">
+          从一份订阅开始，长成属于你的网络。<br />每一条分流，都有自己的去向。
+        </p>
+        <nav id="steps" aria-label="配置步骤"></nav>
+        <div class="journey-note">
+          <span aria-hidden="true">✳</span>
+          <div>
+            <strong>轻量配置，深植 Geo。</strong>
+            <p>规则持续更新，枝叶按需展开。</p>
+          </div>
+        </div>
+      </aside>
+      <section
+        class="workspace"
+        id="workspace"
+        tabindex="-1"
+        aria-label="配置向导"
+      >
+        <div class="panel-top">
+          <span id="step-caption" class="eyebrow"></span
+          ><span class="chip">RATATOSKR</span>
+        </div>
+        <div id="panel"></div>
+        <div id="error" class="error" role="alert" hidden></div>
+        <footer class="wizard-footer">
+          <button id="back" class="button secondary" type="button">
+            上一步</button
+          ><span id="progress-note"></span
+          ><button id="next" class="button primary" type="button">
+            下一步 <span aria-hidden="true">→</span>
+          </button>
+        </footer>
+      </section>
+    </main>
+    <footer class="site-footer">
+      <span>Yggdrasil · 自由生长，生生不息。</span
+      ><a
+        href="https://github.com/yakasuka/yggdrasil#许可与反馈"
+        target="_blank"
+        rel="noopener noreferrer"
+        >许可与项目说明 ↗</a
+      >
+    </footer>
+    <dialog id="preview">
+      <div class="dialog-header">
+        <div>
+          <span class="eyebrow">CONFIGURATION</span>
+          <h2>你的 Ratatoskr</h2>
+        </div>
+        <button id="close-preview" class="icon-button" aria-label="关闭预览">
+          ×
+        </button>
+      </div>
+      <p class="muted">预览含机场订阅地址，请妥善保管。</p>
+      <pre id="yaml-preview" tabindex="0"></pre>
+    </dialog>
+    <div id="toast" role="status" hidden></div>
+    <noscript>请启用 JavaScript，以使用配置向导。</noscript>
+  </body>
+</html>

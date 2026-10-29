@@ -1,0 +1,937 @@
+{
+  "schema": 1,
+  "testUrl": "https://www.gstatic.com/generate_204",
+  "cleanFilter": "^(?!.*(?:(?i)=>|群|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|剩余流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|超时|收藏|福利|失联|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author|Traffic|\\d{4}-\\d{2}-\\d{2}|\\d+G)).*$",
+  "regions": [
+    {
+      "id": "HK",
+      "label": "香港",
+      "flag": "🇭🇰",
+      "name": "🌆",
+      "filter": "(?i)^(?!=>).*(?:🇭🇰|香港|Hong\\s?Kong|\\b(?:HK|HKG)\\d*\\b)"
+    },
+    {
+      "id": "TW",
+      "label": "台湾",
+      "flag": "🇹🇼",
+      "name": "🧋",
+      "filter": "(?i)^(?!=>).*(?:🇹🇼|台湾|Tai(?:wan)?|\\b(?:TW|TWN)\\d*\\b)"
+    },
+    {
+      "id": "MO",
+      "label": "澳门",
+      "flag": "🇲🇴",
+      "name": "🎰",
+      "filter": "(?i)^(?!=>).*(?:🇲🇴|澳门|澳門|\\b(?:Maca[ou])\\b|\\b(?:MO|MAC)\\d*\\b)"
+    },
+    {
+      "id": "JP",
+      "label": "日本",
+      "flag": "🇯🇵",
+      "name": "⛩️",
+      "filter": "(?i)^(?!=>).*(?:🇯🇵|日本|川日|东京|大阪|埼玉|Japan|\\b(?:JP|JPN)\\d*\\b)"
+    },
+    {
+      "id": "KR",
+      "label": "韩国",
+      "flag": "🇰🇷",
+      "name": "🎤",
+      "filter": "(?i)^(?!=>).*(?:🇰🇷|韩国|韓|首尔|Korea|\\b(?:KR|KOR)\\d*\\b)"
+    },
+    {
+      "id": "SG",
+      "label": "新加坡",
+      "flag": "🇸🇬",
+      "name": "🏙️",
+      "filter": "(?i)^(?!=>).*(?:🇸🇬|新加坡|狮|Singapore|\\b(?:SG|SGP)\\d*\\b)"
+    },
+    {
+      "id": "TH",
+      "label": "泰国",
+      "flag": "🇹🇭",
+      "name": "🐘",
+      "filter": "(?i)^(?!=>).*(?:🇹🇭|泰国|泰國|曼谷|\\b(?:Thailand|Bangkok)\\b|\\b(?:TH|THA)\\d*\\b)"
+    },
+    {
+      "id": "MY",
+      "label": "马来西亚",
+      "flag": "🇲🇾",
+      "name": "🌺",
+      "filter": "(?i)^(?!=>).*(?:🇲🇾|马来(?:西亚)?|馬來(?:西亞)?|大马|大馬|吉隆坡|\\b(?:Malaysia|Kuala\\s?Lumpur)\\b|\\b(?:MY|MYS)\\d*\\b)"
+    },
+    {
+      "id": "VN",
+      "label": "越南",
+      "flag": "🇻🇳",
+      "name": "🍜",
+      "filter": "(?i)^(?!=>).*(?:🇻🇳|越南|胡志明|河内|河內|\\b(?:Vietnam|Viet\\s?Nam|Hanoi|Ho\\s?Chi\\s?Minh)\\b|\\b(?:VN|VNM)\\d*\\b)"
+    },
+    {
+      "id": "PH",
+      "label": "菲律宾",
+      "flag": "🇵🇭",
+      "name": "🏝️",
+      "filter": "(?i)^(?!=>).*(?:🇵🇭|菲律宾|菲律賓|马尼拉|馬尼拉|宿务|宿霧|\\b(?:Philippines|Manila|Cebu)\\b|\\b(?:PH|PHL)\\d*\\b)"
+    },
+    {
+      "id": "ID",
+      "label": "印度尼西亚",
+      "flag": "🇮🇩",
+      "name": "🌋",
+      "filter": "(?i)^(?!=>).*(?:🇮🇩|印度尼西亚|印度尼西亞|印尼|雅加达|雅加達|巴厘岛|峇里島|\\b(?:Indonesia|Jakarta|Bali)\\b|\\b(?:ID|IDN)\\d*\\b)"
+    },
+    {
+      "id": "IN",
+      "label": "印度",
+      "flag": "🇮🇳",
+      "name": "🪷",
+      "filter": "(?i)^(?!=>).*(?:🇮🇳|印度(?!尼)|孟买|孟買|新德里|班加罗尔|班加羅爾|\\b(?:India|Mumbai|New\\s?Delhi|Bangalore|Bengaluru)\\b|\\b(?:IN|IND)\\d*\\b)"
+    },
+    {
+      "id": "AU",
+      "label": "澳大利亚",
+      "flag": "🇦🇺",
+      "name": "🦘",
+      "filter": "(?i)^(?!=>).*(?:🇦🇺|澳大利亚|澳大利亞|澳洲|悉尼|雪梨|墨尔本|墨爾本|珀斯|布里斯班|\\b(?:Australia|Sydney|Melbourne|Perth|Brisbane)\\b|\\b(?:AU|AUS)\\d*\\b)"
+    },
+    {
+      "id": "US",
+      "label": "美国",
+      "flag": "🇺🇸",
+      "name": "🗽",
+      "filter": "(?i)^(?!=>).*(?:🇺🇸|美国|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|拉斯维加斯|United States|\\b(?:US|USA)\\d*\\b)"
+    },
+    {
+      "id": "CA",
+      "label": "加拿大",
+      "flag": "🇨🇦",
+      "name": "🍁",
+      "filter": "(?i)^(?!=>).*(?:🇨🇦|加拿大|多伦多|多倫多|温哥华|溫哥華|蒙特利尔|蒙特利爾|渥太华|渥太華|\\b(?:Canada|Toronto|Vancouver|Montreal|Ottawa)\\b|\\b(?:CA|CAN)\\d*\\b)"
+    },
+    {
+      "id": "GB",
+      "label": "英国",
+      "flag": "🇬🇧",
+      "name": "💂",
+      "filter": "(?i)^(?!=>).*(?:🇬🇧|英国|英國|伦敦|倫敦|曼彻斯特|曼徹斯特|\\b(?:United\\s?Kingdom|Great\\s?Britain|Britain|England|London|Manchester)\\b|\\b(?:UK|GB|GBR)\\d*\\b)"
+    },
+    {
+      "id": "DE",
+      "label": "德国",
+      "flag": "🇩🇪",
+      "name": "🍺",
+      "filter": "(?i)^(?!=>).*(?:🇩🇪|德国|德國|法兰克福|法蘭克福|柏林|慕尼黑|\\b(?:Germany|Deutschland|Frankfurt|Berlin|Munich)\\b|\\b(?:DE|DEU)\\d*\\b)"
+    },
+    {
+      "id": "FR",
+      "label": "法国",
+      "flag": "🇫🇷",
+      "name": "🗼",
+      "filter": "(?i)^(?!=>).*(?:🇫🇷|法国|法國|巴黎|里昂|\\b(?:France|Paris|Lyon)\\b|\\b(?:FR|FRA)\\d*\\b)"
+    },
+    {
+      "id": "NL",
+      "label": "荷兰",
+      "flag": "🇳🇱",
+      "name": "🌷",
+      "filter": "(?i)^(?!=>).*(?:🇳🇱|荷兰|荷蘭|阿姆斯特丹|鹿特丹|\\b(?:Netherlands|Holland|Amsterdam|Rotterdam)\\b|\\b(?:NL|NLD)\\d*\\b)"
+    },
+    {
+      "id": "CH",
+      "label": "瑞士",
+      "flag": "🇨🇭",
+      "name": "🏔️",
+      "filter": "(?i)^(?!=>).*(?:🇨🇭|瑞士|苏黎世|蘇黎世|日内瓦|日內瓦|\\b(?:Switzerland|Swiss|Zurich|Geneva)\\b|\\b(?:CH|CHE)\\d*\\b)"
+    },
+    {
+      "id": "RU",
+      "label": "俄罗斯",
+      "flag": "🇷🇺",
+      "name": "🪆",
+      "filter": "(?i)^(?!=>).*(?:🇷🇺|俄罗斯|俄羅斯|莫斯科|圣彼得堡|聖彼得堡|\\b(?:Russia|Moscow|Saint\\s?Petersburg)\\b|\\b(?:RU|RUS)\\d*\\b)"
+    },
+    {
+      "id": "TR",
+      "label": "土耳其",
+      "flag": "🇹🇷",
+      "name": "🧿",
+      "filter": "(?i)^(?!=>).*(?:🇹🇷|土耳其|伊斯坦布尔|伊斯坦布爾|伊斯坦堡|安卡拉|\\b(?:Turkey|Türkiye|Turkiye|Istanbul|Ankara)\\b|\\b(?:TR|TUR)\\d*\\b)"
+    },
+    {
+      "id": "BR",
+      "label": "巴西",
+      "flag": "🇧🇷",
+      "name": "⚽",
+      "filter": "(?i)^(?!=>).*(?:🇧🇷|巴西|圣保罗|聖保羅|里约|里約|\\b(?:Brazil|Brasil|S[aã]o\\s?Paulo|Rio\\s?de\\s?Janeiro)\\b|\\b(?:BR|BRA)\\d*\\b)"
+    },
+    {
+      "id": "AR",
+      "label": "阿根廷",
+      "flag": "🇦🇷",
+      "name": "🧉",
+      "filter": "(?i)^(?!=>).*(?:🇦🇷|阿根廷|布宜诺斯艾利斯|布宜諾斯艾利斯|\\b(?:Argentina|Buenos\\s?Aires)\\b|\\b(?:AR|ARG)\\d*\\b)"
+    }
+  ],
+  "apps": [
+    {
+      "id": "openai",
+      "name": "⚡ OpenAI",
+      "label": "OpenAI",
+      "category": "AI 与开发",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/chatgpt.png",
+      "rules": [
+        "GEOSITE,openai,⚡ OpenAI"
+      ],
+      "direct": false
+    },
+    {
+      "id": "anthropic",
+      "name": "🪐 Anthropic",
+      "label": "Anthropic",
+      "category": "AI 与开发",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/claude.png",
+      "rules": [
+        "GEOSITE,anthropic,🪐 Anthropic"
+      ],
+      "direct": false
+    },
+    {
+      "id": "category-ai-!cn",
+      "name": "✨ AI 服务",
+      "label": "AI 服务",
+      "category": "AI 与开发",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/ai.png",
+      "rules": [
+        "GEOSITE,category-ai-!cn,✨ AI 服务"
+      ],
+      "direct": false
+    },
+    {
+      "id": "okx",
+      "name": "🟦 OKX",
+      "label": "OKX",
+      "category": "数字资产",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/crypto.png",
+      "rules": [
+        "GEOSITE,okx,🟦 OKX"
+      ],
+      "direct": false
+    },
+    {
+      "id": "binance",
+      "name": "🟨 Binance",
+      "label": "Binance",
+      "category": "数字资产",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/crypto.png",
+      "rules": [
+        "GEOSITE,binance,🟨 Binance"
+      ],
+      "direct": false
+    },
+    {
+      "id": "bybit",
+      "name": "🟪 Bybit",
+      "label": "Bybit",
+      "category": "数字资产",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/crypto.png",
+      "rules": [
+        "GEOSITE,bybit,🟪 Bybit"
+      ],
+      "direct": false
+    },
+    {
+      "id": "category-cryptocurrency",
+      "name": "🪙 Crypto",
+      "label": "Crypto",
+      "category": "数字资产",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/crypto.png",
+      "rules": [
+        "GEOSITE,category-cryptocurrency,🪙 Crypto"
+      ],
+      "direct": false
+    },
+    {
+      "id": "youtube",
+      "name": "📺 YouTube",
+      "label": "YouTube",
+      "category": "影音娱乐",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/youtube.png",
+      "rules": [
+        "GEOSITE,youtube,📺 YouTube"
+      ],
+      "direct": false
+    },
+    {
+      "id": "google",
+      "name": "🧭 Google",
+      "label": "Google",
+      "category": "其他服务",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/google.png",
+      "rules": [
+        "GEOSITE,google,🧭 Google"
+      ],
+      "direct": false
+    },
+    {
+      "id": "cloudflare",
+      "name": "☁️ Cloudflare",
+      "label": "Cloudflare",
+      "category": "其他服务",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/cloudflare.png",
+      "rules": [
+        "GEOSITE,cloudflare,☁️ Cloudflare"
+      ],
+      "direct": false
+    },
+    {
+      "id": "amazon",
+      "name": "📦 Amazon",
+      "label": "Amazon",
+      "category": "其他服务",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/amazon.png",
+      "rules": [
+        "GEOSITE,amazon,📦 Amazon"
+      ],
+      "direct": false
+    },
+    {
+      "id": "github",
+      "name": "🐙 GitHub",
+      "label": "GitHub",
+      "category": "其他服务",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/github.png",
+      "rules": [
+        "GEOSITE,github,🐙 GitHub"
+      ],
+      "direct": false
+    },
+    {
+      "id": "microsoft",
+      "name": "🪟 Microsoft",
+      "label": "Microsoft",
+      "category": "其他服务",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/microsoft.png",
+      "rules": [
+        "GEOSITE,microsoft,🪟 Microsoft"
+      ],
+      "direct": true
+    },
+    {
+      "id": "adobe",
+      "name": "🎨 Adobe",
+      "label": "Adobe",
+      "category": "其他服务",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/adobe.png",
+      "rules": [
+        "GEOSITE,adobe,🎨 Adobe"
+      ],
+      "direct": false
+    },
+    {
+      "id": "apple",
+      "name": "⚪ Apple",
+      "label": "Apple",
+      "category": "其他服务",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/apple.png",
+      "rules": [
+        "GEOSITE,apple,⚪ Apple"
+      ],
+      "direct": true
+    },
+    {
+      "id": "twitter",
+      "name": "𝕏 X",
+      "label": "𝕏 X",
+      "category": "社交与通信",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/x.png",
+      "rules": [
+        "GEOSITE,twitter,𝕏 X"
+      ],
+      "direct": false
+    },
+    {
+      "id": "instagram",
+      "name": "♾️ Meta",
+      "label": "Meta",
+      "category": "社交与通信",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/instagram.png",
+      "rules": [
+        "GEOSITE,instagram,♾️ Meta"
+      ],
+      "direct": false
+    },
+    {
+      "id": "telegram",
+      "name": "🪽 Telegram",
+      "label": "Telegram",
+      "category": "社交与通信",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/telegram.png",
+      "rules": [
+        "GEOSITE,telegram,🪽 Telegram"
+      ],
+      "direct": false
+    },
+    {
+      "id": "discord",
+      "name": "🎮 Discord",
+      "label": "Discord",
+      "category": "社交与通信",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/discord.png",
+      "rules": [
+        "GEOSITE,discord,🎮 Discord"
+      ],
+      "direct": false
+    },
+    {
+      "id": "category-communication",
+      "name": "💬 Chat",
+      "label": "Chat",
+      "category": "社交与通信",
+      "icon": "",
+      "rules": [
+        "GEOSITE,category-communication,💬 Chat"
+      ],
+      "direct": false
+    },
+    {
+      "id": "category-social-media-!cn",
+      "name": "🫂 Social",
+      "label": "Social",
+      "category": "社交与通信",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/social.png",
+      "rules": [
+        "GEOSITE,category-social-media-!cn,🫂 Social"
+      ],
+      "direct": false
+    },
+    {
+      "id": "tiktok",
+      "name": "🎶 TikTok",
+      "label": "TikTok",
+      "category": "社交与通信",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/tiktok.png",
+      "rules": [
+        "GEOSITE,tiktok,🎶 TikTok"
+      ],
+      "direct": false
+    },
+    {
+      "id": "netflix",
+      "name": "🍿 Netflix",
+      "label": "Netflix",
+      "category": "影音娱乐",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/netflix.png",
+      "rules": [
+        "GEOSITE,netflix,🍿 Netflix"
+      ],
+      "direct": false
+    },
+    {
+      "id": "hulu",
+      "name": "📺 Hulu",
+      "label": "Hulu",
+      "category": "影音娱乐",
+      "icon": "",
+      "rules": [
+        "GEOSITE,hulu,📺 Hulu"
+      ],
+      "direct": false
+    },
+    {
+      "id": "primevideo",
+      "name": "📦 Prime Video",
+      "label": "Prime Video",
+      "category": "影音娱乐",
+      "icon": "",
+      "rules": [
+        "GEOSITE,primevideo,📦 Prime Video"
+      ],
+      "direct": false
+    },
+    {
+      "id": "hbo",
+      "name": "🎬 HBO",
+      "label": "HBO",
+      "category": "影音娱乐",
+      "icon": "",
+      "rules": [
+        "GEOSITE,hbo,🎬 HBO"
+      ],
+      "direct": false
+    },
+    {
+      "id": "disney",
+      "name": "🏰 Disney+",
+      "label": "Disney+",
+      "category": "影音娱乐",
+      "icon": "",
+      "rules": [
+        "GEOSITE,disney,🏰 Disney+"
+      ],
+      "direct": false
+    },
+    {
+      "id": "twitch",
+      "name": "🟣 Twitch",
+      "label": "Twitch",
+      "category": "影音娱乐",
+      "icon": "",
+      "rules": [
+        "GEOSITE,twitch,🟣 Twitch"
+      ],
+      "direct": false
+    },
+    {
+      "id": "spotify",
+      "name": "💚 Spotify",
+      "label": "Spotify",
+      "category": "影音娱乐",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/spotify.png",
+      "rules": [
+        "GEOSITE,spotify,💚 Spotify"
+      ],
+      "direct": false
+    },
+    {
+      "id": "category-entertainment",
+      "name": "🍿 Entertainment",
+      "label": "Entertainment",
+      "category": "影音娱乐",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/media.png",
+      "rules": [
+        "GEOSITE,category-entertainment,🍿 Entertainment"
+      ],
+      "direct": false
+    },
+    {
+      "id": "category-media",
+      "name": "📰 News",
+      "label": "News",
+      "category": "其他服务",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/media.png",
+      "rules": [
+        "GEOSITE,category-media,📰 News"
+      ],
+      "direct": false
+    },
+    {
+      "id": "bilibili",
+      "name": "📺 Bilibili",
+      "label": "Bilibili",
+      "category": "影音娱乐",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/bilibili.png",
+      "rules": [
+        "GEOSITE,bilibili,📺 Bilibili"
+      ],
+      "direct": true
+    },
+    {
+      "id": "steam",
+      "name": "👾 Steam",
+      "label": "Steam",
+      "category": "游戏与下载",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/steam.png",
+      "rules": [
+        "GEOSITE,steam,👾 Steam"
+      ],
+      "direct": false
+    },
+    {
+      "id": "epicgames",
+      "name": "🎁 Epic",
+      "label": "Epic",
+      "category": "游戏与下载",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/epic.png",
+      "rules": [
+        "GEOSITE,epicgames,🎁 Epic"
+      ],
+      "direct": true
+    },
+    {
+      "id": "taptap",
+      "name": "🕹️ TapTap",
+      "label": "TapTap",
+      "category": "游戏与下载",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/taptap.png",
+      "rules": [
+        "GEOSITE,taptap,🕹️ TapTap"
+      ],
+      "direct": true
+    },
+    {
+      "id": "category-speedtest",
+      "name": "⚡ Speedtest",
+      "label": "Speedtest",
+      "category": "其他服务",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/speedtest.png",
+      "rules": [
+        "GEOSITE,category-speedtest,⚡ Speedtest"
+      ],
+      "direct": false
+    }
+  ],
+  "baseRules": [
+    {
+      "rule": "GEOSITE,private,DIRECT",
+      "module": "private"
+    },
+    {
+      "rule": "GEOIP,private,DIRECT,no-resolve",
+      "module": "private"
+    },
+    {
+      "rule": "RULE-SET,↘️ Direct Domain,DIRECT",
+      "module": "direct-extra"
+    },
+    {
+      "rule": "RULE-SET,📍 Direct IP,DIRECT",
+      "module": "direct-extra"
+    },
+    {
+      "rule": "RULE-SET,🌍 Proxy Domain,🎚️ 节点选择",
+      "module": "proxy-extra"
+    },
+    {
+      "rule": "RULE-SET,🛰️ Proxy IP,🎚️ 节点选择",
+      "module": "proxy-extra"
+    },
+    {
+      "rule": "GEOSITE,cn,DIRECT",
+      "module": "china"
+    },
+    {
+      "rule": "GEOIP,cn,DIRECT,no-resolve",
+      "module": "china"
+    },
+    {
+      "rule": "GEOSITE,google-cn,DIRECT",
+      "module": "china"
+    },
+    {
+      "rule": "GEOSITE,steam@cn,DIRECT",
+      "module": "game-direct"
+    },
+    {
+      "rule": "GEOSITE,category-game-platforms-download@cn,DIRECT",
+      "module": "game-direct"
+    },
+    {
+      "rule": "GEOSITE,category-games,DIRECT",
+      "module": "game-direct"
+    },
+    {
+      "rule": "GEOSITE,category-public-tracker,DIRECT",
+      "module": "game-direct"
+    },
+    {
+      "rule": "RULE-SET,🔀 Port Rules,🔌 特殊端口",
+      "module": "ports"
+    },
+    {
+      "rule": "GEOSITE,gfw,🎚️ 节点选择",
+      "module": "gfw"
+    }
+  ],
+  "orderedRules": [
+    {
+      "rule": "GEOSITE,adobe,🎨 Adobe",
+      "app": "adobe"
+    },
+    {
+      "rule": "GEOSITE,private,DIRECT",
+      "module": "private"
+    },
+    {
+      "rule": "GEOIP,private,DIRECT,no-resolve",
+      "module": "private"
+    },
+    {
+      "rule": "RULE-SET,↘️ Direct Domain,DIRECT",
+      "module": "direct-extra"
+    },
+    {
+      "rule": "RULE-SET,📍 Direct IP,DIRECT",
+      "module": "direct-extra"
+    },
+    {
+      "rule": "RULE-SET,🌍 Proxy Domain,🎚️ 节点选择",
+      "module": "proxy-extra"
+    },
+    {
+      "rule": "RULE-SET,🛰️ Proxy IP,🎚️ 节点选择",
+      "module": "proxy-extra"
+    },
+    {
+      "rule": "GEOSITE,cn,DIRECT",
+      "module": "china"
+    },
+    {
+      "rule": "GEOIP,cn,DIRECT,no-resolve",
+      "module": "china"
+    },
+    {
+      "rule": "GEOSITE,google-cn,DIRECT",
+      "module": "china"
+    },
+    {
+      "rule": "GEOSITE,steam@cn,DIRECT",
+      "module": "game-direct"
+    },
+    {
+      "rule": "GEOSITE,category-game-platforms-download@cn,DIRECT",
+      "module": "game-direct"
+    },
+    {
+      "rule": "GEOSITE,steam,👾 Steam",
+      "app": "steam"
+    },
+    {
+      "rule": "GEOSITE,epicgames,🎁 Epic",
+      "app": "epicgames"
+    },
+    {
+      "rule": "GEOSITE,taptap,🕹️ TapTap",
+      "app": "taptap"
+    },
+    {
+      "rule": "GEOSITE,category-games,DIRECT",
+      "module": "game-direct"
+    },
+    {
+      "rule": "GEOSITE,category-public-tracker,DIRECT",
+      "module": "game-direct"
+    },
+    {
+      "rule": "GEOSITE,netflix,🍿 Netflix",
+      "app": "netflix"
+    },
+    {
+      "rule": "GEOSITE,hulu,📺 Hulu",
+      "app": "hulu"
+    },
+    {
+      "rule": "GEOSITE,primevideo,📦 Prime Video",
+      "app": "primevideo"
+    },
+    {
+      "rule": "GEOSITE,hbo,🎬 HBO",
+      "app": "hbo"
+    },
+    {
+      "rule": "GEOSITE,disney,🏰 Disney+",
+      "app": "disney"
+    },
+    {
+      "rule": "GEOSITE,twitch,🟣 Twitch",
+      "app": "twitch"
+    },
+    {
+      "rule": "GEOSITE,spotify,💚 Spotify",
+      "app": "spotify"
+    },
+    {
+      "rule": "GEOSITE,bilibili,📺 Bilibili",
+      "app": "bilibili"
+    },
+    {
+      "rule": "GEOSITE,telegram,🪽 Telegram",
+      "app": "telegram"
+    },
+    {
+      "rule": "GEOSITE,openai,⚡ OpenAI",
+      "app": "openai"
+    },
+    {
+      "rule": "GEOSITE,anthropic,🪐 Anthropic",
+      "app": "anthropic"
+    },
+    {
+      "rule": "GEOSITE,category-ai-!cn,✨ AI 服务",
+      "app": "category-ai-!cn"
+    },
+    {
+      "rule": "GEOSITE,apple,⚪ Apple",
+      "app": "apple"
+    },
+    {
+      "rule": "GEOSITE,youtube,📺 YouTube",
+      "app": "youtube"
+    },
+    {
+      "rule": "GEOSITE,tiktok,🎶 TikTok",
+      "app": "tiktok"
+    },
+    {
+      "rule": "GEOSITE,instagram,♾️ Meta",
+      "app": "instagram"
+    },
+    {
+      "rule": "GEOSITE,twitter,𝕏 X",
+      "app": "twitter"
+    },
+    {
+      "rule": "GEOSITE,github,🐙 GitHub",
+      "app": "github"
+    },
+    {
+      "rule": "GEOSITE,category-speedtest,⚡ Speedtest",
+      "app": "category-speedtest"
+    },
+    {
+      "rule": "GEOSITE,okx,🟦 OKX",
+      "app": "okx"
+    },
+    {
+      "rule": "GEOSITE,binance,🟨 Binance",
+      "app": "binance"
+    },
+    {
+      "rule": "GEOSITE,bybit,🟪 Bybit",
+      "app": "bybit"
+    },
+    {
+      "rule": "GEOSITE,discord,🎮 Discord",
+      "app": "discord"
+    },
+    {
+      "rule": "GEOSITE,category-communication,💬 Chat",
+      "app": "category-communication"
+    },
+    {
+      "rule": "GEOSITE,category-social-media-!cn,🫂 Social",
+      "app": "category-social-media-!cn"
+    },
+    {
+      "rule": "GEOSITE,cloudflare,☁️ Cloudflare",
+      "app": "cloudflare"
+    },
+    {
+      "rule": "GEOSITE,google,🧭 Google",
+      "app": "google"
+    },
+    {
+      "rule": "GEOSITE,microsoft,🪟 Microsoft",
+      "app": "microsoft"
+    },
+    {
+      "rule": "GEOSITE,category-cryptocurrency,🪙 Crypto",
+      "app": "category-cryptocurrency"
+    },
+    {
+      "rule": "GEOSITE,amazon,📦 Amazon",
+      "app": "amazon"
+    },
+    {
+      "rule": "GEOSITE,category-media,📰 News",
+      "app": "category-media"
+    },
+    {
+      "rule": "GEOSITE,category-entertainment,🍿 Entertainment",
+      "app": "category-entertainment"
+    },
+    {
+      "rule": "RULE-SET,🔀 Port Rules,🔌 特殊端口",
+      "module": "ports"
+    },
+    {
+      "rule": "GEOSITE,gfw,🎚️ 节点选择",
+      "module": "gfw"
+    }
+  ],
+  "providerModules": [
+    {
+      "name": "↘️ Direct Domain",
+      "value": {
+        "type": "http",
+        "behavior": "domain",
+        "format": "yaml",
+        "interval": 28800,
+        "url": "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Direct_Domain.yaml"
+      },
+      "module": "direct-extra"
+    },
+    {
+      "name": "📍 Direct IP",
+      "value": {
+        "type": "http",
+        "behavior": "classical",
+        "format": "yaml",
+        "interval": 28800,
+        "url": "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Direct_Classical_IP.yaml"
+      },
+      "module": "direct-extra"
+    },
+    {
+      "name": "🌍 Proxy Domain",
+      "value": {
+        "type": "http",
+        "behavior": "domain",
+        "format": "yaml",
+        "interval": 28800,
+        "url": "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Proxy_Domain.yaml"
+      },
+      "module": "proxy-extra"
+    },
+    {
+      "name": "🛰️ Proxy IP",
+      "value": {
+        "type": "http",
+        "behavior": "classical",
+        "format": "yaml",
+        "interval": 28800,
+        "url": "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Proxy_Classical_IP.yaml"
+      },
+      "module": "proxy-extra"
+    },
+    {
+      "name": "🔀 Port Rules",
+      "value": {
+        "type": "http",
+        "behavior": "classical",
+        "format": "yaml",
+        "interval": 28800,
+        "url": "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Port_Direct.yaml"
+      },
+      "module": "ports"
+    }
+  ],
+  "modules": [
+    {
+      "id": "china",
+      "label": "国内直连",
+      "description": "中国大陆域名、IP 与可直连的国内服务。",
+      "default": true
+    },
+    {
+      "id": "game-direct",
+      "label": "游戏下载直连",
+      "description": "国内游戏资源、公共 Tracker 与游戏类直连规则。",
+      "default": true
+    },
+    {
+      "id": "gfw",
+      "label": "通用代理",
+      "description": "使用 GeoSite 通用代理分类承接常见境外服务。",
+      "default": true
+    },
+    {
+      "id": "direct-extra",
+      "label": "直连规则补充",
+      "description": "额外的直连域名、IP 与端口规则集。",
+      "default": true
+    },
+    {
+      "id": "proxy-extra",
+      "label": "代理规则补充",
+      "description": "额外的代理域名和 IP 规则集。",
+      "default": true
+    },
+    {
+      "id": "ports",
+      "label": "特殊端口分流",
+      "description": "为特殊端口生成单独的出口策略组。",
+      "default": false
+    }
+  ],
+  "version": "fadf7dfd9850"
+}
