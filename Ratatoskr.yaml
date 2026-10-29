@@ -184,13 +184,14 @@ rules:
   - GEOIP,private,DIRECT,no-resolve
 
   # ── 自定义补充 / Custom ──
-  - RULE-SET,🍃 direct-domain,DIRECT
-  - RULE-SET,📍 direct-ip,DIRECT
-  - RULE-SET,🌐 proxy-domain,🎚️ 节点选择
-  - RULE-SET,🛰️ proxy-ip,🎚️ 节点选择
+  - RULE-SET,↘️ Direct Domain,DIRECT
+  - RULE-SET,📍 Direct IP,DIRECT
+  - RULE-SET,🌍 Proxy Domain,🎚️ 节点选择
+  - RULE-SET,🛰️ Proxy IP,🎚️ 节点选择
 
   # ── 国内流量直连 / China Direct ──
   - GEOSITE,cn,DIRECT
+  - GEOIP,CN,DIRECT
   - GEOIP,cn,DIRECT,no-resolve
   - GEOSITE,google-cn,DIRECT
 
@@ -239,8 +240,11 @@ rules:
   - GEOSITE,category-cryptocurrency,🪙 Crypto
   - GEOSITE,amazon,📦 Amazon
 
+  - GEOSITE,category-media,📰 News
+  - GEOSITE,category-entertainment,🍿 Entertainment
+
   # ── 端口补充 / Ports ──
-  - RULE-SET,🔌 direct-port,🔌 特殊端口
+  - RULE-SET,🔀 Port Rules,🔌 特殊端口
 
   # ── 通用代理 / Proxy ──
   - GEOSITE,gfw,🎚️ 节点选择
@@ -257,8 +261,8 @@ rule-anchor:
   classical: &RP-classical {type: http, behavior: classical, format: yaml, interval: 28800}
 
 rule-providers:
-  🍃 direct-domain:       {<<: *RP-domain,    url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Direct_Domain.yaml"}
-  📍 direct-ip:           {<<: *RP-classical, url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Direct_Classical_IP.yaml"}
-  🌐 proxy-domain:        {<<: *RP-domain,    url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Proxy_Domain.yaml"}
-  🛰️ proxy-ip:            {<<: *RP-classical, url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Proxy_Classical_IP.yaml"}
-  🔌 direct-port:         {<<: *RP-classical, url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Port_Direct.yaml"}
+  ↘️ Direct Domain:       {<<: *RP-domain,    url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Direct_Domain.yaml"}
+  📍 Direct IP:           {<<: *RP-classical, url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Direct_Classical_IP.yaml"}
+  🌍 Proxy Domain:        {<<: *RP-domain,    url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Proxy_Domain.yaml"}
+  🛰️ Proxy IP:            {<<: *RP-classical, url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Proxy_Classical_IP.yaml"}
+  🔀 Port Rules:         {<<: *RP-classical, url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Port_Direct.yaml"}
