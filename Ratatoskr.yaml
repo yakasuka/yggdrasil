@@ -39,6 +39,7 @@ allow-lan: true                      # 允许局域网设备访问代理端口
 mode: rule                           # 规则模式，按下方 rules 列表分流
 log-level: info                      # 日志级别：info，记录一般运行及连接信息
 external-controller: 127.0.0.1:9090  # REST API 监听地址：仅本机访问
+unified-delay: true
 
 # =======================================================
 # 3. 手动节点 Proxies
@@ -92,7 +93,7 @@ proxy-groups:
   - {name: 🎚️ 节点选择, type: select, proxies: [🚀 手动切换, ♻️ 自动选择, 🔯 故障转移, 🔮 负载均衡, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌, DIRECT]}
 
   # ── 全部节点 / Proxy ──
-  - {name: 🚀 手动切换, type: select, include-all: true, filter: *FilterAll, icon: "https://raw.githubusercontent.com/uhovohu/clash/main/icons/proxy.png"}                                            # 全部节点手动选择入口
+  - {name: 🚀 手动切换, type: select, include-all: true, filter: *FilterAll, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/proxy.png"}                                            # 全部节点手动选择入口
 
   # ── 自动选择 / Auto ──
   - {name: ♻️ 自动选择, type: url-test, include-all: true, filter: *FilterAll, url: "https://www.gstatic.com/generate_204", interval: 300, tolerance: 50}
@@ -101,65 +102,65 @@ proxy-groups:
   - {name: 🔯 故障转移, type: fallback, include-all: true, filter: *FilterAll, url: "https://www.gstatic.com/generate_204", interval: 300}
 
   # ── 负载均衡 / Load Balance ──
-  - {name: 🔮 负载均衡, type: load-balance, include-all: true, filter: *FilterAll, strategy: consistent-hashing, icon: "https://raw.githubusercontent.com/uhovohu/clash/main/icons/tracking.png"}   # 域名专用负载均衡入口
+  - {name: 🔮 负载均衡, type: load-balance, include-all: true, filter: *FilterAll, strategy: consistent-hashing, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/tracking.png"}   # 域名专用负载均衡入口
 
   # ── 下载均衡 / Download Balance ──
-  - {name: ⚖️ 下载均衡,    type: load-balance, include-all: true, filter: *FilterAll, strategy: round-robin, icon: "https://raw.githubusercontent.com/uhovohu/clash/main/icons/global.png"}   # 下载多连接轮询均衡
+  - {name: ⚖️ 下载均衡,    type: load-balance, include-all: true, filter: *FilterAll, strategy: round-robin, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/global.png"}   # 下载多连接轮询均衡
 
   # ── 应用分流 / Proxy App ──
-  - {name: ⚡ OpenAI,      type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/uhovohu/clash/main/icons/chatgpt.png"}     # OpenAI / ChatGPT
-  - {name: 🪐 Anthropic,   type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/uhovohu/clash/main/icons/claude.png"}      # Anthropic / Claude
-  - {name: ✨ AI 服务,          type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/uhovohu/clash/main/icons/ai.png"}          # AI 杂项 (Perplexity / Groq / Cerebras / HuggingFace / Cursor / ElevenLabs / ComfyUI / 兜底)
-  - {name: 🟦 OKX,      type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/uhovohu/clash/main/icons/crypto.png"}      # 加密货币
-  - {name: 🟨 Binance,      type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/uhovohu/clash/main/icons/crypto.png"}      # 加密货币
-  - {name: 🟪 Bybit,      type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/uhovohu/clash/main/icons/crypto.png"}      # 加密货币
-  - {name: 🪙 Crypto,      type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/uhovohu/clash/main/icons/crypto.png"}      # 加密货币
-  - {name: 📺 YouTube,     type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/uhovohu/clash/main/icons/youtube.png"}     # YouTube
-  - {name: 🧭 Google,      type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/uhovohu/clash/main/icons/google.png"}      # Google 全家桶
-  - {name: ☁️ Cloudflare,  type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/uhovohu/clash/main/icons/cloudflare.png"}  # Cloudflare
-  - {name: 📦 Amazon,      type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/uhovohu/clash/main/icons/amazon.png"}      # Amazon
-  - {name: 🐙 GitHub,      type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/uhovohu/clash/main/icons/github.png"}      # GitHub
-  - {name: 🪟 Microsoft,   type: select, proxies: [DIRECT, 🎚️ 节点选择, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/uhovohu/clash/main/icons/microsoft.png"}   # Microsoft 全家桶
-  - {name: 🎨 Adobe,       type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/uhovohu/clash/main/icons/adobe.png"}       # Adobe 全家桶
-  - {name: ⚪ Apple,       type: select, proxies: [DIRECT, 🎚️ 节点选择, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/uhovohu/clash/main/icons/apple.png"}       # Apple 全家桶
-  - {name: 🤖 Android,     type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/uhovohu/clash/main/icons/android.png"}     # Android / Google Play
+  - {name: ⚡ OpenAI,      type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/chatgpt.png"}     # OpenAI / ChatGPT
+  - {name: 🪐 Anthropic,   type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/claude.png"}      # Anthropic / Claude
+  - {name: ✨ AI 服务,     type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/ai.png"}          # AI 杂项 (Perplexity / Groq / Cerebras / HuggingFace / Cursor / ElevenLabs / ComfyUI / 兜底)
+  - {name: 🟦 OKX,         type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/crypto.png"}      # 加密货币
+  - {name: 🟨 Binance,     type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/crypto.png"}      # 加密货币
+  - {name: 🟪 Bybit,       type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/crypto.png"}      # 加密货币
+  - {name: 🪙 Crypto,      type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/crypto.png"}      # 加密货币
+  - {name: 📺 YouTube,     type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/youtube.png"}     # YouTube
+  - {name: 🧭 Google,      type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/google.png"}      # Google 全家桶
+  - {name: ☁️ Cloudflare,  type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/cloudflare.png"}  # Cloudflare
+  - {name: 📦 Amazon,      type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/amazon.png"}      # Amazon
+  - {name: 🐙 GitHub,      type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/github.png"}      # GitHub
+  - {name: 🪟 Microsoft,   type: select, proxies: [DIRECT, 🎚️ 节点选择, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/microsoft.png"}   # Microsoft 全家桶
+  - {name: 🎨 Adobe,       type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/adobe.png"}       # Adobe 全家桶
+  - {name: ⚪ Apple,       type: select, proxies: [DIRECT, 🎚️ 节点选择, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/apple.png"}       # Apple 全家桶
+  - {name: 🤖 Android,     type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/android.png"}     # Android / Google Play
 
-  - {name: 𝕏 X,           type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/uhovohu/clash/main/icons/x.png"}           # X / Twitter / 马斯克系
-  - {name: ♾️ Meta,        type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/uhovohu/clash/main/icons/instagram.png"}   # Meta (Facebook / Instagram / WhatsApp)
-  - {name: 🪽 Telegram,    type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/uhovohu/clash/main/icons/telegram.png"}    # Telegram
-  - {name: 🎮 Discord,     type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/uhovohu/clash/main/icons/discord.png"}     # Discord
-  - {name: 🫂 Social,      type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/uhovohu/clash/main/icons/social.png"}      # 社交杂项 (Reddit / Tumblr / LINE)
+  - {name: 𝕏 X,            type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/x.png"}           # X / Twitter / 马斯克系
+  - {name: ♾️ Meta,        type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/instagram.png"}   # Meta (Facebook / Instagram / WhatsApp)
+  - {name: 🪽 Telegram,    type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/telegram.png"}    # Telegram
+  - {name: 🎮 Discord,     type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/discord.png"}     # Discord
+  - {name: 🫂 Social,      type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/social.png"}      # 社交杂项 (Reddit / Tumblr / LINE)
 
-  - {name: 🎶 TikTok,      type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/uhovohu/clash/main/icons/tiktok.png"}      # TikTok / 字节跳动海外
-  - {name: 🍿 Netflix,     type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/uhovohu/clash/main/icons/netflix.png"}     # Netflix
-  - {name: 💚 Spotify,     type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/uhovohu/clash/main/icons/spotify.png"}     # Spotify
-  - {name: 🎥 Media,       type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/uhovohu/clash/main/icons/media.png"}       # 流媒体杂项 (Hulu / Prime Video / DAZN / HBO / Disney+ / Vimeo / Twitch / Rumble / Plex)
-  - {name: 📺 Bilibili,    type: select, proxies: [DIRECT, 🎚️ 节点选择, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/uhovohu/clash/main/icons/bilibili.png"}    # Bilibili
+  - {name: 🎶 TikTok,      type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/tiktok.png"}      # TikTok / 字节跳动海外
+  - {name: 🍿 Netflix,     type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/netflix.png"}     # Netflix
+  - {name: 💚 Spotify,     type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/spotify.png"}     # Spotify
+  - {name: 🎥 Media,       type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/media.png"}       # 流媒体杂项 (Hulu / Prime Video / DAZN / HBO / Disney+ / Vimeo / Twitch / Rumble / Plex)
+  - {name: 📺 Bilibili,    type: select, proxies: [DIRECT, 🎚️ 节点选择, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/bilibili.png"}    # Bilibili
   
-  - {name: 👾 Steam,       type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/uhovohu/clash/main/icons/steam.png"}       # Steam
-  - {name: 🎁 Epic,        type: select, proxies: [DIRECT, 🎚️ 节点选择, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/uhovohu/clash/main/icons/epic.png"}        # Epic Games
-  - {name: 🕹️ TapTap,      type: select, proxies: [DIRECT, 🎚️ 节点选择, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/uhovohu/clash/main/icons/taptap.png"}      # TapTap
+  - {name: 👾 Steam,       type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/steam.png"}       # Steam
+  - {name: 🎁 Epic,        type: select, proxies: [DIRECT, 🎚️ 节点选择, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/epic.png"}        # Epic Games
+  - {name: 🕹️ TapTap,      type: select, proxies: [DIRECT, 🎚️ 节点选择, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/taptap.png"}      # TapTap
   
-  - {name: ⚡ Speedtest,   type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/uhovohu/clash/main/icons/speedtest.png"}   # 测速
+  - {name: ⚡ Speedtest,   type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/speedtest.png"}   # 测速
 
-  - {name: 🔌 特殊端口,    type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌]}                  # 特殊端口流量
+  - {name: 🔌 特殊端口,     type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌]}                  # 特殊端口流量
  
   # ── 可选内容 / R18 ──
-  #- {name: 😈 R18,         type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/uhovohu/clash/main/icons/r18.png"}         # 成人内容
+  #- {name: 😈 R18,         type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/r18.png"}         # 成人内容
 
   # ── 国内与兜底 / CN & Final ──
-  - {name: 🏮,             type: select, proxies: [DIRECT, 🎚️ 节点选择, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/uhovohu/clash/main/icons/cn.png"}          # 默认国内直连
-  - {name: 🏁 Final,       type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/uhovohu/clash/main/icons/final.png"}       # 未匹配流量
+  - {name: 🏮,             type: select, proxies: [DIRECT, 🎚️ 节点选择, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/cn.png"}          # 默认国内直连
+  - {name: 🏁 Final,       type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/final.png"}       # 未匹配流量
 
   # ── 地区节点 / Regions ──
   # 地区组仅应用各自地区正则，未叠加 FilterAll；24 个地区组统一使用 macOSicons Maps 图标
-  - {name: 🌆,          type: select, include-all: true, filter: *FilterHK, icon: "https://raw.githubusercontent.com/uhovohu/clash/main/icons/hk.png"}                                                # 香港节点
-  - {name: 🧋,          type: select, include-all: true, filter: *FilterTW, icon: "https://raw.githubusercontent.com/uhovohu/clash/main/icons/tw.png"}                                                # 台湾节点
-  - {name: ⛩️,          type: select, include-all: true, filter: *FilterJP, icon: "https://raw.githubusercontent.com/uhovohu/clash/main/icons/jp.png"}                                                # 日本节点
-  - {name: 🎤,          type: select, include-all: true, filter: *FilterKR, icon: "https://raw.githubusercontent.com/uhovohu/clash/main/icons/kr.png"}                                                # 韩国节点
-  - {name: 🏙️,          type: select, include-all: true, filter: *FilterSG, icon: "https://raw.githubusercontent.com/uhovohu/clash/main/icons/sg.png"}                                                # 新加坡节点
-  - {name: 🗽,          type: select, include-all: true, filter: *FilterUS, icon: "https://raw.githubusercontent.com/uhovohu/clash/main/icons/us.png"}                                                # 美国节点
-  - {name: 🌌,          type: select, include-all: true, filter: *FilterOthers, icon: "https://raw.githubusercontent.com/uhovohu/clash/main/icons/others.png"}                                        # 其他节点 A
+  - {name: 🌆,          type: select, include-all: true, filter: *FilterHK, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/hk.png"}                                                # 香港节点
+  - {name: 🧋,          type: select, include-all: true, filter: *FilterTW, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/tw.png"}                                                # 台湾节点
+  - {name: ⛩️,          type: select, include-all: true, filter: *FilterJP, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/jp.png"}                                                # 日本节点
+  - {name: 🎤,          type: select, include-all: true, filter: *FilterKR, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/kr.png"}                                                # 韩国节点
+  - {name: 🏙️,          type: select, include-all: true, filter: *FilterSG, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/sg.png"}                                                # 新加坡节点
+  - {name: 🗽,          type: select, include-all: true, filter: *FilterUS, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/us.png"}                                                # 美国节点
+  - {name: 🌌,          type: select, include-all: true, filter: *FilterOthers, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/others.png"}                                        # 其他节点 A
 
 
 # =======================================================
