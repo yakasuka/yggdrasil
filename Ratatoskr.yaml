@@ -123,13 +123,13 @@ proxy-groups:
   - {name: 🪟 Microsoft,   type: select, proxies: [DIRECT, 🎚️ 节点选择, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/microsoft.png"}   # Microsoft 全家桶
   - {name: 🎨 Adobe,       type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/adobe.png"}       # Adobe 全家桶
   - {name: ⚪ Apple,       type: select, proxies: [DIRECT, 🎚️ 节点选择, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/apple.png"}       # Apple 全家桶
-  - {name: 🤖 Android,     type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/android.png"}     # Android / Google Play
 
   - {name: 𝕏 X,            type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/x.png"}           # X / Twitter / 马斯克系
   - {name: ♾️ Meta,        type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/instagram.png"}   # Meta (Facebook / Instagram / WhatsApp)
   - {name: 🪽 Telegram,    type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/telegram.png"}    # Telegram
   - {name: 🎮 Discord,     type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/discord.png"}     # Discord
-  - {name: 🫂 Social,      type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/social.png"}      # 社交杂项 (Reddit / Tumblr / LINE)
+  - {name: 💬 Chat,        type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌]}
+  - {name: 🫂 Social,      type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/social.png"}      # 社交杂项 (Reddit / Tumblr )
 
   - {name: 🎶 TikTok,      type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/tiktok.png"}      # TikTok / 字节跳动海外
   - {name: 🍿 Netflix,     type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/netflix.png"}     # Netflix
@@ -189,18 +189,18 @@ rules:
   - RULE-SET,🌐 proxy-domain,🎚️ 节点选择
   - RULE-SET,🛰️ proxy-ip,🎚️ 节点选择
 
-  # ── 国内直连 / Direct ──
+  # ── 国内流量直连 / China Direct ──
   - GEOSITE,cn,DIRECT
   - GEOIP,cn,DIRECT,no-resolve
   - GEOSITE,google-cn,DIRECT
 
   # ── 游戏与下载 / Games ──
   - GEOSITE,steam@cn,DIRECT
-  - GEOSITE,category-game-platforms-download,DIRECT
   - GEOSITE,steam,👾 Steam
   - GEOSITE,epicgames,🎁 Epic
   - GEOSITE,taptap,🕹️ TapTap
   - GEOSITE,category-games,DIRECT
+  - GEOSITE,category-game-platforms-download,DIRECT
   - GEOSITE,category-public-tracker,DIRECT
 
   # ── 流媒体 / Streaming ──
@@ -229,7 +229,8 @@ rules:
   - GEOSITE,okx,🟦 OKX
   - GEOSITE,binance,🟨 Binance
   - GEOSITE,bybit,🟪 Bybit
-  - GEOSITE,category-communication,🎮 Discord
+  - GEOSITE,discord,🎮 Discord
+  - GEOSITE,category-communication,💬 Chat
   - GEOSITE,category-social-media-!cn,🫂 Social
 #  - GEOSITE,teamviewer,↔️ teamviewer
   - GEOSITE,cloudflare,☁️ Cloudflare
@@ -237,17 +238,15 @@ rules:
   - GEOSITE,microsoft,🪟 Microsoft
   - GEOSITE,category-cryptocurrency,🪙 Crypto
   - GEOSITE,amazon,📦 Amazon
-  - GEOSITE,android,🤖 Android
+
+  # ── 端口补充 / Ports ──
+  - RULE-SET,🔌 direct-port,🔌 特殊端口
 
   # ── 通用代理 / Proxy ──
   - GEOSITE,gfw,🎚️ 节点选择
 
-  # ── 端口补充 / Ports ──
-  - RULE-SET,🔌 direct-port,🔌 特殊端口
-  
   # ── 最终兜底 / Final ──
   - MATCH,🏁 Final
-
 # =======================================================
 # 7. 规则源 Rule Providers
 # =======================================================
