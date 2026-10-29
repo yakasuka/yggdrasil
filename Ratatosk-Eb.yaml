@@ -1,0 +1,275 @@
+# =======================================================
+# 1. 机场订阅 Proxy Providers
+# =======================================================
+
+# ── 手动订阅示例 / Manual Providers ──
+# 手动启用时取消下方整段注释；添加机场时复制 xyang 层级，并修改订阅名称保证唯一
+# url 填写实际节点订阅地址；支持的订阅格式以当前 Mihomo 内核为准
+# proxy-providers:  # 远程节点订阅入口
+#   xyang:  # 订阅名称，供策略组引用或自动汇入使用
+#     url: "https://example.com/sub?token=YOUR_SUBSCRIPTION_TOKEN"  # 机场提供的节点订阅地址
+#     type: http  # HTTP 型订阅，下载远程节点内容
+#     interval: 86400  # 订阅更新间隔：86400 秒 / 24 小时
+#     health-check: {enable: true, lazy: true, url: "https://www.gstatic.com/generate_204", interval: 3600}  # 启用延迟测试，间隔 3600 秒；lazy 表示未使用时不主动定时测速
+#     proxy: DIRECT  # 订阅下载 / 更新使用的出口：直连
+
+# ── 自动订阅区域 / Auto Providers ──
+# 预留自动写入区域；使用自动注入功能时保留下面的起止标记
+# >>> AUTO-PROVIDERS-START
+
+# <<< AUTO-PROVIDERS-END
+
+
+# =======================================================
+# 2. 基础设置 General
+# =======================================================
+
+port: 7890                           # HTTP 代理端口
+socks-port: 7891                     # SOCKS5 代理端口
+allow-lan: true                      # 允许局域网设备访问代理端口
+mode: rule                           # 规则模式，按下方 rules 列表分流
+log-level: info                      # 日志级别：info，记录一般运行及连接信息
+external-controller: 127.0.0.1:9090  # REST API 监听地址：仅本机访问
+
+
+# =======================================================
+# 3. 手动节点 Proxies
+# =======================================================
+
+# 下方仅为节点名称占位，当前整段未启用
+# 启用时取消注释，并补全 type / server / port 及对应协议参数；多个节点的 name 需保持唯一
+# proxies:
+#   - name: "手动节点1"
+#   - name: "手动节点2"
+
+
+# =======================================================
+# 4. 节点筛选 Node Filters
+# =======================================================
+
+# ── 地区匹配 / Regions ──
+# 以下为 YAML 正则锚点，供策略组的 filter 引用；按节点名称匹配，忽略英文大小写
+# 各地区正则排除名称以 => 开头的节点；地区代码支持末尾紧跟数字
+# 按节点名称独立筛选；名称含多个地区标记时可能进入多个组，实际落地以机场标注为准
+FilterHK: &FilterHK '(?i)^(?!=>).*(?:🇭🇰|香港|Hong\s?Kong|\b(?:HK|HKG)\d*\b)'  # 香港：国旗 / 香港 / Hong Kong / HK / HKG
+FilterTW: &FilterTW '(?i)^(?!=>).*(?:🇹🇼|台湾|Tai(?:wan)?|\b(?:TW|TWN)\d*\b)'  # 台湾：国旗 / 台湾 / Tai / Taiwan / TW / TWN
+FilterMO: &FilterMO '(?i)^(?!=>).*(?:🇲🇴|澳门|澳門|\b(?:Maca[ou])\b|\b(?:MO|MAC)\d*\b)'  # 澳门：国旗 / 中英文名称及部分城市名 / MO / MAC
+FilterJP: &FilterJP '(?i)^(?!=>).*(?:🇯🇵|日本|川日|东京|大阪|埼玉|Japan|\b(?:JP|JPN)\d*\b)'  # 日本：国旗 / 日本及部分城市名 / Japan / JP / JPN
+FilterKR: &FilterKR '(?i)^(?!=>).*(?:🇰🇷|韩国|韓|首尔|Korea|\b(?:KR|KOR)\d*\b)'  # 韩国：国旗 / 韩国 / 韓 / 首尔 / Korea / KR / KOR
+FilterSG: &FilterSG '(?i)^(?!=>).*(?:🇸🇬|新加坡|狮|Singapore|\b(?:SG|SGP)\d*\b)'  # 新加坡：国旗 / 新加坡 / 狮 / Singapore / SG / SGP
+FilterTH: &FilterTH '(?i)^(?!=>).*(?:🇹🇭|泰国|泰國|曼谷|\b(?:Thailand|Bangkok)\b|\b(?:TH|THA)\d*\b)'  # 泰国：国旗 / 中英文名称及部分城市名 / TH / THA
+FilterMY: &FilterMY '(?i)^(?!=>).*(?:🇲🇾|马来(?:西亚)?|馬來(?:西亞)?|大马|大馬|吉隆坡|\b(?:Malaysia|Kuala\s?Lumpur)\b|\b(?:MY|MYS)\d*\b)'  # 马来西亚：国旗 / 中英文名称及部分城市名 / MY / MYS
+FilterVN: &FilterVN '(?i)^(?!=>).*(?:🇻🇳|越南|胡志明|河内|河內|\b(?:Vietnam|Viet\s?Nam|Hanoi|Ho\s?Chi\s?Minh)\b|\b(?:VN|VNM)\d*\b)'  # 越南：国旗 / 中英文名称及部分城市名 / VN / VNM
+FilterPH: &FilterPH '(?i)^(?!=>).*(?:🇵🇭|菲律宾|菲律賓|马尼拉|馬尼拉|宿务|宿霧|\b(?:Philippines|Manila|Cebu)\b|\b(?:PH|PHL)\d*\b)'  # 菲律宾：国旗 / 中英文名称及部分城市名 / PH / PHL
+FilterID: &FilterID '(?i)^(?!=>).*(?:🇮🇩|印度尼西亚|印度尼西亞|印尼|雅加达|雅加達|巴厘岛|峇里島|\b(?:Indonesia|Jakarta|Bali)\b|\b(?:ID|IDN)\d*\b)'  # 印度尼西亚：国旗 / 中英文名称及部分城市名 / ID / IDN
+FilterIN: &FilterIN '(?i)^(?!=>).*(?:🇮🇳|印度(?!尼)|孟买|孟買|新德里|班加罗尔|班加羅爾|\b(?:India|Mumbai|New\s?Delhi|Bangalore|Bengaluru)\b|\b(?:IN|IND)\d*\b)'  # 印度：国旗 / 印度（排除印尼） / 部分城市名 / India / IN / IND
+FilterAU: &FilterAU '(?i)^(?!=>).*(?:🇦🇺|澳大利亚|澳大利亞|澳洲|悉尼|雪梨|墨尔本|墨爾本|珀斯|布里斯班|\b(?:Australia|Sydney|Melbourne|Perth|Brisbane)\b|\b(?:AU|AUS)\d*\b)'  # 澳大利亚：国旗 / 中英文名称及部分城市名 / AU / AUS
+FilterUS: &FilterUS '(?i)^(?!=>).*(?:🇺🇸|美国|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|拉斯维加斯|United States|\b(?:US|USA)\d*\b)'  # 美国：国旗 / 美国及部分城市名 / United States / US / USA
+FilterCA: &FilterCA '(?i)^(?!=>).*(?:🇨🇦|加拿大|多伦多|多倫多|温哥华|溫哥華|蒙特利尔|蒙特利爾|渥太华|渥太華|\b(?:Canada|Toronto|Vancouver|Montreal|Ottawa)\b|\b(?:CA|CAN)\d*\b)'  # 加拿大：国旗 / 中英文名称及部分城市名 / CA / CAN
+FilterUK: &FilterUK '(?i)^(?!=>).*(?:🇬🇧|英国|英國|伦敦|倫敦|曼彻斯特|曼徹斯特|\b(?:United\s?Kingdom|Great\s?Britain|Britain|England|London|Manchester)\b|\b(?:UK|GB|GBR)\d*\b)'  # 英国：国旗 / 中英文名称及部分城市名 / UK / GB / GBR
+FilterDE: &FilterDE '(?i)^(?!=>).*(?:🇩🇪|德国|德國|法兰克福|法蘭克福|柏林|慕尼黑|\b(?:Germany|Deutschland|Frankfurt|Berlin|Munich)\b|\b(?:DE|DEU)\d*\b)'  # 德国：国旗 / 中英文名称及部分城市名 / DE / DEU
+FilterFR: &FilterFR '(?i)^(?!=>).*(?:🇫🇷|法国|法國|巴黎|里昂|\b(?:France|Paris|Lyon)\b|\b(?:FR|FRA)\d*\b)'  # 法国：国旗 / 中英文名称及部分城市名 / FR / FRA
+FilterNL: &FilterNL '(?i)^(?!=>).*(?:🇳🇱|荷兰|荷蘭|阿姆斯特丹|鹿特丹|\b(?:Netherlands|Holland|Amsterdam|Rotterdam)\b|\b(?:NL|NLD)\d*\b)'  # 荷兰：国旗 / 中英文名称及部分城市名 / NL / NLD
+FilterCH: &FilterCH '(?i)^(?!=>).*(?:🇨🇭|瑞士|苏黎世|蘇黎世|日内瓦|日內瓦|\b(?:Switzerland|Swiss|Zurich|Geneva)\b|\b(?:CH|CHE)\d*\b)'  # 瑞士：国旗 / 中英文名称及部分城市名 / CH / CHE
+FilterRU: &FilterRU '(?i)^(?!=>).*(?:🇷🇺|俄罗斯|俄羅斯|莫斯科|圣彼得堡|聖彼得堡|\b(?:Russia|Moscow|Saint\s?Petersburg)\b|\b(?:RU|RUS)\d*\b)'  # 俄罗斯：国旗 / 中英文名称及部分城市名 / RU / RUS
+FilterTR: &FilterTR '(?i)^(?!=>).*(?:🇹🇷|土耳其|伊斯坦布尔|伊斯坦布爾|伊斯坦堡|安卡拉|\b(?:Turkey|Türkiye|Turkiye|Istanbul|Ankara)\b|\b(?:TR|TUR)\d*\b)'  # 土耳其：国旗 / 中英文名称及部分城市名 / TR / TUR
+FilterBR: &FilterBR '(?i)^(?!=>).*(?:🇧🇷|巴西|圣保罗|聖保羅|里约|里約|\b(?:Brazil|Brasil|S[aã]o\s?Paulo|Rio\s?de\s?Janeiro)\b|\b(?:BR|BRA)\d*\b)'  # 巴西：国旗 / 中英文名称及部分城市名 / BR / BRA
+FilterAR: &FilterAR '(?i)^(?!=>).*(?:🇦🇷|阿根廷|布宜诺斯艾利斯|布宜諾斯艾利斯|\b(?:Argentina|Buenos\s?Aires)\b|\b(?:AR|ARG)\d*\b)'  # 阿根廷：国旗 / 中英文名称及部分城市名 / AR / ARG
+
+# ── 节点净化 / Clean Filter ──
+# 按名称排除广告 / 流量 / 到期等关键词，以及名称任意位置的 => 标记
+# 仅作用于显式引用此锚点的策略组；匹配关键词的真实节点也会被过滤
+FilterAll: &FilterAll '^(?!.*(?:(?i)=>|群|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|剩余流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|超时|收藏|福利|失联|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author|Traffic|\d{4}-\d{2}-\d{2}|\d+G)).*$'  # 手动切换 / 自动选择 / 故障转移 / 两类负载均衡共用
+
+# ── 其他地区 / Others ──
+# 应用 FilterAll 的节点净化，并排除以上 24 个已分类国家 / 地区
+FilterOthers: &FilterOthers '(?i)^(?!.*(?:🇭🇰|香港|Hong\s?Kong|\b(?:HK|HKG)\d*\b|🇹🇼|台湾|Tai(?:wan)?|\b(?:TW|TWN)\d*\b|🇲🇴|澳门|澳門|\b(?:Maca[ou])\b|\b(?:MO|MAC)\d*\b|🇯🇵|日本|川日|东京|大阪|埼玉|Japan|\b(?:JP|JPN)\d*\b|🇰🇷|韩国|韓|首尔|Korea|\b(?:KR|KOR)\d*\b|🇸🇬|新加坡|狮|Singapore|\b(?:SG|SGP)\d*\b|🇹🇭|泰国|泰國|曼谷|\b(?:Thailand|Bangkok)\b|\b(?:TH|THA)\d*\b|🇲🇾|马来(?:西亚)?|馬來(?:西亞)?|大马|大馬|吉隆坡|\b(?:Malaysia|Kuala\s?Lumpur)\b|\b(?:MY|MYS)\d*\b|🇻🇳|越南|胡志明|河内|河內|\b(?:Vietnam|Viet\s?Nam|Hanoi|Ho\s?Chi\s?Minh)\b|\b(?:VN|VNM)\d*\b|🇵🇭|菲律宾|菲律賓|马尼拉|馬尼拉|宿务|宿霧|\b(?:Philippines|Manila|Cebu)\b|\b(?:PH|PHL)\d*\b|🇮🇩|印度尼西亚|印度尼西亞|印尼|雅加达|雅加達|巴厘岛|峇里島|\b(?:Indonesia|Jakarta|Bali)\b|\b(?:ID|IDN)\d*\b|🇮🇳|印度(?!尼)|孟买|孟買|新德里|班加罗尔|班加羅爾|\b(?:India|Mumbai|New\s?Delhi|Bangalore|Bengaluru)\b|\b(?:IN|IND)\d*\b|🇦🇺|澳大利亚|澳大利亞|澳洲|悉尼|雪梨|墨尔本|墨爾本|珀斯|布里斯班|\b(?:Australia|Sydney|Melbourne|Perth|Brisbane)\b|\b(?:AU|AUS)\d*\b|🇺🇸|美国|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|拉斯维加斯|United States|\b(?:US|USA)\d*\b|🇨🇦|加拿大|多伦多|多倫多|温哥华|溫哥華|蒙特利尔|蒙特利爾|渥太华|渥太華|\b(?:Canada|Toronto|Vancouver|Montreal|Ottawa)\b|\b(?:CA|CAN)\d*\b|🇬🇧|英国|英國|伦敦|倫敦|曼彻斯特|曼徹斯特|\b(?:United\s?Kingdom|Great\s?Britain|Britain|England|London|Manchester)\b|\b(?:UK|GB|GBR)\d*\b|🇩🇪|德国|德國|法兰克福|法蘭克福|柏林|慕尼黑|\b(?:Germany|Deutschland|Frankfurt|Berlin|Munich)\b|\b(?:DE|DEU)\d*\b|🇫🇷|法国|法國|巴黎|里昂|\b(?:France|Paris|Lyon)\b|\b(?:FR|FRA)\d*\b|🇳🇱|荷兰|荷蘭|阿姆斯特丹|鹿特丹|\b(?:Netherlands|Holland|Amsterdam|Rotterdam)\b|\b(?:NL|NLD)\d*\b|🇨🇭|瑞士|苏黎世|蘇黎世|日内瓦|日內瓦|\b(?:Switzerland|Swiss|Zurich|Geneva)\b|\b(?:CH|CHE)\d*\b|🇷🇺|俄罗斯|俄羅斯|莫斯科|圣彼得堡|聖彼得堡|\b(?:Russia|Moscow|Saint\s?Petersburg)\b|\b(?:RU|RUS)\d*\b|🇹🇷|土耳其|伊斯坦布尔|伊斯坦布爾|伊斯坦堡|安卡拉|\b(?:Turkey|Türkiye|Turkiye|Istanbul|Ankara)\b|\b(?:TR|TUR)\d*\b|🇧🇷|巴西|圣保罗|聖保羅|里约|里約|\b(?:Brazil|Brasil|S[aã]o\s?Paulo|Rio\s?de\s?Janeiro)\b|\b(?:BR|BRA)\d*\b|🇦🇷|阿根廷|布宜诺斯艾利斯|布宜諾斯艾利斯|\b(?:Argentina|Buenos\s?Aires)\b|\b(?:AR|ARG)\d*\b))(?!.*(?:=>|群|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|剩余流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|超时|收藏|福利|失联|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author|Traffic|\d{4}-\d{2}-\d{2}|\d+G)).*$'  # 仅收纳未命中上述地区的净化节点
+
+# =======================================================
+# 5. 策略组 Proxy Groups
+# =======================================================
+
+# include-all 汇入手动节点及订阅节点；filter 仅在当前组内按节点名称筛选
+# select 为手动选择，首项为初始选项；标注预留的策略组当前未被规则或其他策略组引用
+# 应用范围由下方 rules 实际命中决定；图标使用 macOSicons PNG，来源见 icons/macosicons/manifest.json
+proxy-groups:
+
+  # ── 策略入口 / Switch ──
+  - {name: 🎚️ 节点选择,   type: select, proxies: [♻️ 自动选择, 🔯 故障转移, 🔮 负载均衡, 🌆, 🧋, 🎰, ⛩️, 🎤, 🏙️, 🐘, 🌺, 🍜, 🏝️, 🌋, 🪷, 🦘, 🗽, 🍁, 💂, 🍺, 🗼, 🌷, 🏔️, 🪆, 🧿, ⚽, 🧉, 🌌, 🚀 手动切换, DIRECT], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/control-center.png"}  # 总切换入口，选择自动策略 / 地区组 / 手动切换 / 直连
+
+  # ── 全部节点 / Proxy ──
+  - {name: 🚀 手动切换,  type: select, include-all: true, filter: *FilterAll, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/network-utility.png"}  # 手动选择通过 FilterAll 净化后的手动节点及订阅节点
+
+  # ── 自动选择 / Auto ──
+  - {name: ♻️ 自动选择,   type: url-test, include-all: true, filter: *FilterAll, url: "https://www.gstatic.com/generate_204", interval: 300, tolerance: 50, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/automator.png"}  # 测速选择低延迟节点，切换容差 50 毫秒
+
+  # ── 故障转移 / Fallback ──
+  - {name: 🔯 故障转移,  type: fallback, include-all: true, filter: *FilterAll, url: "https://www.gstatic.com/generate_204", interval: 300, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/time-machine.png"}  # 按节点顺序选择首个可用节点，故障时自动顺延
+
+  # ── 负载均衡 / Load Balance ──
+  - {name: 🔮 负载均衡,  type: load-balance, include-all: true, filter: *FilterAll, strategy: consistent-hashing, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/activity-monitor.png"}  # 按目标地址做一致性哈希，同一目标尽量固定出口
+
+  # ── 下载均衡 / Download Balance ──
+  - {name: ⚖️ 下载均衡,   type: load-balance, include-all: true, filter: *FilterAll, strategy: round-robin, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/downloads.png"}  # 轮询分配不同连接；当前为预留入口，尚未引用
+
+  # ── 应用分流 / Proxy App ──
+  - {name: ⚡ OpenAI,    type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, 🎰, ⛩️, 🎤, 🏙️, 🐘, 🌺, 🍜, 🏝️, 🌋, 🪷, 🦘, 🗽, 🍁, 💂, 🍺, 🗼, 🌷, 🏔️, 🪆, 🧿, ⚽, 🧉, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/chatgpt.png"}  # OpenAI / ChatGPT 命中入口
+  - {name: 🪐 Anthropic, type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, 🎰, ⛩️, 🎤, 🏙️, 🐘, 🌺, 🍜, 🏝️, 🌋, 🪷, 🦘, 🗽, 🍁, 💂, 🍺, 🗼, 🌷, 🏔️, 🪆, 🧿, ⚽, 🧉, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/claude.png"}  # Anthropic / Claude 命中入口
+  - {name: ✨ AI 服务,   type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, 🎰, ⛩️, 🎤, 🏙️, 🐘, 🌺, 🍜, 🏝️, 🌋, 🪷, 🦘, 🗽, 🍁, 💂, 🍺, 🗼, 🌷, 🏔️, 🪆, 🧿, ⚽, 🧉, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/apple-intelligence.png"}  # 海外 AI 类目入口，已单列的 OpenAI / Anthropic 优先匹配
+  - {name: 🟦 OKX,       type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, 🎰, ⛩️, 🎤, 🏙️, 🐘, 🌺, 🍜, 🏝️, 🌋, 🪷, 🦘, 🗽, 🍁, 💂, 🍺, 🗼, 🌷, 🏔️, 🪆, 🧿, ⚽, 🧉, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/okx.png"}  # OKX / 欧易命中入口
+  - {name: 🟨 Binance,   type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, 🎰, ⛩️, 🎤, 🏙️, 🐘, 🌺, 🍜, 🏝️, 🌋, 🪷, 🦘, 🗽, 🍁, 💂, 🍺, 🗼, 🌷, 🏔️, 🪆, 🧿, ⚽, 🧉, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/binance.png"}  # Binance / 币安命中入口
+  - {name: 🟪 Bybit,     type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, 🎰, ⛩️, 🎤, 🏙️, 🐘, 🌺, 🍜, 🏝️, 🌋, 🪷, 🦘, 🗽, 🍁, 💂, 🍺, 🗼, 🌷, 🏔️, 🪆, 🧿, ⚽, 🧉, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/wallet.png"}  # Bybit 命中入口，图标暂用 Wallet
+  - {name: 🪙 Crypto,    type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, 🎰, ⛩️, 🎤, 🏙️, 🐘, 🌺, 🍜, 🏝️, 🌋, 🪷, 🦘, 🗽, 🍁, 💂, 🍺, 🗼, 🌷, 🏔️, 🪆, 🧿, ⚽, 🧉, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/bitcoin.png"}  # 加密货币预留入口，当前未引用
+  - {name: 📺 YouTube,   type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, 🎰, ⛩️, 🎤, 🏙️, 🐘, 🌺, 🍜, 🏝️, 🌋, 🪷, 🦘, 🗽, 🍁, 💂, 🍺, 🗼, 🌷, 🏔️, 🪆, 🧿, ⚽, 🧉, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/youtube.png"}  # YouTube 命中入口，优先于后续 Google 通用规则
+  - {name: 🧭 Google,    type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, 🎰, ⛩️, 🎤, 🏙️, 🐘, 🌺, 🍜, 🏝️, 🌋, 🪷, 🦘, 🗽, 🍁, 💂, 🍺, 🗼, 🌷, 🏔️, 🪆, 🧿, ⚽, 🧉, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/google.png"}  # Google 通用入口，前置直连及专项规则优先匹配
+  - {name: ☁️ Cloudflare, type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, 🎰, ⛩️, 🎤, 🏙️, 🐘, 🌺, 🍜, 🏝️, 🌋, 🪷, 🦘, 🗽, 🍁, 💂, 🍺, 🗼, 🌷, 🏔️, 🪆, 🧿, ⚽, 🧉, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/cloudflare.png"}  # Cloudflare 命中入口，前置直连及专项规则优先匹配
+  - {name: 📦 Amazon,    type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, 🎰, ⛩️, 🎤, 🏙️, 🐘, 🌺, 🍜, 🏝️, 🌋, 🪷, 🦘, 🗽, 🍁, 💂, 🍺, 🗼, 🌷, 🏔️, 🪆, 🧿, ⚽, 🧉, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/amazon.png"}  # Amazon 预留入口，当前未引用
+  - {name: 🐙 GitHub,    type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, 🎰, ⛩️, 🎤, 🏙️, 🐘, 🌺, 🍜, 🏝️, 🌋, 🪷, 🦘, 🗽, 🍁, 💂, 🍺, 🗼, 🌷, 🏔️, 🪆, 🧿, ⚽, 🧉, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/github.png"}  # GitHub 命中入口
+  - {name: 🪟 Microsoft, type: select, proxies: [DIRECT, 🎚️ 节点选择, REJECT, 🌆, 🧋, 🎰, ⛩️, 🎤, 🏙️, 🐘, 🌺, 🍜, 🏝️, 🌋, 🪷, 🦘, 🗽, 🍁, 💂, 🍺, 🗼, 🌷, 🏔️, 🪆, 🧿, ⚽, 🧉, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/microsoft.png"}  # Microsoft 命中入口，首项为 DIRECT
+  - {name: 🎨 Adobe,     type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, 🎰, ⛩️, 🎤, 🏙️, 🐘, 🌺, 🍜, 🏝️, 🌋, 🪷, 🦘, 🗽, 🍁, 💂, 🍺, 🗼, 🌷, 🏔️, 🪆, 🧿, ⚽, 🧉, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/adobe.png"}  # Adobe 命中入口，当前为分流规则第一条
+  - {name: ⚪ Apple,     type: select, proxies: [DIRECT, 🎚️ 节点选择, REJECT, 🌆, 🧋, 🎰, ⛩️, 🎤, 🏙️, 🐘, 🌺, 🍜, 🏝️, 🌋, 🪷, 🦘, 🗽, 🍁, 💂, 🍺, 🗼, 🌷, 🏔️, 🪆, 🧿, ⚽, 🧉, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/apple.png"}  # Apple 命中入口，首项为 DIRECT
+  - {name: 🤖 Android,   type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, 🎰, ⛩️, 🎤, 🏙️, 🐘, 🌺, 🍜, 🏝️, 🌋, 🪷, 🦘, 🗽, 🍁, 💂, 🍺, 🗼, 🌷, 🏔️, 🪆, 🧿, ⚽, 🧉, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/android.png"}  # Android / Google Play 预留入口，当前未引用
+
+  - {name: 𝕏 X,          type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, 🎰, ⛩️, 🎤, 🏙️, 🐘, 🌺, 🍜, 🏝️, 🌋, 🪷, 🦘, 🗽, 🍁, 💂, 🍺, 🗼, 🌷, 🏔️, 🪆, 🧿, ⚽, 🧉, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/x.png"}  # X / Twitter 命中入口
+  - {name: ♾️ Meta,       type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, 🎰, ⛩️, 🎤, 🏙️, 🐘, 🌺, 🍜, 🏝️, 🌋, 🪷, 🦘, 🗽, 🍁, 💂, 🍺, 🗼, 🌷, 🏔️, 🪆, 🧿, ⚽, 🧉, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/meta.png"}  # Instagram 命中入口，当前未为 Facebook / WhatsApp 单列此组规则
+  - {name: 🪽 Telegram,  type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, 🎰, ⛩️, 🎤, 🏙️, 🐘, 🌺, 🍜, 🏝️, 🌋, 🪷, 🦘, 🗽, 🍁, 💂, 🍺, 🗼, 🌷, 🏔️, 🪆, 🧿, ⚽, 🧉, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/telegram.png"}  # Telegram 专项入口，优先于后续通信类目规则
+  - {name: 🎮 Discord,   type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, 🎰, ⛩️, 🎤, 🏙️, 🐘, 🌺, 🍜, 🏝️, 🌋, 🪷, 🦘, 🗽, 🍁, 💂, 🍺, 🗼, 🌷, 🏔️, 🪆, 🧿, ⚽, 🧉, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/discord.png"}  # 通信服务类目入口，接收 category-communication，范围不限于 Discord
+  - {name: 🫂 Social,    type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, 🎰, ⛩️, 🎤, 🏙️, 🐘, 🌺, 🍜, 🏝️, 🌋, 🪷, 🦘, 🗽, 🍁, 💂, 🍺, 🗼, 🌷, 🏔️, 🪆, 🧿, ⚽, 🧉, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/messages.png"}  # 海外社交类目入口，已单列服务优先匹配
+
+  - {name: 🎶 TikTok,    type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, 🎰, ⛩️, 🎤, 🏙️, 🐘, 🌺, 🍜, 🏝️, 🌋, 🪷, 🦘, 🗽, 🍁, 💂, 🍺, 🗼, 🌷, 🏔️, 🪆, 🧿, ⚽, 🧉, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/tiktok.png"}  # TikTok 命中入口
+  - {name: 🍿 Netflix,   type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, 🎰, ⛩️, 🎤, 🏙️, 🐘, 🌺, 🍜, 🏝️, 🌋, 🪷, 🦘, 🗽, 🍁, 💂, 🍺, 🗼, 🌷, 🏔️, 🪆, 🧿, ⚽, 🧉, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/netflix.png"}  # Netflix 命中入口
+  - {name: 💚 Spotify,   type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, 🎰, ⛩️, 🎤, 🏙️, 🐘, 🌺, 🍜, 🏝️, 🌋, 🪷, 🦘, 🗽, 🍁, 💂, 🍺, 🗼, 🌷, 🏔️, 🪆, 🧿, ⚽, 🧉, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/spotify.png"}  # Spotify 预留入口，当前未引用
+  - {name: 🎥 Media,     type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, 🎰, ⛩️, 🎤, 🏙️, 🐘, 🌺, 🍜, 🏝️, 🌋, 🪷, 🦘, 🗽, 🍁, 💂, 🍺, 🗼, 🌷, 🏔️, 🪆, 🧿, ⚽, 🧉, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/tv.png"}  # 流媒体预留入口，当前未引用
+  - {name: 📺 Bilibili,  type: select, proxies: [DIRECT, 🎚️ 节点选择, REJECT, 🌆, 🧋, 🎰, ⛩️, 🎤, 🏙️, 🐘, 🌺, 🍜, 🏝️, 🌋, 🪷, 🦘, 🗽, 🍁, 💂, 🍺, 🗼, 🌷, 🏔️, 🪆, 🧿, ⚽, 🧉, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/bilibili.png"}  # Bilibili 预留入口，当前未引用；首项为 DIRECT
+
+  - {name: 👾 Steam,     type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, 🎰, ⛩️, 🎤, 🏙️, 🐘, 🌺, 🍜, 🏝️, 🌋, 🪷, 🦘, 🗽, 🍁, 💂, 🍺, 🗼, 🌷, 🏔️, 🪆, 🧿, ⚽, 🧉, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/steam.png"}  # Steam 入口，前置国区及游戏下载规则优先直连
+  - {name: 🎁 Epic,      type: select, proxies: [DIRECT, 🎚️ 节点选择, REJECT, 🌆, 🧋, 🎰, ⛩️, 🎤, 🏙️, 🐘, 🌺, 🍜, 🏝️, 🌋, 🪷, 🦘, 🗽, 🍁, 💂, 🍺, 🗼, 🌷, 🏔️, 🪆, 🧿, ⚽, 🧉, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/epic-games.png"}  # Epic Games 预留入口，当前未引用；首项为 DIRECT
+  - {name: 🕹️ TapTap,     type: select, proxies: [DIRECT, 🎚️ 节点选择, REJECT, 🌆, 🧋, 🎰, ⛩️, 🎤, 🏙️, 🐘, 🌺, 🍜, 🏝️, 🌋, 🪷, 🦘, 🗽, 🍁, 💂, 🍺, 🗼, 🌷, 🏔️, 🪆, 🧿, ⚽, 🧉, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/game-center.png"}  # TapTap 预留入口，当前未引用；图标暂用 Game Center
+
+  - {name: ⚡ Speedtest, type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, 🎰, ⛩️, 🎤, 🏙️, 🐘, 🌺, 🍜, 🏝️, 🌋, 🪷, 🦘, 🗽, 🍁, 💂, 🍺, 🗼, 🌷, 🏔️, 🪆, 🧿, ⚽, 🧉, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/speedtest.png"}  # 测速服务类目入口，接收 category-speedtest
+
+  - {name: 🔌 特殊端口,  type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, 🎰, ⛩️, 🎤, 🏙️, 🐘, 🌺, 🍜, 🏝️, 🌋, 🪷, 🦘, 🗽, 🍁, 💂, 🍺, 🗼, 🌷, 🏔️, 🪆, 🧿, ⚽, 🧉, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/airport-utility.png"}  # 自定义端口规则入口，前置规则优先；实际出口由本组选择
+
+  # ── 可选内容 / R18 ──
+  # - {name: 😈 R18,     type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, 🎰, ⛩️, 🎤, 🏙️, 🐘, 🌺, 🍜, 🏝️, 🌋, 🪷, 🦘, 🗽, 🍁, 💂, 🍺, 🗼, 🌷, 🏔️, 🪆, 🧿, ⚽, 🧉, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/safari-private.png"}  # 可选成人内容入口，默认注释；启用后还需添加对应分流规则
+
+  # ── 国内与兜底 / CN & Final ──
+  - {name: 🏮,           type: select, proxies: [DIRECT, 🎚️ 节点选择, REJECT, 🌆, 🧋, 🎰, ⛩️, 🎤, 🏙️, 🐘, 🌺, 🍜, 🏝️, 🌋, 🪷, 🦘, 🗽, 🍁, 💂, 🍺, 🗼, 🌷, 🏔️, 🪆, 🧿, ⚽, 🧉, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/home.png"}  # 国内预留入口，当前未引用；国内规则直接使用 DIRECT
+  - {name: 🏁 Final,     type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, 🎰, ⛩️, 🎤, 🏙️, 🐘, 🌺, 🍜, 🏝️, 🌋, 🪷, 🦘, 🗽, 🍁, 💂, 🍺, 🗼, 🌷, 🏔️, 🪆, 🧿, ⚽, 🧉, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/safari.png"}  # 最终兜底入口，接收未命中前面规则的流量
+
+  # ── 地区节点 / Regions ──
+  # 地区组仅应用各自地区正则，未叠加 FilterAll；24 个地区组统一使用 macOSicons Maps 图标
+  - {name: 🌆,           type: select, include-all: true, filter: *FilterHK, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png"}  # 香港节点，按 FilterHK 筛选
+  - {name: 🧋,           type: select, include-all: true, filter: *FilterTW, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png"}  # 台湾节点，按 FilterTW 筛选
+  - {name: 🎰,           type: select, include-all: true, filter: *FilterMO, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png"}  # 澳门节点，按 FilterMO 筛选
+  - {name: ⛩️,            type: select, include-all: true, filter: *FilterJP, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png"}  # 日本节点，按 FilterJP 筛选
+  - {name: 🎤,           type: select, include-all: true, filter: *FilterKR, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png"}  # 韩国节点，按 FilterKR 筛选
+  - {name: 🏙️,            type: select, include-all: true, filter: *FilterSG, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png"}  # 新加坡节点，按 FilterSG 筛选
+  - {name: 🐘,           type: select, include-all: true, filter: *FilterTH, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png"}  # 泰国节点，按 FilterTH 筛选
+  - {name: 🌺,           type: select, include-all: true, filter: *FilterMY, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png"}  # 马来西亚节点，按 FilterMY 筛选
+  - {name: 🍜,           type: select, include-all: true, filter: *FilterVN, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png"}  # 越南节点，按 FilterVN 筛选
+  - {name: 🏝️,            type: select, include-all: true, filter: *FilterPH, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png"}  # 菲律宾节点，按 FilterPH 筛选
+  - {name: 🌋,           type: select, include-all: true, filter: *FilterID, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png"}  # 印度尼西亚节点，按 FilterID 筛选
+  - {name: 🪷,           type: select, include-all: true, filter: *FilterIN, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png"}  # 印度节点，按 FilterIN 筛选
+  - {name: 🦘,           type: select, include-all: true, filter: *FilterAU, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png"}  # 澳大利亚节点，按 FilterAU 筛选
+  - {name: 🗽,           type: select, include-all: true, filter: *FilterUS, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png"}  # 美国节点，按 FilterUS 筛选
+  - {name: 🍁,           type: select, include-all: true, filter: *FilterCA, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png"}  # 加拿大节点，按 FilterCA 筛选
+  - {name: 💂,           type: select, include-all: true, filter: *FilterUK, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png"}  # 英国节点，按 FilterUK 筛选
+  - {name: 🍺,           type: select, include-all: true, filter: *FilterDE, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png"}  # 德国节点，按 FilterDE 筛选
+  - {name: 🗼,           type: select, include-all: true, filter: *FilterFR, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png"}  # 法国节点，按 FilterFR 筛选
+  - {name: 🌷,           type: select, include-all: true, filter: *FilterNL, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png"}  # 荷兰节点，按 FilterNL 筛选
+  - {name: 🏔️,            type: select, include-all: true, filter: *FilterCH, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png"}  # 瑞士节点，按 FilterCH 筛选
+  - {name: 🪆,           type: select, include-all: true, filter: *FilterRU, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png"}  # 俄罗斯节点，按 FilterRU 筛选
+  - {name: 🧿,           type: select, include-all: true, filter: *FilterTR, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png"}  # 土耳其节点，按 FilterTR 筛选
+  - {name: ⚽,           type: select, include-all: true, filter: *FilterBR, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png"}  # 巴西节点，按 FilterBR 筛选
+  - {name: 🧉,           type: select, include-all: true, filter: *FilterAR, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png"}  # 阿根廷节点，按 FilterAR 筛选
+  - {name: 🌌,           type: select, include-all: true, filter: *FilterOthers, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/network.png"}  # 未分类地区节点，排除以上 24 个国家 / 地区
+
+
+# =======================================================
+# 6. 分流规则 Rules
+# =======================================================
+
+# 规则自上而下匹配，首次命中即停止；调整规则顺序会影响最终出口
+# GEOSITE / GEOIP 使用客户端实际加载的数据版本；RULE-SET 引用第 7 节同名规则源
+# no-resolve 表示此条 IP 规则不主动触发域名解析，已有目标 IP 时仍可匹配
+rules:
+
+  # ── 优先规则 / Priority ──
+  - GEOSITE,adobe,🎨 Adobe                           # Adobe 专项分流，优先于后续国内直连及自定义补充规则
+  - GEOSITE,private,DIRECT                           # 私有域名 / 局域网域名直连
+  - GEOIP,private,DIRECT,no-resolve                  # 私有目标 IP 直连，不为此条规则额外解析域名
+
+  # ── 自定义补充 / Custom ──
+  - RULE-SET,🏮 Hearth,DIRECT                        # 自定义直连域名补充
+  - RULE-SET,🏮 Hearth · IP,DIRECT                   # 自定义经典直连补充，上游含 IP / 源端口 / 目标端口规则
+  - RULE-SET,🌌 Orbit,🎚️ 节点选择                     # 自定义代理域名补充，交由节点选择
+  - RULE-SET,🌌 Orbit · IP,🎚️ 节点选择                # 自定义代理 IP 补充，交由节点选择
+
+  # ── 国内直连 / Direct ──
+  - GEOSITE,cn,DIRECT                                # 国内域名直连
+  - GEOIP,cn,DIRECT,no-resolve                       # 国内目标 IP 直连，不为此条规则额外解析域名
+  - GEOSITE,google-cn,DIRECT                         # Google 国内可直连类目
+
+  # ── 游戏与下载 / Games ──
+  - GEOSITE,steam@cn,DIRECT                          # Steam 中标记为 @cn 的域名直连
+  - GEOSITE,category-game-platforms-download,DIRECT  # 游戏平台下载类目直连，优先于下方 Steam 通用规则
+  - GEOSITE,steam,👾 Steam                           # 剩余 Steam 域名交由 Steam 策略组
+  - GEOSITE,category-games,DIRECT                    # 剩余游戏类目直连，前置 Steam 专项规则优先
+  - GEOSITE,category-public-tracker,DIRECT           # 公共 Tracker 域名直连
+
+  # ── 应用与类目 / Services ──
+  # - GEOSITE,Notion,📦 Notion                       # 可选 Notion 规则，启用前先定义对应策略组并确认分类可用
+  - GEOSITE,telegram,🪽 Telegram                     # Telegram 专项分流，优先于通信类目
+  - GEOSITE,openai,⚡ OpenAI                         # OpenAI / ChatGPT 专项分流
+  - GEOSITE,anthropic,🪐 Anthropic                   # Anthropic / Claude 专项分流
+  - GEOSITE,category-ai-!cn,✨ AI 服务               # 剩余海外 AI 类目分流
+  - GEOSITE,apple,⚪ Apple                           # Apple 服务分流
+  - GEOSITE,youtube,📺 YouTube                       # YouTube 专项分流，优先于 Google 通用规则
+  - GEOSITE,netflix,🍿 Netflix                       # Netflix 专项分流
+  - GEOSITE,tiktok,🎶 TikTok                         # TikTok 专项分流
+  - GEOSITE,instagram,♾️ Meta                         # Instagram 交由 Meta 策略组
+  - GEOSITE,twitter,𝕏 X                              # X / Twitter 专项分流
+  - GEOSITE,github,🐙 GitHub                         # GitHub 专项分流
+  - GEOSITE,category-speedtest,⚡ Speedtest          # 测速服务类目分流，范围不限于 Speedtest
+
+  - GEOSITE,okx,🟦 OKX                               # OKX / 欧易专项分流
+  - GEOSITE,binance,🟨 Binance                       # Binance / 币安专项分流
+  - GEOSITE,bybit,🟪 Bybit                           # Bybit 专项分流
+  - GEOSITE,category-communication,🎮 Discord        # 通信服务类目交由 Discord 策略组，已单列的 Telegram 优先
+  - GEOSITE,category-social-media-!cn,🫂 Social      # 剩余海外社交类目分流，前置通信及专项规则优先
+  # - GEOSITE,teamviewer,↔️ teamviewer                # 可选 TeamViewer 规则，启用前先定义对应策略组并确认分类可用
+  - GEOSITE,cloudflare,☁️ Cloudflare                  # Cloudflare 通用分流，前置规则优先
+  - GEOSITE,google,🧭 Google                         # Google 通用分流，前置规则优先
+  - GEOSITE,microsoft,🪟 Microsoft                   # Microsoft 通用分流，前置规则优先
+
+  # ── 通用代理 / Proxy ──
+  - GEOSITE,gfw,🎚️ 节点选择                           # gfw 域名类目交由节点选择
+
+  # ── 端口补充 / Ports ──
+  - RULE-SET,🔌 Portal,🔌 特殊端口                   # 对尚未命中的流量应用端口规则，出口交由特殊端口组选择
+
+  # ── 最终兜底 / Final ──
+  - MATCH,🏁 Final                                   # 其余全部流量交由 Final 兜底
+
+
+# =======================================================
+# 7. 规则源 Rule Providers
+# =======================================================
+
+# ── 公共字段 / Rule Anchors ──
+# 以下 YAML 锚点统一复用下载方式 / 匹配类型 / 文件格式 / 更新间隔
+rule-anchor:
+  domain:    &RP-domain    {type: http, behavior: domain,    format: yaml, interval: 28800}  # 域名型规则集，YAML 格式，每 28800 秒 / 8 小时更新
+  classical: &RP-classical {type: http, behavior: classical, format: yaml, interval: 28800}  # 经典规则集，支持 IP / 端口等规则，YAML 格式，每 28800 秒 / 8 小时更新
+
+# ── 规则订阅 / Rule Sources ──
+# 规则源名称需与 RULE-SET 引用一致；实际匹配范围随上游内容更新
+# Hearth · IP 使用 classical 格式，上游还包含端口规则，并非纯 IP 列表
+# Portal 当前上游匹配 80 / 443 以外的目标端口；实际出口由特殊端口策略组选择
+rule-providers:
+  🏮 Hearth:      {<<: *RP-domain,    url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Direct_Domain.yaml"}        # 自定义直连域名补充，命中后使用 DIRECT
+  🏮 Hearth · IP: {<<: *RP-classical, url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Direct_Classical_IP.yaml"}  # 自定义经典直连补充，包含 IP / 端口规则
+  🌌 Orbit:       {<<: *RP-domain,    url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Proxy_Domain.yaml"}         # 自定义代理域名补充，命中后交由节点选择
+  🌌 Orbit · IP:  {<<: *RP-classical, url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Proxy_Classical_IP.yaml"}   # 自定义代理 IP 补充，命中后交由节点选择
+  🔌 Portal:      {<<: *RP-classical, url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Port_Direct.yaml"}          # 自定义端口补充，命中后交由特殊端口策略组
