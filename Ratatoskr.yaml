@@ -62,12 +62,13 @@ unified-delay: true
 # 按节点名称独立筛选；名称含多个地区标记时可能进入多个组，实际落地以机场标注为准
 # ── 地区节点匹配正则 支持国旗 / 中英文 / 地区代码 排除带有 "=>" 前缀的落地节点 ──
 
-FilterHK: &FilterHK '(?i)^(?!=>).*(?:🇭🇰|香港|Hong\s?Kong|\b(?:HK|HKG)\d*\b)'
-FilterTW: &FilterTW '(?i)^(?!=>).*(?:🇹🇼|台湾|Tai(?:wan)?|\b(?:TW|TWN)\d*\b)'
-FilterJP: &FilterJP '(?i)^(?!=>).*(?:🇯🇵|日本|川日|东京|大阪|埼玉|Japan|\b(?:JP|JPN)\d*\b)'
-FilterKR: &FilterKR '(?i)^(?!=>).*(?:🇰🇷|韩国|韓|首尔|Korea|\b(?:KR|KOR)\d*\b)'
-FilterSG: &FilterSG '(?i)^(?!=>).*(?:🇸🇬|新加坡|狮|Singapore|\b(?:SG|SGP)\d*\b)'
-FilterUS: &FilterUS '(?i)^(?!=>).*(?:🇺🇸|美国|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|拉斯维加斯|United States|\b(?:US|USA)\d*\b)'
+FilterRegions: &FilterRegions
+  HK: &FilterHK '(?i)^(?!=>).*(?:🇭🇰|香港|Hong\s?Kong|\b(?:HK|HKG)\d*\b)'
+  TW: &FilterTW '(?i)^(?!=>).*(?:🇹🇼|台湾|Tai(?:wan)?|\b(?:TW|TWN)\d*\b)'
+  JP: &FilterJP '(?i)^(?!=>).*(?:🇯🇵|日本|川日|东京|大阪|埼玉|Japan|\b(?:JP|JPN)\d*\b)'
+  KR: &FilterKR '(?i)^(?!=>).*(?:🇰🇷|韩国|韓|首尔|Korea|\b(?:KR|KOR)\d*\b)'
+  SG: &FilterSG '(?i)^(?!=>).*(?:🇸🇬|新加坡|狮|Singapore|\b(?:SG|SGP)\d*\b)'
+  US: &FilterUS '(?i)^(?!=>).*(?:🇺🇸|美国|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|拉斯维加斯|United States|\b(?:US|USA)\d*\b)'
 
 # ── 节点净化 / Clean Filter ──
 # 按名称排除广告 / 流量 / 到期等关键词，以及名称任意位置的 => 标记
@@ -75,8 +76,9 @@ FilterUS: &FilterUS '(?i)^(?!=>).*(?:🇺🇸|美国|波特兰|达拉斯|俄勒�
 FilterAll: &FilterAll '^(?!.*(?:(?i)=>|群|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|剩余流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|超时|收藏|福利|失联|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author|Traffic|\d{4}-\d{2}-\d{2}|\d+G)).*$'
 
 # ── 其他地区 / Others ──
-# 应用 FilterAll 的节点净化，并排除以上 24 个已分类国家 / 地区
-FilterOthers: &FilterOthers '^(?!.*(?:(?i)=>|群|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|剩余流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|超时|收藏|福利|失联|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author|Traffic|\d{4}-\d{2}-\d{2}|\d+G)).*$'
+# 应用 FilterAll 的节点净化，并排除香港、台湾、日本、韩国、新加坡和美国节点
+# 修改 FilterRegions 或 FilterAll 后，运行 node scripts/generate-ratatoskr-filters.mjs 更新此正则
+FilterOthers: &FilterOthers '^(?!.*(?:(?i)=>|(?i:🇭🇰|香港|Hong\s?Kong|\b(?:HK|HKG)\d*\b)|(?i:🇹🇼|台湾|Tai(?:wan)?|\b(?:TW|TWN)\d*\b)|(?i:🇯🇵|日本|川日|东京|大阪|埼玉|Japan|\b(?:JP|JPN)\d*\b)|(?i:🇰🇷|韩国|韓|首尔|Korea|\b(?:KR|KOR)\d*\b)|(?i:🇸🇬|新加坡|狮|Singapore|\b(?:SG|SGP)\d*\b)|(?i:🇺🇸|美国|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|拉斯维加斯|United States|\b(?:US|USA)\d*\b)|群|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|剩余流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|超时|收藏|福利|失联|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author|Traffic|\d{4}-\d{2}-\d{2}|\d+G)).*$'
 
 # =======================================================
 # 5. 策略组 Proxy Groups
@@ -139,7 +141,8 @@ proxy-groups:
   - {name: 🏰 Disney+,     type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌]}
   - {name: 🟣 Twitch,      type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌]}
   - {name: 💚 Spotify,     type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/spotify.png"}     # Spotify
-  - {name: 🎥 Media,       type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/media.png"}       # 流媒体杂项 (Hulu / Prime Video / DAZN / HBO / Disney+ / Vimeo / Twitch / Rumble / Plex)
+  - {name: 🍿 Entertainment,   type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/media.png"}       # 流媒体杂项 (Hulu / Prime Video / DAZN / HBO / Disney+ / Vimeo / Twitch / Rumble / Plex)
+  - {name: 📰 News,   type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/media.png"}       # 流媒体杂项 (Hulu / Prime Video / DAZN / HBO / Disney+ / Vimeo / Twitch / Rumble / Plex)
   - {name: 📺 Bilibili,    type: select, proxies: [DIRECT, 🎚️ 节点选择, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/bilibili.png"}    # Bilibili
   
   - {name: 👾 Steam,       type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/steam.png"}       # Steam
@@ -180,28 +183,32 @@ rules:
 
   # ── 优先规则 / Priority ──
   - GEOSITE,adobe,🎨 Adobe
+
+  # ── 私网直连 ──
   - GEOSITE,private,DIRECT
   - GEOIP,private,DIRECT,no-resolve
 
   # ── 自定义补充 / Custom ──
+  # ── Aethersailor 直连补丁 ──
   - RULE-SET,↘️ Direct Domain,DIRECT
   - RULE-SET,📍 Direct IP,DIRECT
+
+  # ── Aethersailor 代理补丁（仅兜底用，不越权）──
   - RULE-SET,🌍 Proxy Domain,🎚️ 节点选择
   - RULE-SET,🛰️ Proxy IP,🎚️ 节点选择
 
   # ── 国内流量直连 / China Direct ──
   - GEOSITE,cn,DIRECT
-  - GEOIP,CN,DIRECT
   - GEOIP,cn,DIRECT,no-resolve
   - GEOSITE,google-cn,DIRECT
 
   # ── 游戏与下载 / Games ──
   - GEOSITE,steam@cn,DIRECT
+  - GEOSITE,category-game-platforms-download@cn,DIRECT
   - GEOSITE,steam,👾 Steam
   - GEOSITE,epicgames,🎁 Epic
   - GEOSITE,taptap,🕹️ TapTap
   - GEOSITE,category-games,DIRECT
-  - GEOSITE,category-game-platforms-download,DIRECT
   - GEOSITE,category-public-tracker,DIRECT
 
   # ── 流媒体 / Streaming ──
@@ -265,4 +272,5 @@ rule-providers:
   📍 Direct IP:           {<<: *RP-classical, url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Direct_Classical_IP.yaml"}
   🌍 Proxy Domain:        {<<: *RP-domain,    url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Proxy_Domain.yaml"}
   🛰️ Proxy IP:            {<<: *RP-classical, url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Proxy_Classical_IP.yaml"}
-  🔀 Port Rules:         {<<: *RP-classical, url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Port_Direct.yaml"}
+  🔀 Port Rules:          {<<: *RP-classical, url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Port_Direct.yaml"}
+# =======================================================
