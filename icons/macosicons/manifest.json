@@ -1,0 +1,964 @@
+{
+  "source": "macOSicons.com",
+  "verified_on": "2026-10-29",
+  "configuration": "Ratatoskr.yaml",
+  "assets": {
+    "control-center": {
+      "name": "Control Centre",
+      "object_id": "wEgTx0LD5q",
+      "url": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/control-center.png",
+      "source_url": "https://macosicons.com/icon/control-centre-wEgTx0LD5q",
+      "creator": "Random Ics",
+      "creator_url": "https://macosicons.com/#/u/Random Ics",
+      "file": "control-center.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "917e888df0cfbdcda3a3e5c11ddb05e5f1e23325d8b9d79f4a0247c20490735d",
+      "source_image_url": "https://s3-new.macosicons.com/macosicons/parse/Control_Centre_wEgTx0LD5q_lowResPng-e21c621982.png"
+    },
+    "network-utility": {
+      "name": "Network Utility",
+      "object_id": "JFnWk2pMWE",
+      "url": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/network-utility.png",
+      "source_url": "https://macosicons.com/icon/network-utility-JFnWk2pMWE",
+      "creator": "Fausto Ristagno",
+      "creator_url": "https://apps.apple.com/us/developer/fausto-ristagno/id482102205",
+      "file": "network-utility.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "294f60105fdc3f3dfcb4be54f5e8bd864092987f7676cabbe45571a17fcc6079",
+      "source_image_url": "https://s3-new.macosicons.com/macosicons/parse/low_res_Network_Utility_JFnWk2pMWE-0a64c91ce0.png"
+    },
+    "automator": {
+      "name": "Automator",
+      "object_id": "OOcKY57Kvt",
+      "url": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/automator.png",
+      "source_url": "https://macosicons.com/icon/automator-OOcKY57Kvt",
+      "creator": "Agent David",
+      "creator_url": "https://macosicons.com/#/u/Agent David",
+      "file": "automator.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "9c8f83f76501fae6263f75e5e8403ffc45f5ec4324b500dcb5d0242598a0c201",
+      "source_image_url": "https://s3-new.macosicons.com/macosicons/parse/Automator_OOcKY57Kvt_lowResPng-3cbd7f5ded.png"
+    },
+    "time-machine": {
+      "name": "Time Machine",
+      "object_id": "JDDDaRfWvM",
+      "url": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/time-machine.png",
+      "source_url": "https://macosicons.com/icon/time-machine-JDDDaRfWvM",
+      "creator": "schneidericons",
+      "creator_url": "https://macosicons.com/#/u/schneidericons",
+      "file": "time-machine.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "dd8f8707e435c2df21239d8e60c0e2bb7ae15769e548b952d9c8afe4a37e5210",
+      "source_image_url": "https://s3-new.macosicons.com/macosicons/parse/Time_Machine_JDDDaRfWvM_lowResPng-a95bbb68f8.png"
+    },
+    "activity-monitor": {
+      "name": "Activity Monitor",
+      "object_id": "6VQhaKTBEV",
+      "url": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/activity-monitor.png",
+      "source_url": "https://macosicons.com/icon/activity-monitor-6VQhaKTBEV",
+      "creator": "https://twitter.com/JoeMelanie1",
+      "creator_url": "https://macosicons.com/#/u/jonathan101",
+      "file": "activity-monitor.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "86c849c6df53b370012731fdbdd04128862353df9de6b9961de0e108074e88a2",
+      "source_image_url": "https://s3-new.macosicons.com/macosicons/parse/Activity_Monitor_6VQhaKTBEV_lowResPng-568e639018.png"
+    },
+    "downloads": {
+      "name": "Downloads",
+      "object_id": "uRANJwAgCl",
+      "url": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/downloads.png",
+      "source_url": "https://macosicons.com/icon/downloads-uRANJwAgCl",
+      "creator": "Hubapps.com LLC",
+      "creator_url": "https://apps.apple.com/us/developer/hubapps-com-llc/id369606013?mt=12",
+      "file": "downloads.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "cd808149562df6e338fc703ad75569a8a804c215a13ebc75e880fe10577cbfff",
+      "source_image_url": "https://s3-new.macosicons.com/macosicons/parse/low_res_Downloads_uRANJwAgCl-ae48c00902.png"
+    },
+    "chatgpt": {
+      "name": "ChatGPT (Default) (macOS 26.2+)",
+      "object_id": "KQd6S28qRb",
+      "url": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/chatgpt.png",
+      "source_url": "https://macosicons.com/icon/chatgpt-default-macos-26-2-KQd6S28qRb",
+      "creator": "designer_26.2",
+      "creator_url": "https://macosicons.com/#/u/designer_26.2",
+      "file": "chatgpt.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "cffd8a3fdb8fc52de8bafee9df42a955d3df73def85795538dee23b4f7d07d22",
+      "source_image_url": "https://s3-new.macosicons.com/macosicons/parse/ChatGPT__Default___macOS_26.2___KQd6S28qRb_lowResPng-ac9f03206c.png"
+    },
+    "claude": {
+      "name": "Claude (Default)",
+      "object_id": "bQPQfXDUHF",
+      "url": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/claude.png",
+      "source_url": "https://macosicons.com/icon/claude-default-bQPQfXDUHF",
+      "creator": "kwahli",
+      "creator_url": "https://macosicons.com/#/u/kwahli",
+      "file": "claude.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "014e3157a500a7b3520fe63ba445f2a04ff5e3e57ed2f1496edba0f0c22ea187",
+      "source_image_url": "https://s3-new.macosicons.com/macosicons/parse/Claude__Default__bQPQfXDUHF_lowResPng-8879bdd2ca.png"
+    },
+    "apple-intelligence": {
+      "name": "Apple Intelligence",
+      "object_id": "1IZryj0xQg",
+      "url": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/apple-intelligence.png",
+      "source_url": "https://macosicons.com/icon/apple-intelligence-1IZryj0xQg",
+      "creator": "🅺",
+      "creator_url": "https://macosicons.com/#/u/🅺",
+      "file": "apple-intelligence.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "93a4e459fa8d11618427c9fdf4b336ef2b00d1d6285071a38f872943d39cb1e9",
+      "source_image_url": "https://s3-new.macosicons.com/macosicons/parse/Apple_Intelligence_1IZryj0xQg_lowResPng-2a7f8a6c7c.png"
+    },
+    "okx": {
+      "name": "OKX",
+      "object_id": "giKJ6pF921",
+      "url": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/okx.png",
+      "source_url": "https://macosicons.com/icon/okx-giKJ6pF921",
+      "creator": "OKX Inc.",
+      "creator_url": "https://apps.apple.com/us/developer/okx-inc/id1453135361",
+      "file": "okx.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "8afe4ece0c68ee26f22e3b44f7ea2c6a0aa2a0b40a0255d8bcece73c5885dcbb",
+      "source_image_url": "https://s3-new.macosicons.com/macosicons/parse/low_res_OKX_giKJ6pF921-9b2bbc3ab4.png"
+    },
+    "binance": {
+      "name": "Binance",
+      "object_id": "c1DpPKijNU",
+      "url": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/binance.png",
+      "source_url": "https://macosicons.com/icon/binance-c1DpPKijNU",
+      "creator": "pein1911",
+      "creator_url": "https://macosicons.com/#/u/pein1911",
+      "file": "binance.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "d6bb1a439b1ec5ce4045702c712164f4da0d19ebc483e2500a7c7f9fad106136",
+      "source_image_url": "https://s3-new.macosicons.com/macosicons/parse/Binance_c1DpPKijNU_lowResPng-0c3a5afa76.png"
+    },
+    "wallet": {
+      "name": "Apple Wallet",
+      "object_id": "d5QDUaC49g",
+      "url": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/wallet.png",
+      "source_url": "https://macosicons.com/icon/apple-wallet-d5QDUaC49g",
+      "creator": "Random Ics",
+      "creator_url": "https://macosicons.com/#/u/Random Ics",
+      "file": "wallet.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "251c84df8c1f991186e2f7373a3a32cc417fa8a30202a8ee58e2b4052cd72b1f",
+      "source_image_url": "https://s3-new.macosicons.com/macosicons/parse/low_res_Apple_Wallet_d5QDUaC49g-64856a93e7.png"
+    },
+    "bitcoin": {
+      "name": "Bitcoin Core",
+      "object_id": "zeaBPZEJo9",
+      "url": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/bitcoin.png",
+      "source_url": "https://macosicons.com/icon/bitcoin-core-zeaBPZEJo9",
+      "creator": "Frank Septillion",
+      "creator_url": "https://macosicons.com/#/u/Frank Septillion",
+      "file": "bitcoin.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "e83478a45108fba2e33197d54e4d670460049ba7ca323c35d3c774f67de37f15",
+      "source_image_url": "https://s3-new.macosicons.com/macosicons/parse/low_res_Bitcoin_Core_zeaBPZEJo9-824d0bd1f0.png"
+    },
+    "youtube": {
+      "name": "YouTube",
+      "object_id": "VnDNflASuV",
+      "url": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/youtube.png",
+      "source_url": "https://macosicons.com/icon/youtube-VnDNflASuV",
+      "creator": "Google",
+      "creator_url": "https://apps.apple.com/us/developer/google/id281956209",
+      "file": "youtube.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "afbd6aceb4e44233333a6bad9563146f92f9982739f99fe384693d491230f383",
+      "source_image_url": "https://s3-new.macosicons.com/macosicons/parse/low_res_YouTube_VnDNflASuV-1ebde983a6.png"
+    },
+    "google": {
+      "name": "Google",
+      "object_id": "5ShHbQvlee",
+      "url": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/google.png",
+      "source_url": "https://macosicons.com/icon/google-5ShHbQvlee",
+      "creator": "Google",
+      "creator_url": "https://apps.apple.com/us/developer/google/id281956209",
+      "file": "google.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "4e5e1ceeb4808df318f0a682b89685cc7689700ef4322f338392feaf24f16512",
+      "source_image_url": "https://s3-new.macosicons.com/macosicons/parse/low_res_Google_5ShHbQvlee-70b627f26e.png"
+    },
+    "cloudflare": {
+      "name": "Cloudflare",
+      "object_id": "7VYUVFL1FK",
+      "url": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/cloudflare.png",
+      "source_url": "https://macosicons.com/icon/cloudflare-7VYUVFL1FK",
+      "creator": "https://twitter.com/ii_giovanni",
+      "creator_url": "https://macosicons.com/#/u/iigiovanni",
+      "file": "cloudflare.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "c687927bd846494d4945d67ffb495a7726f38759bfca9d004951363e78b3a915",
+      "source_image_url": "https://s3-new.macosicons.com/macosicons/parse/Cloudflare_7VYUVFL1FK_lowResPng-66124853ec.png"
+    },
+    "amazon": {
+      "name": "Amazon",
+      "object_id": "G7nKNzFQQO",
+      "url": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/amazon.png",
+      "source_url": "https://macosicons.com/icon/amazon-G7nKNzFQQO",
+      "creator": "https://www.behance.net/edermartinez",
+      "creator_url": "https://macosicons.com/#/u/Jack Blaze",
+      "file": "amazon.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "0448875d51cb878ba0eabe86a6f524cfe3d756e8179aaf9ab5867549e700bdef",
+      "source_image_url": "https://s3-new.macosicons.com/macosicons/parse/Amazon_G7nKNzFQQO_lowResPng-49b5389c7c.png"
+    },
+    "github": {
+      "name": "GitHub",
+      "object_id": "yUUfPCJA0m",
+      "url": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/github.png",
+      "source_url": "https://macosicons.com/icon/github-yUUfPCJA0m",
+      "creator": "xdan",
+      "creator_url": "https://macosicons.com/#/u/xdan",
+      "file": "github.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "9b240bbd41660f2cb2c1e726e91976126cdd763ec8209cc9c54a0bf3364a9337",
+      "source_image_url": "https://s3-new.macosicons.com/macosicons/parse/low_res_GitHub_yUUfPCJA0m-5a176135b3.png"
+    },
+    "microsoft": {
+      "name": "Microsoft",
+      "object_id": "NeqoAz6U4c",
+      "url": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/microsoft.png",
+      "source_url": "https://macosicons.com/icon/microsoft-NeqoAz6U4c",
+      "creator": "allenx",
+      "creator_url": "https://macosicons.com/#/u/allenx",
+      "file": "microsoft.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "65f133cff53bf08a1b95a97bb2981e3afedab07cb351be9b390af1c8ae9e2e5e",
+      "source_image_url": "https://s3-new.macosicons.com/macosicons/parse/low_res_Microsoft_NeqoAz6U4c-50f5cada8a.png"
+    },
+    "adobe": {
+      "name": "Adobe",
+      "object_id": "ssXVfVqoWB",
+      "url": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/adobe.png",
+      "source_url": "https://macosicons.com/icon/adobe-ssXVfVqoWB",
+      "creator": "https://macosicons.com/u/IceGod%20-%20Folders",
+      "creator_url": "https://macosicons.com/#/u/IceGod",
+      "file": "adobe.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "f43613b86074ee5dd8d709ebe94d761d8d26d486e39331567c60e4308ec34655",
+      "source_image_url": "https://s3-new.macosicons.com/macosicons/parse/Adobe_ssXVfVqoWB_lowResPng-c8540d956a.png"
+    },
+    "apple": {
+      "name": "Apple",
+      "object_id": "DiPPbQPhrD",
+      "url": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/apple.png",
+      "source_url": "https://macosicons.com/icon/apple-DiPPbQPhrD",
+      "creator": "lck",
+      "creator_url": "https://macosicons.com/#/u/lck",
+      "file": "apple.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "6f6c413a0a55b9f12249f370b04a0be7a298ef184052a096c4be486c1353689b",
+      "source_image_url": "https://s3-new.macosicons.com/macosicons/parse/Apple_DiPPbQPhrD_lowResPng-981339d1ba.png"
+    },
+    "android": {
+      "name": "Android",
+      "object_id": "Xgx04UeAwU",
+      "url": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/android.png",
+      "source_url": "https://macosicons.com/icon/android-Xgx04UeAwU",
+      "creator": "next",
+      "creator_url": "https://macosicons.com/#/u/next",
+      "file": "android.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "16aad52f303329205ec784148bcec1719ae0db4d26baf76cd107a758c39a1a6b",
+      "source_image_url": "https://s3-new.macosicons.com/macosicons/parse/Android_Xgx04UeAwU_lowResPng-052c5db9f1.png"
+    },
+    "x": {
+      "name": "X",
+      "object_id": "P2QIHEpuxi",
+      "url": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/x.png",
+      "source_url": "https://macosicons.com/icon/x-P2QIHEpuxi",
+      "creator": "X Corp.",
+      "creator_url": "https://apps.apple.com/us/developer/x-corp/id296415947",
+      "file": "x.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "d93ba11bdaca8ef5f45102d16a3b9511654ecfae3b895d675ee77b92f7fdb567",
+      "source_image_url": "https://s3-new.macosicons.com/macosicons/parse/low_res_X_P2QIHEpuxi-dda4fd94f3.png"
+    },
+    "meta": {
+      "name": "Instagram",
+      "object_id": "TODQDHD9cx",
+      "url": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/meta.png",
+      "source_url": "https://macosicons.com/icon/instagram-TODQDHD9cx",
+      "creator": "Instagram, Inc.",
+      "creator_url": "https://apps.apple.com/us/developer/instagram-inc/id389801255",
+      "file": "meta.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "19528de0121cac74db94c776c67622e3fc7f79b97ab5a7504bf4003e1806ff47",
+      "source_image_url": "https://s3-new.macosicons.com/macosicons/parse/low_res_Instagram_TODQDHD9cx-0ba22d4501.png"
+    },
+    "telegram": {
+      "name": "Telegram",
+      "object_id": "dQqA49CHzl",
+      "url": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/telegram.png",
+      "source_url": "https://macosicons.com/icon/telegram-dQqA49CHzl",
+      "creator": "Telegram Messenger LLP",
+      "creator_url": "https://apps.apple.com/us/developer/telegram-messenger-llp/id898228813?mt=12",
+      "file": "telegram.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "3746c7faf62c094c251d3c2e44eea9a57ff7507e285750492866a5be92f407cf",
+      "source_image_url": "https://s3-new.macosicons.com/macosicons/parse/low_res_Telegram_dQqA49CHzl-77461e3cc0.png"
+    },
+    "discord": {
+      "name": "Discord",
+      "object_id": "mOqJF5y5me",
+      "url": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/discord.png",
+      "source_url": "https://macosicons.com/icon/discord-mOqJF5y5me",
+      "creator": "iuriveiga",
+      "creator_url": "https://macosicons.com/#/u/iuriveiga",
+      "file": "discord.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "73f57af637b4487c4ca499ef316c45fdc4ba7aaf158bb183ab8f18c3cfb73dae",
+      "source_image_url": "https://s3-new.macosicons.com/macosicons/parse/Discord_mOqJF5y5me_lowResPng-d2656f3f6d.png"
+    },
+    "messages": {
+      "name": "Messages",
+      "object_id": "JQL8D8bMM2",
+      "url": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/messages.png",
+      "source_url": "https://macosicons.com/icon/messages-JQL8D8bMM2",
+      "creator": "https://www.deviantart.com/octaviotti",
+      "creator_url": "https://macosicons.com/#/u/octaviotti",
+      "file": "messages.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "dde5370db348e241a4a057ce255645cb2cc5ff55a1491df89f05b1f8de70097b",
+      "source_image_url": "https://s3-new.macosicons.com/macosicons/parse/Messages_JQL8D8bMM2_lowResPng-3f6a0c9a2f.png"
+    },
+    "tiktok": {
+      "name": "TikTok",
+      "object_id": "PH3ECRHDAv",
+      "url": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/tiktok.png",
+      "source_url": "https://macosicons.com/icon/tiktok-PH3ECRHDAv",
+      "creator": "blackjaeger7423",
+      "creator_url": "https://macosicons.com/#/u/blackjaeger7423",
+      "file": "tiktok.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "ab799671bd8d329b5af1a74b5bbd9465ae2b0c7cfa93c6f54f732c622528d6ba",
+      "source_image_url": "https://s3-new.macosicons.com/macosicons/parse/TikTok_PH3ECRHDAv_lowResPng-43ab20e5fd.png"
+    },
+    "netflix": {
+      "name": "Netflix",
+      "object_id": "tvuzyrdmPE",
+      "url": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/netflix.png",
+      "source_url": "https://macosicons.com/icon/netflix-tvuzyrdmPE",
+      "creator": "maxkoscisz",
+      "creator_url": "https://macosicons.com/#/u/maxkoscisz",
+      "file": "netflix.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "8cfef3cf532e98e70abb067d99b00ef0026a7555a2743fb7aa5b63d24a864eba",
+      "source_image_url": "https://s3-new.macosicons.com/macosicons/parse/Netflix_tvuzyrdmPE_lowResPng-9660e66c56.png"
+    },
+    "spotify": {
+      "name": "Spotify",
+      "object_id": "KqWJyVq6fL",
+      "url": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/spotify.png",
+      "source_url": "https://macosicons.com/icon/spotify-KqWJyVq6fL",
+      "creator": "Spotify",
+      "creator_url": "https://apps.apple.com/us/developer/spotify/id324684583",
+      "file": "spotify.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "18180b4b9a6d38da3c64be2d663931863a0eb527dd9ce71e9c6408e7d19e4811",
+      "source_image_url": "https://s3-new.macosicons.com/macosicons/parse/low_res_Spotify_KqWJyVq6fL-adc422ff79.png"
+    },
+    "tv": {
+      "name": "Apple TV",
+      "object_id": "Ack0y3WKkY",
+      "url": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/tv.png",
+      "source_url": "https://macosicons.com/icon/apple-tv-Ack0y3WKkY",
+      "creator": "Agent David",
+      "creator_url": "https://macosicons.com/#/u/Agent David",
+      "file": "tv.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "caad84b2a525da053b62098f263533197ff8a4a88aac3bcc7732356fb6339b0c",
+      "source_image_url": "https://s3-new.macosicons.com/macosicons/parse/Apple_TV_Ack0y3WKkY_lowResPng-1c7953f103.png"
+    },
+    "bilibili": {
+      "name": "bilibili",
+      "object_id": "rB47NAOsts",
+      "url": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/bilibili.png",
+      "source_url": "https://macosicons.com/icon/bilibili-rB47NAOsts",
+      "creator": "BILIBILI SINGAPORE PTE. LTD.",
+      "creator_url": "https://apps.apple.com/us/developer/bilibili-singapore-pte-ltd/id6800601740",
+      "file": "bilibili.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "7839165b054d72e352a29c8020f7817a1d761f6e0ee1ab7dacd037f78ecb03f9",
+      "source_image_url": "https://s3-new.macosicons.com/macosicons/parse/low_res_bilibili_rB47NAOsts-957167ac44.png"
+    },
+    "steam": {
+      "name": "Steam",
+      "object_id": "6zz45quoGz",
+      "url": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/steam.png",
+      "source_url": "https://macosicons.com/icon/steam-6zz45quoGz",
+      "creator": "https://twitter.com/crakitus",
+      "creator_url": "https://macosicons.com/#/u/Crakitus",
+      "file": "steam.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "776f4e047534366ffde702e081cee8924d010ef80f795b487225784a31000eb7",
+      "source_image_url": "https://s3-new.macosicons.com/macosicons/parse/Steam_6zz45quoGz_lowResPng-c90e543664.png"
+    },
+    "epic-games": {
+      "name": "Epic Games Launcher",
+      "object_id": "hgNgLkETAe",
+      "url": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/epic-games.png",
+      "source_url": "https://macosicons.com/icon/epic-games-launcher-hgNgLkETAe",
+      "creator": "Epic Games Inc.",
+      "creator_url": "https://apps.apple.com/us/developer/epic-games-inc/id1738110841",
+      "file": "epic-games.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "90f7c2d37e8db45522676b991746aafbc9e080aeb8b838893edc4313c006c59d",
+      "source_image_url": "https://s3-new.macosicons.com/macosicons/parse/low_res_Epic_Games_Launcher_hgNgLkETAe-9c215f93d7.png"
+    },
+    "game-center": {
+      "name": "Game Center",
+      "object_id": "GeFwLxoeJR",
+      "url": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/game-center.png",
+      "source_url": "https://macosicons.com/icon/game-center-GeFwLxoeJR",
+      "creator": "Agent David",
+      "creator_url": "https://macosicons.com/#/u/Agent David",
+      "file": "game-center.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "c57daadb386e1cb66f4856258b88420788fb2cd16a51d9bfd15bb3e6da29eb9b",
+      "source_image_url": "https://s3-new.macosicons.com/macosicons/parse/Game_Center_GeFwLxoeJR_lowResPng-91367c9e8f.png"
+    },
+    "speedtest": {
+      "name": "Speedtest",
+      "object_id": "OPHfzYY16a",
+      "url": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/speedtest.png",
+      "source_url": "https://macosicons.com/icon/speedtest-OPHfzYY16a",
+      "creator": "From iOS",
+      "creator_url": "https://macosicons.com/#/u/From iOS",
+      "file": "speedtest.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "df729095c423cf16c76de61bb2ad8c1a9e0ebc9fb9e9e552a252085d43aa11d1",
+      "source_image_url": "https://s3-new.macosicons.com/macosicons/parse/Speedtest_OPHfzYY16a_lowResPng-e23caf31f7.png"
+    },
+    "airport-utility": {
+      "name": "Airport Utility",
+      "object_id": "j6YuYShBli",
+      "url": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/airport-utility.png",
+      "source_url": "https://macosicons.com/icon/airport-utility-j6YuYShBli",
+      "creator": "Apple",
+      "creator_url": "https://apps.apple.com/us/developer/apple/id284417353?mt=12",
+      "file": "airport-utility.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "9158681da1d75b55b77444f532ba88849432378b6c9fbe247d40c7d5ca80815e",
+      "source_image_url": "https://s3-new.macosicons.com/macosicons/parse/low_res_Airport_Utility_j6YuYShBli-e2582c4d22.png"
+    },
+    "safari-private": {
+      "name": "Safari (Pure Dark)",
+      "object_id": "io6FLKAntf",
+      "url": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/safari-private.png",
+      "source_url": "https://macosicons.com/icon/safari-pure-dark-io6FLKAntf",
+      "creator": "Justanotherguy",
+      "creator_url": "https://macosicons.com/#/u/Justanotherguy",
+      "file": "safari-private.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "9451b9f72b71f14b5559fce4e4fc3ec5eaeed4785733bd0c1916f57347513495",
+      "source_image_url": "https://s3-new.macosicons.com/macosicons/parse/Safari__Pure_Dark__io6FLKAntf_lowResPng-7dab666b5d.png"
+    },
+    "home": {
+      "name": "Home",
+      "object_id": "MqhrKGr6yk",
+      "url": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/home.png",
+      "source_url": "https://macosicons.com/icon/home-MqhrKGr6yk",
+      "creator": "Apple",
+      "creator_url": "https://apps.apple.com/us/developer/apple/id284417353?mt=12",
+      "file": "home.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "870fdd9ec87eec08949d44979f7981145d1e0bd0f99f987264e919ae235c6181",
+      "source_image_url": "https://s3-new.macosicons.com/macosicons/parse/low_res_Home_MqhrKGr6yk-05c7a61610.png"
+    },
+    "safari": {
+      "name": "safari",
+      "object_id": "XVYkORoX9d",
+      "url": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/safari.png",
+      "source_url": "https://macosicons.com/icon/safari-XVYkORoX9d",
+      "creator": "Discord: TheHollenVAI#4556",
+      "creator_url": "https://macosicons.com/#/u/HollenVAI",
+      "file": "safari.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "b903cdb789125f438f5e740ed36df3d320426e8df1b3c48bab43250539e850c3",
+      "source_image_url": "https://s3-new.macosicons.com/macosicons/parse/safari_XVYkORoX9d_lowResPng-5b47f910dc.png"
+    },
+    "maps": {
+      "name": "Maps",
+      "object_id": "oSRZz1fudH",
+      "url": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png",
+      "source_url": "https://macosicons.com/icon/maps-oSRZz1fudH",
+      "creator": "Apple",
+      "creator_url": "https://apps.apple.com/us/developer/apple/id284417353?mt=12",
+      "file": "maps.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "9deb09f06598e759b3d8d9a504efea0834e583fb4bcfad53be1efc09c09a1ebb",
+      "source_image_url": "https://s3-new.macosicons.com/macosicons/parse/low_res_Maps_oSRZz1fudH-7d2a1230e7.png"
+    },
+    "network": {
+      "name": "Network",
+      "object_id": "Lq2622Pb8Q",
+      "url": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/network.png",
+      "source_url": "https://macosicons.com/icon/network-Lq2622Pb8Q",
+      "creator": "penntheone",
+      "creator_url": "https://macosicons.com/#/u/penntheone",
+      "file": "network.png",
+      "width": 256,
+      "height": 256,
+      "sha256": "3448f7c38675d515e554b50dd957283f8d1fe151f09df8038ed2dc8fd5b9afef",
+      "source_image_url": "https://s3-new.macosicons.com/macosicons/parse/low_res_Network_Lq2622Pb8Q-f12cf14fa8.png"
+    }
+  },
+  "groups": {
+    "🎚️ 节点选择": {
+      "asset": "control-center",
+      "note": "系统控制中心"
+    },
+    "🚀 手动切换": {
+      "asset": "network-utility",
+      "note": "网络工具"
+    },
+    "♻️ 自动选择": {
+      "asset": "automator",
+      "note": "自动化"
+    },
+    "🔯 故障转移": {
+      "asset": "time-machine",
+      "note": "恢复与回退"
+    },
+    "🔮 负载均衡": {
+      "asset": "activity-monitor",
+      "note": "连接与负载监控"
+    },
+    "⚖️ 下载均衡": {
+      "asset": "downloads",
+      "note": "下载"
+    },
+    "⚡ OpenAI": {
+      "asset": "chatgpt",
+      "note": ""
+    },
+    "🪐 Anthropic": {
+      "asset": "claude",
+      "note": ""
+    },
+    "✨ AI 服务": {
+      "asset": "apple-intelligence",
+      "note": "AI 类目"
+    },
+    "🟦 OKX": {
+      "asset": "okx",
+      "note": ""
+    },
+    "🟨 Binance": {
+      "asset": "binance",
+      "note": ""
+    },
+    "🟪 Bybit": {
+      "asset": "wallet",
+      "note": "未找到精确品牌图标，使用 Wallet 类目图标"
+    },
+    "🪙 Crypto": {
+      "asset": "bitcoin",
+      "note": "加密货币类目"
+    },
+    "📺 YouTube": {
+      "asset": "youtube",
+      "note": ""
+    },
+    "🧭 Google": {
+      "asset": "google",
+      "note": ""
+    },
+    "☁️ Cloudflare": {
+      "asset": "cloudflare",
+      "note": ""
+    },
+    "📦 Amazon": {
+      "asset": "amazon",
+      "note": ""
+    },
+    "🐙 GitHub": {
+      "asset": "github",
+      "note": ""
+    },
+    "🪟 Microsoft": {
+      "asset": "microsoft",
+      "note": ""
+    },
+    "🎨 Adobe": {
+      "asset": "adobe",
+      "note": ""
+    },
+    "⚪ Apple": {
+      "asset": "apple",
+      "note": ""
+    },
+    "🤖 Android": {
+      "asset": "android",
+      "note": ""
+    },
+    "𝕏 X": {
+      "asset": "x",
+      "note": ""
+    },
+    "♾️ Meta": {
+      "asset": "meta",
+      "note": "Meta 旗下服务：沿用 Instagram 品牌标识，避免误用同名音乐应用 Meta"
+    },
+    "🪽 Telegram": {
+      "asset": "telegram",
+      "note": ""
+    },
+    "🎮 Discord": {
+      "asset": "discord",
+      "note": ""
+    },
+    "🫂 Social": {
+      "asset": "messages",
+      "note": "社交类目"
+    },
+    "🎶 TikTok": {
+      "asset": "tiktok",
+      "note": ""
+    },
+    "🍿 Netflix": {
+      "asset": "netflix",
+      "note": ""
+    },
+    "💚 Spotify": {
+      "asset": "spotify",
+      "note": ""
+    },
+    "🎥 Media": {
+      "asset": "tv",
+      "note": "流媒体类目"
+    },
+    "📺 Bilibili": {
+      "asset": "bilibili",
+      "note": ""
+    },
+    "👾 Steam": {
+      "asset": "steam",
+      "note": ""
+    },
+    "🎁 Epic": {
+      "asset": "epic-games",
+      "note": ""
+    },
+    "🕹️ TapTap": {
+      "asset": "game-center",
+      "note": "未找到精确品牌图标，使用 Game Center 类目图标"
+    },
+    "⚡ Speedtest": {
+      "asset": "speedtest",
+      "note": ""
+    },
+    "🔌 特殊端口": {
+      "asset": "airport-utility",
+      "note": "网络连接"
+    },
+    "😈 R18": {
+      "asset": "safari-private",
+      "note": "深色浏览器示意；保持原配置注释状态"
+    },
+    "🏮": {
+      "asset": "home",
+      "note": "默认国内：Home"
+    },
+    "🏁 Final": {
+      "asset": "safari",
+      "note": "兜底：导航罗盘"
+    },
+    "🌆": {
+      "asset": "maps",
+      "note": "香港：按 FilterHK 筛选，使用 macOSicons Maps 图标"
+    },
+    "🧋": {
+      "asset": "maps",
+      "note": "台湾：按 FilterTW 筛选，使用 macOSicons Maps 图标"
+    },
+    "🎰": {
+      "asset": "maps",
+      "note": "澳门：按 FilterMO 筛选，使用 macOSicons Maps 图标"
+    },
+    "⛩️": {
+      "asset": "maps",
+      "note": "日本：按 FilterJP 筛选，使用 macOSicons Maps 图标"
+    },
+    "🎤": {
+      "asset": "maps",
+      "note": "韩国：按 FilterKR 筛选，使用 macOSicons Maps 图标"
+    },
+    "🏙️": {
+      "asset": "maps",
+      "note": "新加坡：按 FilterSG 筛选，使用 macOSicons Maps 图标"
+    },
+    "🐘": {
+      "asset": "maps",
+      "note": "泰国：按 FilterTH 筛选，使用 macOSicons Maps 图标"
+    },
+    "🌺": {
+      "asset": "maps",
+      "note": "马来西亚：按 FilterMY 筛选，使用 macOSicons Maps 图标"
+    },
+    "🍜": {
+      "asset": "maps",
+      "note": "越南：按 FilterVN 筛选，使用 macOSicons Maps 图标"
+    },
+    "🏝️": {
+      "asset": "maps",
+      "note": "菲律宾：按 FilterPH 筛选，使用 macOSicons Maps 图标"
+    },
+    "🌋": {
+      "asset": "maps",
+      "note": "印度尼西亚：按 FilterID 筛选，使用 macOSicons Maps 图标"
+    },
+    "🪷": {
+      "asset": "maps",
+      "note": "印度：按 FilterIN 筛选，使用 macOSicons Maps 图标"
+    },
+    "🦘": {
+      "asset": "maps",
+      "note": "澳大利亚：按 FilterAU 筛选，使用 macOSicons Maps 图标"
+    },
+    "🗽": {
+      "asset": "maps",
+      "note": "美国：按 FilterUS 筛选，使用 macOSicons Maps 图标"
+    },
+    "🍁": {
+      "asset": "maps",
+      "note": "加拿大：按 FilterCA 筛选，使用 macOSicons Maps 图标"
+    },
+    "💂": {
+      "asset": "maps",
+      "note": "英国：按 FilterUK 筛选，使用 macOSicons Maps 图标"
+    },
+    "🍺": {
+      "asset": "maps",
+      "note": "德国：按 FilterDE 筛选，使用 macOSicons Maps 图标"
+    },
+    "🗼": {
+      "asset": "maps",
+      "note": "法国：按 FilterFR 筛选，使用 macOSicons Maps 图标"
+    },
+    "🌷": {
+      "asset": "maps",
+      "note": "荷兰：按 FilterNL 筛选，使用 macOSicons Maps 图标"
+    },
+    "🏔️": {
+      "asset": "maps",
+      "note": "瑞士：按 FilterCH 筛选，使用 macOSicons Maps 图标"
+    },
+    "🪆": {
+      "asset": "maps",
+      "note": "俄罗斯：按 FilterRU 筛选，使用 macOSicons Maps 图标"
+    },
+    "🧿": {
+      "asset": "maps",
+      "note": "土耳其：按 FilterTR 筛选，使用 macOSicons Maps 图标"
+    },
+    "⚽": {
+      "asset": "maps",
+      "note": "巴西：按 FilterBR 筛选，使用 macOSicons Maps 图标"
+    },
+    "🧉": {
+      "asset": "maps",
+      "note": "阿根廷：按 FilterAR 筛选，使用 macOSicons Maps 图标"
+    },
+    "🌌": {
+      "asset": "network",
+      "note": "未分类地区：应用节点净化，并排除已单列的 24 个国家 / 地区"
+    }
+  },
+  "region_groups": [
+    {
+      "code": "HK",
+      "name": "香港",
+      "group": "🌆",
+      "anchor": "FilterHK"
+    },
+    {
+      "code": "TW",
+      "name": "台湾",
+      "group": "🧋",
+      "anchor": "FilterTW"
+    },
+    {
+      "code": "MO",
+      "name": "澳门",
+      "group": "🎰",
+      "anchor": "FilterMO"
+    },
+    {
+      "code": "JP",
+      "name": "日本",
+      "group": "⛩️",
+      "anchor": "FilterJP"
+    },
+    {
+      "code": "KR",
+      "name": "韩国",
+      "group": "🎤",
+      "anchor": "FilterKR"
+    },
+    {
+      "code": "SG",
+      "name": "新加坡",
+      "group": "🏙️",
+      "anchor": "FilterSG"
+    },
+    {
+      "code": "TH",
+      "name": "泰国",
+      "group": "🐘",
+      "anchor": "FilterTH"
+    },
+    {
+      "code": "MY",
+      "name": "马来西亚",
+      "group": "🌺",
+      "anchor": "FilterMY"
+    },
+    {
+      "code": "VN",
+      "name": "越南",
+      "group": "🍜",
+      "anchor": "FilterVN"
+    },
+    {
+      "code": "PH",
+      "name": "菲律宾",
+      "group": "🏝️",
+      "anchor": "FilterPH"
+    },
+    {
+      "code": "ID",
+      "name": "印度尼西亚",
+      "group": "🌋",
+      "anchor": "FilterID"
+    },
+    {
+      "code": "IN",
+      "name": "印度",
+      "group": "🪷",
+      "anchor": "FilterIN"
+    },
+    {
+      "code": "AU",
+      "name": "澳大利亚",
+      "group": "🦘",
+      "anchor": "FilterAU"
+    },
+    {
+      "code": "US",
+      "name": "美国",
+      "group": "🗽",
+      "anchor": "FilterUS"
+    },
+    {
+      "code": "CA",
+      "name": "加拿大",
+      "group": "🍁",
+      "anchor": "FilterCA"
+    },
+    {
+      "code": "GB",
+      "name": "英国",
+      "group": "💂",
+      "anchor": "FilterUK"
+    },
+    {
+      "code": "DE",
+      "name": "德国",
+      "group": "🍺",
+      "anchor": "FilterDE"
+    },
+    {
+      "code": "FR",
+      "name": "法国",
+      "group": "🗼",
+      "anchor": "FilterFR"
+    },
+    {
+      "code": "NL",
+      "name": "荷兰",
+      "group": "🌷",
+      "anchor": "FilterNL"
+    },
+    {
+      "code": "CH",
+      "name": "瑞士",
+      "group": "🏔️",
+      "anchor": "FilterCH"
+    },
+    {
+      "code": "RU",
+      "name": "俄罗斯",
+      "group": "🪆",
+      "anchor": "FilterRU"
+    },
+    {
+      "code": "TR",
+      "name": "土耳其",
+      "group": "🧿",
+      "anchor": "FilterTR"
+    },
+    {
+      "code": "BR",
+      "name": "巴西",
+      "group": "⚽",
+      "anchor": "FilterBR"
+    },
+    {
+      "code": "AR",
+      "name": "阿根廷",
+      "group": "🧉",
+      "anchor": "FilterAR"
+    }
+  ],
+  "configuration_sha256_current": "0c56611123cc67d1935895cc2ab4695e700dc80fef68aaf8c092ae42a7c5f966",
+  "regions_updated_on": "2026-10-29",
+  "hosting": "https://github.com/yakasuka/yggdrasil/tree/main/icons/macosicons"
+}
