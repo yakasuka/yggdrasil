@@ -12,16 +12,6 @@
 #     interval: 86400  # 订阅更新间隔：86400 秒 / 24 小时
 #     health-check: {enable: true, lazy: true, url: "https://www.gstatic.com/generate_204", interval: 3600}  # 启用延迟测试，间隔 3600 秒；lazy 表示未使用时不主动定时测速
 #     proxy: DIRECT  # 订阅下载 / 更新使用的出口：直连
-
-
-proxy-providers:
-   xyang:                                                                                    # 订阅链接，如需多个订阅请复制整段 并修改 provider1 字段 保证唯一性
-     url: "https://yggdrasil-afx.pages.dev/sub?token=xxxx"
-     type: http
-     interval: 86400
-     health-check: {enable: true, lazy: true, url: "https://www.gstatic.com/generate_204",interval: 3600}
-     proxy: DIRECT
-
 # ── 自动订阅区域 / Auto Providers ──
 # 预留自动写入区域；使用自动注入功能时保留下面的起止标记
 
