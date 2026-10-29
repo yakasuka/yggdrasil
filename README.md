@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/yggdrasil-mark.png" width="216" height="216" alt="Yggdrasil 世界树透明标识" />
+  <img src="assets/favicon-master.png" width="216" height="216" alt="Yggdrasil 世界树透明标识" />
 </p>
 
 <h1 align="center">Yggdrasil · 世界树</h1>
