@@ -97,7 +97,7 @@ proxy-groups:
   - {name: 🔮 负载均衡, type: load-balance, include-all: true, filter: *FilterAll, strategy: consistent-hashing, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/tracking.png"}   # 域名专用负载均衡入口
 
   # ── 下载均衡 / Download Balance ──
-  - {name: ⚖️ 下载均衡,    type: load-balance, include-all: true, filter: *FilterAll, strategy: round-robin, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/global.png"}   # 下载多连接轮询均衡
+  - {name: 📦 下载均衡,    type: load-balance, include-all: true, filter: *FilterAll, strategy: round-robin, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/global.png"}   # 下载多连接轮询均衡
 
   # ── 应用分流 / Proxy App ──
   - {name: ⚡ OpenAI,      type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/chatgpt.png"}     # OpenAI / ChatGPT
@@ -179,27 +179,29 @@ rules:
   - GEOIP,private,DIRECT,no-resolve
 
   # ── 自定义补充 / Custom ──
+  - RULE-SET,⬇️ 下载域名,📦 下载均衡
+
   # ── Aethersailor 直连补丁 ──
-  - RULE-SET,↘️ 直连域名,DIRECT
-  - RULE-SET,📍 直连IP,DIRECT
+  - RULE-SET,↘️ 直连域名,🏮
+  - RULE-SET,📍 直连IP,🏮
 
   # ── Aethersailor 代理补丁（仅兜底用，不越权）──
   - RULE-SET,🌍 代理域名,🎚️ 节点选择
   - RULE-SET,🛰️ 代理 IP,🎚️ 节点选择
 
-  # ── 国内流量直连 / China Direct ──
-  - GEOSITE,cn,DIRECT
-  - GEOIP,cn,DIRECT,no-resolve
-  - GEOSITE,google-cn,DIRECT
+  # ── 国内流量直连 / China🏮 ──
+  - GEOSITE,cn,🏮
+  - GEOIP,cn,🏮,no-resolve
+  - GEOSITE,google-cn,🏮
 
   # ── 游戏与下载 / Games ──
-  - GEOSITE,steam@cn,DIRECT
-  - GEOSITE,category-game-platforms-download@cn,DIRECT
+  - GEOSITE,steam@cn,🏮
+  - GEOSITE,category-game-platforms-download@cn,🏮
   - GEOSITE,steam,👾 Steam
   - GEOSITE,epicgames,🎁 Epic
   - GEOSITE,taptap,🕹️ TapTap
-  - GEOSITE,category-games,DIRECT
-  - GEOSITE,category-public-tracker,DIRECT
+  - GEOSITE,category-games,🏮
+  - GEOSITE,category-public-tracker,🏮
 
   # ── 流媒体 / Streaming ──
   - GEOSITE,netflix,🍿 Netflix
@@ -258,9 +260,10 @@ rule-anchor:
   classical: &RP-classical {type: http, behavior: classical, format: yaml, interval: 28800}
 
 rule-providers:
-  ↘️ 直连域名:       {<<: *RP-domain,    url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Direct_Domain.yaml"}
+  ↘️ 直连域名:         {<<: *RP-domain,    url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Direct_Domain.yaml"}
   📍 直连IP:           {<<: *RP-classical, url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Direct_Classical_IP.yaml"}
-  🌍 代理域名:        {<<: *RP-domain,    url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Proxy_Domain.yaml"}
-  🛰️ 代理 IP:            {<<: *RP-classical, url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Proxy_Classical_IP.yaml"}
-  🔀 端口直连规则:          {<<: *RP-classical, url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Port_Direct.yaml"}
+  🌍 代理域名:         {<<: *RP-domain,    url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Proxy_Domain.yaml"}
+  🛰️ 代理 IP:          {<<: *RP-classical, url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Proxy_Classical_IP.yaml"}
+  🔀 端口直连规则:      {<<: *RP-classical, url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Port_Direct.yaml"}
+  ⬇️ 下载域名:          {<<: *RP-domain, url: "https://yggdrasil-afx.pages.dev/download-domains.yaml"}
 # =======================================================
