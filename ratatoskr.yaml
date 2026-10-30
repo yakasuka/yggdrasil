@@ -82,16 +82,16 @@ FilterOthers: &FilterOthers '^(?!.*(?:(?i)=>|(?i:🇭🇰|香港|Hong\s?Kong|\b(
 proxy-groups:
 
   # ── 策略入口 / Switch ──
-  - {name: 🎚️ 节点选择, type: select, proxies: [🚀 手动切换, ♻️ 自动选择, 🔯 故障转移, 🔮 负载均衡, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌, DIRECT]}
+  - {name: 🎚️ 节点选择, type: select, proxies: [🚀 手动切换, ♻️ 自动选择, 🔯 故障转移, 🔮 负载均衡, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌, DIRECT], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/switch.png"}   # 全部节点开关
 
   # ── 全部节点 / Proxy ──
   - {name: 🚀 手动切换, type: select, include-all: true, filter: *FilterAll, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/proxy.png"}                                            # 全部节点手动选择入口
 
   # ── 自动选择 / Auto ──
-  - {name: ♻️ 自动选择, type: url-test, include-all: true, filter: *FilterAll, url: "https://www.gstatic.com/generate_204", interval: 300, tolerance: 50}
+  - {name: ♻️ 自动选择, type: url-test, include-all: true, filter: *FilterAll, url: "https://www.gstatic.com/generate_204", interval: 300, tolerance: 50, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/proxy.png"}
 
   # ── 故障转移 / Fallback ──
-  - {name: 🔯 故障转移, type: fallback, include-all: true, filter: *FilterAll, url: "https://www.gstatic.com/generate_204", interval: 300}
+  - {name: 🔯 故障转移, type: fallback, include-all: true, filter: *FilterAll, url: "https://www.gstatic.com/generate_204", interval: 300, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/fallback.png"}
 
   # ── 负载均衡 / Load Balance ──
   - {name: 🔮 负载均衡, type: load-balance, include-all: true, filter: *FilterAll, strategy: consistent-hashing, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/tracking.png"}   # 域名专用负载均衡入口
@@ -125,14 +125,14 @@ proxy-groups:
 
   - {name: 🎶 TikTok,      type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/tiktok.png"}      # TikTok / 字节跳动海外
   - {name: 🍿 Netflix,     type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/netflix.png"}     # Netflix
-  - {name: 📺 Hulu,        type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌]}
-  - {name: 📦 Prime Video, type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌]}
-  - {name: 🎬 HBO,         type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌]}
-  - {name: 🏰 Disney+,     type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌]}
-  - {name: 🟣 Twitch,      type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌]}
+  - {name: 📺 Hulu,        type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/Hulu.png"}
+  - {name: 📦 Prime Video, type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/primevideo.png"}
+  - {name: 🎬 HBO,         type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/hbo.png}"}
+  - {name: 🏰 Disney+,     type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/disney.png}"}
+  - {name: 🟣 Twitch,      type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/twitch.png}"}
   - {name: 💚 Spotify,     type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/spotify.png"}     # Spotify
   - {name: 🍿 Entertainment,   type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/media.png"}       # 流媒体杂项 (Hulu / Prime Video / DAZN / HBO / Disney+ / Vimeo / Twitch / Rumble / Plex)
-  - {name: 📰 News,   type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/media.png"}       # 流媒体杂项 (Hulu / Prime Video / DAZN / HBO / Disney+ / Vimeo / Twitch / Rumble / Plex)
+  - {name: 📰 News,   type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/news.png"}       # 流媒体杂项 (Hulu / Prime Video / DAZN / HBO / Disney+ / Vimeo / Twitch / Rumble / Plex)
   - {name: 📺 Bilibili,    type: select, proxies: [DIRECT, 🎚️ 节点选择, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/bilibili.png"}    # Bilibili
   
   - {name: 👾 Steam,       type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/steam.png"}       # Steam
@@ -141,7 +141,7 @@ proxy-groups:
   
   - {name: ⚡ Speedtest,   type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/speedtest.png"}   # 测速
 
-  - {name: 🔌 特殊端口,     type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌]}                  # 特殊端口流量
+  - {name: 🔌 特殊端口,     type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/port.png"}                  # 特殊端口流量
  
   # ── 可选内容 / R18 ──
   #- {name: 😈 R18,         type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆, 🧋, ⛩️, 🎤, 🏙️, 🗽, 🌌], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/r18.png"}         # 成人内容
@@ -262,8 +262,8 @@ rule-anchor:
 rule-providers:
   ↘️ 直连域名:         {<<: *RP-domain,    url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Direct_Domain.yaml"}
   📍 直连IP:           {<<: *RP-classical, url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Direct_Classical_IP.yaml"}
-  🌍 代理域名:          {<<: *RP-domain,    url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Proxy_Domain.yaml"}
+  🌍 代理域名:         {<<: *RP-domain,    url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Proxy_Domain.yaml"}
   🛰️ 代理 IP:          {<<: *RP-classical, url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Proxy_Classical_IP.yaml"}
-  🔀 端口直连规则:      {<<: *RP-classical, url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Port_Direct.yaml"}
+  🔀 端口直连规则:     {<<: *RP-classical, url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Port_Direct.yaml"}
 #  ⬇️ 下载域名:          {<<: *RP-domain, url: "https://yggdrasil-afx.pages.dev/download-domains.yaml"}
 # =======================================================
