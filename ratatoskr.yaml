@@ -182,26 +182,26 @@ rules:
   - RULE-SET,⬇️ 下载域名,📦 下载均衡
 
   # ── Aethersailor 直连补丁 ──
-  - RULE-SET,↘️ 直连域名,🏮
-  - RULE-SET,📍 直连IP,🏮
+  - RULE-SET,↘️ 直连域名,DIRECT
+  - RULE-SET,📍 直连IP,DIRECT
 
   # ── Aethersailor 代理补丁（仅兜底用，不越权）──
   - RULE-SET,🌍 代理域名,🎚️ 节点选择
   - RULE-SET,🛰️ 代理 IP,🎚️ 节点选择
 
-  # ── 国内流量直连 / China🏮 ──
-  - GEOSITE,cn,🏮
-  - GEOIP,cn,🏮,no-resolve
-  - GEOSITE,google-cn,🏮
+  # ── 国内流量直连 / China Direct ──
+  - GEOSITE,cn,DIRECT
+  - GEOIP,cn,DIRECT,no-resolve
+  - GEOSITE,google-cn,DIRECT
 
   # ── 游戏与下载 / Games ──
-  - GEOSITE,steam@cn,🏮
-  - GEOSITE,category-game-platforms-download@cn,🏮
+  - GEOSITE,steam@cn,DIRECT
+  - GEOSITE,category-game-platforms-download@cn,DIRECT
   - GEOSITE,steam,👾 Steam
   - GEOSITE,epicgames,🎁 Epic
   - GEOSITE,taptap,🕹️ TapTap
-  - GEOSITE,category-games,🏮
-  - GEOSITE,category-public-tracker,🏮
+  - GEOSITE,category-games,DIRECT
+  - GEOSITE,category-public-tracker,DIRECT
 
   # ── 流媒体 / Streaming ──
   - GEOSITE,netflix,🍿 Netflix
@@ -262,7 +262,7 @@ rule-anchor:
 rule-providers:
   ↘️ 直连域名:         {<<: *RP-domain,    url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Direct_Domain.yaml"}
   📍 直连IP:           {<<: *RP-classical, url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Direct_Classical_IP.yaml"}
-  🌍 代理域名:         {<<: *RP-domain,    url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Proxy_Domain.yaml"}
+  🌍 代理域名:          {<<: *RP-domain,    url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Proxy_Domain.yaml"}
   🛰️ 代理 IP:          {<<: *RP-classical, url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Proxy_Classical_IP.yaml"}
   🔀 端口直连规则:      {<<: *RP-classical, url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Port_Direct.yaml"}
   ⬇️ 下载域名:          {<<: *RP-domain, url: "https://yggdrasil-afx.pages.dev/download-domains.yaml"}
