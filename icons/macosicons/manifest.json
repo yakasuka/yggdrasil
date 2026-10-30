@@ -1,7 +1,7 @@
 {
   "source": "macOSicons.com",
   "verified_on": "2026-10-29",
-  "configuration": "Ratatoskr.yaml",
+  "configuration": "Ratatosk-Eb.yaml",
   "assets": {
     "control-center": {
       "name": "Control Centre",
@@ -958,7 +958,7 @@
       "anchor": "FilterAR"
     }
   ],
-  "configuration_sha256_current": "340b8fa7fa19100c20d1fe7570ea8919691c179334ede62080889a6446f57c02",
+  "configuration_sha256_current": "8e93bc9db42808e0c2fa3b52ae71f5b2fece8b80967a41fe2341cced7e3850e6",
   "regions_updated_on": "2026-10-29",
   "hosting": "https://github.com/yakasuka/yggdrasil/tree/main/icons/macosicons"
 }

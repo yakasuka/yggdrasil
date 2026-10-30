@@ -1,8 +1,9 @@
-# Ratatoskr · macOSicons
+# Ratatosk · Eb / macOSicons
 
 已集成 64 个启用的策略组及 1 个保持注释的可选策略组，共使用 42 张 macOSicons PNG；其中 24 个国家 / 地区策略组统一使用 Maps 图标。
 
-- `Ratatoskr.yaml` 使用本仓库托管的 macOSicons 静态 PNG 地址，导入配置即可由客户端加载，无需 API Key。
+- `Ratatosk-Eb.yaml` 使用本仓库托管的 macOSicons 静态 PNG 地址，客户端可直接加载，无需 API Key。
+- 日常模板 `Ratatoskr.yaml` 使用 `icons/` 中的另一套图标，不属于本清单的策略组映射范围。
 - 此目录的 PNG 是本地备份，均已下载并验证为 256×256。
 - `manifest.json` 保存策略组映射、地区与正则锚点对应关系、原始图片地址、来源页面、作者、尺寸和 SHA-256。
 - `preview.png` 提供整套图标预览。

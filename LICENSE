@@ -1,0 +1,106 @@
+Yggdrasil 专有授权声明
+All Rights Reserved — Prior Written Permission Required
+
+Copyright (c) 2026 the respective authors and copyright holders of Yggdrasil.
+版权所有 (c) 2026 Yggdrasil 项目的各原创作者及相应权利人。
+
+中文条款
+========
+
+1. 适用范围
+
+本声明仅适用于相应权利人有权适用本声明的项目原创代码、配置、文档及
+其他原创内容（“本作品”）。各作者保留各自贡献的权利；本声明不转移
+著作权，也不将其他贡献者的权利归属于仓库维护者。
+
+2. 事先书面许可
+
+除第 3、4 条规定的情形，未经相应原作者或其他有权授权的权利人事先
+书面许可，不得使用、运行、复制、修改、合并、发布、再分发、公开部署、
+托管、再许可、出售本作品，或将其用于其他项目、产品及服务。
+
+个人、学习、非商业及商业用途同样适用。申请授权、注明来源、保留署名、
+收藏仓库或一般性沟通，本身均不构成授权。许可仅以有权授权的权利人
+明确同意的书面范围、条件及期限为准，不当然允许转授权。
+
+可通过以下渠道联系维护者，由其协助确认相应权利人及授权范围：
+https://github.com/yakasuka/yggdrasil/issues
+
+3. 法律、平台条款及既有许可
+
+本声明不限制适用法律允许且无需许可的行为，不扩张著作权的法定范围，
+也不撤回先前已经有效授予的许可。
+
+GitHub 服务条款所允许的查看及平台内 Fork 等行为不受本声明排除。
+此类平台权限本身不构成对其他使用、运行、修改或再分发行为的一般许可；
+仍以适用法律、平台条款及有效授权为准。
+
+4. 第三方内容
+
+第三方代码、规则集、字体、图标、图片、商标及其他素材，继续归相应
+权利人所有，并遵循其各自适用的许可或授权。本声明不替代、收紧或撤销
+第三方已授予的权利，也不授予项目作者无权授予的第三方权限。
+
+尤其是 icons/ 中的图标与面板素材，以及项目引用的外部规则，不因被
+收录、链接或修改而自动成为本项目作者独占的作品。具体署名和来源见
+README.md、icons/macosicons/README.md、同目录的 manifest.json 及相应上游。
+
+5. 无担保与责任限制
+
+在适用法律允许的最大范围内，本作品按“现状”提供，不作明示或默示
+担保，包括适销性、特定用途适用性及不侵权担保。作者或权利人不对因
+使用或无法使用本作品而产生的损失承担责任，但法律另有强制规定或双方
+另有有效书面约定的除外。
+
+English terms
+=============
+
+1. Scope
+
+This notice applies only to original code, configuration, documentation and
+other project material that the respective copyright holders are entitled to
+place under these terms (the "Work"). Each author retains rights in their own
+contributions. No ownership is transferred to the maintainer.
+
+2. Prior written permission
+
+Except as provided in sections 3 and 4, no permission is granted to use, run,
+copy, modify, merge, publish, redistribute, publicly deploy, host, sublicense,
+sell, or incorporate the Work into another project, product or service without
+prior written permission from the relevant author or authorized rights holder.
+This includes personal, educational, noncommercial and commercial purposes.
+
+Requests, attribution, preserved notices, repository stars and general
+correspondence do not themselves grant permission. An authorization is limited
+to its express written scope, conditions and term, and does not implicitly
+grant a right to sublicense. Contact the maintainer to identify the relevant
+rights holder and request permission:
+https://github.com/yakasuka/yggdrasil/issues
+
+3. Applicable law, platform terms and existing permissions
+
+Nothing in this notice restricts acts permitted without permission by
+applicable law, expands the statutory scope of copyright, or revokes previously
+valid permissions. Rights provided by GitHub's Terms of Service, including
+viewing and forking within the platform, remain subject to those terms. Such
+rights do not themselves grant a general license for other use, execution,
+modification or redistribution. Applicable law and valid permissions govern.
+
+4. Third-party material
+
+Third-party code, rule sets, fonts, icons, images, trademarks and other material
+remain subject to their respective ownership and applicable terms. This notice
+does not replace, narrow or revoke third-party grants, or grant rights that the
+project's authors do not control. Inclusion, linking or modification does not
+automatically make third-party material the exclusive property of the authors.
+See README.md, icons/macosicons/README.md, the manifest.json in that directory,
+and upstream sources for attribution and provenance.
+
+5. Disclaimer
+
+To the fullest extent permitted by applicable law, the Work is provided
+"AS IS", without express or implied warranties, including merchantability,
+fitness for a particular purpose and noninfringement. The authors and rights
+holders are not liable for losses arising from use of or inability to use the
+Work, except where mandatory law or a separate valid written agreement provides
+otherwise.

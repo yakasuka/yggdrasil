@@ -2,3 +2,10 @@
 backups/
 Ratatoskr(2).yaml
 Ratatoskr - 副本.yaml
+node_modules/
+.wrangler/
+.dev.vars*
+.env
+.env.*
+worker/wrangler.local.*
+test-results/
