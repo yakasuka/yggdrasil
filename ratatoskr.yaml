@@ -179,7 +179,7 @@ rules:
   - GEOIP,private,DIRECT,no-resolve
 
   # ── 自定义补充 / Custom ──
-  - RULE-SET,⬇️ 下载域名,📦 下载均衡
+#  - RULE-SET,⬇️ 下载域名,📦 下载均衡
 
   # ── Aethersailor 直连补丁 ──
   - RULE-SET,↘️ 直连域名,DIRECT
@@ -265,5 +265,5 @@ rule-providers:
   🌍 代理域名:          {<<: *RP-domain,    url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Proxy_Domain.yaml"}
   🛰️ 代理 IP:          {<<: *RP-classical, url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Proxy_Classical_IP.yaml"}
   🔀 端口直连规则:      {<<: *RP-classical, url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Port_Direct.yaml"}
-  ⬇️ 下载域名:          {<<: *RP-domain, url: "https://yggdrasil-afx.pages.dev/download-domains.yaml"}
+#  ⬇️ 下载域名:          {<<: *RP-domain, url: "https://yggdrasil-afx.pages.dev/download-domains.yaml"}
 # =======================================================
