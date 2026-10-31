@@ -2,24 +2,26 @@
 
 Yggdrasil 的五步订阅向导：填写机场 → 代理分流 → 规则选择 → 地区节点 → 生成配置。
 
-**[打开 WebUI](https://yakasuka.github.io/yggdrasil/webui/)** · [项目说明](../README.md) · [Worker 部署](worker/README.md)
+**[打开 WebUI](https://yakasuka.github.io/yggdrasil/webui/)** · [项目说明](../README.md) · [服务部署](worker/README.md)
 
 ## 目录约定
 
 ```text
 webui/
 ├── index.html                 # GitHub Pages 页面入口
-├── config.json                # 运行时配置：Worker 服务地址
+├── config.json                # 运行时配置：公开服务网关地址
 ├── src/                       # 浏览器端源码，日常修改入口
 │   ├── app.js                 # 五步引导与页面交互
+│   ├── service.js             # 公开服务地址与订阅链接校验
 │   └── styles.css             # 布局、主题与响应式样式
 ├── assets/                    # 编译产物，由构建脚本生成并提交
 │   ├── app.js
 │   └── app.css
 ├── shared/                    # 浏览器与 Worker 共用的配置逻辑
+│   ├── service-routes.js      # JS 公开路径映射
 │   ├── compiler.js            # 参数校验与 Mihomo YAML 生成
 │   └── catalog.json           # 从仓库模板提取的公开规则目录
-├── worker/                    # Cloudflare Worker + KV 后端
+├── worker/                    # 内部配置服务、KV 与公开网关
 ├── scripts/                   # 规则目录生成与前端构建
 ├── tests/                     # 生成器与接口测试
 ├── package.json
@@ -58,4 +60,6 @@ python3 -m http.server 8765
 
 GitHub Pages 继续从仓库根目录发布，无需额外的前端托管配置。正式入口为 `/yggdrasil/webui/`，旧 `/yggdrasil/builder/` 保留兼容跳转。
 
-配置服务需另行部署，详见 [Worker 说明](worker/README.md)。`config.json` 的 `apiBase` 未填写时，WebUI 可预览和下载 YAML，生成正式订阅链接的按钮会显示为不可用。修改共享生成器或目录后，前端与 Worker 都要同步更新。
+配置服务需另行部署，详见 [服务部署说明](worker/README.md)。`config.json` 的 `apiBase` 未填写时，WebUI 可预览和下载 YAML，生成正式订阅链接的按钮会显示为不可用。修改共享生成器或目录后，前端与 Worker 都要同步更新。
+
+公开服务可使用部署后分配的 `pages.dev` 域名，无需购买域名。前端访问公开网关，内部服务关闭默认公网与预览入口；JS 通过 `shared/service-routes.js` 维护公开路径。网关构建产物在 `worker/gateway/dist/`，不提交 Git。

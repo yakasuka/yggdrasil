@@ -1,10 +1,22 @@
 # Ratatoskr 配置服务
 
-GitHub Pages 承载五步配置向导，Cloudflare Worker 接收所选内容并生成 Mihomo YAML，KV 保存有有效期的加密快照。客户端通过私密 HTTPS 链接持续拉取配置；机场节点与 Geo 数据由 Mihomo 自行更新。
+网页继续托管在 GitHub Pages。公开订阅入口使用独立的 Pages 网关，通过 Service Binding 调用内部配置服务；配置服务使用 KV 保存加密快照。没有自有域名也可使用部署后分配的 `项目名.pages.dev` 地址。
+
+```text
+GitHub Pages 引导页
+    ↓ /api/status、/api/subscriptions
+公开服务网关（pages.dev 或自有域名）
+    ↓ Service Binding，内部调用
+配置服务 + KV
+    ↓
+客户端从公开网关的 /subscription/<id>/<secret>.yaml 拉取配置
+```
+
+内部目录保留 `worker/`。`wrangler.jsonc` 关闭 `workers_dev` 与 `preview_urls`，配置服务不开放默认公网入口；前端通过 JS 中的公开路径映射访问网关。网关仅开放指定接口，不提供内部接口别名或源码文件路径。
 
 ## 部署
 
-在仓库根目录执行，需 Node.js 22 或更新版本，以及有 Workers / KV 权限的 Cloudflare 账号：
+在仓库根目录执行，需要 Node.js 22 或更新版本：
 
 ```sh
 cd webui
@@ -15,56 +27,55 @@ npx wrangler login
 npx wrangler kv namespace create SUBSCRIPTIONS --config worker/wrangler.jsonc
 ```
 
-将返回的 namespace ID 填入 [wrangler.jsonc](wrangler.jsonc) 的 `kv_namespaces[0].id`，替换 `REPLACE_WITH_KV_NAMESPACE_ID`，再部署：
+登录账号须具备 Workers、KV 和 Pages 的部署权限。将返回的 KV namespace ID 写入 [wrangler.jsonc](wrangler.jsonc)，替换 `REPLACE_WITH_KV_NAMESPACE_ID`。随后先部署内部服务，再创建、部署公开入口：
 
 ```sh
 npm run worker:deploy
+npx wrangler pages project create ratatoskr-relay --production-branch main
+npm run service:deploy -- --branch main
 ```
 
-如账号包含多个账户，在 `worker/wrangler.jsonc` 中增加实际的 `account_id`。KV ID 和 Account ID 不是密钥；OAuth 凭据、API Token 不得提交进仓库。
+若该项目名已被占用，选择其他可用名称，同步修改 [网关配置](gateway/wrangler.jsonc) 的 `name`。若 Pages 项目已存在，跳过创建步骤。网关配置的 `services[].service` 必须与内部服务的 `name` 一致；两个项目须在同一账户下。
 
-将部署返回的 `https://yggdrasil-subscriptions.<你的子域>.workers.dev` 写入 [前端配置](../config.json)：
+部署后，在 Pages 项目中取得**实际的生产域名**，写入 [前端配置](../config.json) 的 `apiBase`。填写服务 origin，例如 `https://<实际项目名>.pages.dev`，不带路径、查询参数或用户凭据。使用稳定的生产域名，不使用某次部署的临时预览域名。前端会拒绝默认后端域名及不匹配的订阅链接。
 
-```json
-{
-  "apiBase": "https://yggdrasil-subscriptions.<你的子域>.workers.dev"
-}
-```
+配置服务不需要填写公网地址，也不应为它重新开启默认公网入口。公开网关负责将创建结果转换为自己的 `/subscription/…` 地址，订阅文件同样通过网关返回。未来使用自有域名时，将其绑定到公开网关，再更新 `apiBase` 即可。
 
-在 `webui` 中构建并提交 `assets/`、`shared/catalog.json` 以及修改过的配置文件，GitHub Pages 从仓库根目录发布。向导地址为 `https://yakasuka.github.io/yggdrasil/webui/`。使用自己的域名时，同步调整 Worker 的 `ALLOWED_ORIGINS`（多个来源用英文逗号分隔）；填来源 origin，不包含 `/yggdrasil/` 路径。
+`apiBase` 未填写时，页面仅提供预览和文件下载，不会生成虚假订阅地址。修改源码后重新构建并提交前端资源。GitHub Pages 继续从仓库根目录发布，页面入口为 `https://yakasuka.github.io/yggdrasil/webui/`。
 
-未填写 `apiBase` 时，网页仍可预览和下载 YAML，但会明确禁用「生成订阅链接」。网页不会把临时文件地址当作订阅链接。
-
-## 接口
+## 公开接口
 
 | 路径 | 用途 |
 | --- | --- |
-| `GET /api/health` | 检查 KV 绑定和配置目录版本 |
-| `POST /api/profiles` | 校验选项，生成并加密保存 YAML，返回订阅地址与到期时间 |
-| `GET /s/<id>/<secret>.yaml` | 解密并返回 Mihomo 配置；客户端无需额外请求头 |
+| `GET /api/status` | 检查配置服务是否可用 |
+| `POST /api/subscriptions` | 创建加密配置快照，返回公开订阅地址 |
+| `GET /subscription/<id>/<secret>.yaml` | 返回可供 Mihomo 导入的 YAML |
 
-生成接口每 IP 每分钟最多 10 次；请求体上限 64 KiB，最多 10 个机场，每类最多 100 个自定义域名。错误响应不回显机场 URL。有效期可选 30、90 或 365 天，到期后 KV 自动删除。KV 是最终一致的存储，链接刚生成时其他地区的边缘节点可能需短暂等待后才能读到。
+公开路径集中维护在 [service-routes.js](../shared/service-routes.js)。内部接口由 [gateway/index.js](gateway/index.js) 转接，浏览器不直接访问内部服务。页面中的服务提示只描述可用状态，不链接到部署文档。
 
-每条链接包含 256 位随机密钥，配置使用 AES-GCM 加密后保存，密钥不写入 KV。**任何持有完整链接的人都可以读取配置和机场订阅地址**，请像管理机场订阅一样保管它。服务处理生成请求时会接触明文，部署者仍须可信。请勿在监控、日志或分析工具中采集请求体和完整订阅路径；默认关闭 Worker observability。
+生成接口保留每 IP 每分钟 10 次限流；请求体上限 64 KiB，最多 10 个机场，每类最多 100 个自定义域名。到期时间可选 30 / 90 / 365 天，KV 到期自动删除。KV 是最终一致存储，新建链接在不同边缘节点间可能短暂延迟。
 
-订阅保存的是生成时的配置快照。修改网页选项后需要重新生成链接；更新规则编排代码不会重写旧链接。节点订阅、Geo 数据和选中的远程规则源仍按生成配置中的间隔更新。此服务不代拉机场 URL，也不转换 Base64 通用节点订阅；请使用 Mihomo / Clash 格式机场订阅。
+每条链接包含 256 位随机密钥，配置使用 AES-GCM 加密保存，密钥不写入 KV。**持有完整链接即可读取配置和机场订阅地址**，请妥善保管。服务处理生成请求时会接触明文，部署者须可信；不要在日志或监控中记录请求体和完整订阅路径，默认关闭内部服务 observability。
+
+订阅保存的是生成时的快照；修改网页选项需重新生成。机场节点、Geo 数据和远程规则源由 Mihomo 更新。服务不转换 Base64 通用订阅，请使用 Mihomo / Clash 格式节点订阅。
 
 ## 本地开发
 
-在 `webui/` 目录启动后端：
+三个终端分别运行：
 
 ```sh
-npm run worker:dev -- --local --port 8787 --var ALLOWED_ORIGINS:http://localhost:8765
-```
+# 终端一：仓库根目录，启动内部服务
+npm --prefix webui run worker:dev -- --local --port 8787 --var ALLOWED_ORIGINS:http://localhost:8765
 
-另开终端，在仓库根目录启动页面服务：
+# 终端二：仓库根目录，启动公开网关
+npm --prefix webui run service:dev
 
-```sh
+# 终端三：仓库根目录，启动前端
 python3 -m http.server 8765
 ```
 
-临时将 `webui/config.json` 的 `apiBase` 设置为 `http://localhost:8787`，打开 `http://localhost:8765/webui/`。发布前恢复线上地址，勿提交 localhost。Wrangler 本地 KV 数据在 `.wrangler/` 中，已被 Git 忽略。
+Wrangler 将网关的 `PROFILE_SERVICE` 绑定到正在本地运行的 `yggdrasil-subscriptions` 服务。将 `webui/config.json` 的 `apiBase` 临时设为 `http://localhost:8788`，打开 `http://localhost:8765/webui/`。发布前恢复生产地址，不提交 localhost。生成文件在 `worker/gateway/dist/`，本地数据在 `.wrangler/`，均已被 Git 忽略。
 
-前端源代码在 [src/app.js](../src/app.js)，共享生成器在 [shared/compiler.js](../shared/compiler.js)。应用与规则目录从仓库根目录的 `ratatoskr.yaml`、24 地区筛选从 `Ratatosk-Eb.yaml` 提取，仅提取公开规则元数据，**不提取原文件的 `proxy-providers` 或 `proxies`**。修改模板或前端后执行 `npm run build`，同步提交 `shared/catalog.json` 与 `assets/`。前后端使用同一生成器和目录版本，修改生成器后也需重新部署 Worker。
+前端源码在 [src/](../src/)，共用生成器在 [compiler.js](../shared/compiler.js)。应用与规则目录从根目录模板提取，不提取模板内的 `proxy-providers` 或 `proxies`。修改生成逻辑后重新部署内部服务；修改转接逻辑后重新部署网关。生成配置的 DNS / TUN / 系统代理由客户端管理。
 
-生成配置包含混合端口和分流策略，DNS / TUN / 系统代理由客户端配置。输出面向 Mihomo / Clash Meta，不代表支持其他内核格式。
+维护参考：[Pages Service Bindings](https://developers.cloudflare.com/pages/functions/bindings/#service-bindings)、[Pages Advanced mode](https://developers.cloudflare.com/pages/functions/advanced-mode/)。公开源码仓库中的文件仍可查看；此架构隔离的是运行中的内部服务，不将 JS 路径改写当作源码保密措施。

@@ -1,4 +1,5 @@
 import "./styles.css";
+import { SERVICE_ROUTES, serviceOrigin, subscriptionURL } from "./service.js";
 import {
   catalog,
   defaults,
@@ -298,9 +299,9 @@ function serviceNotice() {
   if (service === "checking") return notice("正在检查配置服务…");
   const message =
     service === "unconfigured"
-      ? '配置服务尚未部署。现在可以预览或下载 YAML；完成 <a href="https://github.com/yakasuka/yggdrasil/blob/main/webui/worker/README.md" target="_blank" rel="noopener noreferrer">Worker + KV 部署</a> 并设置服务地址后，即可生成订阅链接。'
+      ? "订阅服务尚未连接。现在可以预览或下载 YAML，在线订阅将在服务开放后可用。"
       : service === "mismatch"
-        ? "配置服务与页面版本不同。请刷新页面；维护者需同步部署前端和 Worker。"
+        ? "配置服务正在更新，请刷新页面或稍后重试。"
         : "配置服务暂时无法连接。你可以先下载 YAML，或稍后重试。";
   return notice(
     message +
@@ -522,18 +523,13 @@ async function checkService() {
         return r.json();
       },
     );
-    if (!settings.apiBase) {
+    const origin = serviceOrigin(settings.apiBase);
+    if (!origin) {
       service = "unconfigured";
       return;
     }
-    const url = new URL(settings.apiBase);
-    if (
-      url.protocol !== "https:" &&
-      !["localhost", "127.0.0.1"].includes(url.hostname)
-    )
-      throw Error();
-    apiBase = url.origin;
-    const response = await fetch(apiBase + "/api/health", {
+    apiBase = origin;
+    const response = await fetch(apiBase + SERVICE_ROUTES.status, {
       signal: AbortSignal.timeout(8000),
       cache: "no-store",
     });
@@ -573,7 +569,7 @@ async function generate() {
   const previous = controls.map((el) => el.disabled);
   controls.forEach((el) => (el.disabled = true));
   try {
-    const response = await fetch(apiBase + "/api/profiles", {
+    const response = await fetch(apiBase + SERVICE_ROUTES.create, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(normalize(state)),
@@ -581,10 +577,7 @@ async function generate() {
     });
     const data = await response.json();
     if (!response.ok) throw Error(data.error || "配置生成失败，请稍后重试。");
-    const link = new URL(data.url);
-    if (link.origin !== apiBase || !link.pathname.startsWith("/s/"))
-      throw Error("服务返回的订阅地址无效。");
-    result = data;
+    result = { ...data, url: subscriptionURL(data.url, apiBase) };
     renderResult();
     $("#result-area").scrollIntoView({ block: "nearest", behavior: "smooth" });
   } catch (error) {
