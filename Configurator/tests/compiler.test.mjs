@@ -202,3 +202,27 @@ test("download response preserves ASCII names and correctly encodes Unicode and 
   assert.ok(header.includes("%E5"));
   assert.ok(!/[\u0080-\uffff]/.test(header));
 });
+
+test("subscription parser does not emit source excerpts or return node secrets", () => {
+  const warnings = [];
+  const warn = console.warn;
+  console.warn = (...v) => warnings.push(v);
+  try {
+    const result = parseNodes(
+      "proxies:\n  - name: Japan JP\n    type: socks5\n    server: node.example.com\n    port: 443\n    password: !private sample-secret\n",
+    );
+    assert.equal(result.length, 1);
+    assert.equal(Object.hasOwn(result[0], "password"), false);
+    assert.deepEqual(warnings, []);
+  } finally {
+    console.warn = warn;
+  }
+});
+
+test("final route is fixed to follow the global proxy selector", async () => {
+  const { config } = await compile(profile());
+  assert.deepEqual(
+    config["proxy-groups"].find((g) => g.name === catalog.groups.final).proxies,
+    [catalog.groups.gateway],
+  );
+});

@@ -207,3 +207,37 @@ test("origin, body and limit checks remain active", async () => {
     429,
   );
 });
+
+test("multiple airports retain P1/P2 node identities and aggregate reported traffic", async () => {
+  const service = app(),
+    env = environment(),
+    p = profile();
+  p.providers.push({
+    name: "第二机场",
+    url: "https://airport.example.com/sub?token=second-fixture",
+  });
+  const inspection = await service.fetch(
+    post("/api/inspect", { providers: p.providers }),
+    env,
+  );
+  const info = await inspection.json();
+  assert.equal(info.usage.total, 200);
+  assert.equal(info.usage.remaining, 140);
+  assert.ok(info.nodes.some((n) => n.id.startsWith("P2:")));
+  const response = await service.fetch(post("/api/profiles", p), env);
+  assert.equal(response.status, 201);
+  const data = await response.json();
+  const file = await service.fetch(new Request(data.url), env);
+  const config = parse(await file.text());
+  assert.deepEqual(
+    Object.values(config["proxy-providers"]).map(
+      (p) => p.override["additional-prefix"],
+    ),
+    ["[P1] ", "[P2] "],
+  );
+  assert.ok(
+    file.headers
+      .get("Subscription-Userinfo")
+      .startsWith("upload=20; download=40; total=200"),
+  );
+});

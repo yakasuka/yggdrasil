@@ -319,7 +319,7 @@ export async function compile(input, model = catalog, options = {}) {
   groups.push({
     name: g.final,
     type: "select",
-    proxies: unique([g.gateway, ...optionsList]),
+    proxies: [g.gateway],
   });
   const entries = await Promise.all(
     p.providers.map(async (v, i) => [
