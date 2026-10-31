@@ -27,6 +27,16 @@ export async function catalogFromTemplate(text) {
     t["proxy-groups"].length
   )
     throw Error("模板包含重复策略组名。");
+  if (typeof t.FilterAll !== "string")
+    throw Error("模板需要 FilterAll 节点筛选规则。");
+  try {
+    new RegExp(
+      t.FilterAll.replaceAll("(?i)", "").replaceAll("(?i:", "(?:"),
+      "i",
+    );
+  } catch {
+    throw Error("FilterAll 需要兼容浏览器解析。");
+  }
   const groups = meta.groups;
   for (const key of ["gateway", "manual", "final", "other", "ports"])
     if (typeof groups?.[key] !== "string") throw Error("模板缺少核心策略组。");
@@ -37,6 +47,8 @@ export async function catalogFromTemplate(text) {
       if (
         !/^[A-Z0-9_-]{2,16}$/.test(m.id) ||
         m.id === "OTHER" ||
+        typeof m.id !== "string" ||
+        typeof m.label !== "string" ||
         !m.label ||
         !g.filter
       )
@@ -95,7 +107,7 @@ export async function catalogFromTemplate(text) {
     })
     .filter((a) => a.rules.length);
   if (
-    apps.some((a) => !a.id) ||
+    apps.some((a) => typeof a.id !== "string" || !a.id) ||
     new Set(apps.map((a) => a.id)).size !== apps.length
   )
     throw Error("APP 需要唯一 ID。");

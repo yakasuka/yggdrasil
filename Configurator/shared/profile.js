@@ -18,3 +18,13 @@ export function lifetime(id) {
   if (!value) throw Error("订阅有效期无效。");
   return value.seconds;
 }
+
+export function contentDisposition(title) {
+  const file = filename(title);
+  const ascii = file.replace(/[^\x20-\x7e]/g, "_");
+  const encoded = encodeURIComponent(file).replace(
+    /['()*]/g,
+    (c) => "%" + c.charCodeAt(0).toString(16).toUpperCase(),
+  );
+  return `attachment; filename="${ascii}"; filename*=UTF-8''${encoded}`;
+}

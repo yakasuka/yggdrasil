@@ -4,7 +4,7 @@ import {
   normalizeProviders,
   ConfigError,
 } from "../shared/compiler.js";
-import { lifetime } from "../shared/profile.js";
+import { lifetime, contentDisposition } from "../shared/profile.js";
 import {
   publicInspection,
   aggregateUsage,
@@ -216,7 +216,7 @@ export function createWorker(options = {}) {
             generated = await compile(profile, model, { migrate: true });
           const headers = {
             "Content-Type": "application/yaml; charset=utf-8",
-            "Content-Disposition": `attachment; filename="${generated.filename.replace(/[^\x20-\x7e]/g, "_")}"; filename*=UTF-8''${encodeURIComponent(generated.filename)}`,
+            "Content-Disposition": contentDisposition(generated.profile.title),
             "Cache-Control": "no-store",
             "Referrer-Policy": "no-referrer",
             "X-Content-Type-Options": "nosniff",

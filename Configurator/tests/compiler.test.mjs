@@ -17,7 +17,7 @@ import {
   parseUsage,
   aggregateUsage,
 } from "../shared/nodes.js";
-import { filename } from "../shared/profile.js";
+import { filename, contentDisposition } from "../shared/profile.js";
 import { profile, text } from "./helpers.mjs";
 test("defaults select all apps, manual routing, and expose no editable rules", () => {
   const p = defaults();
@@ -191,4 +191,14 @@ test("region classification and emitted filters agree for ambiguous and newly ad
     "i",
   );
   assert.equal(nzRegex.test("[P1] 新西兰 NZ 01"), true);
+});
+
+test("download response preserves ASCII names and correctly encodes Unicode and apostrophes", () => {
+  assert.ok(
+    contentDisposition("Eaibee").includes('filename="Eaibee-ratatoskr.yaml"'),
+  );
+  const header = contentDisposition("小明\'s");
+  assert.ok(header.includes("%27"));
+  assert.ok(header.includes("%E5"));
+  assert.ok(!/[\u0080-\uffff]/.test(header));
 });
