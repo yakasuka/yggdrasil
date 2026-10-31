@@ -31,6 +31,18 @@ log-level: info                      # 日志级别：info，记录一般运行�
 external-controller: 127.0.0.1:9090  # REST API 监听地址：仅本机访问
 unified-delay: true                  # 统一延迟测速
 
+dns:
+  enable: true
+  ipv6: false
+  enhanced-mode: fake-ip
+  fake-ip-range: 198.18.0.1/16
+  default-nameserver:
+    - 223.5.5.5
+    - 119.29.29.29
+  nameserver:
+    - https://doh.pub/dns-query
+    - https://dns.alidns.com/dns-query
+
 # =======================================================
 # 3. 手动节点 Proxies
 # =======================================================
