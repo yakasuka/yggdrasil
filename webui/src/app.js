@@ -1,3 +1,4 @@
+import "./styles.css";
 import {
   catalog,
   defaults,
@@ -297,7 +298,7 @@ function serviceNotice() {
   if (service === "checking") return notice("正在检查配置服务…");
   const message =
     service === "unconfigured"
-      ? '配置服务尚未部署。现在可以预览或下载 YAML；完成 <a href="https://github.com/yakasuka/yggdrasil/blob/main/worker/README.md" target="_blank" rel="noopener noreferrer">Worker + KV 部署</a> 并设置服务地址后，即可生成订阅链接。'
+      ? '配置服务尚未部署。现在可以预览或下载 YAML；完成 <a href="https://github.com/yakasuka/yggdrasil/blob/main/webui/worker/README.md" target="_blank" rel="noopener noreferrer">Worker + KV 部署</a> 并设置服务地址后，即可生成订阅链接。'
       : service === "mismatch"
         ? "配置服务与页面版本不同。请刷新页面；维护者需同步部署前端和 Worker。"
         : "配置服务暂时无法连接。你可以先下载 YAML，或稍后重试。";

@@ -41,7 +41,7 @@ Yggdrasil 面向一站式的使用体验：使用者通过 WebUI 选择自己需
 
 <p align="center"><strong>选择所需内容 → 组装个人配置 → 获取文件或订阅 → 导入客户端</strong></p>
 
-打开 **[Ratatoskr 配置工坊](https://yakasuka.github.io/yggdrasil/builder/)**，依次完成五步：
+打开 **[Ratatoskr 配置工坊](https://yakasuka.github.io/yggdrasil/webui/)**，依次完成五步：
 
 1. **订阅来源。** 填入一个或多个机场的名称与 Mihomo / Clash 格式节点订阅。
 2. **代理分流。** 选择自动选择、故障转移、一致性哈希或轮询策略，为 36 类应用与服务启用独立出口。
@@ -49,7 +49,7 @@ Yggdrasil 面向一站式的使用体验：使用者通过 WebUI 选择自己需
 4. **地区节点。** 从 24 个国家 / 地区中选择分组，决定是否保留其他地区。
 5. **生成配置。** 预览或下载 YAML，连接配置服务后生成可直接导入客户端的私密 HTTPS 订阅链接。
 
-前端由 GitHub Pages 承载，动态订阅由 **Cloudflare Worker + KV** 生成和保存。维护者先按 [部署说明](worker/README.md) 连接服务；未连接时，网页明确提示状态，仅提供预览和文件下载。配置链接有效期可选 30 / 90 / 365 天，配置加密保存，链接持有者可读取其中的机场订阅地址，请勿公开分享。
+前端由 GitHub Pages 承载，动态订阅由 **Cloudflare Worker + KV** 生成和保存。维护者先按 [部署说明](webui/worker/README.md) 连接服务；未连接时，网页明确提示状态，仅提供预览和文件下载。配置链接有效期可选 30 / 90 / 365 天，配置加密保存，链接持有者可读取其中的机场订阅地址，请勿公开分享。
 
 网页与 Worker 共享同一个配置生成器。应用、规则与地区目录从现有模板提取，保留模板匹配顺序，生成配置仅包含所选策略和规则源。节点与 Geo 数据由客户端定期更新；修改选择需重新生成链接，旧链接保留生成时的配置快照。
 
@@ -146,7 +146,7 @@ Ratatoskr 将庞大的分类数据交给 Geo 数据库，将清晰的分流意�
 
 ## 快速开始
 
-推荐从 [配置工坊](https://yakasuka.github.io/yggdrasil/builder/) 开始；也可以手动使用模板：
+推荐从 [配置工坊](https://yakasuka.github.io/yggdrasil/webui/) 开始；也可以手动使用模板：
 
 1. **确认授权。** 取得相应原作者或权利人的书面许可，条款见 [LICENSE](LICENSE)。
 2. **选择配置。** 日常使用从 `ratatoskr.yaml` 开始；需要更细地区分组时选择 Eb 版。
@@ -198,7 +198,7 @@ Ratatoskr 将庞大的分类数据交给 Geo 数据库，将清晰的分流意�
 
 当前代码读取 `yakasuka/yggdrasil-private`。迁移时应同步调整仓库位置、凭据和模板地址，并保留成对的 `AUTO-PROVIDERS-START` / `AUTO-PROVIDERS-END` 标记。
 
-现有 `/merge` 负责固定模板的订阅注入；新的配置工坊使用独立的 [Worker + KV 服务](worker/README.md)，按网页选项生成配置。`/sub` 的 `Subscription-Userinfo` 是模拟流量信息，不代表机场真实用量。
+现有 `/merge` 负责固定模板的订阅注入；新的配置工坊使用独立的 [Worker + KV 服务](webui/worker/README.md)，按网页选项生成配置。`/sub` 的 `Subscription-Userinfo` 是模拟流量信息，不代表机场真实用量。
 
 </details>
 

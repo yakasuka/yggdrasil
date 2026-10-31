@@ -7,6 +7,7 @@ GitHub Pages 承载五步配置向导，Cloudflare Worker 接收所选内容并�
 在仓库根目录执行，需 Node.js 22 或更新版本，以及有 Workers / KV 权限的 Cloudflare 账号：
 
 ```sh
+cd webui
 npm ci
 npm run build
 npm test
@@ -22,7 +23,7 @@ npm run worker:deploy
 
 如账号包含多个账户，在 `worker/wrangler.jsonc` 中增加实际的 `account_id`。KV ID 和 Account ID 不是密钥；OAuth 凭据、API Token 不得提交进仓库。
 
-将部署返回的 `https://yggdrasil-subscriptions.<你的子域>.workers.dev` 写入 [前端配置](../builder/config.json)：
+将部署返回的 `https://yggdrasil-subscriptions.<你的子域>.workers.dev` 写入 [前端配置](../config.json)：
 
 ```json
 {
@@ -30,7 +31,7 @@ npm run worker:deploy
 }
 ```
 
-提交并推送 `builder/`、编译资源及其配置，GitHub Pages 从仓库根目录发布。向导地址为 `https://yakasuka.github.io/yggdrasil/builder/`。使用自己的域名时，同步调整 Worker 的 `ALLOWED_ORIGINS`（多个来源用英文逗号分隔）；填来源 origin，不包含 `/yggdrasil/` 路径。
+在 `webui` 中构建并提交 `assets/`、`shared/catalog.json` 以及修改过的配置文件，GitHub Pages 从仓库根目录发布。向导地址为 `https://yakasuka.github.io/yggdrasil/webui/`。使用自己的域名时，同步调整 Worker 的 `ALLOWED_ORIGINS`（多个来源用英文逗号分隔）；填来源 origin，不包含 `/yggdrasil/` 路径。
 
 未填写 `apiBase` 时，网页仍可预览和下载 YAML，但会明确禁用「生成订阅链接」。网页不会把临时文件地址当作订阅链接。
 
@@ -50,13 +51,20 @@ npm run worker:deploy
 
 ## 本地开发
 
+在 `webui/` 目录启动后端：
+
 ```sh
 npm run worker:dev -- --local --port 8787 --var ALLOWED_ORIGINS:http://localhost:8765
+```
+
+另开终端，在仓库根目录启动页面服务：
+
+```sh
 python3 -m http.server 8765
 ```
 
-临时将 `builder/config.json` 的 `apiBase` 设置为 `http://localhost:8787`，打开 `http://localhost:8765/builder/`。发布前恢复线上地址，勿提交 localhost。Wrangler 本地 KV 数据在 `.wrangler/` 中，已被 Git 忽略。
+临时将 `webui/config.json` 的 `apiBase` 设置为 `http://localhost:8787`，打开 `http://localhost:8765/webui/`。发布前恢复线上地址，勿提交 localhost。Wrangler 本地 KV 数据在 `.wrangler/` 中，已被 Git 忽略。
 
-前端源代码在 [web/app.js](../web/app.js)，共享生成器在 [shared/compiler.js](../shared/compiler.js)。应用与规则目录从 `ratatoskr.yaml`、24 地区筛选从 `Ratatosk-Eb.yaml` 提取，仅提取公开规则元数据，**不提取原文件的 `proxy-providers` 或 `proxies`**。修改模板或前端后执行 `npm run build`，同步提交 `shared/catalog.json` 与 `builder/app.js`。前后端使用同一生成器和目录版本，修改生成器后也需重新部署 Worker。
+前端源代码在 [src/app.js](../src/app.js)，共享生成器在 [shared/compiler.js](../shared/compiler.js)。应用与规则目录从仓库根目录的 `ratatoskr.yaml`、24 地区筛选从 `Ratatosk-Eb.yaml` 提取，仅提取公开规则元数据，**不提取原文件的 `proxy-providers` 或 `proxies`**。修改模板或前端后执行 `npm run build`，同步提交 `shared/catalog.json` 与 `assets/`。前后端使用同一生成器和目录版本，修改生成器后也需重新部署 Worker。
 
 生成配置包含混合端口和分流策略，DNS / TUN / 系统代理由客户端配置。输出面向 Mihomo / Clash Meta，不代表支持其他内核格式。

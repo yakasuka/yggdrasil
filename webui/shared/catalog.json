@@ -431,7 +431,7 @@
       "name": "📺 Hulu",
       "label": "Hulu",
       "category": "影音娱乐",
-      "icon": "",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/hulu.png",
       "rules": [
         "GEOSITE,hulu,📺 Hulu"
       ],
@@ -442,7 +442,7 @@
       "name": "📦 Prime Video",
       "label": "Prime Video",
       "category": "影音娱乐",
-      "icon": "",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/primevideo.png",
       "rules": [
         "GEOSITE,primevideo,📦 Prime Video"
       ],
@@ -453,7 +453,7 @@
       "name": "🎬 HBO",
       "label": "HBO",
       "category": "影音娱乐",
-      "icon": "",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/hbo.png",
       "rules": [
         "GEOSITE,hbo,🎬 HBO"
       ],
@@ -464,7 +464,7 @@
       "name": "🏰 Disney+",
       "label": "Disney+",
       "category": "影音娱乐",
-      "icon": "",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/disney.png",
       "rules": [
         "GEOSITE,disney,🏰 Disney+"
       ],
@@ -475,7 +475,7 @@
       "name": "🟣 Twitch",
       "label": "Twitch",
       "category": "影音娱乐",
-      "icon": "",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/twitch.png",
       "rules": [
         "GEOSITE,twitch,🟣 Twitch"
       ],
@@ -508,7 +508,7 @@
       "name": "📰 News",
       "label": "News",
       "category": "其他服务",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/media.png",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/news.png",
       "rules": [
         "GEOSITE,category-media,📰 News"
       ],
@@ -580,19 +580,19 @@
       "module": "private"
     },
     {
-      "rule": "RULE-SET,↘️ Direct Domain,DIRECT",
+      "rule": "RULE-SET,↘️ 直连域名,DIRECT",
       "module": "direct-extra"
     },
     {
-      "rule": "RULE-SET,📍 Direct IP,DIRECT",
+      "rule": "RULE-SET,📍 直连IP,DIRECT",
       "module": "direct-extra"
     },
     {
-      "rule": "RULE-SET,🌍 Proxy Domain,🎚️ 节点选择",
+      "rule": "RULE-SET,🌍 代理域名,🎚️ 节点选择",
       "module": "proxy-extra"
     },
     {
-      "rule": "RULE-SET,🛰️ Proxy IP,🎚️ 节点选择",
+      "rule": "RULE-SET,🛰️ 代理 IP,🎚️ 节点选择",
       "module": "proxy-extra"
     },
     {
@@ -624,7 +624,7 @@
       "module": "game-direct"
     },
     {
-      "rule": "RULE-SET,🔀 Port Rules,🔌 特殊端口",
+      "rule": "RULE-SET,🔀 端口直连规则,🔌 特殊端口",
       "module": "ports"
     },
     {
@@ -646,19 +646,19 @@
       "module": "private"
     },
     {
-      "rule": "RULE-SET,↘️ Direct Domain,DIRECT",
+      "rule": "RULE-SET,↘️ 直连域名,DIRECT",
       "module": "direct-extra"
     },
     {
-      "rule": "RULE-SET,📍 Direct IP,DIRECT",
+      "rule": "RULE-SET,📍 直连IP,DIRECT",
       "module": "direct-extra"
     },
     {
-      "rule": "RULE-SET,🌍 Proxy Domain,🎚️ 节点选择",
+      "rule": "RULE-SET,🌍 代理域名,🎚️ 节点选择",
       "module": "proxy-extra"
     },
     {
-      "rule": "RULE-SET,🛰️ Proxy IP,🎚️ 节点选择",
+      "rule": "RULE-SET,🛰️ 代理 IP,🎚️ 节点选择",
       "module": "proxy-extra"
     },
     {
@@ -830,7 +830,7 @@
       "app": "category-entertainment"
     },
     {
-      "rule": "RULE-SET,🔀 Port Rules,🔌 特殊端口",
+      "rule": "RULE-SET,🔀 端口直连规则,🔌 特殊端口",
       "module": "ports"
     },
     {
@@ -840,7 +840,7 @@
   ],
   "providerModules": [
     {
-      "name": "↘️ Direct Domain",
+      "name": "↘️ 直连域名",
       "value": {
         "type": "http",
         "behavior": "domain",
@@ -851,7 +851,7 @@
       "module": "direct-extra"
     },
     {
-      "name": "📍 Direct IP",
+      "name": "📍 直连IP",
       "value": {
         "type": "http",
         "behavior": "classical",
@@ -862,7 +862,7 @@
       "module": "direct-extra"
     },
     {
-      "name": "🌍 Proxy Domain",
+      "name": "🌍 代理域名",
       "value": {
         "type": "http",
         "behavior": "domain",
@@ -873,7 +873,7 @@
       "module": "proxy-extra"
     },
     {
-      "name": "🛰️ Proxy IP",
+      "name": "🛰️ 代理 IP",
       "value": {
         "type": "http",
         "behavior": "classical",
@@ -884,7 +884,7 @@
       "module": "proxy-extra"
     },
     {
-      "name": "🔀 Port Rules",
+      "name": "🔀 端口直连规则",
       "value": {
         "type": "http",
         "behavior": "classical",
@@ -933,5 +933,5 @@
       "default": false
     }
   ],
-  "version": "fadf7dfd9850"
+  "version": "a11f4771ebf4"
 }

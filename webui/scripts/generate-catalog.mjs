@@ -2,10 +2,18 @@ import fs from "node:fs";
 import crypto from "node:crypto";
 import { parse } from "yaml";
 
-const main = parse(fs.readFileSync("ratatoskr.yaml", "utf8"), { merge: true });
-const expanded = parse(fs.readFileSync("Ratatosk-Eb.yaml", "utf8"), {
-  merge: true,
-});
+const repositoryRoot = new URL("../../", import.meta.url);
+const catalogPath = new URL("../shared/catalog.json", import.meta.url);
+const main = parse(
+  fs.readFileSync(new URL("ratatoskr.yaml", repositoryRoot), "utf8"),
+  { merge: true },
+);
+const expanded = parse(
+  fs.readFileSync(new URL("Ratatosk-Eb.yaml", repositoryRoot), "utf8"),
+  {
+    merge: true,
+  },
+);
 const definitions = [
   ["HK", "香港", "🇭🇰", "🌆", "FilterHK"],
   ["TW", "台湾", "🇹🇼", "🧋", "FilterTW"],
@@ -163,11 +171,8 @@ catalog.version = crypto
   .update(JSON.stringify(catalog))
   .digest("hex")
   .slice(0, 12);
-fs.mkdirSync("shared", { recursive: true });
-fs.writeFileSync(
-  "shared/catalog.json",
-  JSON.stringify(catalog, null, 2) + "\n",
-);
+fs.mkdirSync(new URL("./", catalogPath), { recursive: true });
+fs.writeFileSync(catalogPath, JSON.stringify(catalog, null, 2) + "\n");
 console.log(
   "Catalog: " +
     apps.length +
