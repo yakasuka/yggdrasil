@@ -341,7 +341,7 @@
       "id": "github",
       "name": "🐙 GitHub",
       "label": "GitHub",
-      "category": "其他服务",
+      "category": "AI 与开发",
       "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/github.png",
       "rules": [
         "GEOSITE,github,🐙 GitHub"
@@ -913,5 +913,5 @@
       "module": "ports"
     }
   ],
-  "version": "1139632f9e94"
+  "version": "7137a2eeefb0"
 }
