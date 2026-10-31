@@ -1,0 +1,14 @@
+proxies:
+  - name: 日本 JP 01
+    type: socks5
+    server: node.example.com
+    port: 443
+    password: private-node-fixture
+  - name: 美国 US 01
+    type: socks5
+    server: node.example.com
+    port: 443
+  - name: 未知地区 01
+    type: socks5
+    server: node.example.com
+    port: 443

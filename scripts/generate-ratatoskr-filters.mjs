@@ -1,6 +1,6 @@
 import { readFile, writeFile } from "node:fs/promises";
 
-const configPath = new URL("../Ratatoskr.yaml", import.meta.url);
+const configPath = new URL("../ratatoskr.yaml", import.meta.url);
 const config = await readFile(configPath, "utf8");
 
 const regionBlock = config.match(
@@ -8,7 +8,7 @@ const regionBlock = config.match(
 );
 
 if (!regionBlock) {
-  throw new Error("Could not find the FilterRegions block in Ratatoskr.yaml");
+  throw new Error("Could not find the FilterRegions block in ratatoskr.yaml");
 }
 
 const regionPatterns = [...regionBlock[1].matchAll(
@@ -32,7 +32,7 @@ const regionAlternatives = regionPatterns.map((pattern) => {
 const allFilter = config.match(/^FilterAll: &FilterAll '([^']+)'\r?$/m)?.[1];
 
 if (!allFilter) {
-  throw new Error("Could not find the FilterAll pattern in Ratatoskr.yaml");
+  throw new Error("Could not find the FilterAll pattern in ratatoskr.yaml");
 }
 
 const cleanTerms = allFilter.match(/^\^\(\?!\.\*\(\?:\(\?i\)=>\|(.*)\)\)\.\*\$$/)?.[1];

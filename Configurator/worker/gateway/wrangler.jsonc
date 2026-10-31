@@ -1,0 +1,9 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "ratatoskr-relay",
+  "pages_build_output_dir": "./dist",
+  "compatibility_date": "2026-10-01",
+  "services": [
+    { "binding": "PROFILE_SERVICE", "service": "yggdrasil-subscriptions" },
+  ],
+}
