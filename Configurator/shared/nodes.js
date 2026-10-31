@@ -5,7 +5,12 @@ export function parseNodes(text, providerIndex = 0) {
     throw Error("节点订阅超过 2 MiB。");
   let data;
   try {
-    data = parse(text, { merge: true, maxAliasCount: 100 });
+    data = parse(text, {
+      merge: true,
+      maxAliasCount: 100,
+      logLevel: "silent",
+      prettyErrors: false,
+    });
   } catch {
     throw Error("订阅需要是有效的 Mihomo / Clash YAML。");
   }
