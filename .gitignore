@@ -9,4 +9,4 @@ node_modules/
 .env.*
 **/worker/wrangler.local.*
 test-results/
-webui/worker/gateway/dist/
+Configurator/worker/gateway/dist/

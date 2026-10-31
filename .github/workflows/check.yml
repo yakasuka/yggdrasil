@@ -1,4 +1,4 @@
-name: Validate subscription builder
+name: Validate Configurator
 on: [push, pull_request]
 permissions:
   contents: read
@@ -7,17 +7,59 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: webui
+        working-directory: Configurator
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: webui/package-lock.json
+          cache-dependency-path: Configurator/package-lock.json
       - run: npm ci
       - run: npm run build
       - run: npm test
-      - name: Check generated assets are committed
+  sync-catalog:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: check
+    runs-on: ubuntu-latest
+    concurrency:
+      group: configurator-catalog-sync
+      cancel-in-progress: false
+    permissions:
+      contents: write
+      pages: write
+    defaults:
+      run:
+        working-directory: Configurator
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: Configurator/package-lock.json
+      - run: npm ci
+      - run: npm run build
+      - name: Commit generated catalog and browser assets
+        id: sync
         working-directory: .
-        run: git diff --exit-code -- webui/shared/catalog.json webui/assets
+        run: |
+          git add -- Configurator/shared/catalog.json Configurator/assets
+          if git diff --cached --quiet; then
+            echo 'changed=false' >> "$GITHUB_OUTPUT"
+          else
+            git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'build: sync Configurator from Ratatoskr template'
+            git push origin HEAD:main
+            echo 'changed=true' >> "$GITHUB_OUTPUT"
+          fi
+      - name: Rebuild branch-based Pages after the generated commit
+        if: steps.sync.outputs.changed == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.request('POST /repos/{owner}/{repo}/pages/builds', {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
