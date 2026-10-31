@@ -218,3 +218,11 @@ test("subscription parser does not emit source excerpts or return node secrets",
     console.warn = warn;
   }
 });
+
+test("final route is fixed to follow the global proxy selector", async () => {
+  const { config } = await compile(profile());
+  assert.deepEqual(
+    config["proxy-groups"].find((g) => g.name === catalog.groups.final).proxies,
+    [catalog.groups.gateway],
+  );
+});
