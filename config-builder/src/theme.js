@@ -6,10 +6,10 @@ const maxCssBytes = 256 * 1024;
 const $ = (selector) => document.querySelector(selector);
 
 function apply() {
-  let theme = "system",
+  let theme = "dark",
     css = "";
   try {
-    theme = localStorage.getItem(keys.theme) || "system";
+    theme = localStorage.getItem(keys.theme) || "dark";
     css = localStorage.getItem(keys.css) || "";
   } catch {}
   if (!["light", "dark", "system"].includes(theme)) theme = "system";
