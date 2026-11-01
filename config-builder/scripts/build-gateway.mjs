@@ -37,6 +37,8 @@ for (const [source, destination] of [
   ["config-builder/index.html", "config-builder/index.html"],
   ["config-builder/assets/app.js", "config-builder/assets/app.js"],
   ["config-builder/assets/app.css", "config-builder/assets/app.css"],
+  ["config-builder/src/theme.js", "config-builder/src/theme.js"],
+  ["config-builder/src/caustics.js", "config-builder/src/caustics.js"],
 ])
   await copy(new URL(source, repository), new URL(destination, output));
 for (const path of ["assets/"])

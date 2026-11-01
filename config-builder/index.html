@@ -13,6 +13,8 @@
     <link rel="icon" href="../assets/favicon.png" type="image/png" />
     <link rel="stylesheet" href="./assets/app.css" />
     <script type="module" src="./assets/app.js"></script>
+    <script type="module" src="./src/theme.js"></script>
+    <script type="module" src="./src/caustics.js"></script>
   </head>
   <body>
     <a class="skip-link" href="#workspace">跳到配置内容</a>
@@ -27,7 +29,33 @@
       >
       <div class="header-links">
         <span class="engine"><i></i> 为 Mihomo 而生</span
-        ><a
+        ><div class="appearance-tools" aria-label="外观设置">
+          <label class="theme-picker"
+            >主题<select id="theme-select" aria-label="选择主题">
+              <option value="light">Universe 浅色</option>
+              <option value="dark">Universe 深色</option>
+              <option value="system">跟随系统</option>
+            </select></label
+          >
+          <label
+            class="css-upload button secondary"
+            for="theme-css-file"
+            title="CSS 仅保存在此浏览器"
+            >自定义 CSS<input
+              id="theme-css-file"
+              type="file"
+              accept=".css,text/css"
+          /></label>
+          <button
+            class="text-button clear-theme-css"
+            id="clear-theme-css"
+            type="button"
+            hidden
+          >
+            清除
+          </button>
+        </div>
+        <a
           href="https://github.com/yakasuka/yggdrasil"
           target="_blank"
           rel="noopener noreferrer"
@@ -36,9 +64,19 @@
       </div>
     </header>
     <main class="layout">
+      <section class="caustic-hero" aria-label="动态水面效果。点击水面产生涟漪">
+        <canvas id="caustic-water" aria-hidden="true"></canvas>
+        <div class="caustic-meta"><span><i></i> RATATOSKR · CONFIG STUDIO</span><span>INTERACTIVE CAUSTICS <b>↗</b></span></div>
+        <div class="caustic-copy">
+          <p>MAKE EVERY CONNECTION COUNT</p>
+          <h2>让连接，流向你想去的地方<span>.</span></h2>
+          <a href="#workspace">开始配置 <span aria-hidden="true">↓</span></a>
+        </div>
+        <div class="caustic-hint">点击水面，感受涟漪 <span>↗</span></div>
+      </section>
       <aside class="journey" aria-label="配置进度">
-        <div class="eyebrow">GROW YOUR CONNECTION</div>
-        <h1>让连接，<br />随你生长。</h1>
+        <div class="eyebrow">YOUR CONFIGURATION</div>
+        <h1>从这里开始。</h1>
         <p class="intro">
           从一份订阅开始，长成属于你的网络。<br />每一条分流，都有自己的去向。
         </p>
