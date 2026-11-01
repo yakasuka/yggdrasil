@@ -358,8 +358,8 @@ rule-providers:
   R-anthropic-ip:       {<<: *yaml-ip,url: "https://raw.githubusercontent.com/uhovohu/clash/refs/heads/main/Rules/anthropic-ip.yaml"}
   
   # ── Download Balance 下载流量均衡 ──
-  R-download:           {<<: *yaml,   url: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/Rules/download.yaml"}                                        # Hugging Face CDN下载域名
-  R-DIRECT:             {<<: *yaml,   url: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/Rules/CN.yaml"}                                        # 直连域名补充集
+  R-download:           {<<: *yaml,   url: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/resources/rules/download.yaml"}                                        # Hugging Face CDN下载域名
+  R-DIRECT:             {<<: *yaml,   url: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/resources/rules/CN.yaml"}                                        # 直连域名补充集
 
   
 

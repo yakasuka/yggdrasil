@@ -9,14 +9,19 @@ import {
 } from "../shared/compiler.js";
 import { publicInspection, MAX_SUBSCRIPTION_BYTES } from "../shared/nodes.js";
 import { filename } from "../shared/profile.js";
-import { SERVICE_ROUTES, serviceOrigin, subscriptionURL } from "./service.js";
+import {
+  SERVICE_ROUTES,
+  serviceOrigin,
+  subscriptionURL,
+  probeService,
+} from "./service.js";
 import { esc, usageCards } from "./ui.js";
 import { sourcesPanel } from "./panels/sources.js";
 import { regionsPanel } from "./panels/regions.js";
 import { strategiesPanel } from "./panels/strategies.js";
 import { appsPanel } from "./panels/apps.js";
 import { reviewPanel, resultPanel } from "./panels/review.js";
-import { browserRecords } from "./subscriptions.js";
+import { browserRecords, sourceFailureMessage } from "./subscriptions.js";
 const $ = (s) => document.querySelector(s);
 const steps = [
   ["订阅来源", "连接你的机场"],
@@ -30,6 +35,7 @@ const ctx = {
   files: new Map(),
   inspection: null,
   service: "checking",
+  serviceMessage: "正在检查订阅服务…",
   search: "",
   phase: "idle",
   probeDone: 0,
@@ -44,6 +50,10 @@ let step = 0,
   result = null,
   inspectionController,
   probeController;
+const serviceStorageKey =
+  "yggdrasil:service-origin:" + new URL(".", location.href).pathname;
+let serviceTask = null,
+  serviceRevision = 0;
 const panels = [
   sourcesPanel,
   regionsPanel,
@@ -116,6 +126,7 @@ function footer() {
     ? "配置按当前选择生成"
     : "只保留你需要的枝叶。";
   document.querySelector(".wizard-footer").dataset.final = String(final);
+  renderService();
 }
 function render() {
   renderNav();
@@ -178,33 +189,69 @@ function navigate(next) {
   if (matchMedia("(max-width:680px)").matches)
     window.scrollTo({ top: 0, behavior: "instant" });
 }
-async function checkService() {
-  try {
-    const settings = await fetch("./config.json", { cache: "no-store" }).then(
-      (r) => r.json(),
-    );
-    apiBase = serviceOrigin(settings.apiBase) || "";
-    if (!apiBase) {
-      ctx.service = "unconfigured";
-      return;
+function renderService() {
+  $("#service-label").textContent = {
+    checking: "正在检查订阅服务",
+    unconfigured: "本地模式 · 可连接订阅服务",
+    ready: "订阅服务已连接",
+    offline: "订阅服务未连接",
+    mismatch: "订阅服务版本不一致",
+  }[ctx.service];
+  $("#service-description").textContent = ctx.serviceMessage;
+  $("#service-settings").dataset.state = ctx.service;
+  for (const input of $("#service-form").querySelectorAll("input,button"))
+    input.disabled = busy || ctx.service === "checking";
+}
+function checkService(origin) {
+  const ticket = ++serviceRevision;
+  ctx.service = "checking";
+  ctx.serviceMessage = "正在检查订阅服务…";
+  ctx.tcp = false;
+  renderService();
+  serviceTask = (async () => {
+    let target = origin,
+      status;
+    try {
+      if (target === undefined) {
+        const response = await fetch("./config.json", {
+          cache: "no-store",
+          credentials: "omit",
+          signal: AbortSignal.timeout(10000),
+        });
+        if (!response.ok) throw Error();
+        const settings = await response.json();
+        const configured = serviceOrigin(settings.apiBase) || "";
+        let saved = "";
+        try {
+          saved = serviceOrigin(localStorage.getItem(serviceStorageKey)) || "";
+        } catch {}
+        // A same-origin Pages deployment remains authoritative after migration.
+        target =
+          configured === location.origin ? configured : saved || configured;
+      }
+      status = await probeService(target, catalog.version);
+    } catch {
+      status = {
+        state: "offline",
+        message: "无法读取服务配置，请重试连接或填写有效的服务地址。",
+      };
     }
-    const response = await fetch(apiBase + SERVICE_ROUTES.status, {
-      signal: AbortSignal.timeout(10000),
-      cache: "no-store",
-    });
-    if (!response.ok) throw Error();
-    const health = await response.json();
-    ctx.tcp = health.capabilities?.tcp === true;
-    ctx.service = !health.ready
-      ? "offline"
-      : health.version !== catalog.version
-        ? "mismatch"
-        : "ready";
-  } catch {
-    ctx.service = "offline";
-  } finally {
-    if (!busy) render();
-  }
+    if (ticket !== serviceRevision) return status;
+    apiBase = target || "";
+    ctx.service = status.state;
+    ctx.serviceMessage = status.message;
+    ctx.tcp = status.tcp === true;
+    if (status.state === "ready" && origin !== undefined) {
+      try {
+        localStorage.setItem(serviceStorageKey, apiBase);
+      } catch {}
+    }
+    $("#service-origin").value = apiBase;
+    if (!busy && step === 4) render();
+    else footer();
+    return status;
+  })();
+  return serviceTask;
 }
 async function resolveSources() {
   if (busy) return;
@@ -237,11 +284,13 @@ async function resolveSources() {
       });
     } catch (directError) {
       sourceProxies = null;
-      if (local) throw directError;
+      if (local || directError.code === "SOURCE_FILE") throw directError;
+      if (rev !== revision || inspectionController.signal.aborted) return;
+      if (ctx.service === "checking") await serviceTask;
+      else if (ctx.service !== "ready" && apiBase) await checkService(apiBase);
+      if (rev !== revision || inspectionController.signal.aborted) return;
       if (ctx.service !== "ready")
-        throw Error(
-          "浏览器无法直接读取订阅，机场可能未开放跨域访问。请导入节点文件，或等待订阅服务连接后重试。",
-        );
+        throw Error(sourceFailureMessage(directError, ctx.service));
       const response = await fetch(apiBase + SERVICE_ROUTES.inspect, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -434,6 +483,23 @@ function toast(text) {
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => ($("#toast").hidden = true), 2500);
 }
+document.addEventListener("submit", async (e) => {
+  if (e.target.id !== "service-form") return;
+  e.preventDefault();
+  if (busy || ctx.service === "checking") return;
+  let origin;
+  try {
+    origin = serviceOrigin($("#service-origin").value);
+    if (!origin) throw Error("请先填写订阅服务的公开地址。");
+  } catch (e) {
+    $("#service-description").textContent = e.message;
+    return;
+  }
+  invalidate();
+  step = 0;
+  render();
+  await checkService(origin);
+});
 document.addEventListener("input", (e) => {
   const el = e.target;
   if (el.dataset.provider !== undefined) {
@@ -505,6 +571,23 @@ document.addEventListener("change", (e) => {
 document.addEventListener("click", async (e) => {
   const el = e.target.closest("button");
   if (!el || el.disabled) return;
+  if (el.id === "retry-service" || el.id === "reset-service") {
+    if (el.id === "reset-service") {
+      invalidate();
+      step = 0;
+      render();
+      try {
+        localStorage.removeItem(serviceStorageKey);
+      } catch {}
+    } else {
+      changed();
+      probeController?.abort();
+    }
+    await checkService(
+      el.id === "retry-service" ? apiBase || undefined : undefined,
+    );
+    return;
+  }
   if (el.id === "next") {
     if (step === 0) await resolveSources();
     else if (step === 4) await generate();

@@ -74,7 +74,7 @@ test("public site discovers its own service and does not expose private source p
       },
     };
   const settings = await gateway.fetch(
-    new Request("https://configurator.example/Configurator/config.json"),
+    new Request("https://configurator.example/config-builder/config.json"),
     env,
   );
   assert.deepEqual(await settings.json(), {
@@ -82,9 +82,9 @@ test("public site discovers its own service and does not expose private source p
   });
   for (const path of [
     "/",
-    "/Configurator/",
-    "/Configurator/assets/app.js",
-    "/icons/macosicons/chatgpt.png",
+    "/config-builder/",
+    "/config-builder/assets/app.js",
+    "/assets/icons/macosicons/chatgpt.png",
   ])
     assert.equal(
       (
@@ -98,9 +98,9 @@ test("public site discovers its own service and does not expose private source p
   for (const path of [
     "/.git/config",
     "/functions/sub.js",
-    "/Configurator/src/app.js",
-    "/Configurator/worker/wrangler.jsonc",
-    "/Configurator/shared/catalog.json",
+    "/config-builder/src/app.js",
+    "/config-builder/worker/wrangler.jsonc",
+    "/config-builder/shared/catalog.json",
     "/Ratatoskr-Template.yaml",
     "/_worker.js",
     "/api/health",
@@ -121,10 +121,12 @@ test("public site discovers its own service and does not expose private source p
 test("Pages output includes the frontend and excludes source and private configuration", () => {
   const output = new URL("../worker/gateway/dist/", import.meta.url);
   assert.ok(
-    existsSync(new URL("Configurator/assets/app.js", output)),
+    existsSync(new URL("config-builder/assets/app.js", output)),
     "Run npm run build before testing deployment output",
   );
-  assert.ok(existsSync(new URL("Configurator/index.html", output)));
+  assert.ok(existsSync(new URL("config-builder/index.html", output)));
+  assert.ok(existsSync(new URL("assets/favicon.png", output)));
+  assert.ok(existsSync(new URL("assets/icons/macosicons/chatgpt.png", output)));
   const files = readdirSync(output, { recursive: true });
   assert.ok(
     !files.some((p) =>
@@ -132,6 +134,25 @@ test("Pages output includes the frontend and excludes source and private configu
     ),
   );
   assert.ok(!files.some((p) => /\.(?:yaml|jsonc|env)$/.test(p)));
+});
+
+test("legacy page entrances redirect to the canonical config-builder route", async () => {
+  for (const path of [
+    "/Configurator/",
+    "/webui/",
+    "/builder/",
+    "/config-builder",
+  ]) {
+    const response = await gateway.fetch(
+      new Request("https://service.example" + path),
+      {},
+    );
+    assert.equal(response.status, 308);
+    assert.equal(
+      response.headers.get("Location"),
+      "https://service.example/config-builder/",
+    );
+  }
 });
 
 test("gateway diagnostics distinguish absent bindings, connection errors and service errors without leaking details", async () => {

@@ -10,7 +10,7 @@
     <meta name="color-scheme" content="light dark" />
     <meta name="referrer" content="no-referrer" />
     <title>config-builder · Yggdrasil</title>
-    <link rel="icon" href="../favicon.png" type="image/png" />
+    <link rel="icon" href="../assets/favicon.png" type="image/png" />
     <link rel="stylesheet" href="./assets/app.css" />
     <script type="module" src="./assets/app.js"></script>
   </head>
@@ -61,6 +61,44 @@
           <span id="step-caption" class="eyebrow"></span
           ><span class="chip">RATATOSKR</span>
         </div>
+        <details class="service-settings" id="service-settings">
+          <summary>
+            <span id="service-label">正在检查订阅服务</span
+            ><span class="muted">连接设置</span>
+          </summary>
+          <div>
+            <p id="service-description" class="muted" role="status"></p>
+            <form id="service-form">
+              <label class="field"
+                >订阅服务地址<input
+                  id="service-origin"
+                  type="url"
+                  placeholder="https://你的服务域名"
+                  maxlength="2048"
+                  autocomplete="off"
+                  spellcheck="false"
+              /></label>
+              <p class="muted">
+                仅连接你信任的服务。这里只记住公开地址，不保存机场链接。
+              </p>
+              <div class="service-actions">
+                <button
+                  type="submit"
+                  class="button secondary"
+                  id="connect-service"
+                >
+                  连接并记住
+                </button>
+                <button type="button" class="text-button" id="retry-service">
+                  重试连接
+                </button>
+                <button type="button" class="text-button" id="reset-service">
+                  恢复默认
+                </button>
+              </div>
+            </form>
+          </div>
+        </details>
         <div id="panel"></div>
         <div id="error" class="error" role="alert" hidden></div>
         <footer class="wizard-footer">

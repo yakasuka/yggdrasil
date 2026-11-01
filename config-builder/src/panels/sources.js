@@ -14,12 +14,6 @@ export function sourcesPanel(ctx) {
     `<button class="button add-provider" id="add-provider"${ctx.profile.providers.length >= 10 ? " disabled" : ""}>＋ 添加另一个机场 <span class="muted">${ctx.profile.providers.length} / 10</span></button>` +
     notice(
       "点击下一步后解析节点与流量信息。机场链接仅用于处理你的配置，不会写入浏览器本地存储。",
-    ) +
-    (!["ready", "checking"].includes(ctx.service)
-      ? notice(
-          "网页会先尝试直接读取并解析订阅。跨域代取与持久订阅服务暂未连接，也可以导入节点文件继续预览和下载。",
-          true,
-        )
-      : "")
+    )
   );
 }

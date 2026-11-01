@@ -12,7 +12,7 @@ config-builder/
 ├── src/
 │   ├── app.js                 # 状态、解析和五步引导调度
 │   ├── panels/                # 订阅 / 地区 / 策略 / APP / 确认，分别维护
-│   ├── service.js             # 公开地址与返回链接校验
+│   ├── service.js             # 地址校验、健康检查与返回链接校验
 │   ├── subscriptions.js       # 浏览器拉取与节点文件导入
 │   ├── ui.js                  # 文本转义、流量卡片与显示格式
 │   └── styles.css
@@ -41,8 +41,10 @@ npm --prefix config-builder test
 npm --prefix config-builder run service:dev
 ```
 
-打开 `http://localhost:8788/Configurator/`。旧 `/webui/`、`/builder/` 和 `/config-builder/` 会跳转到新入口。
+打开 `http://localhost:8788/config-builder/`。旧 `/webui/`、`/builder/` 和 `/Configurator/` 会跳转到新入口。
 
 修改源码后构建并提交 `assets/` 与 `shared/catalog.json`。新增模板内容的格式、相同 Token 跟随模板更新的机制，以及流量和 TCP 检测的实际边界，见 [完整实现路径](docs/IMPLEMENTATION.md)。
 
 网页先尝试直接拉取订阅并解码 Base64；无法跨域读取时由 Pages 代取。KV 保存加密的用户选择和 YAML 快照，订阅拉取会更新节点与真实流量。完整配置保留所选地区和 P1/P2 来源标识。
+
+GitHub Pages 的默认 `apiBase` 留空，页面会显示本地模式。订阅服务部署后，可在“连接设置”填写可信服务地址，或由维护者更新 `config.json`；Cloudflare Pages 会自动连接同源服务。未部署后端时，跨域代取和持久订阅仍不可用，文件导入、预览和下载可独立使用。

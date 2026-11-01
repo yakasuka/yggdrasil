@@ -9,4 +9,4 @@ node_modules
 .env.*
 **/worker/wrangler.local.*
 test-results/
-Configurator/worker/gateway/dist/
+**/worker/gateway/dist/

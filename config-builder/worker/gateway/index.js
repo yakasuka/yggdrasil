@@ -7,8 +7,8 @@ const application = createWorker();
 const publicAsset = (path) =>
   /^\/(?:index\.html|favicon\.(?:png|ico))?$/.test(path) ||
   /^\/(?:assets|icons)\/[A-Za-z0-9_./-]+\.(?:png|ico|svg|webp)$/.test(path) ||
-  /^\/(?:Configurator|webui|builder)(?:\/|\/index\.html)?$/.test(path) ||
-  /^\/Configurator\/assets\/app\.(?:js|css)$/.test(path);
+  /^\/config-builder(?:\/|\/index\.html)?$/.test(path) ||
+  /^\/config-builder\/assets\/app\.(?:js|css)$/.test(path);
 // The fixed health probe never processes subscription data. Keep its runtime
 // diagnostics bounded and strip URLs, resource identifiers and local paths.
 const probeError = (error) => {
@@ -50,13 +50,18 @@ export default {
       return mergeRequest({ request, env });
     if (
       ["GET", "HEAD"].includes(request.method) &&
-      /^\/(?:builder|webui|config-builder)(?:\/index\.html)?\/?$/.test(
+      /^\/(?:builder|webui|Configurator)(?:\/index\.html)?\/?$/.test(
         publicURL.pathname,
       )
     )
-      return Response.redirect(new URL("/Configurator/", publicURL), 308);
+      return Response.redirect(new URL("/config-builder/", publicURL), 308);
+    if (
+      ["GET", "HEAD"].includes(request.method) &&
+      publicURL.pathname === "/config-builder"
+    )
+      return Response.redirect(new URL("/config-builder/", publicURL), 308);
     if (["GET", "HEAD"].includes(request.method)) {
-      if (publicURL.pathname === "/Configurator/config.json") {
+      if (publicURL.pathname === "/config-builder/config.json") {
         const headers = {
           "Cache-Control": "no-store",
           "Content-Type": "application/json",

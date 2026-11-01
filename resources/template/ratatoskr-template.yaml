@@ -29,12 +29,12 @@ proxy-groups:
       - 🗽
       - 🌌
       - DIRECT
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/switch.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/switch.png
   - name: 🚀 手动切换
     type: select
     include-all: true
     filter: ^(?!.*(?:(?i)=>|群|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|剩余流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|超时|收藏|福利|失联|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author|Traffic|\d{4}-\d{2}-\d{2}|\d+G)).*$
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/proxy.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/proxy.png
   - name: ♻️ 自动选择
     type: url-test
     include-all: true
@@ -42,7 +42,7 @@ proxy-groups:
     url: https://www.gstatic.com/generate_204
     interval: 300
     tolerance: 50
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/proxy.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/proxy.png
     x-configurator:
       kind: strategy
       id: auto
@@ -52,7 +52,7 @@ proxy-groups:
     filter: ^(?!.*(?:(?i)=>|群|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|剩余流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|超时|收藏|福利|失联|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author|Traffic|\d{4}-\d{2}-\d{2}|\d+G)).*$
     url: https://www.gstatic.com/generate_204
     interval: 300
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/fallback.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/fallback.png
     x-configurator:
       kind: strategy
       id: fallback
@@ -61,7 +61,7 @@ proxy-groups:
     include-all: true
     filter: ^(?!.*(?:(?i)=>|群|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|剩余流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|超时|收藏|福利|失联|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author|Traffic|\d{4}-\d{2}-\d{2}|\d+G)).*$
     strategy: consistent-hashing
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/tracking.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/tracking.png
     x-configurator:
       kind: strategy
       id: balanced
@@ -70,7 +70,7 @@ proxy-groups:
     include-all: true
     filter: ^(?!.*(?:(?i)=>|群|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|剩余流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|超时|收藏|福利|失联|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author|Traffic|\d{4}-\d{2}-\d{2}|\d+G)).*$
     strategy: round-robin
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/global.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/global.png
     x-configurator:
       kind: strategy
       id: download
@@ -87,7 +87,7 @@ proxy-groups:
       - 🏙️
       - 🗽
       - 🌌
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/chatgpt.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/chatgpt.png
     x-configurator:
       kind: app
       category: AI 与开发
@@ -104,7 +104,7 @@ proxy-groups:
       - 🏙️
       - 🗽
       - 🌌
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/claude.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/claude.png
     x-configurator:
       kind: app
       category: AI 与开发
@@ -121,7 +121,7 @@ proxy-groups:
       - 🏙️
       - 🗽
       - 🌌
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/ai.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/ai.png
     x-configurator:
       kind: app
       category: AI 与开发
@@ -138,7 +138,7 @@ proxy-groups:
       - 🏙️
       - 🗽
       - 🌌
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/crypto.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/crypto.png
     x-configurator:
       kind: app
       category: 数字资产
@@ -155,7 +155,7 @@ proxy-groups:
       - 🏙️
       - 🗽
       - 🌌
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/crypto.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/crypto.png
     x-configurator:
       kind: app
       category: 数字资产
@@ -172,7 +172,7 @@ proxy-groups:
       - 🏙️
       - 🗽
       - 🌌
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/crypto.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/crypto.png
     x-configurator:
       kind: app
       category: 数字资产
@@ -189,7 +189,7 @@ proxy-groups:
       - 🏙️
       - 🗽
       - 🌌
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/crypto.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/crypto.png
     x-configurator:
       kind: app
       category: 数字资产
@@ -206,7 +206,7 @@ proxy-groups:
       - 🏙️
       - 🗽
       - 🌌
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/youtube.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/youtube.png
     x-configurator:
       kind: app
       category: 影音娱乐
@@ -223,7 +223,7 @@ proxy-groups:
       - 🏙️
       - 🗽
       - 🌌
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/google.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/google.png
     x-configurator:
       kind: app
       category: 其他服务
@@ -240,7 +240,7 @@ proxy-groups:
       - 🏙️
       - 🗽
       - 🌌
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/cloudflare.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/cloudflare.png
     x-configurator:
       kind: app
       category: 其他服务
@@ -257,7 +257,7 @@ proxy-groups:
       - 🏙️
       - 🗽
       - 🌌
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/amazon.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/amazon.png
     x-configurator:
       kind: app
       category: 其他服务
@@ -274,7 +274,7 @@ proxy-groups:
       - 🏙️
       - 🗽
       - 🌌
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/github.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/github.png
     x-configurator:
       kind: app
       category: AI 与开发
@@ -291,7 +291,7 @@ proxy-groups:
       - 🏙️
       - 🗽
       - 🌌
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/microsoft.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/microsoft.png
     x-configurator:
       kind: app
       category: 其他服务
@@ -308,7 +308,7 @@ proxy-groups:
       - 🏙️
       - 🗽
       - 🌌
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/adobe.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/adobe.png
     x-configurator:
       kind: app
       category: 其他服务
@@ -325,7 +325,7 @@ proxy-groups:
       - 🏙️
       - 🗽
       - 🌌
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/apple.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/apple.png
     x-configurator:
       kind: app
       category: 其他服务
@@ -342,7 +342,7 @@ proxy-groups:
       - 🏙️
       - 🗽
       - 🌌
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/x.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/x.png
     x-configurator:
       kind: app
       category: 社交与通信
@@ -359,7 +359,7 @@ proxy-groups:
       - 🏙️
       - 🗽
       - 🌌
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/instagram.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/instagram.png
     x-configurator:
       kind: app
       category: 社交与通信
@@ -376,7 +376,7 @@ proxy-groups:
       - 🏙️
       - 🗽
       - 🌌
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/telegram.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/telegram.png
     x-configurator:
       kind: app
       category: 社交与通信
@@ -393,7 +393,7 @@ proxy-groups:
       - 🏙️
       - 🗽
       - 🌌
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/discord.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/discord.png
     x-configurator:
       kind: app
       category: 社交与通信
@@ -426,7 +426,7 @@ proxy-groups:
       - 🏙️
       - 🗽
       - 🌌
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/social.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/social.png
     x-configurator:
       kind: app
       category: 社交与通信
@@ -443,7 +443,7 @@ proxy-groups:
       - 🏙️
       - 🗽
       - 🌌
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/tiktok.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/tiktok.png
     x-configurator:
       kind: app
       category: 社交与通信
@@ -460,7 +460,7 @@ proxy-groups:
       - 🏙️
       - 🗽
       - 🌌
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/netflix.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/netflix.png
     x-configurator:
       kind: app
       category: 影音娱乐
@@ -477,7 +477,7 @@ proxy-groups:
       - 🏙️
       - 🗽
       - 🌌
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/hulu.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/hulu.png
     x-configurator:
       kind: app
       category: 影音娱乐
@@ -494,7 +494,7 @@ proxy-groups:
       - 🏙️
       - 🗽
       - 🌌
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/primevideo.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/primevideo.png
     x-configurator:
       kind: app
       category: 影音娱乐
@@ -511,7 +511,7 @@ proxy-groups:
       - 🏙️
       - 🗽
       - 🌌
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/hbo.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/hbo.png
     x-configurator:
       kind: app
       category: 影音娱乐
@@ -528,7 +528,7 @@ proxy-groups:
       - 🏙️
       - 🗽
       - 🌌
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/disney.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/disney.png
     x-configurator:
       kind: app
       category: 影音娱乐
@@ -545,7 +545,7 @@ proxy-groups:
       - 🏙️
       - 🗽
       - 🌌
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/twitch.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/twitch.png
     x-configurator:
       kind: app
       category: 影音娱乐
@@ -562,7 +562,7 @@ proxy-groups:
       - 🏙️
       - 🗽
       - 🌌
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/spotify.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/spotify.png
     x-configurator:
       kind: app
       category: 影音娱乐
@@ -579,7 +579,7 @@ proxy-groups:
       - 🏙️
       - 🗽
       - 🌌
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/media.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/media.png
     x-configurator:
       kind: app
       category: 影音娱乐
@@ -596,7 +596,7 @@ proxy-groups:
       - 🏙️
       - 🗽
       - 🌌
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/news.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/news.png
     x-configurator:
       kind: app
       category: 其他服务
@@ -613,7 +613,7 @@ proxy-groups:
       - 🏙️
       - 🗽
       - 🌌
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/bilibili.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/bilibili.png
     x-configurator:
       kind: app
       category: 影音娱乐
@@ -630,7 +630,7 @@ proxy-groups:
       - 🏙️
       - 🗽
       - 🌌
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/steam.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/steam.png
     x-configurator:
       kind: app
       category: 游戏与下载
@@ -647,7 +647,7 @@ proxy-groups:
       - 🏙️
       - 🗽
       - 🌌
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/epic.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/epic.png
     x-configurator:
       kind: app
       category: 游戏与下载
@@ -664,7 +664,7 @@ proxy-groups:
       - 🏙️
       - 🗽
       - 🌌
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/taptap.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/taptap.png
     x-configurator:
       kind: app
       category: 游戏与下载
@@ -681,7 +681,7 @@ proxy-groups:
       - 🏙️
       - 🗽
       - 🌌
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/speedtest.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/speedtest.png
     x-configurator:
       kind: app
       category: 其他服务
@@ -698,7 +698,7 @@ proxy-groups:
       - 🏙️
       - 🗽
       - 🌌
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/port.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/port.png
   - name: 🏮
     type: select
     proxies:
@@ -712,7 +712,7 @@ proxy-groups:
       - 🏙️
       - 🗽
       - 🌌
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/cn.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/cn.png
   - name: 🏁 Final
     type: select
     proxies:
@@ -726,17 +726,17 @@ proxy-groups:
       - 🏙️
       - 🗽
       - 🌌
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/final.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/final.png
   - name: 🌌
     type: select
     include-all: true
     filter: ^(?!.*(?:(?i)=>|(?i:🇭🇰|香港|Hong\s?Kong|\b(?:HK|HKG)\d*\b)|(?i:🇹🇼|台湾|Tai(?:wan)?|\b(?:TW|TWN)\d*\b)|(?i:🇯🇵|日本|川日|东京|大阪|埼玉|Japan|\b(?:JP|JPN)\d*\b)|(?i:🇰🇷|韩国|韓|首尔|Korea|\b(?:KR|KOR)\d*\b)|(?i:🇸🇬|新加坡|狮|Singapore|\b(?:SG|SGP)\d*\b)|(?i:🇺🇸|美国|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|拉斯维加斯|United States|\b(?:US|USA)\d*\b)|群|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|剩余流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|超时|收藏|福利|失联|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author|Traffic|\d{4}-\d{2}-\d{2}|\d+G)).*$
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/others.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/others.png
   - name: 🌆
     type: select
     include-all: true
     filter: (?i)^(?!=>).*(?:🇭🇰|香港|Hong\s?Kong|\b(?:HK|HKG)\d*\b)
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/macosicons/maps.png
     x-configurator:
       kind: region
       id: HK
@@ -746,7 +746,7 @@ proxy-groups:
     type: select
     include-all: true
     filter: (?i)^(?!=>).*(?:🇹🇼|台湾|Tai(?:wan)?|\b(?:TW|TWN)\d*\b)
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/macosicons/maps.png
     x-configurator:
       kind: region
       id: TW
@@ -756,7 +756,7 @@ proxy-groups:
     type: select
     include-all: true
     filter: (?i)^(?!=>).*(?:🇲🇴|澳门|澳門|\b(?:Maca[ou])\b|\b(?:MO|MAC)\d*\b)
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/macosicons/maps.png
     x-configurator:
       kind: region
       id: MO
@@ -766,7 +766,7 @@ proxy-groups:
     type: select
     include-all: true
     filter: (?i)^(?!=>).*(?:🇯🇵|日本|川日|东京|大阪|埼玉|Japan|\b(?:JP|JPN)\d*\b)
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/macosicons/maps.png
     x-configurator:
       kind: region
       id: JP
@@ -776,7 +776,7 @@ proxy-groups:
     type: select
     include-all: true
     filter: (?i)^(?!=>).*(?:🇰🇷|韩国|韓|首尔|Korea|\b(?:KR|KOR)\d*\b)
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/macosicons/maps.png
     x-configurator:
       kind: region
       id: KR
@@ -786,7 +786,7 @@ proxy-groups:
     type: select
     include-all: true
     filter: (?i)^(?!=>).*(?:🇸🇬|新加坡|狮|Singapore|\b(?:SG|SGP)\d*\b)
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/macosicons/maps.png
     x-configurator:
       kind: region
       id: SG
@@ -796,7 +796,7 @@ proxy-groups:
     type: select
     include-all: true
     filter: (?i)^(?!=>).*(?:🇹🇭|泰国|泰國|曼谷|\b(?:Thailand|Bangkok)\b|\b(?:TH|THA)\d*\b)
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/macosicons/maps.png
     x-configurator:
       kind: region
       id: TH
@@ -806,7 +806,7 @@ proxy-groups:
     type: select
     include-all: true
     filter: (?i)^(?!=>).*(?:🇲🇾|马来(?:西亚)?|馬來(?:西亞)?|大马|大馬|吉隆坡|\b(?:Malaysia|Kuala\s?Lumpur)\b|\b(?:MY|MYS)\d*\b)
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/macosicons/maps.png
     x-configurator:
       kind: region
       id: MY
@@ -816,7 +816,7 @@ proxy-groups:
     type: select
     include-all: true
     filter: (?i)^(?!=>).*(?:🇻🇳|越南|胡志明|河内|河內|\b(?:Vietnam|Viet\s?Nam|Hanoi|Ho\s?Chi\s?Minh)\b|\b(?:VN|VNM)\d*\b)
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/macosicons/maps.png
     x-configurator:
       kind: region
       id: VN
@@ -826,7 +826,7 @@ proxy-groups:
     type: select
     include-all: true
     filter: (?i)^(?!=>).*(?:🇵🇭|菲律宾|菲律賓|马尼拉|馬尼拉|宿务|宿霧|\b(?:Philippines|Manila|Cebu)\b|\b(?:PH|PHL)\d*\b)
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/macosicons/maps.png
     x-configurator:
       kind: region
       id: PH
@@ -836,7 +836,7 @@ proxy-groups:
     type: select
     include-all: true
     filter: (?i)^(?!=>).*(?:🇮🇩|印度尼西亚|印度尼西亞|印尼|雅加达|雅加達|巴厘岛|峇里島|\b(?:Indonesia|Jakarta|Bali)\b|\b(?:ID|IDN)\d*\b)
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/macosicons/maps.png
     x-configurator:
       kind: region
       id: ID
@@ -846,7 +846,7 @@ proxy-groups:
     type: select
     include-all: true
     filter: (?i)^(?!=>).*(?:🇮🇳|印度(?!尼)|孟买|孟買|新德里|班加罗尔|班加羅爾|\b(?:India|Mumbai|New\s?Delhi|Bangalore|Bengaluru)\b|\b(?:IN|IND)\d*\b)
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/macosicons/maps.png
     x-configurator:
       kind: region
       id: IN
@@ -856,7 +856,7 @@ proxy-groups:
     type: select
     include-all: true
     filter: (?i)^(?!=>).*(?:🇦🇺|澳大利亚|澳大利亞|澳洲|悉尼|雪梨|墨尔本|墨爾本|珀斯|布里斯班|\b(?:Australia|Sydney|Melbourne|Perth|Brisbane)\b|\b(?:AU|AUS)\d*\b)
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/macosicons/maps.png
     x-configurator:
       kind: region
       id: AU
@@ -866,7 +866,7 @@ proxy-groups:
     type: select
     include-all: true
     filter: (?i)^(?!=>).*(?:🇺🇸|美国|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|拉斯维加斯|United States|\b(?:US|USA)\d*\b)
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/macosicons/maps.png
     x-configurator:
       kind: region
       id: US
@@ -876,7 +876,7 @@ proxy-groups:
     type: select
     include-all: true
     filter: (?i)^(?!=>).*(?:🇨🇦|加拿大|多伦多|多倫多|温哥华|溫哥華|蒙特利尔|蒙特利爾|渥太华|渥太華|\b(?:Canada|Toronto|Vancouver|Montreal|Ottawa)\b|\b(?:CA|CAN)\d*\b)
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/macosicons/maps.png
     x-configurator:
       kind: region
       id: CA
@@ -886,7 +886,7 @@ proxy-groups:
     type: select
     include-all: true
     filter: (?i)^(?!=>).*(?:🇬🇧|英国|英國|伦敦|倫敦|曼彻斯特|曼徹斯特|\b(?:United\s?Kingdom|Great\s?Britain|Britain|England|London|Manchester)\b|\b(?:UK|GB|GBR)\d*\b)
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/macosicons/maps.png
     x-configurator:
       kind: region
       id: GB
@@ -896,7 +896,7 @@ proxy-groups:
     type: select
     include-all: true
     filter: (?i)^(?!=>).*(?:🇩🇪|德国|德國|法兰克福|法蘭克福|柏林|慕尼黑|\b(?:Germany|Deutschland|Frankfurt|Berlin|Munich)\b|\b(?:DE|DEU)\d*\b)
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/macosicons/maps.png
     x-configurator:
       kind: region
       id: DE
@@ -906,7 +906,7 @@ proxy-groups:
     type: select
     include-all: true
     filter: (?i)^(?!=>).*(?:🇫🇷|法国|法國|巴黎|里昂|\b(?:France|Paris|Lyon)\b|\b(?:FR|FRA)\d*\b)
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/macosicons/maps.png
     x-configurator:
       kind: region
       id: FR
@@ -916,7 +916,7 @@ proxy-groups:
     type: select
     include-all: true
     filter: (?i)^(?!=>).*(?:🇳🇱|荷兰|荷蘭|阿姆斯特丹|鹿特丹|\b(?:Netherlands|Holland|Amsterdam|Rotterdam)\b|\b(?:NL|NLD)\d*\b)
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/macosicons/maps.png
     x-configurator:
       kind: region
       id: NL
@@ -926,7 +926,7 @@ proxy-groups:
     type: select
     include-all: true
     filter: (?i)^(?!=>).*(?:🇨🇭|瑞士|苏黎世|蘇黎世|日内瓦|日內瓦|\b(?:Switzerland|Swiss|Zurich|Geneva)\b|\b(?:CH|CHE)\d*\b)
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/macosicons/maps.png
     x-configurator:
       kind: region
       id: CH
@@ -936,7 +936,7 @@ proxy-groups:
     type: select
     include-all: true
     filter: (?i)^(?!=>).*(?:🇷🇺|俄罗斯|俄羅斯|莫斯科|圣彼得堡|聖彼得堡|\b(?:Russia|Moscow|Saint\s?Petersburg)\b|\b(?:RU|RUS)\d*\b)
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/macosicons/maps.png
     x-configurator:
       kind: region
       id: RU
@@ -946,7 +946,7 @@ proxy-groups:
     type: select
     include-all: true
     filter: (?i)^(?!=>).*(?:🇹🇷|土耳其|伊斯坦布尔|伊斯坦布爾|伊斯坦堡|安卡拉|\b(?:Turkey|Türkiye|Turkiye|Istanbul|Ankara)\b|\b(?:TR|TUR)\d*\b)
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/macosicons/maps.png
     x-configurator:
       kind: region
       id: TR
@@ -956,7 +956,7 @@ proxy-groups:
     type: select
     include-all: true
     filter: (?i)^(?!=>).*(?:🇧🇷|巴西|圣保罗|聖保羅|里约|里約|\b(?:Brazil|Brasil|S[aã]o\s?Paulo|Rio\s?de\s?Janeiro)\b|\b(?:BR|BRA)\d*\b)
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/macosicons/maps.png
     x-configurator:
       kind: region
       id: BR
@@ -966,7 +966,7 @@ proxy-groups:
     type: select
     include-all: true
     filter: (?i)^(?!=>).*(?:🇦🇷|阿根廷|布宜诺斯艾利斯|布宜諾斯艾利斯|\b(?:Argentina|Buenos\s?Aires)\b|\b(?:AR|ARG)\d*\b)
-    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png
+    icon: https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/macosicons/maps.png
     x-configurator:
       kind: region
       id: AR

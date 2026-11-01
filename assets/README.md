@@ -20,8 +20,8 @@ Use case: logo-brand. Asset type: a transparent PNG brand emblem for the top of 
 网站小图标以几何世界树和融入根部的松鼠轮廓组成，采用青绿浅浮雕标识与深墨蓝渐变底；柔和高光、连续曲线圆角和轻微接触阴影带来克制的 macOS 应用图标质感。
 
 - [生成原稿](favicon-master.png)：1254 × 1254，RGBA PNG。
-- [浏览器 PNG](../favicon.png)：32 × 32。
-- [多尺寸 ICO](../favicon.ico)：包含 16 / 32 / 48 / 64 / 128 / 256 像素版本。
+- [浏览器 PNG](favicon.png)：32 × 32。
+- [多尺寸 ICO](favicon.ico)：包含 16 / 32 / 48 / 64 / 128 / 256 像素版本。
 - 圆角方形以外保留真实透明通道。
 - 生成日期：2026-10-30（Asia/Shanghai）。
 - 生成方式：内置 `image_gen`，先生成初版，再参考原稿微调材质与光照；保留透明圆角。

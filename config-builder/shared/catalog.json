@@ -1,6 +1,6 @@
 {
   "schema": 2,
-  "source": "Ratatoskr-Template.yaml",
+  "source": "resources/template/ratatoskr-template.yaml",
   "testUrl": "https://www.gstatic.com/generate_204",
   "cleanFilter": "^(?!.*(?:(?i)=>|群|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|剩余流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|超时|收藏|福利|失联|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author|Traffic|\\d{4}-\\d{2}-\\d{2}|\\d+G)).*$",
   "groups": {
@@ -17,7 +17,7 @@
       "flag": "🇭🇰",
       "name": "🌆",
       "filter": "(?i)^(?!=>).*(?:🇭🇰|香港|Hong\\s?Kong|\\b(?:HK|HKG)\\d*\\b)",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png"
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/macosicons/maps.png"
     },
     {
       "id": "TW",
@@ -25,7 +25,7 @@
       "flag": "🇹🇼",
       "name": "🧋",
       "filter": "(?i)^(?!=>).*(?:🇹🇼|台湾|Tai(?:wan)?|\\b(?:TW|TWN)\\d*\\b)",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png"
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/macosicons/maps.png"
     },
     {
       "id": "MO",
@@ -33,7 +33,7 @@
       "flag": "🇲🇴",
       "name": "🎰",
       "filter": "(?i)^(?!=>).*(?:🇲🇴|澳门|澳門|\\b(?:Maca[ou])\\b|\\b(?:MO|MAC)\\d*\\b)",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png"
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/macosicons/maps.png"
     },
     {
       "id": "JP",
@@ -41,7 +41,7 @@
       "flag": "🇯🇵",
       "name": "⛩️",
       "filter": "(?i)^(?!=>).*(?:🇯🇵|日本|川日|东京|大阪|埼玉|Japan|\\b(?:JP|JPN)\\d*\\b)",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png"
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/macosicons/maps.png"
     },
     {
       "id": "KR",
@@ -49,7 +49,7 @@
       "flag": "🇰🇷",
       "name": "🎤",
       "filter": "(?i)^(?!=>).*(?:🇰🇷|韩国|韓|首尔|Korea|\\b(?:KR|KOR)\\d*\\b)",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png"
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/macosicons/maps.png"
     },
     {
       "id": "SG",
@@ -57,7 +57,7 @@
       "flag": "🇸🇬",
       "name": "🏙️",
       "filter": "(?i)^(?!=>).*(?:🇸🇬|新加坡|狮|Singapore|\\b(?:SG|SGP)\\d*\\b)",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png"
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/macosicons/maps.png"
     },
     {
       "id": "TH",
@@ -65,7 +65,7 @@
       "flag": "🇹🇭",
       "name": "🐘",
       "filter": "(?i)^(?!=>).*(?:🇹🇭|泰国|泰國|曼谷|\\b(?:Thailand|Bangkok)\\b|\\b(?:TH|THA)\\d*\\b)",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png"
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/macosicons/maps.png"
     },
     {
       "id": "MY",
@@ -73,7 +73,7 @@
       "flag": "🇲🇾",
       "name": "🌺",
       "filter": "(?i)^(?!=>).*(?:🇲🇾|马来(?:西亚)?|馬來(?:西亞)?|大马|大馬|吉隆坡|\\b(?:Malaysia|Kuala\\s?Lumpur)\\b|\\b(?:MY|MYS)\\d*\\b)",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png"
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/macosicons/maps.png"
     },
     {
       "id": "VN",
@@ -81,7 +81,7 @@
       "flag": "🇻🇳",
       "name": "🍜",
       "filter": "(?i)^(?!=>).*(?:🇻🇳|越南|胡志明|河内|河內|\\b(?:Vietnam|Viet\\s?Nam|Hanoi|Ho\\s?Chi\\s?Minh)\\b|\\b(?:VN|VNM)\\d*\\b)",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png"
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/macosicons/maps.png"
     },
     {
       "id": "PH",
@@ -89,7 +89,7 @@
       "flag": "🇵🇭",
       "name": "🏝️",
       "filter": "(?i)^(?!=>).*(?:🇵🇭|菲律宾|菲律賓|马尼拉|馬尼拉|宿务|宿霧|\\b(?:Philippines|Manila|Cebu)\\b|\\b(?:PH|PHL)\\d*\\b)",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png"
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/macosicons/maps.png"
     },
     {
       "id": "ID",
@@ -97,7 +97,7 @@
       "flag": "🇮🇩",
       "name": "🌋",
       "filter": "(?i)^(?!=>).*(?:🇮🇩|印度尼西亚|印度尼西亞|印尼|雅加达|雅加達|巴厘岛|峇里島|\\b(?:Indonesia|Jakarta|Bali)\\b|\\b(?:ID|IDN)\\d*\\b)",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png"
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/macosicons/maps.png"
     },
     {
       "id": "IN",
@@ -105,7 +105,7 @@
       "flag": "🇮🇳",
       "name": "🪷",
       "filter": "(?i)^(?!=>).*(?:🇮🇳|印度(?!尼)|孟买|孟買|新德里|班加罗尔|班加羅爾|\\b(?:India|Mumbai|New\\s?Delhi|Bangalore|Bengaluru)\\b|\\b(?:IN|IND)\\d*\\b)",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png"
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/macosicons/maps.png"
     },
     {
       "id": "AU",
@@ -113,7 +113,7 @@
       "flag": "🇦🇺",
       "name": "🦘",
       "filter": "(?i)^(?!=>).*(?:🇦🇺|澳大利亚|澳大利亞|澳洲|悉尼|雪梨|墨尔本|墨爾本|珀斯|布里斯班|\\b(?:Australia|Sydney|Melbourne|Perth|Brisbane)\\b|\\b(?:AU|AUS)\\d*\\b)",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png"
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/macosicons/maps.png"
     },
     {
       "id": "US",
@@ -121,7 +121,7 @@
       "flag": "🇺🇸",
       "name": "🗽",
       "filter": "(?i)^(?!=>).*(?:🇺🇸|美国|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|拉斯维加斯|United States|\\b(?:US|USA)\\d*\\b)",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png"
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/macosicons/maps.png"
     },
     {
       "id": "CA",
@@ -129,7 +129,7 @@
       "flag": "🇨🇦",
       "name": "🍁",
       "filter": "(?i)^(?!=>).*(?:🇨🇦|加拿大|多伦多|多倫多|温哥华|溫哥華|蒙特利尔|蒙特利爾|渥太华|渥太華|\\b(?:Canada|Toronto|Vancouver|Montreal|Ottawa)\\b|\\b(?:CA|CAN)\\d*\\b)",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png"
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/macosicons/maps.png"
     },
     {
       "id": "GB",
@@ -137,7 +137,7 @@
       "flag": "🇬🇧",
       "name": "💂",
       "filter": "(?i)^(?!=>).*(?:🇬🇧|英国|英國|伦敦|倫敦|曼彻斯特|曼徹斯特|\\b(?:United\\s?Kingdom|Great\\s?Britain|Britain|England|London|Manchester)\\b|\\b(?:UK|GB|GBR)\\d*\\b)",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png"
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/macosicons/maps.png"
     },
     {
       "id": "DE",
@@ -145,7 +145,7 @@
       "flag": "🇩🇪",
       "name": "🍺",
       "filter": "(?i)^(?!=>).*(?:🇩🇪|德国|德國|法兰克福|法蘭克福|柏林|慕尼黑|\\b(?:Germany|Deutschland|Frankfurt|Berlin|Munich)\\b|\\b(?:DE|DEU)\\d*\\b)",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png"
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/macosicons/maps.png"
     },
     {
       "id": "FR",
@@ -153,7 +153,7 @@
       "flag": "🇫🇷",
       "name": "🗼",
       "filter": "(?i)^(?!=>).*(?:🇫🇷|法国|法國|巴黎|里昂|\\b(?:France|Paris|Lyon)\\b|\\b(?:FR|FRA)\\d*\\b)",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png"
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/macosicons/maps.png"
     },
     {
       "id": "NL",
@@ -161,7 +161,7 @@
       "flag": "🇳🇱",
       "name": "🌷",
       "filter": "(?i)^(?!=>).*(?:🇳🇱|荷兰|荷蘭|阿姆斯特丹|鹿特丹|\\b(?:Netherlands|Holland|Amsterdam|Rotterdam)\\b|\\b(?:NL|NLD)\\d*\\b)",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png"
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/macosicons/maps.png"
     },
     {
       "id": "CH",
@@ -169,7 +169,7 @@
       "flag": "🇨🇭",
       "name": "🏔️",
       "filter": "(?i)^(?!=>).*(?:🇨🇭|瑞士|苏黎世|蘇黎世|日内瓦|日內瓦|\\b(?:Switzerland|Swiss|Zurich|Geneva)\\b|\\b(?:CH|CHE)\\d*\\b)",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png"
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/macosicons/maps.png"
     },
     {
       "id": "RU",
@@ -177,7 +177,7 @@
       "flag": "🇷🇺",
       "name": "🪆",
       "filter": "(?i)^(?!=>).*(?:🇷🇺|俄罗斯|俄羅斯|莫斯科|圣彼得堡|聖彼得堡|\\b(?:Russia|Moscow|Saint\\s?Petersburg)\\b|\\b(?:RU|RUS)\\d*\\b)",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png"
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/macosicons/maps.png"
     },
     {
       "id": "TR",
@@ -185,7 +185,7 @@
       "flag": "🇹🇷",
       "name": "🧿",
       "filter": "(?i)^(?!=>).*(?:🇹🇷|土耳其|伊斯坦布尔|伊斯坦布爾|伊斯坦堡|安卡拉|\\b(?:Turkey|Türkiye|Turkiye|Istanbul|Ankara)\\b|\\b(?:TR|TUR)\\d*\\b)",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png"
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/macosicons/maps.png"
     },
     {
       "id": "BR",
@@ -193,7 +193,7 @@
       "flag": "🇧🇷",
       "name": "⚽",
       "filter": "(?i)^(?!=>).*(?:🇧🇷|巴西|圣保罗|聖保羅|里约|里約|\\b(?:Brazil|Brasil|S[aã]o\\s?Paulo|Rio\\s?de\\s?Janeiro)\\b|\\b(?:BR|BRA)\\d*\\b)",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png"
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/macosicons/maps.png"
     },
     {
       "id": "AR",
@@ -201,29 +201,29 @@
       "flag": "🇦🇷",
       "name": "🧉",
       "filter": "(?i)^(?!=>).*(?:🇦🇷|阿根廷|布宜诺斯艾利斯|布宜諾斯艾利斯|\\b(?:Argentina|Buenos\\s?Aires)\\b|\\b(?:AR|ARG)\\d*\\b)",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/macosicons/maps.png"
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/macosicons/maps.png"
     }
   ],
   "strategies": [
     {
       "id": "auto",
       "name": "♻️ 自动选择",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/proxy.png"
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/proxy.png"
     },
     {
       "id": "fallback",
       "name": "🔯 故障转移",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/fallback.png"
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/fallback.png"
     },
     {
       "id": "balanced",
       "name": "🔮 负载均衡",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/tracking.png"
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/tracking.png"
     },
     {
       "id": "download",
       "name": "📦 下载均衡",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/global.png"
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/global.png"
     }
   ],
   "apps": [
@@ -232,7 +232,7 @@
       "name": "⚡ OpenAI",
       "label": "OpenAI",
       "category": "AI 与开发",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/chatgpt.png",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/chatgpt.png",
       "rules": [
         "GEOSITE,openai,⚡ OpenAI"
       ]
@@ -242,7 +242,7 @@
       "name": "🪐 Anthropic",
       "label": "Anthropic",
       "category": "AI 与开发",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/claude.png",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/claude.png",
       "rules": [
         "GEOSITE,anthropic,🪐 Anthropic"
       ]
@@ -252,7 +252,7 @@
       "name": "✨ AI 服务",
       "label": "AI 服务",
       "category": "AI 与开发",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/ai.png",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/ai.png",
       "rules": [
         "GEOSITE,category-ai-!cn,✨ AI 服务"
       ]
@@ -262,7 +262,7 @@
       "name": "🟦 OKX",
       "label": "OKX",
       "category": "数字资产",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/crypto.png",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/crypto.png",
       "rules": [
         "GEOSITE,okx,🟦 OKX"
       ]
@@ -272,7 +272,7 @@
       "name": "🟨 Binance",
       "label": "Binance",
       "category": "数字资产",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/crypto.png",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/crypto.png",
       "rules": [
         "GEOSITE,binance,🟨 Binance"
       ]
@@ -282,7 +282,7 @@
       "name": "🟪 Bybit",
       "label": "Bybit",
       "category": "数字资产",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/crypto.png",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/crypto.png",
       "rules": [
         "GEOSITE,bybit,🟪 Bybit"
       ]
@@ -292,7 +292,7 @@
       "name": "🪙 Crypto",
       "label": "Crypto",
       "category": "数字资产",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/crypto.png",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/crypto.png",
       "rules": [
         "GEOSITE,category-cryptocurrency,🪙 Crypto"
       ]
@@ -302,7 +302,7 @@
       "name": "📺 YouTube",
       "label": "YouTube",
       "category": "影音娱乐",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/youtube.png",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/youtube.png",
       "rules": [
         "GEOSITE,youtube,📺 YouTube"
       ]
@@ -312,7 +312,7 @@
       "name": "🧭 Google",
       "label": "Google",
       "category": "其他服务",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/google.png",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/google.png",
       "rules": [
         "GEOSITE,google,🧭 Google"
       ]
@@ -322,7 +322,7 @@
       "name": "☁️ Cloudflare",
       "label": "Cloudflare",
       "category": "其他服务",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/cloudflare.png",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/cloudflare.png",
       "rules": [
         "GEOSITE,cloudflare,☁️ Cloudflare"
       ]
@@ -332,7 +332,7 @@
       "name": "📦 Amazon",
       "label": "Amazon",
       "category": "其他服务",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/amazon.png",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/amazon.png",
       "rules": [
         "GEOSITE,amazon,📦 Amazon"
       ]
@@ -342,7 +342,7 @@
       "name": "🐙 GitHub",
       "label": "GitHub",
       "category": "AI 与开发",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/github.png",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/github.png",
       "rules": [
         "GEOSITE,github,🐙 GitHub"
       ]
@@ -352,7 +352,7 @@
       "name": "🪟 Microsoft",
       "label": "Microsoft",
       "category": "其他服务",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/microsoft.png",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/microsoft.png",
       "rules": [
         "GEOSITE,microsoft,🪟 Microsoft"
       ]
@@ -362,7 +362,7 @@
       "name": "🎨 Adobe",
       "label": "Adobe",
       "category": "其他服务",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/adobe.png",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/adobe.png",
       "rules": [
         "GEOSITE,adobe,🎨 Adobe"
       ]
@@ -372,7 +372,7 @@
       "name": "⚪ Apple",
       "label": "Apple",
       "category": "其他服务",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/apple.png",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/apple.png",
       "rules": [
         "GEOSITE,apple,⚪ Apple"
       ]
@@ -382,7 +382,7 @@
       "name": "𝕏 X",
       "label": "𝕏 X",
       "category": "社交与通信",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/x.png",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/x.png",
       "rules": [
         "GEOSITE,twitter,𝕏 X"
       ]
@@ -392,7 +392,7 @@
       "name": "♾️ Meta",
       "label": "Meta",
       "category": "社交与通信",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/instagram.png",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/instagram.png",
       "rules": [
         "GEOSITE,instagram,♾️ Meta"
       ]
@@ -402,7 +402,7 @@
       "name": "🪽 Telegram",
       "label": "Telegram",
       "category": "社交与通信",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/telegram.png",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/telegram.png",
       "rules": [
         "GEOSITE,telegram,🪽 Telegram"
       ]
@@ -412,7 +412,7 @@
       "name": "🎮 Discord",
       "label": "Discord",
       "category": "社交与通信",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/discord.png",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/discord.png",
       "rules": [
         "GEOSITE,discord,🎮 Discord"
       ]
@@ -432,7 +432,7 @@
       "name": "🫂 Social",
       "label": "Social",
       "category": "社交与通信",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/social.png",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/social.png",
       "rules": [
         "GEOSITE,category-social-media-!cn,🫂 Social"
       ]
@@ -442,7 +442,7 @@
       "name": "🎶 TikTok",
       "label": "TikTok",
       "category": "社交与通信",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/tiktok.png",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/tiktok.png",
       "rules": [
         "GEOSITE,tiktok,🎶 TikTok"
       ]
@@ -452,7 +452,7 @@
       "name": "🍿 Netflix",
       "label": "Netflix",
       "category": "影音娱乐",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/netflix.png",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/netflix.png",
       "rules": [
         "GEOSITE,netflix,🍿 Netflix"
       ]
@@ -462,7 +462,7 @@
       "name": "📺 Hulu",
       "label": "Hulu",
       "category": "影音娱乐",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/hulu.png",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/hulu.png",
       "rules": [
         "GEOSITE,hulu,📺 Hulu"
       ]
@@ -472,7 +472,7 @@
       "name": "📦 Prime Video",
       "label": "Prime Video",
       "category": "影音娱乐",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/primevideo.png",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/primevideo.png",
       "rules": [
         "GEOSITE,primevideo,📦 Prime Video"
       ]
@@ -482,7 +482,7 @@
       "name": "🎬 HBO",
       "label": "HBO",
       "category": "影音娱乐",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/hbo.png",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/hbo.png",
       "rules": [
         "GEOSITE,hbo,🎬 HBO"
       ]
@@ -492,7 +492,7 @@
       "name": "🏰 Disney+",
       "label": "Disney+",
       "category": "影音娱乐",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/disney.png",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/disney.png",
       "rules": [
         "GEOSITE,disney,🏰 Disney+"
       ]
@@ -502,7 +502,7 @@
       "name": "🟣 Twitch",
       "label": "Twitch",
       "category": "影音娱乐",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/twitch.png",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/twitch.png",
       "rules": [
         "GEOSITE,twitch,🟣 Twitch"
       ]
@@ -512,7 +512,7 @@
       "name": "💚 Spotify",
       "label": "Spotify",
       "category": "影音娱乐",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/spotify.png",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/spotify.png",
       "rules": [
         "GEOSITE,spotify,💚 Spotify"
       ]
@@ -522,7 +522,7 @@
       "name": "🍿 Entertainment",
       "label": "Entertainment",
       "category": "影音娱乐",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/media.png",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/media.png",
       "rules": [
         "GEOSITE,category-entertainment,🍿 Entertainment"
       ]
@@ -532,7 +532,7 @@
       "name": "📰 News",
       "label": "News",
       "category": "其他服务",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/news.png",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/news.png",
       "rules": [
         "GEOSITE,category-media,📰 News"
       ]
@@ -542,7 +542,7 @@
       "name": "📺 Bilibili",
       "label": "Bilibili",
       "category": "影音娱乐",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/bilibili.png",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/bilibili.png",
       "rules": [
         "GEOSITE,bilibili,📺 Bilibili"
       ]
@@ -552,7 +552,7 @@
       "name": "👾 Steam",
       "label": "Steam",
       "category": "游戏与下载",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/steam.png",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/steam.png",
       "rules": [
         "GEOSITE,steam,👾 Steam"
       ]
@@ -562,7 +562,7 @@
       "name": "🎁 Epic",
       "label": "Epic",
       "category": "游戏与下载",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/epic.png",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/epic.png",
       "rules": [
         "GEOSITE,epicgames,🎁 Epic"
       ]
@@ -572,7 +572,7 @@
       "name": "🕹️ TapTap",
       "label": "TapTap",
       "category": "游戏与下载",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/taptap.png",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/taptap.png",
       "rules": [
         "GEOSITE,taptap,🕹️ TapTap"
       ]
@@ -582,7 +582,7 @@
       "name": "⚡ Speedtest",
       "label": "Speedtest",
       "category": "其他服务",
-      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/icons/speedtest.png",
+      "icon": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/speedtest.png",
       "rules": [
         "GEOSITE,category-speedtest,⚡ Speedtest"
       ]
@@ -913,5 +913,5 @@
       "module": "ports"
     }
   ],
-  "version": "7137a2eeefb0"
+  "version": "eb8e4a178817"
 }

@@ -55,6 +55,8 @@ Yggdrasil 面向一站式的使用体验：使用者通过 config-builder 模块
 
 GitHub Pages 提供静态前端入口；完整在线服务使用 Cloudflare Pages 同时承载前端与接口，直接连接 KV 保存加密配置与 YAML 快照。网页优先直接读取与解码订阅；遇到跨域限制时由同源接口代取。生成配置包含所选地区的完整节点，支持文件下载与持久订阅链接。仓库提供通用部署模板，使用自己的项目名称与 KV 绑定接入，见 **[部署指南与故障复盘](config-builder/docs/DEPLOYMENT.md)**。
 
+尚未部署服务时，GitHub Pages 入口明确显示本地模式，可直接解析允许跨域的订阅或导入节点文件，完成预览和下载。服务上线后，在页面“连接设置”中接入，或由维护者填写默认公开地址；跨域代取和持久订阅需要该服务实际可用。
+
 机场流量来自 `Subscription-Userinfo`，随订阅或手动刷新更新；缺失时明确显示未知。可选检测测量服务器到节点的 TCP 建连耗时，不将其标为 ICMP ping 或完整代理延迟。
 
 ## Ratatoskr · 轻量配置本体
@@ -125,9 +127,9 @@ Ratatoskr 将庞大的分类数据交给 Geo 数据库，将清晰的分流意�
 
 | 文件 | 定位 | 主要内容 |
 | :--- | :--- | :--- |
-| **[Ratatoskr](ratatoskr.yaml)** | 日常主配置 | Geo 驱动的轻量分流，6 个常用地区与其他节点入口 |
-| **[Ratatosk · Eb](Ratatosk-Eb.yaml)** | 地区扩展 | 24 个国家 / 地区分组，使用 macOSicons 图标 |
-| **[yggdrasil.yaml](yggdrasil.yaml)** | 完整网络栈参考 | DNS、TUN、流量嗅探与详细外部规则集 |
+| **[Ratatoskr](resources/ratatoskr.yaml)** | 日常主配置 | Geo 驱动的轻量分流，6 个常用地区与其他节点入口 |
+| **[Ratatosk · Eb](resources/template/ratatosk-Eb.yaml)** | 地区扩展 | 24 个国家 / 地区分组，使用 macOSicons 图标 |
+| **[yggdrasil.yaml](resources/yggdrasil.yaml)** | 完整网络栈参考 | DNS、TUN、流量嗅探与详细外部规则集 |
 
 `Ratatosk-Eb.yaml` 沿用仓库现有文件名。三份配置独立维护，规则与策略组并不完全相同；当前主模板的轻量 Geo 架构不代表所有参考配置使用同一种规则组织方式。
 
@@ -136,9 +138,9 @@ Ratatoskr 将庞大的分类数据交给 Geo 数据库，将清晰的分流意�
 
 取得授权后，可下载文件或将配置地址导入客户端：
 
-- [ratatoskr.yaml](https://raw.githubusercontent.com/yakasuka/yggdrasil/main/ratatoskr.yaml)
-- [Ratatosk-Eb.yaml](https://raw.githubusercontent.com/yakasuka/yggdrasil/main/Ratatosk-Eb.yaml)
-- [yggdrasil.yaml](https://raw.githubusercontent.com/yakasuka/yggdrasil/main/yggdrasil.yaml)
+- [ratatoskr.yaml](https://raw.githubusercontent.com/yakasuka/yggdrasil/main/resources/ratatoskr.yaml)
+- [Ratatosk-Eb.yaml](https://raw.githubusercontent.com/yakasuka/yggdrasil/main/resources/template/ratatosk-Eb.yaml)
+- [yggdrasil.yaml](https://raw.githubusercontent.com/yakasuka/yggdrasil/main/resources/yggdrasil.yaml)
 
 **常用地区**：香港、台湾、日本、韩国、新加坡、美国。
 
@@ -211,22 +213,22 @@ Ratatoskr 将庞大的分类数据交给 Geo 数据库，将清晰的分流意�
 世界树标识与命名贯穿项目，应用和地区图标帮助使用者更快找到自己的出口。
 
 <p align="center">
-  <img src="icons/macosicons/chatgpt.png" width="46" alt="ChatGPT 图标" />
-  <img src="icons/macosicons/claude.png" width="46" alt="Claude 图标" />
-  <img src="icons/macosicons/telegram.png" width="46" alt="Telegram 图标" />
-  <img src="icons/macosicons/spotify.png" width="46" alt="Spotify 图标" />
-  <img src="icons/macosicons/steam.png" width="46" alt="Steam 图标" />
-  <img src="icons/macosicons/maps.png" width="46" alt="地区分组图标" />
+  <img src="assets/icons/macosicons/chatgpt.png" width="46" alt="ChatGPT 图标" />
+  <img src="assets/icons/macosicons/claude.png" width="46" alt="Claude 图标" />
+  <img src="assets/icons/macosicons/telegram.png" width="46" alt="Telegram 图标" />
+  <img src="assets/icons/macosicons/spotify.png" width="46" alt="Spotify 图标" />
+  <img src="assets/icons/macosicons/steam.png" width="46" alt="Steam 图标" />
+  <img src="assets/icons/macosicons/maps.png" width="46" alt="地区分组图标" />
 </p>
 
-[品牌标识](assets/README.md) · [Eb 图标预览](icons/macosicons/preview.png) · [图标作者与来源](icons/macosicons/README.md) · [映射清单](icons/macosicons/manifest.json)
+[品牌标识](assets/README.md) · [Eb 图标预览](assets/icons/macosicons/preview.png) · [图标作者与来源](assets/icons/macosicons/README.md) · [映射清单](assets/icons/macosicons/manifest.json)
 
-日常模板使用 `icons/` 中的图标；Eb 版使用 42 张 macOSicons PNG。图标作品、品牌标识及面板素材的权利归各自权利人所有。
+日常模板使用 `assets/icons/` 中的图标；Eb 版使用 42 张 macOSicons PNG。图标作品、品牌标识及面板素材的权利归各自权利人所有。
 
 <details>
 <summary><strong>查看 Mihomo 控制面板参考</strong></summary>
 
-![Zashboard 代理面板效果参考](icons/zashboard-pc-dark.png)
+![Zashboard 代理面板效果参考](assets/icons/zashboard-pc-dark.png)
 
 Mihomo 运行时的 Zashboard 控制面板参考；分组名称、节点状态与数值以所选配置和实际运行结果为准。
 

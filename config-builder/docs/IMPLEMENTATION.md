@@ -8,6 +8,10 @@
 
 浏览器遇到 CORS 或读取失败时，调用同源 `/api/inspect`。Pages 拉取订阅并返回相同的脱敏清单。后续选择地区、策略和 APP 与订阅协议分离。
 
+GitHub Pages 通过 `config.json` 或用户在“连接设置”中填写的公开 origin 接入已部署服务。`src/service.js` 验证地址、健康响应和模板版本；`src/app.js` 管理连接与重试，仅在验证成功后记住公开 origin。首次健康检查未完成时，解析兜底会等待它完成；配置了暂不可用的服务时，用户再次解析会重试一次连接。Cloudflare Pages 的同源配置优先于浏览器记住的地址。
+
+没有部署地址时处于本地模式。网络、超时、HTTP 和节点格式错误分别显示；不会把所有失败都解释为 CORS，也不会让用户等待不存在的服务。
+
 最终下载使用完整节点生成自包含 YAML。生成订阅时，Pages 将用户选择与 YAML 快照通过 AES-GCM 加密保存到 KV；客户端持有 ID 与独立随机 Token，访问稳定的 `/subscription/…` 地址。每次拉取更新节点和真实流量，再按当前模板编排。
 
 ## 功能对应位置
@@ -16,6 +20,7 @@
 | ---------------------------------------------- | -------------------------------------------------- |
 | 机场名称、链接及 P1/P2                         | `src/panels/sources.js`、`src/app.js`              |
 | 浏览器优先读取、文件导入                       | `src/subscriptions.js`                             |
+| 公开服务地址、健康检查与连接设置               | `src/service.js`、`src/app.js`、`index.html`       |
 | Base64、YAML 和协议链接转换                    | `shared/subscription.js`                           |
 | 脱敏节点清单、地区匹配、流量汇总               | `shared/nodes.js`                                  |
 | 只展示拥有的地区、地区去留                     | `src/panels/regions.js`                            |

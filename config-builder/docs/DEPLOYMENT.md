@@ -9,7 +9,7 @@
         │ HTTPS
         ▼
 同一个 Cloudflare Pages 项目
-  ├─ /Configurator/                 配置向导
+  ├─ /config-builder/                 配置向导
   ├─ /api/status                    健康检查
   ├─ /api/inspect                    节点与流量清单
   ├─ /api/preview                    完整 YAML 预览与下载
@@ -20,7 +20,7 @@
 
 Pages Functions 直接运行应用并访问 KV。标准部署只需要一个 Pages 项目和一个 KV namespace；`worker/index.js` 保留为兼容的独立 Worker 入口，当前方案无需部署它，也无需创建 `PROFILE_SERVICE` 服务绑定。
 
-公开链接使用自己的 Pages 域名或自有域名。`/Configurator/config.json` 按请求域名自动返回同源 `apiBase`，无需填写 `workers.dev` 地址。GitHub Pages 仍可承载静态向导；无法在静态站内执行 Functions 或连接 KV。
+公开链接使用自己的 Pages 域名或自有域名。`/config-builder/config.json` 按请求域名自动返回同源 `apiBase`，无需填写 `workers.dev` 地址。GitHub Pages 仍可承载静态向导；无法在静态站内执行 Functions 或连接 KV。
 
 ## 2. 先填写部署模板
 
@@ -32,6 +32,7 @@ Pages Functions 直接运行应用并访问 KV。标准部署只需要一个 Pag
   "name": "yggdrasil-configurator",
   "pages_build_output_dir": "./worker/gateway/dist",
   "compatibility_date": "2026-10-01",
+  "vars": { "ALLOWED_ORIGINS": "https://yakasuka.github.io" },
   "kv_namespaces": [
     { "binding": "SUBSCRIPTIONS", "id": "REPLACE_WITH_KV_NAMESPACE_ID" },
   ],
@@ -42,6 +43,7 @@ Pages Functions 直接运行应用并访问 KV。标准部署只需要一个 Pag
 - `id` 替换为自己 KV namespace 的 ID。它是资源标识，不能拿其他账户的 ID 直接使用。
 - `binding` 保持 `SUBSCRIPTIONS`，代码通过这个名称访问存储。
 - 保留 `pages_build_output_dir` 和配置文件位置，避免本地发布与 Git 构建使用不同目录。
+- `ALLOWED_ORIGINS` 允许本项目的 GitHub Pages 前端连接服务。部署自己的副本时换成自己的前端 origin，多个来源以逗号分隔；不要填路径或使用通配符。
 
 配置启用后以 Wrangler 文件为配置来源，线上绑定应与文件保持一致。控制台手动添加的同名绑定不能作为配置文件正确性的替代品，详见 [Pages Wrangler 配置](https://developers.cloudflare.com/pages/functions/wrangler-configuration/)。
 
@@ -68,15 +70,32 @@ Pages Functions 直接运行应用并访问 KV。标准部署只需要一个 Pag
 首次验收可先关闭可选 TCP 检测，在 `wrangler.jsonc` 合并字符串变量后发布：
 
 ```jsonc
-"vars": { "TCP_PROBE_ENABLED": "false" }
+"vars": {
+  "ALLOWED_ORIGINS": "https://yakasuka.github.io",
+  "TCP_PROBE_ENABLED": "false"
+}
 ```
+
+### GitHub Pages 的服务接入
+
+GitHub Pages 只发布静态页面，不运行仓库中的 Worker 或 KV。`config-builder/config.json` 的 `apiBase` 留空时，页面明确显示本地模式：可直接读取允许 CORS 的机场，或导入节点文件，继续选择地区、预览和下载。无法跨域的机场与持久订阅链接需要实际部署的订阅服务，等待或修改 Base64 参数不会自动建立该服务。
+
+部署服务并通过 `/api/status` 验收后，可采用以下任一种接入方式：
+
+1. 在页面的“连接设置”中填写自己的 Pages 或自有域名 origin，点击“连接并记住”。这里只请求健康接口，验证成功后才记住公开地址；机场链接不会保存到本地存储。可以重试连接或恢复仓库默认设置。
+2. 维护者将真实 origin 写入 `config-builder/config.json` 的 `apiBase`，提交到 GitHub，为所有静态站访问者提供默认地址。
+3. 直接使用 Cloudflare Pages 的 `/config-builder/`，由运行时自动返回同源地址，不需要手工填写。
+
+不填写未经部署验证的示例域名，也不把个人测试服务设为原仓库默认地址。跨域连接还要求服务的 `ALLOWED_ORIGINS` 包含网页 origin；前端会区分服务未连接、存储未绑定和模板版本不一致。地址只接受 origin，不带路径、账号、查询参数或 Token。
+
+`config-builder/wrangler.jsonc` 是标准 Pages 部署的唯一配置入口。旧网关的独立配置已移除；`/Configurator/`、`/webui/` 和 `/builder/` 在 Pages 服务中跳转到 `/config-builder/`。
 
 ## 4. 发布后的验收顺序
 
 将下面的 `your-project` 换为自己的真实项目名：
 
 ```text
-https://your-project.pages.dev/Configurator/
+https://your-project.pages.dev/config-builder/
 https://your-project.pages.dev/api/status
 ```
 
@@ -95,7 +114,7 @@ https://your-project.pages.dev/api/status
 mihomo -t -d /path/to/mihomo-data -f /path/to/Example-ratatoskr.yaml
 ```
 
-最后访问 `/Configurator/wrangler.jsonc`、`/Configurator/src/app.js`，应返回 404。绿色部署状态、GitHub 检查通过与业务验收是不同结果，需要分别确认。
+最后访问 `/config-builder/wrangler.jsonc`、`/config-builder/src/app.js`，应返回 404。绿色部署状态、GitHub 检查通过与业务验收是不同结果，需要分别确认。
 
 ## 5. 本地开发与手动发布
 
@@ -108,7 +127,7 @@ npm --prefix config-builder test
 npm --prefix config-builder run service:dev
 ```
 
-打开 `http://localhost:8788/Configurator/`。本地 Pages 使用本地 KV 模拟存储，不要把本地健康检查当作生产 KV 已连接。
+打开 `http://localhost:8788/config-builder/`。本地 Pages 使用本地 KV 模拟存储，不要把本地健康检查当作生产 KV 已连接。
 
 账号状态正常且已经填写项目与 KV 后，可以通过官方 Wrangler 登录并发布：
 

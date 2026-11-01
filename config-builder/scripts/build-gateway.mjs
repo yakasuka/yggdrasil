@@ -34,16 +34,11 @@ async function images(source, destination) {
 // Publish an explicit set of browser files; never copy the repository wholesale.
 for (const [source, destination] of [
   ["index.html", "index.html"],
-  ["favicon.png", "favicon.png"],
-  ["favicon.ico", "favicon.ico"],
-  ["config-builder/index.html", "Configurator/index.html"],
-  ["config-builder/assets/app.js", "Configurator/assets/app.js"],
-  ["config-builder/assets/app.css", "Configurator/assets/app.css"],
+  ["config-builder/index.html", "config-builder/index.html"],
+  ["config-builder/assets/app.js", "config-builder/assets/app.js"],
+  ["config-builder/assets/app.css", "config-builder/assets/app.css"],
 ])
-  await copy(
-    new URL(source, repository),
-    new URL(destination, output),
-  );
+  await copy(new URL(source, repository), new URL(destination, output));
 for (const path of ["assets/"])
   await images(new URL(path, repository), new URL(path, output));
 const notices = await Promise.all(
