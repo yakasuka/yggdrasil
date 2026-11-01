@@ -1,0 +1,36 @@
+name: Deploy Cloudflare Pages
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: cloudflare-pages-production
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Configurator
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: Configurator/package-lock.json
+      - run: npm ci
+      - run: npm run build
+      - run: npm test
+      - name: Require the account and KV setup
+        run: |
+          test -n "$CLOUDFLARE_API_TOKEN" || { echo 'Configure CLOUDFLARE_API_TOKEN first.'; exit 1; }
+          test -n "$CLOUDFLARE_ACCOUNT_ID" || { echo 'Configure CLOUDFLARE_ACCOUNT_ID first.'; exit 1; }
+          if grep -q REPLACE_WITH_KV_NAMESPACE_ID wrangler.jsonc; then
+            echo 'Create your KV namespace and commit its ID before deployment.'
+            exit 1
+          fi
+      - run: npm run service:deploy -- --branch main

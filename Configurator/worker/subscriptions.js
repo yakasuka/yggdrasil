@@ -1,47 +1,8 @@
-import {
-  parseNodes,
-  parseUsage,
-  MAX_SUBSCRIPTION_BYTES,
-} from "../shared/nodes.js";
-export function isPublicAddress(address) {
-  const host = address.replace(/^\[|\]$/g, "").toLowerCase();
-  if (host.includes(":"))
-    return /^[23][a-f0-9]{3}:/.test(host) && !host.startsWith("2001:db8:");
-  const p = host.split(".").map(Number);
-  if (p.length !== 4 || p.some((n) => !Number.isInteger(n) || n < 0 || n > 255))
-    return false;
-  const [a, b] = p;
-  return !(
-    a === 0 ||
-    a === 10 ||
-    a === 127 ||
-    a >= 224 ||
-    (a === 169 && b === 254) ||
-    (a === 172 && b >= 16 && b <= 31) ||
-    (a === 192 && b === 168) ||
-    (a === 100 && b >= 64 && b <= 127) ||
-    (a === 198 && (b === 18 || b === 19)) ||
-    (a === 192 && b === 0)
-  );
-}
-export function publicURL(value) {
-  const url = new URL(value);
-  const host = url.hostname.replace(/\.$/, "").toLowerCase();
-  if (
-    !["https:", "http:"].includes(url.protocol) ||
-    url.username ||
-    url.password ||
-    (!host.includes(".") && !host.includes(":")) ||
-    /(?:^|\.)(?:localhost|local|internal|invalid|test)$/.test(host)
-  )
-    throw Error("订阅地址需要可公开访问的域名。");
-  if (
-    (/^\d+\.\d+\.\d+\.\d+$/.test(host) || host.includes(":")) &&
-    !isPublicAddress(host)
-  )
-    throw Error("不能访问私有网络地址。");
-  return url;
-}
+import { parseUsage, MAX_SUBSCRIPTION_BYTES } from "../shared/nodes.js";
+import { parseSubscription, nodeInventory } from "../shared/subscription.js";
+import { fetchIP } from "./ip-fetch.js";
+import { isPublicAddress, publicURL, literalIP } from "./public-url.js";
+export { isPublicAddress, publicURL } from "./public-url.js";
 export async function readLimited(response, max = MAX_SUBSCRIPTION_BYTES) {
   if (Number(response.headers.get("Content-Length")) > max) {
     await response.body?.cancel();
@@ -82,8 +43,14 @@ export async function mapLimit(values, limit, fn) {
   );
   return results;
 }
-export function subscriptionClient({ fetcher = fetch, resolver, probe } = {}) {
+export function subscriptionClient({
+  fetcher = fetch,
+  resolver,
+  probe,
+  ipFetcher,
+} = {}) {
   const cache = new Map();
+  const requestIP = ipFetcher || (fetcher === fetch ? fetchIP : fetcher);
   async function resolve(host) {
     if (resolver) return resolver(host);
     let result = [];
@@ -118,15 +85,18 @@ export function subscriptionClient({ fetcher = fetch, resolver, probe } = {}) {
     let url = value;
     for (let redirects = 0; redirects < 3; redirects++) {
       const safe = await guard(url);
-      const response = await fetcher(safe, {
-        method,
-        redirect: "manual",
-        headers: {
-          "User-Agent": "mihomo/Configurator",
-          Accept: "application/yaml,text/yaml,text/plain;q=0.9,*/*;q=0.5",
+      const response = await (literalIP(safe.hostname) ? requestIP : fetcher)(
+        safe,
+        {
+          method,
+          redirect: "manual",
+          headers: {
+            "User-Agent": "mihomo/Configurator",
+            Accept: "application/yaml,text/yaml,text/plain;q=0.9,*/*;q=0.5",
+          },
+          signal: AbortSignal.timeout(12000),
         },
-        signal: AbortSignal.timeout(12000),
-      });
+      );
       if (response.status >= 300 && response.status < 400) {
         await response.body?.cancel();
         if (redirects === 2 || !response.headers.get("Location"))
@@ -141,18 +111,22 @@ export function subscriptionClient({ fetcher = fetch, resolver, probe } = {}) {
       return response;
     }
   }
-  async function inspect(providers) {
+  async function inspect(providers, { fresh = false } = {}) {
     return mapLimit(providers, 3, async (p, i) => {
       try {
         let record = cache.get(p.url);
-        if (!record || record.until < Date.now()) {
+        if (fresh || !record || record.until < Date.now()) {
           const response = await request(p.url);
           const usage = parseUsage(
             response.headers.get("Subscription-Userinfo"),
           );
-          const nodes = parseNodes(await readLimited(response), i);
+          const parsed = parseSubscription(await readLimited(response));
+          const nodes = nodeInventory(parsed.proxies, i);
           if (!nodes.length) throw Error("订阅中没有可用节点。");
           record = {
+            proxies: parsed.proxies,
+            format: parsed.format,
+            skipped: parsed.skipped,
             nodes: nodes.map((n) => ({
               ...n,
               provider: 0,
@@ -166,6 +140,9 @@ export function subscriptionClient({ fetcher = fetch, resolver, probe } = {}) {
         }
         return {
           name: p.name,
+          proxies: record.proxies,
+          format: record.format,
+          skipped: record.skipped,
           nodes: record.nodes.map((n) => ({
             ...n,
             provider: i,
@@ -179,7 +156,7 @@ export function subscriptionClient({ fetcher = fetch, resolver, probe } = {}) {
           nodes: [],
           usage: null,
           error:
-            "解析失败，请确认机场提供 Mihomo / Clash YAML 订阅，且链接仍有效。",
+            "解析失败，请确认订阅链接有效，并提供 YAML、Base64 或支持的节点链接。",
         };
       }
     });

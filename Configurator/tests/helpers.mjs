@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import { defaults, catalog } from "../shared/compiler.js";
-import { createWorker } from "../worker/index.js";
+import { createWorker } from "../worker/application.js";
 export const text = fs.readFileSync(
   new URL("./fixtures/subscription.yaml", import.meta.url),
   "utf8",

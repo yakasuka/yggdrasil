@@ -1,45 +1,7 @@
-import { parse } from "yaml";
-export const MAX_SUBSCRIPTION_BYTES = 2 * 1024 * 1024;
+import { parseSubscription, nodeInventory } from "./subscription.js";
+export { MAX_SUBSCRIPTION_BYTES } from "./subscription.js";
 export function parseNodes(text, providerIndex = 0) {
-  if (new TextEncoder().encode(text).length > MAX_SUBSCRIPTION_BYTES)
-    throw Error("节点订阅超过 2 MiB。");
-  let data;
-  try {
-    data = parse(text, {
-      merge: true,
-      maxAliasCount: 100,
-      logLevel: "silent",
-      prettyErrors: false,
-    });
-  } catch {
-    throw Error("订阅需要是有效的 Mihomo / Clash YAML。");
-  }
-  const source = Array.isArray(data?.proxies)
-    ? data.proxies
-    : Array.isArray(data?.payload)
-      ? data.payload
-      : null;
-  if (!source || !source.length || source.length > 2000)
-    throw Error("订阅需包含 1–2000 个 Mihomo 节点。");
-  return source
-    .filter(
-      (n) =>
-        n &&
-        typeof n.name === "string" &&
-        n.name.length <= 300 &&
-        typeof n.server === "string" &&
-        Number.isInteger(Number(n.port)) &&
-        Number(n.port) > 0 &&
-        Number(n.port) <= 65535,
-    )
-    .map((n, i) => ({
-      id: `P${providerIndex + 1}:${i}`,
-      provider: providerIndex,
-      name: n.name,
-      server: n.server,
-      port: Number(n.port),
-      latencyMs: null,
-    }));
+  return nodeInventory(parseSubscription(text).proxies, providerIndex);
 }
 export function classifyNodes(nodes, model) {
   const regex = (p) =>
@@ -124,12 +86,13 @@ export function publicInspection(
     model,
   );
   return {
-    providers: providers.map(({ name, usage, error }, i) => ({
+    providers: providers.map(({ name, usage, error, format, skipped }, i) => ({
       id: "P" + (i + 1),
       name,
       usage: usage || null,
       error: error || null,
       nodeCount: nodes.filter((n) => n.provider === i).length,
+      ...(format ? { format, skipped: skipped || 0 } : {}),
     })),
     nodes: nodes.map(({ server, port, ...n }) => n),
     regions: regionInventory(nodes, model),

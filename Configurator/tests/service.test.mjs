@@ -230,10 +230,8 @@ test("multiple airports retain P1/P2 node identities and aggregate reported traf
   const file = await service.fetch(new Request(data.url), env);
   const config = parse(await file.text());
   assert.deepEqual(
-    Object.values(config["proxy-providers"]).map(
-      (p) => p.override["additional-prefix"],
-    ),
-    ["[P1] ", "[P2] "],
+    [...new Set(config.proxies.map((p) => p.name.match(/^\[P\d+\]/)[0]))],
+    ["[P1]", "[P2]"],
   );
   assert.ok(
     file.headers

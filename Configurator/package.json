@@ -14,10 +14,12 @@
     "worker:deploy": "wrangler deploy --config worker/wrangler.jsonc",
     "worker:whoami": "wrangler whoami",
     "service:build": "node scripts/build-gateway.mjs",
-    "service:dev": "npm run service:build && wrangler pages dev --cwd worker/gateway --service PROFILE_SERVICE=yggdrasil-subscriptions --port 8788",
-    "service:deploy": "npm run service:build && wrangler pages deploy --cwd worker/gateway"
+    "service:dev": "npm run service:build && wrangler pages dev --port 8788",
+    "service:deploy": "npm run service:build && wrangler pages deploy"
   },
   "dependencies": {
+    "buffer": "^6.0.3",
+    "http-parser-js": "^0.5.10",
     "yaml": "^2.8.0"
   },
   "devDependencies": {

@@ -1,6 +1,7 @@
 import { stringify } from "yaml";
 import catalog from "./catalog.json" with { type: "json" };
 import { filename, lifetime } from "./profile.js";
+import { classifyNodes } from "./nodes.js";
 export { catalog };
 export const STRATEGIES = [
   {
@@ -345,6 +346,33 @@ export async function compile(input, model = catalog, options = {}) {
   const providers = new Set(
     rules.filter((r) => r.startsWith("RULE-SET,")).map((r) => r.split(",")[1]),
   );
+  const inlineNames = new Set();
+  const inline = options.inlineProxies?.flatMap((nodes, i) => {
+    const kept = new Set(
+      classifyNodes(
+        nodes.map((node, id) => ({ id, name: node.name })),
+        model,
+      )
+        .filter(
+          (node) =>
+            p.countries.includes(node.region) ||
+            (p.other && node.region === "OTHER"),
+        )
+        .map((node) => node.id),
+    );
+    return nodes
+      .filter((_, id) => kept.has(id))
+      .map((node) => {
+        const base = `[P${i + 1}] ${node.name}`;
+        let name = base,
+          suffix = 2;
+        while (inlineNames.has(name)) name = base + " · " + suffix++;
+        inlineNames.add(name);
+        return { ...node, name };
+      });
+  });
+  if (inline && !inline.length)
+    fail("所选地区当前没有可用节点，请重新选择地区。", "countries");
   const config = {
     "mixed-port": p.port,
     "allow-lan": p.allowLan,
@@ -361,7 +389,9 @@ export async function compile(input, model = catalog, options = {}) {
         "https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geosite.dat",
     },
     profile: { "store-selected": true },
-    "proxy-providers": Object.fromEntries(entries),
+    ...(inline
+      ? { proxies: inline }
+      : { "proxy-providers": Object.fromEntries(entries) }),
     "proxy-groups": groups,
     ...(providers.size
       ? {

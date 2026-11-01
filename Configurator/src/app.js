@@ -7,11 +7,7 @@ import {
   normalizeProviders,
   STRATEGIES,
 } from "../shared/compiler.js";
-import {
-  parseNodes,
-  publicInspection,
-  MAX_SUBSCRIPTION_BYTES,
-} from "../shared/nodes.js";
+import { publicInspection, MAX_SUBSCRIPTION_BYTES } from "../shared/nodes.js";
 import { filename } from "../shared/profile.js";
 import { SERVICE_ROUTES, serviceOrigin, subscriptionURL } from "./service.js";
 import { esc, usageCards } from "./ui.js";
@@ -20,6 +16,7 @@ import { regionsPanel } from "./panels/regions.js";
 import { strategiesPanel } from "./panels/strategies.js";
 import { appsPanel } from "./panels/apps.js";
 import { reviewPanel, resultPanel } from "./panels/review.js";
+import { browserRecords } from "./subscriptions.js";
 const $ = (s) => document.querySelector(s);
 const steps = [
   ["订阅来源", "连接你的机场"],
@@ -36,7 +33,9 @@ const ctx = {
   search: "",
   phase: "idle",
   probeDone: 0,
+  tcp: false,
 };
+let sourceProxies = null;
 let step = 0,
   furthest = 0,
   busy = false,
@@ -72,6 +71,7 @@ function invalidate() {
   inspectionController?.abort();
   probeController?.abort();
   ctx.inspection = null;
+  sourceProxies = null;
   ctx.phase = "idle";
   ctx.probeDone = 0;
   furthest = 0;
@@ -194,6 +194,7 @@ async function checkService() {
     });
     if (!response.ok) throw Error();
     const health = await response.json();
+    ctx.tcp = health.capabilities?.tcp === true;
     ctx.service = !health.ready
       ? "offline"
       : health.version !== catalog.version
@@ -215,12 +216,6 @@ async function resolveSources() {
     return;
   }
   const local = ctx.files.size === providers.length;
-  if (!local && ctx.service !== "ready") {
-    error(
-      "在线解析尚未连接。请为每个机场导入 Mihomo 节点文件，或连接解析服务后重试。",
-    );
-    return;
-  }
   busy = true;
   ctx.phase = "loading";
   clearError();
@@ -230,16 +225,23 @@ async function resolveSources() {
   inspectionController = new AbortController();
   try {
     let inspection;
-    if (local) {
-      const records = await Promise.all(
-        providers.map(async (p, i) => ({
-          name: p.name,
-          nodes: parseNodes(await ctx.files.get(i).text(), i),
-          usage: null,
-        })),
+    try {
+      const records = await browserRecords(
+        providers,
+        ctx.files,
+        inspectionController.signal,
       );
-      inspection = publicInspection(records, catalog, { tcp: false });
-    } else {
+      sourceProxies = records.map((r) => r.proxies);
+      inspection = publicInspection(records, catalog, {
+        tcp: !ctx.files.size && ctx.service === "ready" && ctx.tcp,
+      });
+    } catch (directError) {
+      sourceProxies = null;
+      if (local) throw directError;
+      if (ctx.service !== "ready")
+        throw Error(
+          "浏览器无法直接读取订阅，机场可能未开放跨域访问。请导入节点文件，或等待订阅服务连接后重试。",
+        );
       const response = await fetch(apiBase + SERVICE_ROUTES.inspect, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -328,17 +330,22 @@ async function probeAll(providers, rev) {
 async function updateSummary() {
   const rev = revision;
   try {
-    const output = await compile({
-      ...ctx.profile,
-      title: ctx.profile.title || "未命名",
-    });
+    const output = await compile(
+      {
+        ...ctx.profile,
+        title: ctx.profile.title || "未命名",
+      },
+      catalog,
+      sourceProxies ? { inlineProxies: sourceProxies } : {},
+    );
     if (step !== 4 || rev !== revision) return;
     $("#rule-count").textContent = output.summary.rules;
     $("#file-name").textContent = ctx.profile.title
       ? filename(ctx.profile.title)
       : "名字-ratatoskr.yaml";
-    $("#file-size").textContent =
-      `${(output.summary.bytes / 1024).toFixed(1)} KiB · ${output.summary.groups} 个策略组`;
+    $("#file-size").textContent = sourceProxies
+      ? `${(output.summary.bytes / 1024).toFixed(1)} KiB · ${output.summary.groups} 个策略组`
+      : `节点在生成时写入 · ${output.summary.groups} 个策略组`;
   } catch (e) {
     if (step === 4 && rev === revision)
       $("#file-size").textContent = "请检查配置选择";
@@ -390,7 +397,7 @@ async function generate() {
 }
 async function download() {
   try {
-    const output = await compile(ctx.profile),
+    const output = await configurationOutput(),
       url = URL.createObjectURL(
         new Blob([output.yaml], { type: "application/yaml" }),
       ),
@@ -402,6 +409,23 @@ async function download() {
   } catch (e) {
     error(e.message);
   }
+}
+async function configurationOutput() {
+  const profile = normalize(ctx.profile);
+  if (sourceProxies)
+    return compile(profile, catalog, { inlineProxies: sourceProxies });
+  if (ctx.service === "ready") {
+    const response = await fetch(apiBase + SERVICE_ROUTES.preview, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(profile),
+      signal: AbortSignal.timeout(90000),
+    });
+    const data = await response.json();
+    if (!response.ok) throw Error(data.error || "配置暂时无法生成。");
+    return data;
+  }
+  throw Error("请先解析订阅或导入节点文件。");
 }
 let toastTimer;
 function toast(text) {
@@ -525,7 +549,7 @@ document.addEventListener("click", async (e) => {
   }
   if (el.id === "show-preview") {
     try {
-      $("#yaml-preview").textContent = (await compile(ctx.profile)).yaml;
+      $("#yaml-preview").textContent = (await configurationOutput()).yaml;
       $("#preview").showModal();
     } catch (e) {
       error(e.message);

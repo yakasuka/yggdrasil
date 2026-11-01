@@ -4,5 +4,6 @@ export const SERVICE_ROUTES = Object.freeze({
   inspect: "/api/inspect",
   probe: "/api/latency",
   create: "/api/subscriptions",
+  preview: "/api/preview",
   subscription: "/subscription/",
 });
