@@ -1,4 +1,4 @@
-name: Validate Configurator
+name: Validate config-builder
 on: [push, pull_request]
 permissions:
   contents: read
@@ -7,14 +7,14 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: Configurator
+        working-directory: config-builder
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: Configurator/package-lock.json
+          cache-dependency-path: config-builder/package-lock.json
       - run: npm ci
       - run: npm run build
       - run: npm test
@@ -23,14 +23,14 @@ jobs:
     needs: check
     runs-on: ubuntu-latest
     concurrency:
-      group: configurator-catalog-sync
+      group: config-builder-catalog-sync
       cancel-in-progress: false
     permissions:
       contents: write
       pages: write
     defaults:
       run:
-        working-directory: Configurator
+        working-directory: config-builder
     steps:
       - uses: actions/checkout@v4
         with:
@@ -39,18 +39,18 @@ jobs:
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: Configurator/package-lock.json
+          cache-dependency-path: config-builder/package-lock.json
       - run: npm ci
       - run: npm run build
       - name: Commit generated catalog and browser assets
         id: sync
         working-directory: .
         run: |
-          git add -- Configurator/shared/catalog.json Configurator/assets
+          git add -- config-builder/shared/catalog.json config-builder/assets
           if git diff --cached --quiet; then
             echo 'changed=false' >> "$GITHUB_OUTPUT"
           else
-            git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'build: sync Configurator from Ratatoskr template'
+            git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'build: sync config-builder from Ratatoskr template'
             git push origin HEAD:main
             echo 'changed=true' >> "$GITHUB_OUTPUT"
           fi

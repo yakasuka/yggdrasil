@@ -67,7 +67,7 @@ FilterAll: &FilterAll '^(?!.*(?:(?i)=>|群|邀请|返利|循环|官网|客服|�
 
 # ── 其他地区 / Others ──
 # 应用 FilterAll 的节点净化，并排除香港、台湾、日本、韩国、新加坡和美国节点
-# 修改 FilterRegions 或 FilterAll 后，运行 node scripts/generate-ratatoskr-filters.mjs 更新此正则
+# 修改 FilterRegions 或 FilterAll 后，运行 node config-builder/scripts/generate-ratatoskr-filters.mjs 更新此正则
 FilterOthers: &FilterOthers '^(?!.*(?:(?i)=>|(?i:🇭🇰|香港|Hong\s?Kong|\b(?:HK|HKG)\d*\b)|(?i:🇹🇼|台湾|Tai(?:wan)?|\b(?:TW|TWN)\d*\b)|(?i:🇯🇵|日本|川日|东京|大阪|埼玉|Japan|\b(?:JP|JPN)\d*\b)|(?i:🇰🇷|韩国|韓|首尔|Korea|\b(?:KR|KOR)\d*\b)|(?i:🇸🇬|新加坡|狮|Singapore|\b(?:SG|SGP)\d*\b)|(?i:🇺🇸|美国|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|拉斯维加斯|United States|\b(?:US|USA)\d*\b)|群|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|剩余流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|超时|收藏|福利|失联|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author|Traffic|\d{4}-\d{2}-\d{2}|\d+G)).*$'
 
 # =======================================================

@@ -1,1 +1,1 @@
-export { onRequestGet } from "../builder/functions/merge.js";
+export { onRequestGet } from "../config-builder/functions/merge.js";

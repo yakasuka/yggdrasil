@@ -37,11 +37,11 @@
 
 ## 一站式订阅
 
-Yggdrasil 面向一站式的使用体验：使用者通过 Configurator 选择自己需要的配置内容，获得加工后生成的配置文件或订阅链接，再交给客户端使用。
+Yggdrasil 面向一站式的使用体验：使用者通过 config-builder 模块选择自己需要的配置内容，获得加工后生成的配置文件或订阅链接，再交给客户端使用。
 
 <p align="center"><strong>选择所需内容 → 组装个人配置 → 获取文件或订阅 → 导入客户端</strong></p>
 
-打开 **[Ratatoskr 配置工坊](https://yakasuka.github.io/yggdrasil/Configurator/)**，依次完成五步：
+打开 **[Ratatoskr 配置工坊](https://yakasuka.github.io/yggdrasil/config-builder/)**，依次完成五步：
 
 1. **订阅来源。** 填写机场名称与 YAML、Base64 或常见节点链接订阅，随后解析节点和机场报告的流量信息。
 2. **地区节点。** 只展示订阅中确实拥有的地区，选择需要保留的节点范围。
@@ -49,11 +49,11 @@ Yggdrasil 面向一站式的使用体验：使用者通过 Configurator 选择�
 4. **APP 分流。** 默认全部启用并跟随代理，也可指定已保留的地区、Direct 或 Reject。规则和最终出口由模板统一维护。
 5. **最终确认。** 预览配置，下载 `名字-ratatoskr.yaml`，或在服务上线后生成持久订阅链接。
 
-**[Ratatoskr-Template.yaml](Ratatoskr-Template.yaml)** 是 APP、地区与规则的唯一目录来源。模板新增 APP 或地区后，构建会同步页面目录和后端模板；重新部署 Pages 后，同一 Token 可取得新的配置。完整的数据流与每项功能的位置见 **[实现路径](Configurator/docs/IMPLEMENTATION.md)**。
+**[ratatoskr-template.yaml](resources/template/ratatoskr-template.yaml)** 是 APP、地区与规则的唯一目录来源。模板新增 APP 或地区后，构建会同步页面目录和后端模板；重新部署 Pages 后，同一 Token 可取得新的配置。完整的数据流与每项功能的位置见 **[实现路径](config-builder/docs/IMPLEMENTATION.md)**。
 
 个人订阅使用独立随机 Token，持续时间可选 **3 小时 / 7 天 / 30 天 / 永久**。配置标题下的 catalog 指纹只标识模板版本，不用作访问凭据。节点来源保留 `[P1]`、`[P2]` 标识。
 
-GitHub Pages 提供静态前端入口；完整在线服务使用 Cloudflare Pages 同时承载前端与接口，直接连接 KV 保存加密配置与 YAML 快照。网页优先直接读取与解码订阅；遇到跨域限制时由同源接口代取。生成配置包含所选地区的完整节点，支持文件下载与持久订阅链接。仓库提供通用部署模板，使用自己的项目名称与 KV 绑定接入，见 **[部署指南与故障复盘](Configurator/docs/DEPLOYMENT.md)**。
+GitHub Pages 提供静态前端入口；完整在线服务使用 Cloudflare Pages 同时承载前端与接口，直接连接 KV 保存加密配置与 YAML 快照。网页优先直接读取与解码订阅；遇到跨域限制时由同源接口代取。生成配置包含所选地区的完整节点，支持文件下载与持久订阅链接。仓库提供通用部署模板，使用自己的项目名称与 KV 绑定接入，见 **[部署指南与故障复盘](config-builder/docs/DEPLOYMENT.md)**。
 
 机场流量来自 `Subscription-Userinfo`，随订阅或手动刷新更新；缺失时明确显示未知。可选检测测量服务器到节点的 TCP 建连耗时，不将其标为 ICMP ping 或完整代理延迟。
 
@@ -150,7 +150,7 @@ Ratatoskr 将庞大的分类数据交给 Geo 数据库，将清晰的分流意�
 
 ## 快速开始
 
-推荐从 [配置工坊](https://yakasuka.github.io/yggdrasil/Configurator/) 开始；也可以手动使用模板：
+推荐从 [配置工坊](https://yakasuka.github.io/yggdrasil/config-builder/) 开始；也可以手动使用模板：
 
 1. **确认授权。** 取得相应原作者或权利人的书面许可，条款见 [LICENSE](LICENSE)。
 2. **选择配置。** 日常使用从 `ratatoskr.yaml` 开始；需要更细地区分组时选择 Eb 版。
@@ -202,7 +202,7 @@ Ratatoskr 将庞大的分类数据交给 Geo 数据库，将清晰的分流意�
 
 以上为保留的旧接口，仍引用 `yakasuka/yggdrasil-private`；新的 Pages 构建不发布该目录，也不需要 GitHub 读取 Token。若另行启用旧接口，须同步配置仓库位置、凭据和模板地址，并保留成对的 `AUTO-PROVIDERS-START` / `AUTO-PROVIDERS-END` 标记。
 
-现有 `/merge` 负责固定模板的订阅注入；新的配置工坊使用独立的 [配置服务与网关](Configurator/worker/README.md)，按网页选项生成配置。`/sub` 的 `Subscription-Userinfo` 是模拟流量信息，不代表机场真实用量。
+现有 `/merge` 负责固定模板的订阅注入；新的配置工坊使用独立的 [配置服务与网关](config-builder/worker/README.md)，按网页选项生成配置。`/sub` 的 `Subscription-Userinfo` 是模拟流量信息，不代表机场真实用量。
 
 </details>
 
