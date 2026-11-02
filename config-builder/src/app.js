@@ -7,7 +7,7 @@ import {
   normalizeProviders,
   STRATEGIES,
 } from "../shared/compiler.js";
-import { publicInspection, MAX_SUBSCRIPTION_BYTES } from "../shared/nodes.js";
+import { publicInspection } from "../shared/nodes.js";
 import { filename } from "../shared/profile.js";
 import {
   SERVICE_ROUTES,
@@ -192,7 +192,7 @@ function navigate(next) {
 function renderService() {
   $("#service-label").textContent = {
     checking: "正在检查订阅服务",
-    unconfigured: "本地模式 · 可连接订阅服务",
+    unconfigured: "可连接订阅服务",
     ready: "订阅服务已连接",
     offline: "订阅服务未连接",
     mismatch: "订阅服务版本不一致",
@@ -474,7 +474,7 @@ async function configurationOutput() {
     if (!response.ok) throw Error(data.error || "配置暂时无法生成。");
     return data;
   }
-  throw Error("请先解析订阅或导入节点文件。");
+  throw Error("请先解析订阅。");
 }
 let toastTimer;
 function toast(text) {
@@ -522,17 +522,6 @@ document.addEventListener("input", (e) => {
 });
 document.addEventListener("change", (e) => {
   const el = e.target;
-  if (el.dataset.nodeFile !== undefined) {
-    const file = el.files[0];
-    if (file && file.size > MAX_SUBSCRIPTION_BYTES) {
-      error("节点文件超过 2 MiB。");
-      return;
-    }
-    if (file) ctx.files.set(Number(el.dataset.nodeFile), file);
-    else ctx.files.delete(Number(el.dataset.nodeFile));
-    invalidate();
-    return;
-  }
   if (el.dataset.region) {
     if (el.dataset.region === "OTHER") ctx.profile.other = el.checked;
     else toggle(ctx.profile.countries, el.dataset.region, el.checked);
@@ -605,7 +594,6 @@ document.addEventListener("click", async (e) => {
   }
   if (el.dataset.remove !== undefined) {
     ctx.profile.providers.splice(Number(el.dataset.remove), 1);
-    ctx.files.clear();
     invalidate();
     render();
   }

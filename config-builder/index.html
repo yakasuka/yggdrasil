@@ -17,6 +17,10 @@
     <script type="module" src="./src/caustics.js"></script>
   </head>
   <body>
+    <div class="loading-screen" id="loading-screen" role="status" aria-label="正在加载配置工作台">
+      <canvas id="caustic-water" aria-hidden="true"></canvas>
+      <div class="loading-copy"><span class="loading-emblem"><img class="loading-mark" src="../assets/favicon-master.png" alt="" /></span><p>RATATOSKR · CONFIG STUDIO</p><span>正在唤醒配置工作台</span></div>
+    </div>
     <a class="skip-link" href="#workspace">跳到配置内容</a>
     <header class="site-header">
       <a class="brand" href="../" aria-label="Yggdrasil 项目首页"
@@ -64,16 +68,6 @@
       </div>
     </header>
     <main class="layout">
-      <section class="caustic-hero" aria-label="动态水面效果。点击水面产生涟漪">
-        <canvas id="caustic-water" aria-hidden="true"></canvas>
-        <div class="caustic-meta"><span><i></i> RATATOSKR · CONFIG STUDIO</span><span>INTERACTIVE CAUSTICS <b>↗</b></span></div>
-        <div class="caustic-copy">
-          <p>MAKE EVERY CONNECTION COUNT</p>
-          <h2>让连接，流向你想去的地方<span>.</span></h2>
-          <a href="#workspace">开始配置 <span aria-hidden="true">↓</span></a>
-        </div>
-        <div class="caustic-hint">点击水面，感受涟漪 <span>↗</span></div>
-      </section>
       <aside class="journey" aria-label="配置进度">
         <div class="eyebrow">YOUR CONFIGURATION</div>
         <h1>从这里开始。</h1>

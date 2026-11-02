@@ -7,6 +7,30 @@ const gl = canvas?.getContext("webgl2", {
 });
 
 if (canvas) {
+  const loadingScreen = document.querySelector("#loading-screen");
+  const loadingMark = loadingScreen?.querySelector(".loading-mark");
+  const dismissLoadingScreen = () => {
+    if (!loadingScreen || loadingScreen.dataset.dismissed) return;
+    loadingScreen.dataset.dismissed = "true";
+    loadingScreen.classList.add("is-loaded");
+    window.setTimeout(() => loadingScreen.remove(), 700);
+  };
+  if (document.readyState === "complete") dismissLoadingScreen();
+  else window.addEventListener("load", dismissLoadingScreen, { once: true });
+  if (loadingScreen && loadingMark && matchMedia("(hover: hover) and (pointer: fine)").matches && !reducedMotion.matches) {
+    loadingScreen.addEventListener("pointermove", (event) => {
+      const bounds = loadingMark.getBoundingClientRect();
+      const x = (event.clientX - (bounds.left + bounds.width / 2)) / innerWidth;
+      const y = (event.clientY - (bounds.top + bounds.height / 2)) / innerHeight;
+      loadingMark.style.setProperty("--tilt-x", `${Math.max(-1, Math.min(1, y * 9))}deg`);
+      loadingMark.style.setProperty("--tilt-y", `${Math.max(-1, Math.min(1, -x * 9))}deg`);
+    });
+    loadingScreen.addEventListener("pointerleave", () => {
+      loadingMark.style.setProperty("--tilt-x", "0deg");
+      loadingMark.style.setProperty("--tilt-y", "0deg");
+    });
+  }
+
   const vertex = `#version 300 es
   in vec2 position;
   out vec2 uv;
