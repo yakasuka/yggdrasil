@@ -1,5 +1,6 @@
 const canvas = document.querySelector("#caustic-water");
 const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
+const introStarted = performance.now();
 const gl = canvas?.getContext("webgl2", {
   alpha: false,
   antialias: false,
@@ -8,10 +9,38 @@ const gl = canvas?.getContext("webgl2", {
 
 if (canvas) {
   const loadingScreen = document.querySelector("#loading-screen");
+  const hero = document.querySelector(".caustic-hero");
   const loadingMark = loadingScreen?.querySelector(".loading-mark");
-  const dismissLoadingScreen = () => {
+  let firstOpen = true;
+  try {
+    firstOpen = localStorage.getItem("yggdrasil:config-builder:intro-seen") !== "yes";
+  } catch {}
+  const dismissLoadingScreen = async () => {
     if (!loadingScreen || loadingScreen.dataset.dismissed) return;
     loadingScreen.dataset.dismissed = "true";
+    if (firstOpen) {
+      const remaining = 2000 - (performance.now() - introStarted);
+      if (remaining > 0) await new Promise((resolve) => setTimeout(resolve, remaining));
+    }
+    try {
+      localStorage.setItem("yggdrasil:config-builder:intro-seen", "yes");
+    } catch {}
+    if (hero) {
+      hero.append(canvas);
+      hero.classList.add("is-visible");
+      if (firstOpen && !reducedMotion.matches) hero.classList.add("is-arriving");
+      loadingScreen.classList.add("is-collapsing");
+      const rect = hero.getBoundingClientRect();
+      const clip = `inset(${Math.max(0, rect.top)}px ${Math.max(0, innerWidth - rect.right)}px ${Math.max(0, innerHeight - rect.bottom)}px ${Math.max(0, rect.left)}px round 10px)`;
+      if (firstOpen && loadingScreen.animate && !reducedMotion.matches) {
+        try {
+          await loadingScreen.animate(
+            [{ clipPath: "inset(0 round 0px)" }, { clipPath: clip }],
+            { duration: 820, easing: "cubic-bezier(.2,.75,.25,1)", fill: "forwards" },
+          ).finished;
+        } catch {}
+      }
+    }
     loadingScreen.classList.add("is-loaded");
     window.setTimeout(() => loadingScreen.remove(), 700);
   };

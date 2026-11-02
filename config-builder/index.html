@@ -32,31 +32,10 @@
         /><span>Yggdrasil<small>世界树 · config-builder</small></span></a
       >
       <div class="header-links">
-        <span class="engine"><i></i> 为 Mihomo 而生</span
-        ><div class="appearance-tools" aria-label="外观设置">
-          <label class="theme-picker"
-            >主题<select id="theme-select" aria-label="选择主题">
-              <option value="light">Universe 浅色</option>
-              <option value="dark">Universe 深色</option>
-              <option value="system">跟随系统</option>
-            </select></label
-          >
-          <label
-            class="css-upload button secondary"
-            for="theme-css-file"
-            title="CSS 仅保存在此浏览器"
-            >自定义 CSS<input
-              id="theme-css-file"
-              type="file"
-              accept=".css,text/css"
-          /></label>
-          <button
-            class="text-button clear-theme-css"
-            id="clear-theme-css"
-            type="button"
-            hidden
-          >
-            清除
+        <span class="engine"><i></i> 为 Mihomo 而生</span>
+        <div class="appearance-tools" aria-label="外观设置">
+          <button class="theme-toggle button secondary" id="theme-toggle" type="button" aria-label="切换到浅色模式" title="切换主题">
+            <span aria-hidden="true" id="theme-toggle-icon">☀︎</span><span id="theme-toggle-label">浅色</span>
           </button>
         </div>
         <a
@@ -68,6 +47,14 @@
       </div>
     </header>
     <main class="layout">
+      <section class="caustic-hero" aria-label="动态水面效果。点击水面产生涟漪">
+        <div class="caustic-meta"><span><i></i> RATATOSKR · CONFIG STUDIO</span><span>INTERACTIVE CAUSTICS <b>↗</b></span></div>
+        <div class="caustic-copy">
+          <div><p>MAKE EVERY CONNECTION COUNT</p><h2>让信息，流向你想去的地方</h2></div>
+          <a href="#workspace">开始配置 <span aria-hidden="true">↓</span></a>
+        </div>
+        <div class="caustic-hint">点击水面，感受涟漪 <span>↗</span></div>
+      </section>
       <aside class="journey" aria-label="配置进度">
         <div class="eyebrow">YOUR CONFIGURATION</div>
         <h1>从这里开始。</h1>

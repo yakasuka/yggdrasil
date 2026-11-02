@@ -24,11 +24,11 @@ import { reviewPanel, resultPanel } from "./panels/review.js";
 import { browserRecords, sourceFailureMessage } from "./subscriptions.js";
 const $ = (s) => document.querySelector(s);
 const steps = [
-  ["订阅来源", "连接你的机场"],
-  ["地区节点", "仅保留需要的地区"],
-  ["节点策略", "默认手动选择"],
-  ["APP 分流", "为应用指定地区"],
-  ["最终确认", "让 Ratatoskr 出发"],
+  "订阅来源",
+  "地区节点",
+  "节点策略",
+  "APP 分流",
+  "最终确认",
 ];
 const ctx = {
   profile: defaults(),
@@ -99,8 +99,8 @@ function renderNav() {
           : "等待解析";
   $("#steps").innerHTML = steps
     .map(
-      ([label, desc], i) =>
-        `<button class="step-button${i < step ? " done" : ""}" data-step="${i}"${i === step ? ' aria-current="step"' : ""}${i > furthest || busy ? " disabled" : ""}><span class="step-number">${i < step ? "✓" : String(i + 1).padStart(2, "0")}</span><span><strong>${label}</strong><small>${desc}</small></span></button>` +
+      (label, i) =>
+        `<button class="step-button${i < step ? " done" : ""}" data-step="${i}"${i === step ? ' aria-current="step"' : ""}${i > furthest || busy ? " disabled" : ""}><span><strong>${label}</strong></span></button>` +
         (i === 0
           ? `<div class="parse-step" aria-disabled="true" data-phase="${ctx.phase}"><span aria-hidden="true">${ctx.phase === "ready" ? "✓" : "⋯"}</span><div><strong>解析节点</strong><small>${esc(phase)}</small></div></div>`
           : ""),
@@ -192,7 +192,7 @@ function navigate(next) {
 function renderService() {
   $("#service-label").textContent = {
     checking: "正在检查订阅服务",
-    unconfigured: "可连接订阅服务",
+    unconfigured: "",
     ready: "订阅服务已连接",
     offline: "订阅服务未连接",
     mismatch: "订阅服务版本不一致",
