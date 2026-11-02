@@ -15,14 +15,14 @@ export async function onRequestGet({ request, env }) {
     });
 
   const api =
-    "https://api.github.com/repos/yakasuka/yggdrasil-private/contents/nodes.yaml";
+    "https://api.github.com/repos/yakasuka/yggdrasil-private/contents/providers.yaml";
   try {
     const response = await fetch(api, {
       headers: {
         Authorization: `Bearer ${env.GH_TOKEN}`,
         Accept: "application/vnd.github+json",
         "X-GitHub-Api-Version": "2022-11-28",
-        "User-Agent": "yggdrasil-subscription",
+        "User-Agent": "yggdrasil-providers",
       },
     });
     if (!response.ok)
@@ -37,21 +37,12 @@ export async function onRequestGet({ request, env }) {
     const yaml = new TextDecoder("utf-8").decode(
       Uint8Array.from(binary, (character) => character.charCodeAt(0)),
     );
-    const used = Math.floor(Math.random() * (20 * 1024 ** 4 + 1));
-    const upload = Math.floor(Math.random() * (used + 1));
-    const userinfo = [
-      `upload=${upload}`,
-      `download=${used - upload}`,
-      "total=0",
-      "expire=0",
-    ].join("; ");
     return new Response(yaml, {
       headers: {
         "Content-Type": "text/plain; charset=utf-8",
         "Content-Disposition": "inline",
         "Cache-Control": "no-store",
         "X-Content-Type-Options": "nosniff",
-        "Subscription-Userinfo": userinfo,
       },
     });
   } catch {
