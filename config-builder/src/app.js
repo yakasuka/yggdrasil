@@ -1,4 +1,8 @@
 import "./styles.css";
+import "./motion.css";
+import "./theme.js";
+import "./caustics.js";
+import { progressCursor, enterPanel, revealCard, celebrate } from "./motion.js";
 import {
   catalog,
   defaults,
@@ -16,20 +20,18 @@ import {
   probeService,
 } from "./service.js";
 import { esc, usageCards } from "./ui.js";
-import { sourcesPanel } from "./panels/sources.js";
+import {
+  sourcesPanel,
+  providerCard,
+  removeProviderButton,
+} from "./panels/sources.js";
 import { regionsPanel } from "./panels/regions.js";
 import { strategiesPanel } from "./panels/strategies.js";
 import { appsPanel } from "./panels/apps.js";
 import { reviewPanel, resultPanel } from "./panels/review.js";
 import { browserRecords, sourceFailureMessage } from "./subscriptions.js";
 const $ = (s) => document.querySelector(s);
-const steps = [
-  "订阅来源",
-  "地区节点",
-  "节点策略",
-  "APP 分流",
-  "最终确认",
-];
+const steps = ["订阅来源", "地区节点", "节点策略", "APP 分流", "最终确认"];
 const ctx = {
   profile: defaults(),
   files: new Map(),
@@ -54,6 +56,7 @@ const serviceStorageKey =
   "yggdrasil:service-origin:" + new URL(".", location.href).pathname;
 let serviceTask = null,
   serviceRevision = 0;
+let pointToStep;
 const panels = [
   sourcesPanel,
   regionsPanel,
@@ -88,6 +91,32 @@ function invalidate() {
   changed();
   renderNav();
 }
+function syncProviderCards() {
+  const slots = $("#provider-list").querySelectorAll(
+    ".provider-slot:not(.is-removing)",
+  );
+  slots.forEach((slot, i) => {
+    slot.querySelector(".card-heading > span").textContent =
+      `PROVIDER ${String(i + 1).padStart(2, "0")}`;
+    slot
+      .querySelectorAll("[data-provider]")
+      .forEach((input) => (input.dataset.provider = String(i)));
+    let remove = slot.querySelector("[data-remove]");
+    if (slots.length === 1) remove?.remove();
+    else {
+      if (!remove) {
+        slot
+          .querySelector(".card-heading")
+          .insertAdjacentHTML("beforeend", removeProviderButton(i));
+        remove = slot.querySelector("[data-remove]");
+      }
+      remove.dataset.remove = String(i);
+      remove.setAttribute("aria-label", `移除第 ${i + 1} 个机场`);
+    }
+  });
+  $("#add-provider span").textContent = `${slots.length} / 10`;
+  $("#add-provider").disabled = slots.length >= 10;
+}
 function renderNav() {
   const phase =
     ctx.phase === "loading"
@@ -97,15 +126,35 @@ function renderNav() {
         : ctx.inspection
           ? `${ctx.inspection.nodes.length} 个节点${ctx.inspection.capabilities.tcp ? " · 已测 " + ctx.probeDone : ""}`
           : "等待解析";
-  $("#steps").innerHTML = steps
-    .map(
-      (label, i) =>
-        `<button class="step-button${i < step ? " done" : ""}" data-step="${i}"${i === step ? ' aria-current="step"' : ""}${i > furthest || busy ? " disabled" : ""}><span><strong>${label}</strong></span></button>` +
-        (i === 0
-          ? `<div class="parse-step" aria-disabled="true" data-phase="${ctx.phase}"><span aria-hidden="true">${ctx.phase === "ready" ? "✓" : "⋯"}</span><div><strong>解析节点</strong><small>${esc(phase)}</small></div></div>`
-          : ""),
-    )
-    .join("");
+  if (!pointToStep) {
+    $("#steps").innerHTML = steps
+      .map(
+        (label, i) =>
+          `<button class="step-button" data-step="${i}"><span><strong>${label}</strong></span></button>` +
+          (i === 0
+            ? `<div class="parse-step" aria-disabled="true" data-phase="${ctx.phase}"><span aria-hidden="true">${ctx.phase === "ready" ? "✓" : "⋯"}</span><div><strong>解析节点</strong><small>${esc(phase)}</small></div></div>`
+            : ""),
+      )
+      .join("");
+    pointToStep = progressCursor($("#steps"));
+  }
+  const parsing = step === 0 && ctx.phase === "loading";
+  for (const button of $("#steps").querySelectorAll("[data-step]")) {
+    const i = Number(button.dataset.step);
+    button.disabled = i > furthest || busy;
+    button.classList.toggle("done", i < step);
+    if (i === step && !parsing) button.setAttribute("aria-current", "step");
+    else button.removeAttribute("aria-current");
+  }
+  const parse = $("#steps .parse-step");
+  parse.dataset.phase = ctx.phase;
+  parse.querySelector("small").textContent = phase;
+  parse.querySelector(":scope > span").textContent =
+    ctx.phase === "ready" ? "✓" : "⋯";
+  parse.classList.toggle("is-current", parsing);
+  pointToStep(
+    parsing ? parse : $("#steps").querySelector(`[data-step="${step}"]`),
+  );
 }
 function footer() {
   const final = step === 4;
@@ -127,6 +176,11 @@ function footer() {
     : "只保留你需要的枝叶。";
   document.querySelector(".wizard-footer").dataset.final = String(final);
   renderService();
+  if ($("#add-provider"))
+    $("#add-provider").disabled = busy || ctx.profile.providers.length >= 10;
+  $("#panel")
+    .querySelectorAll("[data-remove]")
+    .forEach((button) => (button.disabled = busy));
 }
 function render() {
   renderNav();
@@ -185,6 +239,7 @@ function navigate(next) {
   step = next;
   furthest = Math.max(furthest, next);
   render();
+  enterPanel($("#panel"));
   $("#workspace").focus({ preventScroll: true });
   if (matchMedia("(max-width:680px)").matches)
     window.scrollTo({ top: 0, behavior: "instant" });
@@ -428,6 +483,7 @@ async function generate() {
     if (rev !== revision) return;
     result = { ...data, url: subscriptionURL(data.url, apiBase) };
     result.usageUrl = result.url.replace(/\.yaml$/, "/status");
+    celebrate($("#next"));
     $("#result-area").innerHTML = resultPanel(result);
     $("#result-area").scrollIntoView({
       block: "nearest",
@@ -454,6 +510,8 @@ async function download() {
     a.href = url;
     a.download = output.filename;
     a.click();
+    celebrate($("#download"));
+    toast("配置已生成");
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   } catch (e) {
     error(e.message);
@@ -588,14 +646,38 @@ document.addEventListener("click", async (e) => {
     if (next < step || validateStep()) navigate(next);
   }
   if (el.id === "add-provider") {
+    if (busy || ctx.profile.providers.length >= 10) return;
     ctx.profile.providers.push({ name: "", url: "" });
     invalidate();
-    render();
+    const i = ctx.profile.providers.length - 1;
+    $("#provider-list").insertAdjacentHTML(
+      "beforeend",
+      providerCard(ctx.profile.providers[i], i, i + 1),
+    );
+    syncProviderCards();
+    const slot = $("#provider-list").lastElementChild;
+    revealCard(slot);
+    slot.querySelector("input").focus({ preventScroll: true });
   }
   if (el.dataset.remove !== undefined) {
-    ctx.profile.providers.splice(Number(el.dataset.remove), 1);
+    if (busy || ctx.profile.providers.length <= 1) return;
+    const index = Number(el.dataset.remove),
+      slot = el.closest(".provider-slot");
+    ctx.profile.providers.splice(index, 1);
+    ctx.files = new Map(
+      [...ctx.files]
+        .filter(([i]) => i !== index)
+        .map(([i, file]) => [i > index ? i - 1 : i, file]),
+    );
+    slot.classList.add("is-removing");
+    slot.setAttribute("aria-hidden", "true");
+    slot
+      .querySelectorAll("input,button")
+      .forEach((input) => (input.disabled = true));
     invalidate();
-    render();
+    syncProviderCards();
+    revealCard(slot, true);
+    $("#add-provider").focus({ preventScroll: true });
   }
   if (el.dataset.regions) {
     ctx.profile.countries =

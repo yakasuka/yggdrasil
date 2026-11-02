@@ -1,0 +1,238 @@
+/* Shared rhythm: soft travel, quick response, no motion on routine re-renders. */
+:root {
+  --ease-fluid: cubic-bezier(0.22, 1, 0.36, 1);
+}
+#panel > *,
+#panel .provider-card,
+#panel .choice,
+#panel .region-choice,
+#panel .app-card,
+#panel .usage-card {
+  animation: none;
+}
+.provider-slot {
+  display: flow-root;
+  min-width: 0;
+}
+.provider-slot.is-removing {
+  pointer-events: none;
+}
+.provider-card {
+  transform-origin: top center;
+}
+.button,
+.icon-button,
+.text-button {
+  transition:
+    background 180ms var(--ease-fluid),
+    border-color 180ms var(--ease-fluid),
+    color 180ms var(--ease-fluid),
+    transform 180ms var(--ease-fluid);
+}
+
+/* The water remains one surface until it reaches its final bounds. */
+.loading-screen {
+  display: block;
+  opacity: 1;
+  animation: none;
+  transition: none;
+  visibility: visible;
+  transform-origin: 0 0;
+  will-change: transform;
+}
+.loading-copy {
+  position: fixed;
+  z-index: 101;
+  inset: 0;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  pointer-events: none;
+}
+.loading-screen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(4, 17, 27, 0.56), transparent 72%),
+    linear-gradient(0deg, rgba(3, 16, 25, 0.48), transparent 65%);
+  opacity: 0;
+  transition: opacity 1280ms cubic-bezier(0.77, 0, 0.175, 1);
+}
+html[data-intro="morphing"] .loading-screen::after,
+html[data-intro="revealed"] .loading-screen::after {
+  opacity: 1;
+}
+.loading-mark {
+  transform: none;
+  filter: drop-shadow(0 8px 20px #0006);
+  will-change: auto;
+}
+.loading-emblem::before {
+  opacity: 0.2;
+}
+html[data-intro="skip"] .loading-screen,
+html[data-intro="skip"] .loading-copy {
+  display: none;
+}
+.caustic-hero {
+  visibility: visible;
+}
+.caustic-hero.is-arriving {
+  animation: none;
+}
+.site-header,
+.journey,
+.workspace,
+.site-footer {
+  transition:
+    opacity 480ms var(--ease-fluid),
+    transform 600ms var(--ease-fluid);
+}
+html[data-intro="pending"]
+  :is(.site-header, .journey, .workspace, .site-footer),
+html[data-intro="morphing"]
+  :is(.site-header, .journey, .workspace, .site-footer) {
+  opacity: 0;
+  transform: translateY(16px);
+  pointer-events: none;
+}
+.caustic-copy,
+.caustic-meta,
+.caustic-hint {
+  transition:
+    opacity 420ms var(--ease-fluid),
+    transform 600ms var(--ease-fluid);
+  pointer-events: none;
+}
+.caustic-copy a {
+  pointer-events: auto;
+}
+html:not([data-intro="done"]):not([data-intro="skip"])
+  :is(.caustic-copy, .caustic-meta, .caustic-hint) {
+  opacity: 0;
+}
+
+/* A persistent spring cursor follows the step, including the parsing interlude. */
+#steps {
+  position: relative;
+  padding-left: 24px;
+}
+.step-cursor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 18px;
+  height: 18px;
+  color: var(--accent);
+  pointer-events: none;
+  will-change: transform;
+}
+.step-cursor svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+#steps .step-button,
+#steps .step-button[aria-current="step"],
+#steps .step-button:hover:not(:disabled) {
+  background: transparent;
+  box-shadow: none;
+  border-color: transparent;
+}
+#steps .step-button {
+  color: var(--muted);
+}
+#steps .step-button[aria-current="step"]:disabled {
+  opacity: 1;
+}
+#steps .step-button > span {
+  display: inline-flex;
+}
+#steps .step-button strong,
+#steps .parse-step strong {
+  display: inline-block;
+  transform-origin: left center;
+  transition:
+    color 300ms var(--ease-fluid),
+    transform 380ms var(--ease-fluid);
+}
+#steps .step-button[aria-current="step"] strong {
+  color: var(--accent);
+  transform: scale(1.14);
+}
+#steps .parse-step {
+  margin: 0;
+  padding: 8px;
+  min-height: 42px;
+}
+#steps .parse-step > span {
+  display: none;
+}
+#steps .parse-step.is-current strong {
+  color: var(--accent);
+  transform: scale(1.1);
+}
+.completion-confetti {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 110;
+  pointer-events: none;
+}
+@media (max-width: 680px) {
+  #steps {
+    padding: 18px 0 0;
+    gap: 3px;
+  }
+  .step-cursor svg {
+    transform: rotate(90deg);
+  }
+  #steps .parse-step {
+    display: flex;
+    flex: 0 0 34px;
+    justify-content: center;
+    padding: 0;
+    min-height: 36px;
+  }
+  #steps .parse-step strong {
+    font-size: 8px;
+    white-space: nowrap;
+  }
+  #steps .parse-step small {
+    display: none;
+  }
+  #steps .step-button strong {
+    transform-origin: center;
+  }
+  #steps .step-button[aria-current="step"] strong {
+    transform: scale(1.08);
+  }
+}
+@media (hover: none) {
+  .choice:hover,
+  .region-choice:hover,
+  .app-card:hover,
+  .button:hover {
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-header,
+  .journey,
+  .workspace,
+  .site-footer,
+  .caustic-copy,
+  .caustic-meta,
+  .caustic-hint,
+  #steps .step-button strong,
+  #steps .parse-step strong {
+    transition: none;
+  }
+  #steps .step-button[aria-current="step"] strong,
+  #steps .parse-step.is-current strong {
+    transform: none;
+  }
+}

@@ -10,16 +10,47 @@
     <meta name="color-scheme" content="light dark" />
     <meta name="referrer" content="no-referrer" />
     <title>config-builder · Yggdrasil</title>
+    <script>
+      (() => {
+        let seen = false;
+        try {
+          seen =
+            localStorage.getItem("yggdrasil:config-builder:intro-seen") ===
+            "yes";
+          document.documentElement.dataset.theme =
+            localStorage.getItem("yggdrasil:config-builder:theme") === "light"
+              ? "light"
+              : "dark";
+        } catch {}
+        const reload =
+          performance.getEntriesByType("navigation")[0]?.type === "reload";
+        document.documentElement.dataset.intro =
+          seen ||
+          reload ||
+          matchMedia("(prefers-reduced-motion: reduce)").matches
+            ? "skip"
+            : "pending";
+      })();
+    </script>
     <link rel="icon" href="../assets/favicon.png" type="image/png" />
-    <link rel="stylesheet" href="./assets/app.css?v=20261103" />
-    <script type="module" src="./assets/app.js?v=20261103"></script>
-    <script type="module" src="./src/theme.js?v=20261103"></script>
-    <script type="module" src="./src/caustics.js?v=20261103"></script>
+    <link rel="stylesheet" href="./assets/app.css?v=e764ca0a21db" />
+    <script type="module" src="./assets/app.js?v=b8529e5009dc"></script>
   </head>
   <body>
-    <div class="loading-screen" id="loading-screen" role="status" aria-label="正在加载配置工作台">
+    <div
+      class="loading-screen"
+      id="loading-screen"
+      role="status"
+      aria-label="正在加载配置工作台"
+    >
       <canvas id="caustic-water" aria-hidden="true"></canvas>
-      <div class="loading-copy"><span class="loading-emblem"><img class="loading-mark" src="../assets/favicon-master.png" alt="" /></span><p>RATATOSKR · CONFIG STUDIO</p><span>正在唤醒配置工作台</span></div>
+    </div>
+    <div class="loading-copy" id="loading-copy" aria-hidden="true">
+      <span class="loading-emblem"
+        ><img class="loading-mark" src="../assets/favicon-master.png" alt=""
+      /></span>
+      <p>RATATOSKR · CONFIG STUDIO</p>
+      <span>正在准备你的配置</span>
     </div>
     <a class="skip-link" href="#workspace">跳到配置内容</a>
     <header class="site-header">
@@ -34,8 +65,15 @@
       <div class="header-links">
         <span class="engine"><i></i> 为 Mihomo 而生</span>
         <div class="appearance-tools" aria-label="外观设置">
-          <button class="theme-toggle button secondary" id="theme-toggle" type="button" aria-label="切换到浅色模式" title="切换主题">
-            <span aria-hidden="true" id="theme-toggle-icon">☀︎</span><span id="theme-toggle-label">浅色</span>
+          <button
+            class="theme-toggle button secondary"
+            id="theme-toggle"
+            type="button"
+            aria-label="切换到浅色模式"
+            title="切换主题"
+          >
+            <span aria-hidden="true" id="theme-toggle-icon">☀︎</span
+            ><span id="theme-toggle-label">浅色</span>
           </button>
         </div>
         <a
@@ -48,9 +86,15 @@
     </header>
     <main class="layout">
       <section class="caustic-hero" aria-label="动态水面效果。点击水面产生涟漪">
-        <div class="caustic-meta"><span><i></i> RATATOSKR · CONFIG STUDIO</span><span>INTERACTIVE CAUSTICS <b>↗</b></span></div>
+        <div class="caustic-meta">
+          <span><i></i> RATATOSKR · CONFIG STUDIO</span
+          ><span>INTERACTIVE CAUSTICS <b>↗</b></span>
+        </div>
         <div class="caustic-copy">
-          <div><p>MAKE EVERY CONNECTION COUNT</p><h2>让信息，流向你想去的地方</h2></div>
+          <div>
+            <p>MAKE EVERY CONNECTION COUNT</p>
+            <h2>让信息，流向你想去的地方</h2>
+          </div>
           <a href="#workspace">开始配置 <span aria-hidden="true">↓</span></a>
         </div>
         <div class="caustic-hint">点击水面，感受涟漪 <span>↗</span></div>

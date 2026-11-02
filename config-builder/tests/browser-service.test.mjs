@@ -113,7 +113,7 @@ test("direct subscription failures retain HTTP, format and timeout distinctions 
       assert.ok(!message.includes("等待"));
       if (code === "SOURCE_HTTP" || code === "SOURCE_FORMAT")
         assert.ok(!message.includes("跨域"));
-      else assert.ok(message.includes("连接订阅服务"));
+      else assert.ok(message.includes("连接服务"));
       return true;
     });
   }
