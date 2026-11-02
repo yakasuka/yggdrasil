@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="从机场订阅、应用分流到地区策略，按需生成你的 Ratatoskr。"
+    />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="referrer" content="no-referrer" />
+    <title>config-builder · Yggdrasil</title>
+    <link rel="icon" href="../assets/favicon.png" type="image/png" />
+    <link rel="stylesheet" href="./assets/app.css" />
+    <script type="module" src="./assets/app.js"></script>
+    <script type="module" src="./src/theme.js"></script>
+    <script type="module" src="./src/caustics.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#workspace">跳到配置内容</a>
+    <header class="site-header">
+      <a class="brand" href="../" aria-label="Yggdrasil 项目首页"
+        ><img
+          src="../assets/favicon-master.png"
+          width="40"
+          height="40"
+          alt=""
+        /><span>Yggdrasil<small>世界树 · config-builder</small></span></a
+      >
+      <div class="header-links">
+        <span class="engine"><i></i> 为 Mihomo 而生</span
+        ><div class="appearance-tools" aria-label="外观设置">
+          <label class="theme-picker"
+            >主题<select id="theme-select" aria-label="选择主题">
+              <option value="light">Universe 浅色</option>
+              <option value="dark">Universe 深色</option>
+              <option value="system">跟随系统</option>
+            </select></label
+          >
+          <label
+            class="css-upload button secondary"
+            for="theme-css-file"
+            title="CSS 仅保存在此浏览器"
+            >自定义 CSS<input
+              id="theme-css-file"
+              type="file"
+              accept=".css,text/css"
+          /></label>
+          <button
+            class="text-button clear-theme-css"
+            id="clear-theme-css"
+            type="button"
+            hidden
+          >
+            清除
+          </button>
+        </div>
+        <a
+          href="https://github.com/yakasuka/yggdrasil"
+          target="_blank"
+          rel="noopener noreferrer"
+          >GitHub <span aria-hidden="true">↗</span></a
+        >
+      </div>
+    </header>
+    <main class="layout">
+      <section class="caustic-hero" aria-label="动态水面效果。点击水面产生涟漪">
+        <canvas id="caustic-water" aria-hidden="true"></canvas>
+        <div class="caustic-meta"><span><i></i> RATATOSKR · CONFIG STUDIO</span><span>INTERACTIVE CAUSTICS <b>↗</b></span></div>
+        <div class="caustic-copy">
+          <p>MAKE EVERY CONNECTION COUNT</p>
+          <h2>让连接，流向你想去的地方<span>.</span></h2>
+          <a href="#workspace">开始配置 <span aria-hidden="true">↓</span></a>
+        </div>
+        <div class="caustic-hint">点击水面，感受涟漪 <span>↗</span></div>
+      </section>
+      <aside class="journey" aria-label="配置进度">
+        <div class="eyebrow">YOUR CONFIGURATION</div>
+        <h1>从这里开始。</h1>
+        <p class="intro">
+          从一份订阅开始，长成属于你的网络。<br />每一条分流，都有自己的去向。
+        </p>
+        <nav id="steps" aria-label="配置步骤"></nav>
+        <div class="journey-note">
+          <span aria-hidden="true">✳</span>
+          <div>
+            <strong>轻量配置，深植 Geo。</strong>
+            <p>规则持续更新，枝叶按需展开。</p>
+          </div>
+        </div>
+      </aside>
+      <section
+        class="workspace"
+        id="workspace"
+        tabindex="-1"
+        aria-label="配置向导"
+      >
+        <div class="panel-top">
+          <span id="step-caption" class="eyebrow"></span
+          ><span class="chip">RATATOSKR</span>
+        </div>
+        <details class="service-settings" id="service-settings">
+          <summary>
+            <span id="service-label">正在检查订阅服务</span
+            ><span class="muted">连接设置</span>
+          </summary>
+          <div>
+            <p id="service-description" class="muted" role="status"></p>
+            <form id="service-form">
+              <label class="field"
+                >订阅服务地址<input
+                  id="service-origin"
+                  type="url"
+                  placeholder="https://你的服务域名"
+                  maxlength="2048"
+                  autocomplete="off"
+                  spellcheck="false"
+              /></label>
+              <p class="muted">
+                仅连接你信任的服务。这里只记住公开地址，不保存机场链接。
+              </p>
+              <div class="service-actions">
+                <button
+                  type="submit"
+                  class="button secondary"
+                  id="connect-service"
+                >
+                  连接并记住
+                </button>
+                <button type="button" class="text-button" id="retry-service">
+                  重试连接
+                </button>
+                <button type="button" class="text-button" id="reset-service">
+                  恢复默认
+                </button>
+              </div>
+            </form>
+          </div>
+        </details>
+        <div id="panel"></div>
+        <div id="error" class="error" role="alert" hidden></div>
+        <footer class="wizard-footer">
+          <button id="back" class="button secondary" type="button">
+            上一步</button
+          ><span id="progress-note"></span
+          ><button id="download" class="button secondary" type="button" hidden>
+            下载 YAML ↓</button
+          ><button id="next" class="button primary" type="button">
+            下一步 <span aria-hidden="true">→</span>
+          </button>
+        </footer>
+      </section>
+    </main>
+    <footer class="site-footer">
+      <span>Yggdrasil · 自由生长，生生不息。</span
+      ><a
+        href="https://github.com/yakasuka/yggdrasil#许可与反馈"
+        target="_blank"
+        rel="noopener noreferrer"
+        >许可与项目说明 ↗</a
+      >
+    </footer>
+    <dialog id="preview">
+      <div class="dialog-header">
+        <div>
+          <span class="eyebrow">CONFIGURATION</span>
+          <h2>你的 Ratatoskr</h2>
+        </div>
+        <button id="close-preview" class="icon-button" aria-label="关闭预览">
+          ×
+        </button>
+      </div>
+      <p class="muted">预览含机场订阅地址，请妥善保管。</p>
+      <pre id="yaml-preview" tabindex="0"></pre>
+    </dialog>
+    <div id="toast" role="status" hidden></div>
+    <noscript>请启用 JavaScript，以使用配置向导。</noscript>
+  </body>
+</html>
