@@ -1,1 +1,7 @@
-export { onRequestGet } from "./sub.js";
+import gateway from "../worker/gateway/index.js";
+
+export async function onRequestGet(context) {
+  const url = new URL(context.request.url);
+  url.pathname = "/sub";
+  return gateway.fetch(new Request(url, context.request), context.env);
+}
