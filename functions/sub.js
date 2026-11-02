@@ -26,10 +26,16 @@ export async function onRequestGet({ request, env }) {
       },
     });
     if (!response.ok)
-      return new Response(`Failed to read providers.yaml: GitHub HTTP ${response.status}`, {
-        status: 502,
-        headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store" },
-      });
+      return new Response(
+        `Failed to read providers.yaml: GitHub HTTP ${response.status}`,
+        {
+          status: 502,
+          headers: {
+            "Content-Type": "text/plain; charset=utf-8",
+            "Cache-Control": "no-store",
+          },
+        },
+      );
     const data = await response.json();
     if (!data.content || data.encoding !== "base64")
       return new Response("Invalid GitHub file response", { status: 502 });
@@ -46,9 +52,12 @@ export async function onRequestGet({ request, env }) {
       },
     });
   } catch {
-    return new Response("Failed to read node file", {
+    return new Response("Failed to read providers.yaml", {
       status: 502,
-      headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store" },
+      headers: {
+        "Content-Type": "text/plain; charset=utf-8",
+        "Cache-Control": "no-store",
+      },
     });
   }
 }

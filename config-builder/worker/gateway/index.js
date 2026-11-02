@@ -1,7 +1,7 @@
 import { SERVICE_ROUTES } from "../../shared/service-routes.js";
 import { createWorker } from "../application.js";
-import { onRequestGet as subscriptionRequest } from "../../functions/sub.js";
-import { onRequestGet as mergeRequest } from "../../functions/merge.js";
+import { onRequestGet as subscriptionRequest } from "../../../functions/sub.js";
+import { onRequestGet as mergeRequest } from "../../../functions/merge.js";
 const application = createWorker();
 // Only the files copied by build-gateway.mjs may be served as public assets.
 const publicAsset = (path) =>

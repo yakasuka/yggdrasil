@@ -10,13 +10,14 @@ async function readPrivateFile(env, filename) {
       "User-Agent": "yggdrasil-merge",
     },
   });
-  if (!response.ok) throw new Error(`Failed to read ${filename}: GitHub HTTP ${response.status}`);
+  if (!response.ok)
+    throw new Error(`Failed to read ${filename}: GitHub HTTP ${response.status}`);
   const data = await response.json();
   if (!data.content || data.encoding !== "base64")
     throw new Error(`Invalid GitHub response for ${filename}`);
   const binary = atob(data.content.replace(/\s/g, ""));
   return new TextDecoder("utf-8").decode(
-    Uint8Array.from(binary, (c) => c.charCodeAt(0)),
+    Uint8Array.from(binary, (character) => character.charCodeAt(0)),
   );
 }
 
@@ -55,7 +56,10 @@ export async function onRequestGet({ request, env }) {
   } catch (error) {
     return new Response(`Merge failed: ${error.message}`, {
       status: 502,
-      headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store" },
+      headers: {
+        "Content-Type": "text/plain; charset=utf-8",
+        "Cache-Control": "no-store",
+      },
     });
   }
 }
