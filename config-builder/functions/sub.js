@@ -26,7 +26,7 @@ export async function onRequestGet({ request, env }) {
       },
     });
     if (!response.ok)
-      return new Response(`Failed to read node file: GitHub HTTP ${response.status}`, {
+      return new Response(`Failed to read providers.yaml: GitHub HTTP ${response.status}`, {
         status: 502,
         headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store" },
       });
