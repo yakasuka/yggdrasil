@@ -1,1 +1,1 @@
-export { onRequestGet } from "../config-builder/functions/sub.js";
+export { onRequestGet } from "./sub.js";
