@@ -182,11 +182,11 @@ rules:
 #  - RULE-SET,⬇️ 下载域名,📦 下载均衡
 
   # ── Aethersailor 直连补丁 ──
-  - RULE-SET,↘️ 直连域名,DIRECT
-  - RULE-SET,📍 直连IP,DIRECT
+  - RULE-SET,🪐 Domain Bypass,DIRECT
+  - RULE-SET,🔮 IP Bypass,DIRECT
 
   # ── Aethersailor 代理补丁（仅兜底用，不越权）──
-  - RULE-SET,🌍 代理域名,🎚️ 节点选择
+  - RULE-SET,🕸️ Domain Route,🎚️ 节点选择
   - RULE-SET,🛰️ 代理 IP,🎚️ 节点选择
 
   # ── 国内流量直连 / China Direct ──
@@ -244,7 +244,7 @@ rules:
   - GEOSITE,category-entertainment,🍿 Entertainment
 
   # ── 端口补充 / Ports ──
-  - RULE-SET,🔀 端口直连规则,🔌 特殊端口
+  - RULE-SET,🔌 Portal,🔌 特殊端口
 
   # ── 通用代理 / Proxy ──
   - GEOSITE,gfw,🎚️ 节点选择
@@ -261,10 +261,10 @@ rule-anchor:
   classical: &RP-classical {type: http, behavior: classical, format: yaml, interval: 28800}
 
 rule-providers:
-  ↘️ 直连域名:         {<<: *RP-domain,    url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Direct_Domain.yaml"}
-  📍 直连IP:           {<<: *RP-classical, url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Direct_Classical_IP.yaml"}
-  🌍 代理域名:         {<<: *RP-domain,    url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Proxy_Domain.yaml"}
-  🛰️ 代理 IP:          {<<: *RP-classical, url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Proxy_Classical_IP.yaml"}
-  🔀 端口直连规则:     {<<: *RP-classical, url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Port_Direct.yaml"}
-#  ⬇️ 下载域名:          {<<: *RP-domain, url: "https://yggdrasil-afx.pages.dev/download-domains.yaml"}
+  🪐 Domain Bypass:         {<<: *RP-domain,    url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Direct_Domain.yaml"}
+  🔮 IP Bypass:           {<<: *RP-classical, url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Direct_Classical_IP.yaml"}
+  🕸️ Domain Route:         {<<: *RP-domain,    url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Proxy_Domain.yaml"}
+  🚀 IP Route:          {<<: *RP-classical, url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Proxy_Classical_IP.yaml"}
+  ⚡ Port Matrix:     {<<: *RP-classical, url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Port_Direct.yaml"}
+#  🚀 Download Nexus:          {<<: *RP-domain, url: "https://yggdrasil-afx.pages.dev/download-domains.yaml"}
 # =======================================================
