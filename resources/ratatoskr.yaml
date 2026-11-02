@@ -187,7 +187,7 @@ rules:
 
   # ── Aethersailor 代理补丁（仅兜底用，不越权）──
   - RULE-SET,🕸️ Domain Route,🎚️ 节点选择
-  - RULE-SET,🛰️ 代理 IP,🎚️ 节点选择
+  - RULE-SET,🚀 IP Route,🎚️ 节点选择
 
   # ── 国内流量直连 / China Direct ──
   - GEOSITE,cn,DIRECT
