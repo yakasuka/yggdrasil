@@ -15,7 +15,7 @@ export async function onRequestGet({ request, env }) {
     });
 
   const api =
-    "https://api.github.com/repos/yakasuka/yggdrasil-private/contents/providers.yaml";
+    "https://api.github.com/repos/yakasuka/yggdrasil-private/contents/nodes.yaml";
   try {
     const response = await fetch(api, {
       headers: {
@@ -27,7 +27,7 @@ export async function onRequestGet({ request, env }) {
     });
     if (!response.ok)
       return new Response(
-        `Failed to read providers.yaml: GitHub HTTP ${response.status}`,
+        `Failed to read nodes.yaml: GitHub HTTP ${response.status}`,
         {
           status: 502,
           headers: {
@@ -52,7 +52,7 @@ export async function onRequestGet({ request, env }) {
       },
     });
   } catch {
-    return new Response("Failed to read providers.yaml", {
+    return new Response("Failed to read nodes.yaml", {
       status: 502,
       headers: {
         "Content-Type": "text/plain; charset=utf-8",

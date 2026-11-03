@@ -199,13 +199,13 @@ Ratatoskr 将庞大的分类数据交给 Geo 数据库，将清晰的分流意�
 | 接口 | 实现与职责 |
 | :--- | :--- |
 | `/merge?token=…` | [merge.js](../functions/merge.js)：读取公开模板，将私有 `providers.yaml` 注入自动订阅标记区 |
-| `/sub?token=…` | [sub.js](../functions/sub.js)：读取私有 `providers.yaml`，原样返回订阅提供方 YAML |
+| `/sub?token=…` | [sub.js](../functions/sub.js)：读取私有 `nodes.yaml`，原样返回节点订阅 YAML |
 
 环境变量：`TOKEN` 用于接口鉴权，`GH_TOKEN` 用于读取私有仓库，`PUBLIC_CONFIG_URL` 指定合并接口使用的模板地址。
 
 以上为保留的旧接口，仍引用 `yakasuka/yggdrasil-private`；新的 Pages 构建不发布该目录，也不需要 GitHub 读取 Token。若另行启用旧接口，须同步配置仓库位置、凭据和模板地址，并保留成对的 `AUTO-PROVIDERS-START` / `AUTO-PROVIDERS-END` 标记。
 
-现有 `/merge` 获取公开配置并将私有 `providers.yaml` 注入自动订阅标记区；`/sub` 直接提供私有 `providers.yaml`。新的配置工坊使用独立的 [配置服务与网关](../config-builder/worker/README.md)，按网页选项生成配置。
+现有 `/merge` 获取公开配置并将私有 `providers.yaml` 注入自动订阅标记区；`/sub` 直接提供私有 `nodes.yaml`。新的配置工坊使用独立的 [配置服务与网关](../config-builder/worker/README.md)，按网页选项生成配置。
 
 </details>
 
