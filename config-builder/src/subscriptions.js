@@ -21,10 +21,10 @@ export function sourceFailureMessage(error, service) {
       : "浏览器未能读取订阅，可能受到跨域、网络或证书限制。";
   const help =
     service === "unconfigured"
-      ? "当前处于本地模式，请连接订阅服务或导入节点文件。"
+      ? "订阅服务尚未连接，请连接服务后重试。"
       : service === "mismatch"
-        ? "页面与订阅服务版本不一致，请更新后重试，或导入节点文件。"
-        : "订阅服务暂不可用，请重试连接或导入节点文件。";
+        ? "页面与订阅服务版本不一致，请更新后重试。"
+        : "订阅服务暂不可用，请重试连接。";
   return reason + help;
 }
 

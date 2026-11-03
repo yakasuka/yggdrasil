@@ -46,7 +46,7 @@ jobs:
         id: sync
         working-directory: .
         run: |
-          git add -- config-builder/shared/catalog.json config-builder/assets
+          git add -- config-builder/shared/catalog.json config-builder/assets config-builder/index.html
           if git diff --cached --quiet; then
             echo 'changed=false' >> "$GITHUB_OUTPUT"
           else

@@ -34,7 +34,7 @@ export async function probeService(origin, version, fetcher = fetch) {
     return {
       state: "unconfigured",
       message:
-        "可直接读取允许跨域的订阅，或导入节点文件。连接可信服务后，可代取订阅并生成持久链接。",
+        "可直接读取允许跨域的订阅。连接可信服务后，可代取订阅并生成持久链接。",
     };
   let response;
   try {
