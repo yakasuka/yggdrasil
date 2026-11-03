@@ -88,7 +88,7 @@ proxy-groups:
   - {name: 🚀 手动切换, type: select, include-all: true, filter: *FilterAll, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/proxy.png"}                                            # 全部节点手动选择入口
 
   # ── 自动选择 / Auto ──
-  - {name: ♻️ 自动选择, type: url-test, include-all: true, filter: *FilterAll, url: "https://www.gstatic.com/generate_204", interval: 300, tolerance: 50, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/proxy.png"}
+  - {name: ♻️ 自动选择, type: url-test, include-all: true, filter: *FilterAll, url: "https://www.gstatic.com/generate_204", interval: 300, tolerance: 50, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/yggdrasil.png"}
 
   # ── 故障转移 / Fallback ──
   - {name: 🔯 故障转移, type: fallback, include-all: true, filter: *FilterAll, url: "https://www.gstatic.com/generate_204", interval: 300, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/fallback.png"}
@@ -182,12 +182,12 @@ rules:
 #  - RULE-SET,⬇️ 下载域名,📦 下载均衡
 
   # ── Aethersailor 直连补丁 ──
-  - RULE-SET,🪐 Domain Bypass,DIRECT
-  - RULE-SET,🔮 IP Bypass,DIRECT
+  - RULE-SET,🪐 Astra Domain,DIRECT
+  - RULE-SET,🔮 Prism IP,DIRECT
 
   # ── Aethersailor 代理补丁（仅兜底用，不越权）──
-  - RULE-SET,🕸️ Domain Route,🎚️ 节点选择
-  - RULE-SET,🚀 IP Route,🎚️ 节点选择
+  - RULE-SET,🪐 Orbit Domain,🎚️ 节点选择
+  - RULE-SET,🚀 Voyager IP,🎚️ 节点选择
 
   # ── 国内流量直连 / China Direct ──
   - GEOSITE,cn,DIRECT
@@ -244,7 +244,7 @@ rules:
   - GEOSITE,category-entertainment,🍿 Entertainment
 
   # ── 端口补充 / Ports ──
-  - RULE-SET,⚡ Port Matrix,🔌 特殊端口
+  - RULE-SET,⚡ Matrix Port,🔌 特殊端口
 
   # ── 通用代理 / Proxy ──
   - GEOSITE,gfw,🎚️ 节点选择
@@ -261,10 +261,10 @@ rule-anchor:
   classical: &RP-classical {type: http, behavior: classical, format: yaml, interval: 28800}
 
 rule-providers:
-  🪐 Domain Bypass:         {<<: *RP-domain,    url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Direct_Domain.yaml"}
-  🔮 IP Bypass:           {<<: *RP-classical, url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Direct_Classical_IP.yaml"}
-  🕸️ Domain Route:         {<<: *RP-domain,    url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Proxy_Domain.yaml"}
-  🚀 IP Route:          {<<: *RP-classical, url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Proxy_Classical_IP.yaml"}
-  ⚡ Port Matrix:     {<<: *RP-classical, url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Port_Direct.yaml"}
-#  🚀 Download Nexus:          {<<: *RP-domain, url: "https://yggdrasil-afx.pages.dev/download-domains.yaml"}
+  🪐 Astra Domain:         {<<: *RP-domain,    url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Direct_Domain.yaml"}
+  🔮 Prism IP:           {<<: *RP-classical, url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Direct_Classical_IP.yaml"}
+  🪐 Orbit Domain:         {<<: *RP-domain,    url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Proxy_Domain.yaml"}
+  🚀 Voyager IP:          {<<: *RP-classical, url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Proxy_Classical_IP.yaml"}
+  ⚡ Matrix Port:     {<<: *RP-classical, url: "https://testingcf.jsdelivr.net/gh/Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Port_Direct.yaml"}
+  📦 Cargo Downloads:          {<<: *RP-domain, url: "https://testingcf.jsdelivr.net/gh/yakasuka/yggdrasil/resources/rules/download.yaml"}
 # =======================================================
