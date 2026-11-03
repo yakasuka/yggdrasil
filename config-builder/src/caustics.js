@@ -199,6 +199,9 @@ if (canvas && hero && stage) {
   }
   const surface = waterSurface();
   if (!skip) {
+    const holdDuration = 2100;
+    const morphDuration = 1500;
+    stage.style.setProperty("--intro-morph-duration", `${morphDuration}ms`);
     let done = false;
     const timers = [];
     const finish = () => {
@@ -215,76 +218,84 @@ if (canvas && hero && stage) {
       root.dataset.intro = "done";
       surface.resize();
       window.removeEventListener("resize", finish);
+      document.removeEventListener("keydown", skipOnKey);
+      reduced.removeEventListener("change", finish);
     };
-    copy?.querySelectorAll(":scope > *").forEach((part, i) =>
-      part.animate(
-        [
-          { opacity: 0, transform: "translateY(12px) scale(.96)" },
-          { opacity: 1, transform: "translateY(0) scale(1)" },
-        ],
-        { duration: 520, delay: i * 65, easing: EASE_OUT, fill: "both" },
-      ),
-    );
-    timers.push(
-      setTimeout(() => {
-        if (done) return;
-        const rect = hero.getBoundingClientRect();
-        const full = { width: innerWidth, height: innerHeight };
-        transitioning = true;
-        Object.assign(stage.style, {
-          inset: "auto",
-          left: `${rect.left}px`,
-          top: `${rect.top}px`,
-          width: `${rect.width}px`,
-          height: `${rect.height}px`,
-          transformOrigin: "0 0",
-        });
-        copy?.animate(
+    const skipOnKey = (event) => {
+      if (event.key === "Escape" || event.key === "Tab") finish();
+    };
+    const present = () => {
+      if (done) return;
+      copy?.querySelectorAll(":scope > *").forEach((part, i) =>
+        part.animate(
           [
-            { opacity: 1, transform: "translateY(0)" },
-            { opacity: 0, transform: "translateY(-8px)" },
+            { opacity: 0, transform: "translateY(12px) scale(.96)" },
+            { opacity: 1, transform: "translateY(0) scale(1)" },
           ],
-          { duration: 220, easing: EASE_OUT, fill: "forwards" },
-        );
-        root.dataset.intro = "morphing";
-        morph = stage.animate(
-          [
-            {
-              transform: `translate(${-rect.left}px, ${-rect.top}px) scale(${full.width / rect.width}, ${full.height / rect.height})`,
-              borderRadius: "0px",
-            },
-            {
-              transform: "translate(0, 0) scale(1, 1)",
-              borderRadius: getComputedStyle(hero).borderRadius,
-            },
-          ],
-          { duration: 1280, easing: EASE_MORPH, fill: "forwards" },
-        );
-        animatedView = () => {
-          const p = morph.effect.getComputedTiming().progress || 0;
-          return {
-            width: full.width + (rect.width - full.width) * p,
-            height: full.height + (rect.height - full.height) * p,
+          { duration: 650, delay: i * 90, easing: EASE_OUT, fill: "both" },
+        ),
+      );
+      timers.push(
+        setTimeout(() => {
+          if (done) return;
+          const rect = hero.getBoundingClientRect();
+          const full = { width: innerWidth, height: innerHeight };
+          transitioning = true;
+          Object.assign(stage.style, {
+            inset: "auto",
+            left: `${rect.left}px`,
+            top: `${rect.top}px`,
+            width: `${rect.width}px`,
+            height: `${rect.height}px`,
+            transformOrigin: "0 0",
+          });
+          copy?.animate(
+            [
+              { opacity: 1, transform: "translateY(0)" },
+              { opacity: 0, transform: "translateY(-8px)" },
+            ],
+            { duration: 350, easing: EASE_OUT, fill: "forwards" },
+          );
+          root.dataset.intro = "morphing";
+          morph = stage.animate(
+            [
+              {
+                transform: `translate(${-rect.left}px, ${-rect.top}px) scale(${full.width / rect.width}, ${full.height / rect.height})`,
+                borderRadius: "0px",
+              },
+              {
+                transform: "translate(0, 0) scale(1, 1)",
+                borderRadius: getComputedStyle(hero).borderRadius,
+              },
+            ],
+            { duration: morphDuration, easing: EASE_MORPH, fill: "forwards" },
+          );
+          animatedView = () => {
+            const p = morph.effect.getComputedTiming().progress || 0;
+            return {
+              width: full.width + (rect.width - full.width) * p,
+              height: full.height + (rect.height - full.height) * p,
+            };
           };
-        };
-        timers.push(
-          setTimeout(() => {
-            if (!done) root.dataset.intro = "revealed";
-          }, 800),
-        );
-        morph.finished.then(finish).catch(() => {});
-      }, 560),
-    );
-    // Bounded fallback and immediate escape for reduced motion or a resized viewport.
-    timers.push(setTimeout(finish, 2100));
+          timers.push(
+            setTimeout(() => {
+              if (!done) root.dataset.intro = "revealed";
+            }, 950),
+          );
+          morph.finished.then(finish).catch(() => {});
+        }, holdDuration),
+      );
+    };
+    // Start the visible hold after decoding; a slow or broken image never traps the UI.
+    const mark = copy?.querySelector(".loading-mark");
+    const decoded = mark?.decode?.().catch(() => {});
+    Promise.race([
+      decoded,
+      new Promise((resolve) => timers.push(setTimeout(resolve, 900))),
+    ]).then(present);
+    timers.push(setTimeout(finish, holdDuration + morphDuration + 1400));
     window.addEventListener("resize", finish);
     reduced.addEventListener("change", finish, { once: true });
-    document.addEventListener(
-      "keydown",
-      (event) => {
-        if (event.key === "Escape" || event.key === "Tab") finish();
-      },
-      { once: true },
-    );
+    document.addEventListener("keydown", skipOnKey);
   }
 }

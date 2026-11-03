@@ -241,13 +241,17 @@ function navigate(next) {
   render();
   enterPanel($("#panel"));
   $("#workspace").focus({ preventScroll: true });
-  if (matchMedia("(max-width:680px)").matches)
-    window.scrollTo({ top: 0, behavior: "instant" });
+  $("#workspace").scrollIntoView({
+    block: "start",
+    behavior: matchMedia("(prefers-reduced-motion: reduce)").matches
+      ? "instant"
+      : "smooth",
+  });
 }
 function renderService() {
   $("#service-label").textContent = {
     checking: "正在检查订阅服务",
-    unconfigured: "",
+    unconfigured: "本地配置模式",
     ready: "订阅服务已连接",
     offline: "订阅服务未连接",
     mismatch: "订阅服务版本不一致",
