@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/yggdrasil-mark.png" width="148" alt="Yggdrasil" />
+  <img src="assets/favicon.png" width="104" alt="Yggdrasil" />
 </p>
 
 <h1 align="center">Yggdrasil</h1>

@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="../assets/yggdrasil-mark.png" width="112" alt="Yggdrasil brand mark" />
+<img src="../assets/favicon.png" width="88" alt="Yggdrasil app icon" />
 
 # Yggdrasil
 
