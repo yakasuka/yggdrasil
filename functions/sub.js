@@ -49,7 +49,8 @@ export async function onRequestGet({ request, env }) {
         "Content-Disposition": "inline",
         "Cache-Control": "no-store",
         "X-Content-Type-Options": "nosniff",
-        "Subscription-Userinfo": "total=10000000000000",
+        "Subscription-Userinfo":
+          "upload=0; download=0; total=10000000000000",
       },
     });
   } catch {
