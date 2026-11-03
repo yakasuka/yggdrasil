@@ -49,6 +49,7 @@ export async function onRequestGet({ request, env }) {
         "Content-Disposition": "inline",
         "Cache-Control": "no-store",
         "X-Content-Type-Options": "nosniff",
+        "X-Subscription-Monthly-Quota": "10 TB / 月",
       },
     });
   } catch {
