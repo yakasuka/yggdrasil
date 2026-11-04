@@ -94,10 +94,10 @@ proxy-groups:
   - {name: 🔯 故障转移, type: fallback, include-all: true, filter: *FilterAll, url: "https://www.gstatic.com/generate_204", interval: 300, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/fallback.png"}
 
   # ── 负载均衡 / Load Balance ──
-  - {name: 🔮 负载均衡, type: load-balance, include-all: true, filter: *FilterAll, strategy: consistent-hashing, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/tracking.png"}   # 域名专用负载均衡入口
+  - {name: 🔮 负载均衡, type: load-balance, include-all: true, filter: *FilterAll, strategy: consistent-hashing, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/global.png"}   # 域名专用负载均衡入口
 
   # ── 下载均衡 / Download Balance ──
-  - {name: 📦 下载均衡,    type: load-balance, include-all: true, filter: *FilterAll, strategy: round-robin, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/global.png"}   # 下载多连接轮询均衡
+  - {name: 📦 下载均衡,    type: load-balance, include-all: true, filter: *FilterAll, strategy: round-robin, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/tracking.png"}   # 下载多连接轮询均衡
 
   # ── 应用分流 / Proxy App ──
   - {name: ⚡ OpenAI,      type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/chatgpt.png"}     # OpenAI / ChatGPT
@@ -120,7 +120,7 @@ proxy-groups:
   - {name: ♾️ Meta,        type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/instagram.png"}   # Meta (Facebook / Instagram / WhatsApp)
   - {name: 🪽 Telegram,    type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/telegram.png"}    # Telegram
   - {name: 🎮 Discord,     type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/discord.png"}     # Discord
-  - {name: 💬 Chat,        type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others]}
+  - {name: 💬 Chat,        type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/message.png"}
   - {name: 🫂 Social,      type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/social.png"}      # 社交杂项 (Reddit / Tumblr )
 
   - {name: 🎶 TikTok,      type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/tiktok.png"}      # TikTok / 字节跳动海外
