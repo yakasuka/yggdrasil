@@ -82,13 +82,13 @@ FilterOthers: &FilterOthers '^(?!.*(?:(?i)=>|(?i:🇭🇰|香港|Hong\s?Kong|\b(
 proxy-groups:
 
   # ── 策略入口 / Switch ──
-  - {name: 🎚️ 节点选择, type: select, proxies: [🚀 手动切换, ♻️ 自动选择, 🔯 故障转移, 🔮 负载均衡, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others, DIRECT], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/switch.png"}   # 全部节点开关
+  - {name: 🎚️ 节点选择, type: select, proxies: [🚀 手动切换, ⚡ 自动选择, 🔯 故障转移, 🔮 负载均衡, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others, DIRECT], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/switch.png"}   # 全部节点开关
 
   # ── 全部节点 / Proxy ──
   - {name: 🚀 手动切换, type: select, include-all: true, filter: *FilterAll, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/proxy.png"}                                            # 全部节点手动选择入口
 
   # ── 自动选择 / Auto ──
-  - {name: ♻️ 自动选择, type: url-test, include-all: true, filter: *FilterAll, url: "https://www.gstatic.com/generate_204", interval: 300, tolerance: 50, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/yggdrasil.png"}
+  - {name: ⚡ 自动选择, type: url-test, include-all: true, filter: *FilterAll, url: "https://www.gstatic.com/generate_204", interval: 300, tolerance: 50, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/yggdrasil.png"}
 
   # ── 故障转移 / Fallback ──
   - {name: 🔯 故障转移, type: fallback, include-all: true, filter: *FilterAll, url: "https://www.gstatic.com/generate_204", interval: 300, icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/fallback.png"}
@@ -103,12 +103,12 @@ proxy-groups:
   - {name: ⚡ OpenAI,      type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/chatgpt.png"}     # OpenAI / ChatGPT
   - {name: 🪐 Anthropic,   type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/claude.png"}      # Anthropic / Claude
   - {name: ✨ AI 服务,     type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/ai.png"}          # AI 杂项 (Perplexity / Groq / Cerebras / HuggingFace / Cursor / ElevenLabs / ComfyUI / 兜底)
-  - {name: 🟦 OKX,         type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/okx.png"}      # 加密货币
+  - {name: ⬛ OKX,         type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/okx.png"}      # 加密货币
   - {name: 🟨 Binance,     type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/binance.png"}      # 加密货币
-  - {name: 🟪 Bybit,       type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/bybit.png"}      # 加密货币
+  - {name: 🟧 Bybit,       type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/bybit.png"}      # 加密货币
   - {name: 🪙 Crypto,      type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/crypto.png"}      # 加密货币
   - {name: 📺 YouTube,     type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/youtube.png"}     # YouTube
-  - {name: 🧭 Google,      type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/google.png"}      # Google 全家桶
+  - {name: ✨ Google,      type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/google.png"}      # Google 全家桶
   - {name: ☁️ Cloudflare,  type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/cloudflare.png"}  # Cloudflare
   - {name: 📦 Amazon,      type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/amazon.png"}      # Amazon
   - {name: 🐙 GitHub,      type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/github.png"}      # GitHub
@@ -147,7 +147,7 @@ proxy-groups:
   #- {name: 😈 R18,         type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/r18.png"}         # 成人内容
 
   # ── 国内与兜底 / CN & Final ──
-  - {name: 🏮,             type: select, proxies: [DIRECT, 🎚️ 节点选择, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/cn.png"}          # 默认国内直连
+  - {name: 🏯 China,             type: select, proxies: [DIRECT, 🎚️ 节点选择, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/cn.png"}          # 默认国内直连
   - {name: 🏁 Final,       type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/assets/icons/final.png"}       # 未匹配流量
 
   # ── 地区节点 / Regions ──
@@ -227,15 +227,15 @@ rules:
   - GEOSITE,twitter,𝕏 X
   - GEOSITE,github,🐙 GitHub
   - GEOSITE,category-speedtest,⚡ Speedtest
-  - GEOSITE,okx,🟦 OKX
+  - GEOSITE,okx,⬛ OKX
   - GEOSITE,binance,🟨 Binance
-  - GEOSITE,bybit,🟪 Bybit
+  - GEOSITE,bybit,🟧 Bybit
   - GEOSITE,discord,🎮 Discord
   - GEOSITE,category-communication,💬 Chat
   - GEOSITE,category-social-media-!cn,🫂 Social
 #  - GEOSITE,teamviewer,↔️ teamviewer
   - GEOSITE,cloudflare,☁️ Cloudflare
-  - GEOSITE,google,🧭 Google
+  - GEOSITE,google,✨ Google
   - GEOSITE,microsoft,🪟 Microsoft
   - GEOSITE,category-cryptocurrency,🪙 Crypto
   - GEOSITE,amazon,📦 Amazon
