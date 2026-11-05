@@ -20,7 +20,7 @@
 
 Pages Functions 直接运行应用并访问 KV。标准部署只需要一个 Pages 项目和一个 KV namespace；`worker/index.js` 保留为兼容的独立 Worker 入口，当前方案无需部署它，也无需创建 `PROFILE_SERVICE` 服务绑定。
 
-公开链接使用自己的 Pages 域名或自有域名。`/config-builder/config.json` 按请求域名自动返回同源 `apiBase`，无需填写 `workers.dev` 地址。GitHub Pages 仍可承载静态向导；无法在静态站内执行 Functions 或连接 KV。
+公开链接使用自己的 Pages 域名或自有域名。前端固定请求同源 `/api/*`，与页面一起部署，不需要填写 `workers.dev` 地址，也没有"连接设置"或服务地址配置项。GitHub 只承载仓库与自动构建；静态站无法执行 Functions 或连接 KV，因此不再提供可用的 GitHub Pages 版向导。
 
 ## 2. 先填写部署模板
 
@@ -32,7 +32,7 @@ Pages Functions 直接运行应用并访问 KV。标准部署只需要一个 Pag
   "name": "yggdrasil-configurator",
   "pages_build_output_dir": "./worker/gateway/dist",
   "compatibility_date": "2026-10-01",
-  "vars": { "ALLOWED_ORIGINS": "https://yakasuka.github.io" },
+  "vars": { "ALLOWED_ORIGINS": "" },
   "kv_namespaces": [
     { "binding": "SUBSCRIPTIONS", "id": "REPLACE_WITH_KV_NAMESPACE_ID" },
   ],
@@ -43,7 +43,7 @@ Pages Functions 直接运行应用并访问 KV。标准部署只需要一个 Pag
 - `id` 替换为自己 KV namespace 的 ID。它是资源标识，不能拿其他账户的 ID 直接使用。
 - `binding` 保持 `SUBSCRIPTIONS`，代码通过这个名称访问存储。
 - 保留 `pages_build_output_dir` 和配置文件位置，避免本地发布与 Git 构建使用不同目录。
-- `ALLOWED_ORIGINS` 允许本项目的 GitHub Pages 前端连接服务。部署自己的副本时换成自己的前端 origin，多个来源以逗号分隔；不要填路径或使用通配符。
+- `ALLOWED_ORIGINS` 默认留空：页面与服务同源，浏览器请求不会被跨源检查拦截。只有确实要让另一个域名的前端调用本服务时，才填写那个前端的 origin（多个以逗号分隔）；不要填路径或使用通配符。
 
 配置启用后以 Wrangler 文件为配置来源，线上绑定应与文件保持一致。控制台手动添加的同名绑定不能作为配置文件正确性的替代品，详见 [Pages Wrangler 配置](https://developers.cloudflare.com/pages/functions/wrangler-configuration/)。
 
@@ -71,22 +71,33 @@ Pages Functions 直接运行应用并访问 KV。标准部署只需要一个 Pag
 
 ```jsonc
 "vars": {
-  "ALLOWED_ORIGINS": "https://yakasuka.github.io",
+  "ALLOWED_ORIGINS": "",
   "TCP_PROBE_ENABLED": "false"
 }
 ```
 
-### GitHub Pages 的服务接入
+### 只用免费云服务：GitHub 托管代码，Cloudflare 提供运行
 
-GitHub Pages 只发布静态页面，不运行仓库中的 Worker 或 KV。`config-builder/config.json` 的 `apiBase` 留空时，页面明确显示本地模式：可直接读取允许 CORS 的机场，或导入节点文件，继续选择地区、预览和下载。无法跨域的机场与持久订阅链接需要实际部署的订阅服务，等待或修改 Base64 参数不会自动建立该服务。
+整套服务不需要自建或租用服务器，由两个平台的免费额度组成：
 
-部署服务并通过 `/api/status` 验收后，可采用以下任一种接入方式：
+| 环节 | 服务 | 免费额度（2026 年，以官方为准） |
+| --- | --- | --- |
+| 代码仓库、版本管理、项目主页 | GitHub 公开仓库 + GitHub Pages | 公开仓库免费，Pages 静态站免费 |
+| 构建、测试、生成资源同步 | GitHub Actions `check.yml` | 公开仓库免费额度 |
+| 前端静态资源 + Functions 接口 | Cloudflare Pages（Git 集成） | 无限站点、无限静态带宽、每月 500 次构建；Functions 与 Workers 共用每天 10 万次请求 |
+| 加密配置与 YAML 快照 | Cloudflare Workers KV | 每天 10 万次读、1000 次写、1 GB 存储 |
+| 公网地址 | `*.pages.dev`，或免费套餐下的自有域名 | 自动 HTTPS，无需自管证书 |
 
-1. 在页面的“连接设置”中填写自己的 Pages 或自有域名 origin，点击“连接并记住”。这里只请求健康接口，验证成功后才记住公开地址；机场链接不会保存到本地存储。可以重试连接或恢复仓库默认设置。
-2. 维护者将真实 origin 写入 `config-builder/config.json` 的 `apiBase`，提交到 GitHub，为所有静态站访问者提供默认地址。
-3. 直接使用 Cloudflare Pages 的 `/config-builder/`，由运行时自动返回同源地址，不需要手工填写。
+前端已移除本地模式，固定请求同源 `/api/*`，所以**唯一可用的公开入口是 Pages 域名** `https://<项目名>.pages.dev/config-builder/`。GitHub Pages 上的 `/config-builder/` 静态副本即使发布，也只会显示"订阅服务未连接"；不要把它当作可用入口，也不要再为它配置跨域白名单。
 
-不填写未经部署验证的示例域名，也不把个人测试服务设为原仓库默认地址。跨域连接还要求服务的 `ALLOWED_ORIGINS` 包含网页 origin；前端会区分服务未连接、存储未绑定和模板版本不一致。地址只接受 origin，不带路径、账号、查询参数或 Token。
+部署顺序：
+
+1. 按第 2 节创建自己的 KV namespace，把 ID 写入 `config-builder/wrangler.jsonc`。
+2. 按第 3 节用 Cloudflare Pages 连接 GitHub 仓库，构建命令 `npm ci && npm run build && npm test`，输出目录 `worker/gateway/dist`，环境变量 `NODE_VERSION=22`。Git 集成在推送后自动构建发布，不需要 API Token。
+3. 在 Pages 项目的生产与预览环境绑定名为 `SUBSCRIPTIONS` 的 KV，按第 4 节验收 `/api/status`。
+4. 把 Pages 域名写进项目 README 作为唯一公开链接；仓库自带的 `Deploy Cloudflare Pages` 手动工作流仅在需要 CLI 发布时使用，届时才配置 `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID`。
+
+额度边界：KV 的每天 1000 次写入为整个账户共享，创建订阅每次写入一次；预览接口不写 KV。`worker/application.js` 已对 `/api/inspect`（20 次/分钟）、`/api/preview` 与 `/api/subscriptions`（10 次/分钟）、`/api/latency`（240 次/分钟）做单 IP 限流；公开部署可在 Cloudflare 控制台再加 WAF / Rate Limiting 规则。免费额度足够个人和小范围使用，超限后请求失败而不会自动计费；高频公开服务再考虑升级。
 
 `config-builder/wrangler.jsonc` 是标准 Pages 部署的唯一配置入口。旧网关的独立配置已移除；`/Configurator/`、`/webui/` 和 `/builder/` 在 Pages 服务中跳转到 `/config-builder/`。
 
@@ -103,7 +114,7 @@ https://your-project.pages.dev/api/status
 
 接下来完成一次完整业务流程：
 
-1. 填入一个授权使用的测试订阅，确认解析节点和地区。没有 CORS 时允许同源服务代取。
+1. 填入一个授权使用的测试订阅，确认由同源 `/api/inspect` 解析节点和地区。
 2. 选择地区、策略和 APP，填写配置名称，例如 `Example`；首次选择 3 小时有效期。
 3. 预览并下载 `Example-ratatoskr.yaml`，检查完整节点、地区去留和 `[P1]` / `[P2]` 标识。
 4. 创建订阅，确认 `/api/subscriptions` 返回 201，并使用响应中实际返回的地址读取 YAML，确认返回 200。
@@ -114,7 +125,7 @@ https://your-project.pages.dev/api/status
 mihomo -t -d /path/to/mihomo-data -f /path/to/Example-ratatoskr.yaml
 ```
 
-最后访问 `/config-builder/wrangler.jsonc`、`/config-builder/src/app.js`，应返回 404。绿色部署状态、GitHub 检查通过与业务验收是不同结果，需要分别确认。
+最后访问 `/config-builder/wrangler.jsonc`、`/config-builder/config.json`、`/config-builder/src/app.js`，应返回 404。绿色部署状态、GitHub 检查通过与业务验收是不同结果，需要分别确认。
 
 ## 5. 本地开发与手动发布
 
@@ -147,9 +158,9 @@ npm run service:deploy -- --branch main
 
 ## 6. 订阅格式、流量与存储
 
-网页先尝试直接读取机场；允许跨域访问时，在浏览器解析。浏览器被 CORS 限制时，通过同源 `/api/inspect` 读取；Base64 解码不能解除 CORS。
+网页把机场链接提交给同源 `/api/inspect`，由 Pages 服务端拉取、解码并只返回脱敏清单；浏览器不直接读取机场，因此不受 CORS 限制。完整节点只在用户主动预览、下载或持 Token 拉取时交付。Base64 是编码，不是解密。
 
-浏览器和服务端共用 [shared/subscription.js](../shared/subscription.js)，支持 YAML、JSON、标准或 URL-safe Base64，以及 VMess、SS、SSR、Trojan、VLESS、Hysteria2、TUIC 链接。Base64 是编码，解码需保留 UTF-8 名称。格式识别依据正文，即使响应被标为 `text/html` 也可以解析，不会执行 HTML。
+服务端使用 [shared/subscription.js](../shared/subscription.js) 解析订阅，支持 YAML、JSON、标准或 URL-safe Base64，以及 VMess、SS、SSR、Trojan、VLESS、Hysteria2、TUIC 链接。Base64 是编码，解码需保留 UTF-8 名称。格式识别依据正文，即使响应被标为 `text/html` 也可以解析，不会执行 HTML。
 
 域名机场使用服务端 `fetch()`；公网 IP 与自定义端口由 [worker/ip-fetch.js](../worker/ip-fetch.js) 使用原生 HTTP / TLS 读取。HTTPS 保留证书校验；重定向重新检查目标，连接、响应大小、解压和超时均有限制。不会把原始订阅发送到第三方转换服务。
 
@@ -182,7 +193,7 @@ npm run service:deploy -- --branch main
 | 测试工厂与生产入口混杂                          | 工厂移入 `application.js`，生产入口只默认导出 HTTP 处理器；此调整没有单独解决旧服务故障 |
 | Pages → 独立 Worker 链路持续不稳定              | Pages 直接运行应用并绑定 KV，移除标准部署对 Service Binding 的依赖                      |
 | YAML 订阅可用，Base64 不识别                    | 共用解析器将 Base64 / URI 转成 Mihomo 节点，编译完整 YAML                               |
-| 浏览器无法读取机场                              | 保留浏览器优先，遇到 CORS 时同源代取；支持本地节点文件导入                              |
+| 浏览器无法读取机场                              | 统一由同源 `/api/inspect` 代取；移除浏览器直连、本地文件导入与本地模式 |
 | 公网 IP 加非标准端口的源失败                    | 增加原生 TLS、HTTP 分块、压缩、关闭连接与超时处理，独立回归测试                         |
 | Base64 内容被标为 HTML                          | 根据正文识别格式，不依赖响应 MIME                                                       |
 | 转换后节点数量减少                              | 核对模板 filter，提示和不保留地区可能按规则被排除，不直接视为解析丢失                   |
@@ -202,7 +213,7 @@ npm run service:deploy -- --branch main
 1. 统一 config-builder 模块名、公开路径和同源配置，保留旧静态入口跳转。
 2. 增加健康接口、分层错误码、仅限健康探针的脱敏诊断。
 3. 分离测试工厂与生产入口，将业务与 KV 放入同一个 Pages 运行时。
-4. 加入浏览器优先拉取、共用 Base64 / URI 解码和文件导入。
+4. 加入服务端统一拉取、共用 Base64 / URI 解码；前端只保留同源接口调用。
 5. 将所选地区完整节点写入预览、下载与订阅 YAML，保留 P1/P2。
 6. 加入不写 KV 的预览接口、加密 v3 YAML 快照与旧 v2 读取兼容。
 7. 兼容公网 IP 与自定义端口的订阅，保留 TLS 验证和地址限制。

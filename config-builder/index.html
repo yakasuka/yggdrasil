@@ -34,8 +34,8 @@
     </script>
     <link rel="icon" href="../assets/favicon.png" type="image/png" />
     <link rel="preload" as="image" href="../assets/favicon.png" />
-    <link rel="stylesheet" href="./assets/app.css?v=1908eb8cedfe" />
-    <script type="module" src="./assets/app.js?v=dd70fac4be78"></script>
+    <link rel="stylesheet" href="./assets/app.css?v=83f4c1793bd5" />
+    <script type="module" src="./assets/app.js?v=eb2bf3d32839"></script>
   </head>
   <body>
     <div
@@ -134,39 +134,18 @@
         <details class="service-settings" id="service-settings">
           <summary>
             <span id="service-label">正在检查订阅服务</span
-            ><span class="muted">连接设置</span>
+            ><span class="muted">服务状态</span>
           </summary>
           <div>
             <p id="service-description" class="muted" role="status"></p>
-            <form id="service-form">
-              <label class="field"
-                >订阅服务地址<input
-                  id="service-origin"
-                  type="url"
-                  placeholder="https://你的服务域名"
-                  maxlength="2048"
-                  autocomplete="off"
-                  spellcheck="false"
-              /></label>
-              <p class="muted">
-                仅连接你信任的服务。这里只记住公开地址，不保存机场链接。
-              </p>
-              <div class="service-actions">
-                <button
-                  type="submit"
-                  class="button secondary"
-                  id="connect-service"
-                >
-                  连接并记住
-                </button>
-                <button type="button" class="text-button" id="retry-service">
-                  重试连接
-                </button>
-                <button type="button" class="text-button" id="reset-service">
-                  恢复默认
-                </button>
-              </div>
-            </form>
+            <p class="muted">
+              页面与订阅服务同源部署，机场链接仅在处理配置时发送给该服务。
+            </p>
+            <div class="service-actions">
+              <button type="button" class="text-button" id="retry-service">
+                重试连接
+              </button>
+            </div>
           </div>
         </details>
         <div id="panel"></div>

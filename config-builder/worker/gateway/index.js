@@ -61,19 +61,6 @@ export default {
     )
       return Response.redirect(new URL("/config-builder/", publicURL), 308);
     if (["GET", "HEAD"].includes(request.method)) {
-      if (publicURL.pathname === "/config-builder/config.json") {
-        const headers = {
-          "Cache-Control": "no-store",
-          "Content-Type": "application/json",
-          "X-Content-Type-Options": "nosniff",
-        };
-        return new Response(
-          request.method === "HEAD"
-            ? null
-            : JSON.stringify({ apiBase: publicURL.origin }),
-          { headers },
-        );
-      }
       if (publicAsset(publicURL.pathname))
         return env.ASSETS ? env.ASSETS.fetch(request) : failure();
     }
