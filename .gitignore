@@ -10,3 +10,38 @@ node_modules
 **/worker/wrangler.local.*
 test-results/
 **/worker/gateway/dist/
+
+# ── Local agent workspace / memory (never commit) ──
+.workbuddy/
+
+# ── Scratch files from local previews & checks ──
+.shots/
+._*
+.chk*.js
+*.tmp.png
+
+# ── Caches & build output ──
+node_modules/
+__pycache__/
+*.py[cod]
+.cache/
+.parcel-cache/
+.vite/
+.turbo/
+.eslintcache
+*.tsbuildinfo
+dist/
+build/
+coverage/
+playwright-report/
+*.log
+npm-debug.log*
+yarn-error.log*
+Thumbs.db
+Desktop.ini
+*.tmp
+*.swp
+*~
+.idea/
+.vscode/
+

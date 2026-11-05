@@ -1,687 +1,2058 @@
 <!DOCTYPE html>
-<html lang="zh-CN" class="dark scroll-smooth">
+<html lang="zh-CN">
 <head>
-    <link rel="icon" type="image/png" sizes="512x512" href="./assets/favicon.png?v=b9d535601980">
-    <meta name="theme-color" content="#05070a">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YGGDRASIL | 世界树 - 全自动分布式网络订阅中枢</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        obsidian: '#05070a',
-                        gold: {
-                            400: '#f5e298',
-                            500: '#d4af37',
-                            600: '#a38422'
-                        },
-                        cyber: {
-                            cyan: '#00f2fe',
-                            blue: '#4facfe'
-                        }
-                    },
-                    fontFamily: {
-                        serif: ['Cinzel', 'Georgia', 'serif'],
-                        sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif']
-                    }
-                }
-            }
-        }
-    </script>
-    <!-- Fonts & Icons -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Three.js & GSAP -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Yggdrasil — 全自动分布式网络订阅中枢</title>
+<meta name="description" content="Yggdrasil 以 Ratatoskr 为核心配置模板，将全球节点、路由规则与分流策略收敛为一份会自我进化的 Mihomo 配置。">
+<meta name="theme-color" content="#06100c">
+<link rel="icon" type="image/png" sizes="512x512" href="./assets/favicon.png?v=b9d535601980">
 
-    <style>
-        body {
-            background-color: #05070a;
-            color: #e2e8f0;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            overflow-x: hidden;
-        }
-        .cinzel { font-family: 'Cinzel', serif; }
-        
-        /* Glassmorphism */
-        .glass-panel {
-            background: rgba(10, 14, 23, 0.65);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(212, 175, 55, 0.18);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
-        }
-        .glass-card {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .glass-card:hover {
-            border-color: rgba(212, 175, 55, 0.4);
-            transform: translateY(-4px);
-            box-shadow: 0 10px 30px rgba(0, 242, 254, 0.15);
-        }
+<meta property="og:type" content="website">
+<meta property="og:title" content="Yggdrasil — 全自动分布式网络订阅中枢">
+<meta property="og:description" content="把上万节点、路由规则与分流策略，收敛成一份会自我进化的配置。">
+<meta property="og:image" content="./assets/favicon.png?v=b9d535601980">
 
-        /* Gold & Cyber Gradient Text */
-        .text-gold-gradient {
-            background: linear-gradient(135deg, #FFF5C0 0%, #D4AF37 50%, #AA8C2C 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .text-cyber-gradient {
-            background: linear-gradient(135deg, #00F2FE 0%, #4FACFE 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-        /* Canvas background */
-        #webgl-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            pointer-events: none;
-            z-index: 0;
-        }
-    
-        /* Premium cinematic world-tree treatment */
-        body {
-            background:
-                radial-gradient(ellipse at 50% 38%, rgba(43, 35, 18, .24) 0%, rgba(5, 7, 10, 0) 44%),
-                radial-gradient(ellipse at 82% 18%, rgba(13, 49, 57, .12) 0%, transparent 36%),
-                #05070a;
-        }
-        #webgl-canvas {
-            opacity: .9;
-            filter: saturate(.78) contrast(1.08);
-        }
-        .glass-panel {
-            background: linear-gradient(145deg, rgba(16, 18, 22, .80), rgba(7, 10, 15, .70));
-            border-color: rgba(211, 180, 98, .22);
-            box-shadow: 0 24px 80px rgba(0,0,0,.48), inset 0 1px 0 rgba(255,255,255,.035);
-        }
-        .glass-card {
-            background: linear-gradient(145deg, rgba(255,255,255,.045), rgba(255,255,255,.012));
-            border-color: rgba(255,255,255,.075);
-        }
-        .glass-card:hover {
-            border-color: rgba(211,180,98,.32);
-            transform: translateY(-3px);
-            box-shadow: 0 18px 45px rgba(0,0,0,.28);
-        }
-        .text-gold-gradient {
-            background: linear-gradient(115deg, #fff7d8 4%, #e6cb80 30%, #b48a3b 62%, #f2e4b0 90%);
-            background-size: 180% auto;
-            animation: goldSheen 12s ease-in-out infinite alternate;
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        header {
-            background: rgba(5, 7, 10, .66) !important;
-            border-bottom-color: rgba(222, 193, 124, .09) !important;
-            box-shadow: 0 8px 40px rgba(0,0,0,.12);
-        }
-        header button, main button, main a[class*="rounded-full"] {
-            transition: transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s ease, border-color .35s ease, opacity .35s ease;
-        }
-        header button:hover, main button:hover {
-            box-shadow: 0 0 28px rgba(210,177,95,.13);
-        }
-        #section-hero h1 {
-            text-shadow: 0 0 55px rgba(207, 170, 77, .10);
-            letter-spacing: .045em;
-        }
-        #section-hero > div::before {
-            content: "";
-            position: absolute;
-            left: 50%;
-            top: 50%;
-            width: min(76vw, 760px);
-            height: min(76vw, 760px);
-            transform: translate(-50%, -46%);
-            border: 1px solid rgba(214, 183, 105, .055);
-            border-radius: 50%;
-            box-shadow: 0 0 0 42px rgba(214,183,105,.018), 0 0 0 90px rgba(214,183,105,.012);
-            pointer-events: none;
-            z-index: -1;
-        }
-        #section-breakthrough, #section-modular, #section-autonomous {
-            isolation: isolate;
-        }
-        #section-breakthrough .glass-panel, #section-modular .glass-panel, #section-autonomous .glass-panel {
-            backdrop-filter: blur(24px) saturate(120%);
-            -webkit-backdrop-filter: blur(24px) saturate(120%);
-        }
-        #section-autonomous input {
-            letter-spacing: .015em;
-        }
-        #toast {
-            box-shadow: 0 18px 60px rgba(0,0,0,.42);
-        }
-        @keyframes goldSheen {
-            from { background-position: 0% center; }
-            to { background-position: 100% center; }
-        }
-        @media (prefers-reduced-motion: reduce) {
-            .text-gold-gradient { animation: none; }
-            *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
-        }
-        @media (max-width: 640px) {
-            #webgl-canvas { opacity: .65; }
-            #section-hero h1 { letter-spacing: .015em; }
-            #section-autonomous .glass-panel { padding: 1.35rem; }
-            #toast { left: 1rem; right: 1rem; bottom: 1rem; }
-        }
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
-    </style>
+<style>
+/* ─────────────────────────────────────────────
+   Design tokens — Apple-leaning neutrals
+   ───────────────────────────────────────────── */
+:root{
+  --bg:#fbfbfd;
+  --surface:#f5f5f7;
+  --surface-2:#ffffff;
+  --ink:#1d1d1f;
+  --ink-2:#6e6e73;
+  --ink-3:#86868b;
+  --hairline:rgba(0,0,0,.10);
+  --hairline-strong:rgba(0,0,0,.16);
+  --accent:#0071e3;
+  --accent-hover:#0077ed;
+  --dark:#000000;
+  --dark-ink:#f5f5f7;
+  --ease:cubic-bezier(.16,1,.3,1);
+  --nav-h:48px;
+  --maxw:1180px;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+
+html{
+  -webkit-text-size-adjust:100%;
+  scroll-behavior:smooth;
+  scroll-padding-top:72px;
+}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:"Inter",-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Helvetica Neue","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  font-size:17px;
+  line-height:1.47;
+  letter-spacing:-.011em;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  overflow-x:hidden;
+}
+
+::selection{background:#1d1d1f;color:#fff}
+
+a{color:inherit}
+
+/* ─────────────────────────────────────────────
+   Layers — the tree is scoped to the hero stage. It never bleeds
+   through the white content sections below.
+   ───────────────────────────────────────────── */
+.backdrop{
+  position:fixed;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  background:
+    radial-gradient(120% 70% at 50% -10%, #ffffff 0%, rgba(255,255,255,0) 58%),
+    radial-gradient(90% 55% at 50% 108%, #f0f0f4 0%, rgba(240,240,244,0) 62%),
+    var(--bg);
+}
+
+/* All three visual layers are children of .hero, which owns the dark
+   stage and the stacking context. No fixed canvases over the whole page. */
+#tree,#ornaments,#sparkles{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  pointer-events:none;
+}
+#tree{z-index:1;opacity:.92}
+#tree.intro-fly{opacity:1}
+#ornaments{z-index:2;overflow:hidden}
+#sparkles{z-index:2}
+
+.orn{
+  position:absolute;
+  left:0;top:0;
+  width:38px;height:38px;
+  margin:-19px 0 0 -19px;
+  padding:2px;
+  border-radius:11px;
+  background:rgba(10,24,18,.72);
+  border:1px solid rgba(226,196,132,.34);
+  box-shadow:0 10px 22px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.10);
+  will-change:transform;
+}
+.orn img{
+  display:block;
+  width:100%;height:100%;
+  border-radius:9px;
+  object-fit:cover;
+}
+.orn::before{
+  content:"";
+  position:absolute;
+  left:50%;top:-13px;
+  width:1px;height:13px;
+  background:linear-gradient(rgba(214,178,110,0),rgba(226,190,120,.72));
+}
+.orn::after{
+  content:"";
+  position:absolute;
+  left:50%;top:-16px;
+  width:6px;height:6px;
+  margin-left:-3px;
+  border:1px solid rgba(232,198,132,.8);
+  border-radius:50%;
+}
+/* Below the two-column breakpoint the tree becomes a genuinely quiet
+   backdrop. On a dark stage low opacity means deeper green, never the
+   washed-out grey that the same trick produces on white paper. */
+@media (max-width:900px){
+  #tree{opacity:.42}
+}
+@media (max-width:720px){
+  .orn{width:31px;height:31px;margin:-15.5px 0 0 -15.5px;border-radius:10px}
+  .orn img{border-radius:8px}
+}
+
+main{position:relative;z-index:3}
+
+/* ─────────────────────────────────────────────
+   Nav
+   ───────────────────────────────────────────── */
+#nav{
+  position:fixed;
+  top:0;left:0;right:0;
+  z-index:60;
+  height:var(--nav-h);
+  background:rgba(7,17,13,.42);
+  -webkit-backdrop-filter:saturate(180%) blur(20px);
+  backdrop-filter:saturate(180%) blur(20px);
+  border-bottom:1px solid rgba(255,255,255,.07);
+  transition:background .4s var(--ease),border-color .4s var(--ease);
+}
+/* Over the dark stage the nav is dark; once the white content scrolls up
+   underneath, it flips back to the light frosted bar. */
+#nav.scrolled{
+  background:rgba(251,251,253,.80);
+  border-bottom-color:rgba(0,0,0,.08);
+}
+
+.nav-inner{
+  max-width:1024px;
+  height:100%;
+  margin:0 auto;
+  padding:0 22px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+}
+
+.brand{
+  display:inline-flex;
+  align-items:center;
+  gap:9px;
+  text-decoration:none;
+  color:#f5f5f7;
+  font-size:15px;
+  font-weight:600;
+  letter-spacing:-.02em;
+  opacity:.92;
+  transition:opacity .3s var(--ease),color .4s var(--ease);
+}
+#nav.scrolled .brand{color:var(--ink)}
+.brand:hover{opacity:1}
+.brand img{width:20px;height:20px;display:block;border-radius:5.5px;box-shadow:0 1px 3px rgba(0,0,0,.14)}
+
+.nav-links{
+  display:flex;
+  align-items:center;
+  gap:32px;
+}
+.nav-links a{
+  position:relative;
+  font-size:12px;
+  font-weight:400;
+  letter-spacing:.01em;
+  color:rgba(245,245,247,.72);
+  text-decoration:none;
+  transition:color .3s var(--ease);
+}
+#nav.scrolled .nav-links a{color:rgba(29,29,31,.72)}
+.nav-links a:hover,#nav.scrolled .nav-links a:hover{color:var(--ink)}
+#nav:not(.scrolled) .nav-links a:hover{color:#fff}
+.nav-links a.active{color:#fff}
+#nav.scrolled .nav-links a.active{color:var(--ink)}
+.nav-links a.active::after{
+  content:"";
+  position:absolute;
+  left:50%;
+  bottom:-21px;
+  width:3px;height:3px;
+  margin-left:-1.5px;
+  border-radius:50%;
+  background:currentColor;
+  opacity:.55;
+}
+
+/* ─────────────────────────────────────────────
+   Buttons
+   ───────────────────────────────────────────── */
+.btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  height:46px;
+  padding:0 25px;
+  border:0;
+  border-radius:980px;
+  font-family:inherit;
+  font-size:16px;
+  font-weight:500;
+  letter-spacing:-.01em;
+  text-decoration:none;
+  white-space:nowrap;
+  cursor:pointer;
+  transition:background-color .3s var(--ease),color .3s var(--ease),transform .25s var(--ease),opacity .3s var(--ease);
+}
+.btn:active{transform:scale(.975)}
+
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent-hover)}
+
+.btn-sm{height:30px;padding:0 15px;font-size:12px;letter-spacing:0}
+
+.btn-text{
+  height:46px;
+  padding:0 4px;
+  background:none;
+  color:var(--accent);
+  font-weight:400;
+}
+.btn-text:hover{text-decoration:underline}
+.chev{display:inline-block;margin-left:5px;font-size:1.02em;transform:translateY(-.045em)}
+
+/* ─────────────────────────────────────────────
+   Typography helpers
+   ───────────────────────────────────────────── */
+.eyebrow{
+  margin:0 0 18px;
+  font-size:12px;
+  font-weight:600;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:var(--ink-3);
+}
+
+.h2{
+  margin:0;
+  font-size:clamp(34px,4.6vw,54px);
+  line-height:1.07;
+  letter-spacing:-.032em;
+  font-weight:600;
+}
+
+.body-lg{
+  margin:0;
+  font-size:clamp(17px,1.55vw,21px);
+  line-height:1.5;
+  letter-spacing:-.014em;
+  color:var(--ink-2);
+  font-weight:400;
+}
+
+.section{
+  position:relative;
+  padding:clamp(88px,13vh,168px) 24px;
+}
+.section-inner{
+  max-width:var(--maxw);
+  margin:0 auto;
+}
+
+.section-head{
+  max-width:740px;
+  margin:0 auto clamp(48px,6vw,80px);
+  text-align:center;
+}
+.section-head .body-lg{margin-top:22px}
+
+/* ─────────────────────────────────────────────
+   Hero — a dark, self-contained stage.
+   A saturated tree on deep evergreen reads as a real object. The same
+   tree at 40% over white paper can only ever read as grey haze.
+   ───────────────────────────────────────────── */
+.hero{
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+  min-height:100vh;
+  min-height:100svh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:calc(var(--nav-h) + 84px) 24px 40px;
+  text-align:center;
+  color:#f5f5f7;
+  background:
+    radial-gradient(46% 34% at 71% 12%, rgba(214,168,86,.10) 0%, rgba(214,168,86,0) 76%),
+    radial-gradient(64% 66% at 70% 52%, rgba(22,66,46,.34) 0%, rgba(8,20,15,0) 78%),
+    radial-gradient(38% 14% at 70% 88%, rgba(214,168,86,.085) 0%, rgba(214,168,86,0) 78%),
+    linear-gradient(180deg,#06100c 0%,#0a1712 55%,#07120e 100%);
+}
+
+/* Two clean columns: type on the left, the tree as one complete,
+   unobstructed object on the right. Nothing overlaps. */
+.hero-grid{
+  position:relative;
+  z-index:3;
+  width:100%;
+  max-width:var(--maxw);
+  margin:0 auto;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  gap:40px;
+}
+.hero-copy{grid-column:1;max-width:560px;text-align:left}
+.hero-inner{position:relative;z-index:3;width:100%;max-width:560px;margin:0}
+
+/* The entrance owns the whole screen. Hero copy appears all at once —
+   no staggered fades, no haze behind the type. */
+body.intro-stage .hero [data-reveal],
+body.intro-stage .scroll-hint{
+  opacity:0!important;
+  transform:none!important;
+  transition:none!important;
+  animation:none!important;
+}
+
+.hero-icon{
+  display:block;
+  width:clamp(76px,7vw,100px);
+  height:auto;
+  margin:0 0 26px;
+  border-radius:24%;
+  box-shadow:
+    0 26px 58px -12px rgba(0,0,0,.62),
+    0 6px 16px rgba(0,0,0,.38);
+}
+
+.hero-tag{
+  margin:18px 0 0;
+  font-size:14px;
+  font-weight:500;
+  letter-spacing:.02em;
+  color:#b7c6bd;
+}
+
+.hero h1{
+  margin:0;
+  font-size:clamp(54px,7.1vw,98px);
+  line-height:.9;
+  letter-spacing:-.055em;
+  font-weight:700;
+  color:#f7f8f7;
+  text-shadow:0 3px 42px rgba(2,10,6,.62);
+}
+
+.hero .lede{
+  margin:14px 0 0;
+  max-width:470px;
+  font-size:clamp(16px,1.5vw,20px);
+  line-height:1.46;
+  letter-spacing:-.018em;
+  color:#c4d0c8;
+  font-weight:400;
+}
+
+.cta-row{
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  gap:26px;
+  flex-wrap:wrap;
+  margin-top:30px;
+}
+.hero .btn-primary{background:#f5f5f7;color:#0a1712}
+.hero .btn-primary:hover{background:#fff}
+.hero .btn-text{color:#92c9ff}
+
+.hero-stats{
+  position:relative;
+  z-index:3;
+  width:100%;
+  max-width:560px;
+  margin:clamp(36px,5vh,54px) 0 0;
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  border-top:1px solid rgba(255,255,255,.18);
+  padding-top:22px;
+}
+.hero-stats div{
+  padding:0 10px;
+  border-right:1px solid rgba(255,255,255,.14);
+  text-align:left;
+}
+.hero-stats div:last-child{border-right:0}
+.hero-stats strong{
+  display:block;
+  font-size:clamp(17px,1.8vw,23px);
+  font-weight:600;
+  letter-spacing:-.03em;
+  color:#f7f8f7;
+  font-variant-numeric:tabular-nums;
+}
+.hero-stats span{
+  display:block;
+  margin-top:4px;
+  font-size:12px;
+  letter-spacing:0;
+  color:#8fa196;
+}
+
+.scroll-hint{
+  position:relative;
+  z-index:3;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:8px;
+  margin-top:clamp(24px,3.6vh,38px);
+  font-size:11px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:#8fa196;
+}
+.scroll-hint svg{
+  width:16px;height:16px;
+  animation:drift 2.4s var(--ease) infinite;
+  opacity:.7;
+}
+/* Narrow screens go back to a single centred column; the tree settles
+   behind the copy as a quiet, darker backdrop. */
+@media (max-width:900px){
+  .hero-grid{grid-template-columns:1fr;gap:0}
+  .hero-copy{max-width:none;text-align:center}
+  .hero-inner{max-width:none;margin:0 auto}
+  .hero-icon{margin:0 auto 24px}
+  .hero h1{font-size:clamp(56px,11vw,104px)}
+  .hero .lede{margin:12px auto 0;max-width:600px}
+  .cta-row{justify-content:center}
+  .hero-stats{max-width:700px;margin:clamp(34px,5.5vh,56px) auto 0}
+  .hero-stats div{text-align:center}
+  .scroll-hint{align-items:center}
+}
+@keyframes drift{
+  0%,100%{transform:translateY(0);opacity:.35}
+  50%{transform:translateY(5px);opacity:.85}
+}
+
+/* ─────────────────────────────────────────────
+   Feature grid
+   ───────────────────────────────────────────── */
+.grid-3{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+}
+
+.card{
+  position:relative;
+  border-radius:22px;
+  background:var(--surface);
+  padding:34px 32px 36px;
+  transition:transform .5s var(--ease),box-shadow .5s var(--ease),background-color .4s var(--ease);
+  will-change:transform;
+}
+.card:hover{
+  transform:translateY(-3px);
+  box-shadow:0 22px 48px -20px rgba(0,0,0,.16);
+  background:#f2f2f5;
+}
+
+.card .ico{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:38px;height:38px;
+  margin-bottom:22px;
+  border-radius:11px;
+  background:#fff;
+  box-shadow:0 1px 2px rgba(0,0,0,.06),inset 0 0 0 1px rgba(0,0,0,.045);
+  color:var(--ink);
+}
+.card .ico svg{width:19px;height:19px}
+
+.card h3{
+  margin:0 0 8px;
+  font-size:17px;
+  font-weight:600;
+  letter-spacing:-.021em;
+}
+.card p{
+  margin:0;
+  font-size:14px;
+  line-height:1.55;
+  letter-spacing:-.006em;
+  color:var(--ink-2);
+}
+
+.card .meta{
+  margin-top:22px;
+  display:flex;
+  align-items:baseline;
+  gap:8px;
+  font-size:12px;
+  color:var(--ink-3);
+  letter-spacing:.02em;
+}
+.card .meta b{
+  font-size:20px;
+  font-weight:600;
+  letter-spacing:-.03em;
+  color:var(--ink);
+  font-variant-numeric:tabular-nums;
+}
+
+/* ─────────────────────────────────────────────
+   Bento
+   ───────────────────────────────────────────── */
+.bento{
+  display:grid;
+  grid-template-columns:repeat(6,minmax(0,1fr));
+  gap:14px;
+}
+.bento .card{min-height:250px;display:flex;flex-direction:column}
+.bento .card p{margin-top:auto}
+.span-4{grid-column:span 4}
+.span-3{grid-column:span 3}
+.span-2{grid-column:span 2}
+.span-6{grid-column:span 6}
+
+.bento .card.dark{
+  background:#0a0a0c;
+  color:var(--dark-ink);
+}
+.bento .card.dark:hover{background:#111114;box-shadow:0 26px 60px -26px rgba(0,0,0,.55)}
+.bento .card.dark h3{color:var(--dark-ink)}
+.bento .card.dark p{color:rgba(245,245,247,.62)}
+.bento .card.dark .meta{color:rgba(245,245,247,.45)}
+.bento .card.dark .meta b{color:var(--dark-ink)}
+.bento .card.dark .ico{
+  background:rgba(255,255,255,.08);
+  color:#fff;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.12);
+}
+
+.bento .card.card-wide{
+  display:grid;
+  grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);
+  gap:30px;
+  align-items:end;
+  padding:34px 32px 30px;
+}
+.card-wide .copy{
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-end;
+  height:100%;
+}
+.card-wide .copy p{margin-top:8px}
+
+.wave{
+  display:flex;
+  align-items:flex-end;
+  justify-content:flex-end;
+  gap:4px;
+  height:74px;
+  min-width:0;
+  overflow:hidden;
+  opacity:.9;
+}
+.wave i{
+  display:block;
+  width:5px;
+  border-radius:3px;
+  transform-origin:bottom center;
+  background:#c9c9cf;
+  animation:beat 2.6s var(--ease) infinite;
+}
+.bento .card.dark .wave i{background:rgba(255,255,255,.42)}
+@keyframes beat{
+  0%,100%{transform:scaleY(.28)}
+  50%{transform:scaleY(1)}
+}
+
+/* ─────────────────────────────────────────────
+   Specs
+   ───────────────────────────────────────────── */
+.specs-list{
+  max-width:860px;
+  margin:0 auto;
+  border-top:1px solid var(--hairline);
+}
+.spec-row{
+  display:grid;
+  grid-template-columns:210px 1fr;
+  gap:28px;
+  padding:22px 2px;
+  border-bottom:1px solid var(--hairline);
+  font-size:15px;
+  line-height:1.55;
+  align-items:baseline;
+}
+.spec-row dt{
+  color:var(--ink-3);
+  font-size:14px;
+  letter-spacing:0;
+}
+.spec-row dd{
+  margin:0;
+  color:var(--ink);
+  letter-spacing:-.01em;
+}
+.spec-row dd em{
+  font-style:normal;
+  color:var(--ink-2);
+}
+
+/* ─────────────────────────────────────────────
+   Dark evolve section
+   ───────────────────────────────────────────── */
+.dark-section{
+  position:relative;
+  background:var(--dark);
+  color:var(--dark-ink);
+  padding:clamp(96px,15vh,180px) 24px;
+  overflow:hidden;
+}
+.dark-section::before{
+  content:"";
+  position:absolute;
+  inset:-20% -10% auto;
+  height:70%;
+  background:radial-gradient(50% 60% at 50% 0%, rgba(199,169,97,.16) 0%, rgba(199,169,97,0) 72%);
+  pointer-events:none;
+}
+.dark-section .section-inner{position:relative}
+
+.dark-section .eyebrow{color:rgba(245,245,247,.42)}
+.dark-section .h2{color:var(--dark-ink)}
+.dark-section .body-lg{color:rgba(245,245,247,.62)}
+
+.url-card{
+  max-width:760px;
+  margin:clamp(44px,6vw,64px) auto 0;
+  border-radius:20px;
+  background:rgba(255,255,255,.055);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.11);
+  padding:18px;
+  -webkit-backdrop-filter:blur(20px);
+  backdrop-filter:blur(20px);
+}
+.url-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:2px 6px 14px;
+  font-size:12px;
+  letter-spacing:0;
+  color:rgba(245,245,247,.55);
+}
+.url-head .live{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+}
+.url-head .live img{
+  border-radius:4px;
+  box-shadow:0 1px 3px rgba(0,0,0,.35);
+  flex:none;
+}
+.url-field{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:6px 6px 6px 16px;
+  border-radius:14px;
+  background:rgba(0,0,0,.42);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);
+}
+.url-field input{
+  flex:1;
+  min-width:0;
+  border:0;
+  outline:none;
+  background:transparent;
+  color:rgba(245,245,247,.86);
+  font-family:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+  font-size:13px;
+  letter-spacing:0;
+  padding:10px 0;
+  text-overflow:ellipsis;
+}
+
+.chips{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:8px;
+  max-width:760px;
+  margin:34px auto 0;
+}
+.chips span{
+  padding:7px 14px;
+  border-radius:980px;
+  font-size:12px;
+  letter-spacing:.01em;
+  color:rgba(245,245,247,.68);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.13);
+  transition:color .3s var(--ease),box-shadow .3s var(--ease);
+}
+.chips span:hover{
+  color:#fff;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.3);
+}
+
+/* ─────────────────────────────────────────────
+   Footer
+   ───────────────────────────────────────────── */
+footer{
+  position:relative;
+  z-index:3;
+  background:var(--bg);
+  border-top:1px solid var(--hairline);
+  padding:52px 24px 46px;
+  font-size:12px;
+  line-height:1.7;
+  color:var(--ink-3);
+  letter-spacing:0;
+}
+.foot-inner{
+  max-width:1024px;
+  margin:0 auto;
+  display:flex;
+  flex-wrap:wrap;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:28px;
+}
+.foot-brand{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  color:var(--ink-2);
+  font-weight:600;
+  font-size:13px;
+  letter-spacing:-.01em;
+}
+.foot-brand img{width:18px;height:18px;display:block;border-radius:5px;box-shadow:0 1px 3px rgba(0,0,0,.14)}
+.foot-links{display:flex;flex-wrap:wrap;gap:24px}
+.foot-links a{
+  color:var(--ink-3);
+  text-decoration:none;
+  transition:color .3s var(--ease);
+}
+.foot-links a:hover{color:var(--ink)}
+.foot-legal{width:100%;padding-top:26px;margin-top:6px;border-top:1px solid var(--hairline);display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px}
+
+/* ─────────────────────────────────────────────
+   Toast
+   ───────────────────────────────────────────── */
+#toast{
+  position:fixed;
+  left:50%;
+  bottom:34px;
+  z-index:90;
+  display:flex;
+  align-items:center;
+  gap:9px;
+  padding:12px 22px;
+  border-radius:980px;
+  background:rgba(29,29,31,.92);
+  -webkit-backdrop-filter:blur(14px);
+  backdrop-filter:blur(14px);
+  color:#fff;
+  font-size:13px;
+  letter-spacing:-.005em;
+  box-shadow:0 14px 40px rgba(0,0,0,.22);
+  transform:translate(-50%,18px);
+  opacity:0;
+  pointer-events:none;
+  transition:transform .45s var(--ease),opacity .45s var(--ease);
+}
+#toast.show{transform:translate(-50%,0);opacity:1}
+#toast svg{width:14px;height:14px;flex:none}
+
+/* ─────────────────────────────────────────────
+   Reveal
+   ───────────────────────────────────────────── */
+[data-reveal]{
+  opacity:0;
+  transform:translate3d(0,26px,0);
+  transition:opacity 1s var(--ease),transform 1s var(--ease);
+  transition-delay:var(--d,0s);
+}
+[data-reveal].is-in{opacity:1;transform:none}
+
+/* ─────────────────────────────────────────────
+   Responsive
+   ───────────────────────────────────────────── */
+@media (max-width:900px){
+  .grid-3{grid-template-columns:1fr}
+  .bento{grid-template-columns:repeat(2,1fr)}
+  .span-4,.span-3,.span-2,.span-6{grid-column:span 2}
+  .bento .card.card-wide{grid-template-columns:1fr;gap:24px}
+  .bento .card{min-height:0}
+  .bento .card p{margin-top:16px}
+  .wave{height:56px;justify-content:flex-start}
+}
+
+@media (max-width:720px){
+  .nav-links{display:none}
+  .hero{padding-top:calc(var(--nav-h) + 56px)}
+  .hero-stats{grid-template-columns:repeat(2,1fr);row-gap:22px;padding-top:22px}
+  .hero-stats div:nth-child(2){border-right:0}
+  .hero-stats div:nth-child(1),
+  .hero-stats div:nth-child(2){padding-bottom:2px}
+  .spec-row{grid-template-columns:1fr;gap:6px;padding:18px 0}
+  .url-field{flex-wrap:wrap;padding:10px 10px 10px 14px}
+  .url-field .btn{width:100%}
+  .cta-row{gap:14px}
+  .cta-row .btn{width:auto}
+  .cta-row .btn-text{width:auto}
+  #toast{left:16px;right:16px;bottom:20px;transform:translate(0,18px);justify-content:center}
+  #toast.show{transform:translate(0,0)}
+}
+
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto}
+  [data-reveal]{opacity:1;transform:none;transition:none}
+  .scroll-hint svg,.wave i{animation:none}
+  *{transition-duration:.01ms !important;animation-duration:.01ms !important}
+}
+</style>
 </head>
-<body class="relative antialiased selection:bg-gold-500 selection:text-black">
 
-    <!-- WebGL Background Canvas -->
-    <canvas id="webgl-canvas"></canvas>
+<body>
 
-    <!-- Navigation Header -->
-    <header class="fixed top-0 left-0 right-0 z-50 px-6 py-5 transition-all duration-300 backdrop-blur-md bg-obsidian/40 border-b border-white/5">
-        <div class="max-w-7xl mx-auto flex items-center justify-between">
-            <div class="flex items-center space-x-3 cursor-pointer">
-                <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-gold-500 to-cyber-cyan p-[1px] flex items-center justify-center shadow-lg shadow-gold-500/20">
-                    <div class="w-full h-full bg-obsidian rounded-full flex items-center justify-center">
-                        <i class="fa-solid font-bold text-gold-400 text-sm">Y</i>
-                    </div>
-                </div>
-                <span class="cinzel text-xl font-bold tracking-widest text-gold-gradient">YGGDRASIL</span>
-            </div>
+<div class="backdrop" aria-hidden="true"></div>
 
-            <nav class="hidden md:flex items-center space-x-8 text-sm font-medium tracking-wide text-gray-300">
-                <a href="#section-hero" class="hover:text-gold-400 transition-colors">起源</a>
-                <a href="#section-breakthrough" class="hover:text-cyber-cyan transition-colors">深根</a>
-                <a href="#section-modular" class="hover:text-gold-400 transition-colors">节点叶群</a>
-                <a href="#section-autonomous" class="hover:text-cyber-cyan transition-colors">进化</a>
-            </nav>
+<header id="nav">
+  <div class="nav-inner">
+    <a class="brand" href="#origin" aria-label="Yggdrasil 首页">
+      <img src="./assets/favicon.png?v=b9d535601980" alt="" width="20" height="20">
+      <span>Yggdrasil</span>
+    </a>
 
-            <div class="flex items-center space-x-4">
-                <button onclick="startBuilder()" class="relative group overflow-hidden px-5 py-2.5 rounded-full text-xs font-semibold tracking-wider uppercase bg-gradient-to-r from-gold-500 to-gold-600 text-obsidian shadow-lg hover:shadow-gold-500/30 transition-all duration-300 transform active:scale-95">
-                    <span class="relative z-10 flex items-center gap-2">
-                        <i class="fa-solid fa-bolt"></i> 定制订阅
-                    </span>
-                    <div class="absolute inset-0 bg-white/30 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-                </button>
-            </div>
-        </div>
-    </header>
+    <nav class="nav-links" aria-label="页面导航">
+      <a href="#origin" class="active">起源</a>
+      <a href="#root">深根</a>
+      <a href="#nodes">节点</a>
+      <a href="#specs">规格</a>
+      <a href="#evolve">进化</a>
+    </nav>
 
-    <!-- Scroll Content Container -->
-    <main id="scroll-container" class="relative z-10">
+    <div class="nav-actions">
+      <button class="btn btn-primary btn-sm" type="button" data-builder>配置工坊</button>
+    </div>
+  </div>
+</header>
 
-        <!-- SECTION 1: HERO / ORIGIN -->
-        <section id="section-hero" class="min-h-screen flex items-center justify-center px-6 relative pt-20">
-            <div class="max-w-4xl mx-auto text-center space-y-6">
-                <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-card text-xs font-medium tracking-wider text-gold-400 uppercase">
-                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-                    全自动化分布式网络订阅中枢
-                </div>
-                
-                <h1 class="cinzel text-5xl md:text-7xl lg:text-8xl font-black tracking-tight leading-tight text-gold-gradient">
-                    YGGDRASIL
-                </h1>
-                
-                <p class="text-lg md:text-xl text-gray-300 font-light tracking-wide max-w-2xl mx-auto leading-relaxed">
-                    突破重力，重塑网络边界。<br>
-                    以参天世界树之名，将庞大节点融汇为生生不息的无界网络。
-                </p>
+<main>
 
-                <div class="pt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
-                    <a href="#section-breakthrough" class="w-full sm:w-auto px-8 py-3.5 rounded-full glass-panel border border-gold-500/40 text-gold-400 font-medium text-sm tracking-wider uppercase hover:bg-gold-500/10 hover:border-gold-400 transition-all text-center">
-                        探索拓扑架构 <i class="fa-solid fa-arrow-down ml-2 text-xs"></i>
-                    </a>
-                    <button onclick="startBuilder()" class="w-full sm:w-auto px-8 py-3.5 rounded-full bg-gradient-to-r from-cyber-cyan to-cyber-blue text-obsidian font-bold text-sm tracking-wider uppercase shadow-lg shadow-cyber-cyan/20 hover:opacity-90 transition-all">
-                        开始定制配置
-                    </button>
-                </div>
+  <!-- ── Hero ───────────────────────────────── -->
+  <section class="hero" id="origin">
+    <canvas id="tree" aria-hidden="true"></canvas>
+    <div id="ornaments" aria-hidden="true"></div>
+    <canvas id="sparkles" aria-hidden="true"></canvas>
 
-                <div class="pt-16 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto">
-                    <div class="glass-card p-4 rounded-xl text-center">
-                        <div class="text-2xl font-bold text-gold-gradient cinzel">99.99%</div>
-                        <div class="text-xs text-gray-400 mt-1">节点高可用率</div>
-                    </div>
-                    <div class="glass-card p-4 rounded-xl text-center">
-                        <div class="text-2xl font-bold text-cyber-gradient cinzel">&lt; 15ms</div>
-                        <div class="text-xs text-gray-400 mt-1">智能优选延迟</div>
-                    </div>
-                    <div class="glass-card p-4 rounded-xl text-center">
-                        <div class="text-2xl font-bold text-gold-gradient cinzel">分布式</div>
-                        <div class="text-xs text-gray-400 mt-1">无单点故障风险</div>
-                    </div>
-                    <div class="glass-card p-4 rounded-xl text-center">
-                        <div class="text-2xl font-bold text-cyber-gradient cinzel">全自动</div>
-                        <div class="text-xs text-gray-400 mt-1">云端实时自愈更新</div>
-                    </div>
-                </div>
-            </div>
-        </section>
+    <div class="hero-grid">
+    <div class="hero-copy">
+    <div class="hero-inner">
+      <img class="hero-icon" src="./assets/favicon.png?v=b9d535601980" alt="Yggdrasil 应用图标" data-reveal>
 
-        <!-- SECTION 2: BREAKTHROUGH -->
-        <section id="section-breakthrough" class="min-h-screen flex items-center justify-end px-6 md:px-20 relative">
-            <div class="max-w-xl space-y-6 glass-panel p-8 md:p-12 rounded-3xl relative overflow-hidden">
-                <div class="absolute -top-10 -right-10 w-40 h-40 bg-gold-500/10 rounded-full blur-3xl pointer-events-none"></div>
-                <div class="text-xs font-semibold text-gold-400 tracking-widest uppercase flex items-center gap-2">
-                    <span class="w-8 h-[1px] bg-gold-400"></span> 01 / DEEP ROOT SYSTEM
-                </div>
-                <h2 class="cinzel text-3xl md:text-5xl font-bold text-white leading-tight">
-                    无界 · 穿透
-                </h2>
-                <p class="text-gray-300 leading-relaxed font-light">
-                    深扎于数字大地的地下根系。在复杂网络封锁与干扰下，Yggdrasil 的庞大根系能自动探测并穿透屏障，以极具鲁棒性的底层路由策略，确保数据如养分般源源不断流向枝叶。
-                </p>
-                <ul class="space-y-3 text-sm text-gray-300">
-                    <li class="flex items-center gap-3">
-                        <i class="fa-solid fa-shield-halved text-cyber-cyan"></i>
-                        <span>底层抗封锁算法与多重隐蔽传输</span>
-                    </li>
-                    <li class="flex items-center gap-3">
-                        <i class="fa-solid fa-network-wired text-cyber-cyan"></i>
-                        <span>全球 Anycast 边缘拓扑感知</span>
-                    </li>
-                    <li class="flex items-center gap-3">
-                        <i class="fa-solid fa-lock text-cyber-cyan"></i>
-                        <span>端到端零日志高强度安全防护</span>
-                    </li>
-                </ul>
-            </div>
-        </section>
+      <h1 data-reveal>Yggdrasil</h1>
 
-        <!-- SECTION 3: MODULAR (ZOOM INTO LEAF NODES) -->
-        <section id="section-modular" class="min-h-screen flex items-center justify-start px-6 md:px-20 relative">
-            <div class="max-w-xl space-y-6 glass-panel p-8 md:p-12 rounded-3xl relative overflow-hidden">
-                <div class="absolute -bottom-10 -left-10 w-40 h-40 bg-cyber-cyan/10 rounded-full blur-3xl pointer-events-none"></div>
-                <div class="text-xs font-semibold text-cyber-cyan tracking-widest uppercase flex items-center gap-2">
-                    <span class="w-8 h-[1px] bg-cyber-cyan"></span> 02 / LEAF NODE CLUSTERS
-                </div>
-                <h2 class="cinzel text-3xl md:text-5xl font-bold text-white leading-tight">
-                    解构 · 节点集群
-                </h2>
-                <p class="text-gray-300 leading-relaxed font-light">
-                    镜头深入树冠微观世界。树叶上繁星般的每一个光点，都是一个分布于全球的独立节点。分布式模块化设计将节点集群、分流策略与规则引擎完美解构。
-                </p>
-                <div class="grid grid-cols-2 gap-4 pt-2">
-                    <div class="glass-card p-4 rounded-xl border-l-2 border-l-gold-500">
-                        <div class="font-bold text-white text-sm">高度可维护</div>
-                        <div class="text-xs text-gray-400 mt-1">单一节点故障无感切用，集群热插拔替换</div>
-                    </div>
-                    <div class="glass-card p-4 rounded-xl border-l-2 border-l-cyber-cyan">
-                        <div class="font-bold text-white text-sm">无缝兼容</div>
-                        <div class="text-xs text-gray-400 mt-1">适配 Surge, Stash, Loon, Quantumult X 等高性能客户端</div>
-                    </div>
-                </div>
-            </div>
-        </section>
+      <p class="hero-tag" data-reveal>全自动分布式网络订阅中枢</p>
 
-        <!-- SECTION 4: AUTONOMOUS -->
-        <section id="section-autonomous" class="min-h-screen flex items-center justify-center px-6 relative py-20">
-            <div class="max-w-3xl mx-auto text-center space-y-8 glass-panel p-10 md:p-16 rounded-3xl relative">
-                <div class="inline-block p-3 rounded-2xl bg-gold-500/10 border border-gold-500/20 text-gold-400 mb-2">
-                    <i class="fa-solid fa-dna text-3xl"></i>
-                </div>
-                <div class="text-xs font-semibold text-gold-400 tracking-widest uppercase">
-                    03 / AUTONOMOUS ECOSYSTEM
-                </div>
-                <h2 class="cinzel text-3xl md:text-6xl font-bold text-gold-gradient">
-                    进化 · 自治
-                </h2>
-                <p class="text-gray-300 text-lg leading-relaxed font-light max-w-xl mx-auto">
-                    可升级，全自动，全自主。配置实时拉取与智能优选在静默中自发迭代。Yggdrasil，不仅是订阅中枢，更是会呼吸的网络生命体。
-                </p>
+      <p class="lede" data-reveal>
+        把上万节点、路由规则与分流策略，<br>
+        收敛成一份会自我进化的配置。
+      </p>
 
-                <!-- Subscription Action Box -->
-                <div class="p-4 rounded-2xl bg-black/60 border border-white/10 max-w-2xl mx-auto space-y-4">
-                    <div class="flex items-center justify-between text-xs text-gray-400 px-2">
-                        <span><i class="fa-solid fa-link text-gold-500 mr-1"></i> Ratatoskr 配置向导</span>
-                        <span class="text-emerald-400 flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> 按需组合规则与策略</span>
-                    </div>
-                    <div class="flex items-center gap-2 bg-obsidian p-2 rounded-xl border border-white/5">
-                        <input id="sub-url-input" type="text" readonly value="" placeholder="配置向导地址" class="bg-transparent text-gray-300 text-sm px-3 w-full focus:outline-none font-mono">
-                        <button onclick="startBuilder()" class="px-6 py-2.5 rounded-lg bg-gold-500 hover:bg-gold-600 text-obsidian font-bold text-xs uppercase tracking-wider transition-all whitespace-nowrap">
-                            打开向导
-                        </button>
-                    </div>
-                </div>
-
-                <div class="text-xs text-gray-400 flex flex-wrap items-center justify-center gap-6 pt-4">
-                    <span><i class="fa-solid fa-check text-gold-500 mr-1"></i> Mihomo</span>
-                    <span><i class="fa-solid fa-check text-gold-500 mr-1"></i> Clash Meta</span>
-                    <span><i class="fa-solid fa-check text-gold-500 mr-1"></i> GeoSite / GeoIP</span>
-                    <span><i class="fa-solid fa-check text-gold-500 mr-1"></i> 模块化定制</span>
-                </div>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- Footer -->
-    <footer class="relative z-10 border-t border-white/5 py-8 px-6 bg-obsidian/80 backdrop-blur-md text-xs text-gray-500 text-center">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-            <div class="cinzel text-gray-400 font-semibold tracking-widest">YGGDRASIL NETWORK SYSTEM</div>
-            <div>Geo-powered Configuration &bull; Permission Required</div>
-            <div>&copy; 2026 Yggdrasil Project. All rights reserved.</div>
-        </div>
-    </footer>
-
-    <!-- Toast Notification -->
-    <div id="toast" class="fixed bottom-8 right-8 z-50 transform translate-y-20 opacity-0 transition-all duration-300 glass-panel px-6 py-4 rounded-xl border border-gold-500/30 flex items-center gap-3 text-sm text-white shadow-2xl">
-        <i class="fa-solid fa-circle-check text-gold-400 text-lg"></i>
-        <span id="toast-msg">订阅链接已成功复制至剪贴板</span>
+      <div class="cta-row" data-reveal>
+        <button class="btn btn-primary" type="button" data-builder>开始定制</button>
+        <a class="btn btn-text" href="#root">了解架构<span class="chev">›</span></a>
+      </div>
     </div>
 
-    <!-- WebGL & Interactive Script -->
-    <script>
-        function getBuilderUrl() {
-            return new URL('./config-builder/', window.location.href).href;
-        }
+    <div class="hero-stats" data-reveal>
+      <div><strong>99.99%</strong><span>节点可用率</span></div>
+      <div><strong>&lt;15ms</strong><span>智能优选延迟</span></div>
+      <div><strong>0</strong><span>单点故障</span></div>
+      <div><strong>24/7</strong><span>云端实时自愈</span></div>
+    </div>
 
-        function startBuilder() {
-            window.location.assign(getBuilderUrl());
-        }
+    <div class="scroll-hint" aria-hidden="true">
+      <span>Scroll</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 4v12"/><path d="m6 11 6 6 6-6"/>
+      </svg>
+    </div>
+    </div><!-- /hero-copy -->
+    </div><!-- /hero-grid -->
+  </section>
 
-        document.getElementById('sub-url-input').value = getBuilderUrl();
+  <!-- ── 01 深根 ────────────────────────────── -->
+  <section class="section" id="root">
+    <div class="section-inner">
+      <div class="section-head">
+        <p class="eyebrow" data-reveal>01 — Deep Root System</p>
+        <h2 class="h2" data-reveal style="--d:.06s">无界，穿透。</h2>
+        <p class="body-lg" data-reveal style="--d:.12s">
+          深扎于数字大地之下。当链路被干扰、被封锁、被重写，
+          庞大的根系会自动探测路径，以极具鲁棒性的底层路由把数据送回枝头。
+        </p>
+      </div>
 
-        function showToast(msg) {
-            const toast = document.getElementById('toast');
-            document.getElementById('toast-msg').innerText = msg;
-            toast.classList.remove('translate-y-20', 'opacity-0');
-            toast.classList.add('translate-y-0', 'opacity-100');
-            setTimeout(() => {
-                toast.classList.remove('translate-y-0', 'opacity-100');
-                toast.classList.add('translate-y-20', 'opacity-0');
-            }, 3000);
-        }
+      <div class="grid-3">
+        <article class="card" data-reveal>
+          <div class="ico">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3.2 19 6v6c0 4.3-2.9 7.7-7 8.9-4.1-1.2-7-4.6-7-8.9V6l7-2.8Z"/>
+              <path d="m9 12 2.2 2.2L15.4 10"/>
+            </svg>
+          </div>
+          <h3>抗封锁传输</h3>
+          <p>多重隐蔽传输与混淆握手，在链路层完成自适应探测，不依赖单一协议存活。</p>
+          <div class="meta"><b>4</b> 层降级备用通道</div>
+        </article>
 
-        // --- THREE.JS 3D GRAND TREE SETUP ---
-        const canvas = document.getElementById('webgl-canvas');
-        const scene = new THREE.Scene();
-        scene.fog = new THREE.FogExp2(0x05070a, 0.022);
+        <article class="card" data-reveal style="--d:.08s">
+          <div class="ico">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="8.6"/>
+              <path d="M3.4 12h17.2"/>
+              <path d="M12 3.4c2.4 2.4 3.6 5.4 3.6 8.6S14.4 18.2 12 20.6c-2.4-2.4-3.6-5.4-3.6-8.6S9.6 5.8 12 3.4Z"/>
+            </svg>
+          </div>
+          <h3>Anycast 边缘拓扑</h3>
+          <p>就近接入全球边缘入口，路径由实时拓扑感知决定，而非写死的规则表。</p>
+          <div class="meta"><b>60+</b> 边缘接入点</div>
+        </article>
 
-        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 2, 28);
+        <article class="card" data-reveal style="--d:.16s">
+          <div class="ico">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="4.6" y="10.4" width="14.8" height="9.6" rx="2.6"/>
+              <path d="M8.4 10.4V7.8a3.6 3.6 0 1 1 7.2 0v2.6"/>
+              <path d="M12 14.6v1.8"/>
+            </svg>
+          </div>
+          <h3>零日志加密</h3>
+          <p>端到端加密传输，服务端不留存访问记录。你能验证的，才是真正私有的。</p>
+          <div class="meta"><b>0</b> 日志留存</div>
+        </article>
+      </div>
+    </div>
+  </section>
 
-        const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        const isSmallScreen = window.matchMedia('(max-width: 640px)').matches;
-        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, isSmallScreen ? 1.25 : 1.75));
+  <!-- ── 02 节点 ────────────────────────────── -->
+  <section class="section" id="nodes">
+    <div class="section-inner">
+      <div class="section-head">
+        <p class="eyebrow" data-reveal>02 — Leaf Node Clusters</p>
+        <h2 class="h2" data-reveal style="--d:.06s">一万个出口，<br>一种秩序。</h2>
+        <p class="body-lg" data-reveal style="--d:.12s">
+          树冠上的每一个光点，都是一台独立节点。
+          分布式模块化把节点集群、分流策略与规则引擎彻底解构，再自动重组。
+        </p>
+      </div>
 
-        const treeGroup = new THREE.Group();
-        scene.add(treeGroup);
+      <div class="bento">
+        <article class="card span-4 card-wide" data-reveal>
+          <div class="copy">
+            <div class="ico">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m12 3 8.4 4.3L12 11.6 3.6 7.3 12 3Z"/>
+                <path d="m3.6 12.4 8.4 4.3 8.4-4.3"/>
+                <path d="m3.6 16.8 8.4 4.3 8.4-4.3"/>
+              </svg>
+            </div>
+            <h3>集群热插拔</h3>
+            <p>单个节点故障无感切换，集群扩容只需要加入，不需要停机。配置在运行中完成重组。</p>
+          </div>
+          <div class="wave" aria-hidden="true"></div>
+        </article>
 
-        // Materials
-        const trunkMaterial = new THREE.LineBasicMaterial({
-            color: 0xd9bd72,
-            transparent: true,
-            opacity: 0.43,
-            blending: THREE.AdditiveBlending
+        <article class="card span-2" data-reveal style="--d:.08s">
+          <div class="ico">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 7h9"/><path d="M4 12h16"/><path d="M4 17h6"/>
+              <circle cx="16.5" cy="7" r="2.2"/><circle cx="12.5" cy="17" r="2.2"/>
+            </svg>
+          </div>
+          <h3>规则引擎</h3>
+          <p>GeoSite 与 GeoIP 双层匹配，应用级策略按需组合，不做无谓的代理解析。</p>
+        </article>
+
+        <article class="card span-3" data-reveal style="--d:.04s">
+          <div class="ico">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3.4" y="5.2" width="17.2" height="11.4" rx="2.2"/>
+              <path d="M8 20h8"/><path d="M12 16.6V20"/>
+            </svg>
+          </div>
+          <h3>全客户端兼容</h3>
+          <p>一份 YAML，同时适配 Surge、Stash、Loon、Quantumult X、Clash Verge 与 Mihomo 内核。</p>
+          <div class="meta"><b>6</b> 主流客户端</div>
+        </article>
+
+        <article class="card span-3 dark" data-reveal style="--d:.12s">
+          <div class="ico">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M13.2 2.8 4.6 13.4h6.1l-.9 7.8 8.6-10.6h-6.1l.9-7.8Z"/>
+            </svg>
+          </div>
+          <h3>智能优选</h3>
+          <p>延迟、丢包与带宽三维加权，每 60 秒重新采样一次，把流量交给此刻最快的出口。</p>
+          <div class="meta"><b>60s</b> 采样周期</div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 03 规格 ────────────────────────────── -->
+  <section class="section" id="specs">
+    <div class="section-inner">
+      <div class="section-head">
+        <p class="eyebrow" data-reveal>03 — Technical Specifications</p>
+        <h2 class="h2" data-reveal style="--d:.06s">技术规格。</h2>
+      </div>
+
+      <dl class="specs-list">
+        <div class="spec-row" data-reveal>
+          <dt>核心内核</dt>
+          <dd>Mihomo（Clash.Meta）· <em>兼容 Clash Premium 全部字段</em></dd>
+        </div>
+        <div class="spec-row" data-reveal style="--d:.03s">
+          <dt>传输协议</dt>
+          <dd>Shadowsocks · VMess · VLESS · Trojan · Hysteria2 · TUIC</dd>
+        </div>
+        <div class="spec-row" data-reveal style="--d:.06s">
+          <dt>规则体系</dt>
+          <dd>GeoSite + GeoIP · 应用级分流 · 自定义规则注入</dd>
+        </div>
+        <div class="spec-row" data-reveal style="--d:.09s">
+          <dt>策略组</dt>
+          <dd>手动切换 · 自动选择 · 故障转移 · 负载均衡 · 下载均衡</dd>
+        </div>
+        <div class="spec-row" data-reveal style="--d:.12s">
+          <dt>模板</dt>
+          <dd>Ratatoskr 主配置 · 地区扩展版 · 网络栈参考</dd>
+        </div>
+        <div class="spec-row" data-reveal style="--d:.15s">
+          <dt>更新方式</dt>
+          <dd>云端实时拉取，<em>无需手动重装或重新导入</em></dd>
+        </div>
+        <div class="spec-row" data-reveal style="--d:.18s">
+          <dt>授权</dt>
+          <dd>Permission Required</dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- ── 04 进化 ────────────────────────────── -->
+  <section class="dark-section" id="evolve">
+    <div class="section-inner">
+      <div class="section-head">
+        <p class="eyebrow" data-reveal>04 — Autonomous Ecosystem</p>
+        <h2 class="h2" data-reveal style="--d:.06s">会呼吸的网络。</h2>
+        <p class="body-lg" data-reveal style="--d:.12s">
+          可升级、全自动、全自主。配置拉取与智能优选在静默中持续迭代，
+          Yggdrasil 不只是订阅中枢——它更像一株还在生长的活体。
+        </p>
+      </div>
+
+      <div class="url-card" data-reveal style="--d:.18s">
+        <div class="url-head">
+          <span class="live">
+            <img src="./assets/favicon.png?v=b9d535601980" alt="" width="15" height="15">
+            Ratatoskr 配置向导
+          </span>
+          <span>按需组合规则与策略</span>
+        </div>
+        <div class="url-field">
+          <input id="builder-url" type="text" readonly aria-label="配置向导地址">
+          <button class="btn btn-primary btn-sm" type="button" id="copy-btn">复制链接</button>
+        </div>
+      </div>
+
+      <div class="chips" data-reveal style="--d:.24s">
+        <span>Mihomo</span>
+        <span>Clash Meta</span>
+        <span>Surge</span>
+        <span>Stash</span>
+        <span>Loon</span>
+        <span>Quantumult X</span>
+        <span>GeoSite</span>
+        <span>GeoIP</span>
+        <span>模块化定制</span>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="foot-inner">
+    <div class="foot-brand">
+      <img src="./assets/favicon.png?v=b9d535601980" alt="" width="18" height="18">
+      <span>Yggdrasil</span>
+    </div>
+
+    <nav class="foot-links" aria-label="页脚导航">
+      <a href="./docs/zh-CN.md">中文指南</a>
+      <a href="./docs/en.md">English</a>
+      <a href="./config-builder/">配置工坊</a>
+      <a href="./resources/ratatoskr.yaml">Ratatoskr 模板</a>
+      <a href="./LICENSE">授权协议</a>
+    </nav>
+
+    <div class="foot-legal">
+      <span>© 2026 Yggdrasil Project. All rights reserved.</span>
+      <span>Geo-powered Configuration · Permission Required</span>
+    </div>
+  </div>
+</footer>
+
+<div id="toast" role="status" aria-live="polite">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="m4.5 12.5 5 5 10-11"/>
+  </svg>
+  <span id="toast-msg">链接已复制</span>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var builderUrl = new URL('./config-builder/', window.location.href).href;
+
+  /* ── Builder entry ─────────────────────────── */
+  function startBuilder() {
+    window.location.assign(builderUrl);
+  }
+  document.querySelectorAll('[data-builder]').forEach(function (el) {
+    el.addEventListener('click', startBuilder);
+  });
+
+  var urlInput = document.getElementById('builder-url');
+  if (urlInput) urlInput.value = builderUrl;
+
+  /* ── Toast ─────────────────────────────────── */
+  var toast = document.getElementById('toast');
+  var toastMsg = document.getElementById('toast-msg');
+  var toastTimer = null;
+
+  function showToast(msg) {
+    if (!toast) return;
+    toastMsg.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () {
+      toast.classList.remove('show');
+    }, 2400);
+  }
+
+  /* ── Copy builder url ──────────────────────── */
+  var copyBtn = document.getElementById('copy-btn');
+  if (copyBtn) {
+    copyBtn.addEventListener('click', function () {
+      var done = function () { showToast('配置向导链接已复制'); };
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(builderUrl).then(done).catch(fallback);
+      } else {
+        fallback();
+      }
+      function fallback() {
+        var tmp = document.createElement('textarea');
+        tmp.value = builderUrl;
+        tmp.setAttribute('readonly', '');
+        tmp.style.position = 'fixed';
+        tmp.style.opacity = '0';
+        document.body.appendChild(tmp);
+        tmp.select();
+        try { document.execCommand('copy'); done(); }
+        catch (e) { showToast('复制失败，请手动选择链接'); }
+        document.body.removeChild(tmp);
+      }
+    });
+  }
+
+  /* ── Nav state ─────────────────────────────── */
+  var nav = document.getElementById('nav');
+  var navLinks = Array.prototype.slice.call(document.querySelectorAll('.nav-links a'));
+
+  function onScroll() {
+    if (nav) nav.classList.toggle('scrolled', window.scrollY > 8);
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  /* ── Active section ────────────────────────── */
+  var sections = navLinks
+    .map(function (a) { return document.querySelector(a.getAttribute('href')); })
+    .filter(Boolean);
+
+  if ('IntersectionObserver' in window && sections.length) {
+    var spy = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        navLinks.forEach(function (a) {
+          a.classList.toggle('active', a.getAttribute('href') === '#' + entry.target.id);
         });
+      });
+    }, { rootMargin: '-45% 0px -50% 0px', threshold: 0 });
+    sections.forEach(function (s) { spy.observe(s); });
+  }
 
-        const branchMaterial = new THREE.LineBasicMaterial({
-            color: 0xcab477,
-            transparent: true,
-            opacity: 0.29,
-            blending: THREE.AdditiveBlending
-        });
-
-        const rootMaterial = new THREE.LineBasicMaterial({
-            color: 0x4ebdc1,
-            transparent: true,
-            opacity: 0.23,
-            blending: THREE.AdditiveBlending
-        });
-
-        const leafPositions = [];
-
-        // 1. Spiral Intertwined Massive Trunk
-        const TRUNK_STRANDS = 14;
-        const TRUNK_HEIGHT = 14;
-        for (let i = 0; i < TRUNK_STRANDS; i++) {
-            const points = [];
-            const angleOffset = (i / TRUNK_STRANDS) * Math.PI * 2;
-            const strandRadius = 1.55;
-
-            for (let y = -8; y <= TRUNK_HEIGHT; y += 0.5) {
-                const progress = (y + 8) / (TRUNK_HEIGHT + 8);
-                const currentRadius = strandRadius * (1 - progress * 0.4) + Math.sin(y * 0.5 + angleOffset) * 0.2;
-                const angle = angleOffset + y * 0.25;
-
-                const x = Math.cos(angle) * currentRadius;
-                const z = Math.sin(angle) * currentRadius;
-                points.push(new THREE.Vector3(x, y, z));
-            }
-
-            const curve = new THREE.CatmullRomCurve3(points);
-            const geometry = new THREE.BufferGeometry().setFromPoints(curve.getPoints(60));
-            const line = new THREE.Line(geometry, trunkMaterial);
-            treeGroup.add(line);
+  /* ── Reveal ────────────────────────────────── */
+  var revealItems = document.querySelectorAll('[data-reveal]');
+  if ('IntersectionObserver' in window) {
+    var revealer = new IntersectionObserver(function (entries, obs) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-in');
+          obs.unobserve(entry.target);
         }
+      });
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.12 });
+    revealItems.forEach(function (el) { revealer.observe(el); });
+  } else {
+    revealItems.forEach(function (el) { el.classList.add('is-in'); });
+  }
 
-        // 2. Dense Recursive Branch System
-        function buildBranch(start, direction, length, depth) {
-            if (depth <= 0) {
-                for (let l = 0; l < 10; l++) {
-                    leafPositions.push(new THREE.Vector3(
-                        start.x + (Math.random() - 0.5) * 2.5,
-                        start.y + (Math.random() - 0.5) * 2.5,
-                        start.z + (Math.random() - 0.5) * 2.5
-                    ));
-                }
-                return;
-            }
+  /* ── Equalizer bars ────────────────────────── */
+  var wave = document.querySelector('.wave');
+  if (wave) {
+    var n = window.innerWidth < 900 ? 24 : 46;
+    var frag = document.createDocumentFragment();
+    for (var i = 0; i < n; i++) {
+      var bar = document.createElement('i');
+      var h = 14 + Math.abs(Math.sin(i * 0.55)) * 34 + Math.random() * 8;
+      bar.style.height = h.toFixed(1) + 'px';
+      bar.style.animationDelay = (-(i * 0.07) % 2.6).toFixed(2) + 's';
+      bar.style.opacity = (0.35 + 0.65 * (h / 56)).toFixed(2);
+      frag.appendChild(bar);
+    }
+    wave.appendChild(frag);
+  }
 
-            const end = start.clone().add(direction.clone().multiplyScalar(length));
-            const mid = start.clone().add(end).multiplyScalar(0.5);
-            mid.x += (Math.random() - 0.5) * length * 0.4;
-            mid.z += (Math.random() - 0.5) * length * 0.4;
+  /* ── Three.js: a precise little Christmas tree ─────────────── */
+  var canvas = document.getElementById('tree');
+  var layer = document.getElementById('ornaments');
+  if (!canvas || typeof THREE === 'undefined') return;
 
-            const curve = new THREE.QuadraticBezierCurve3(start, mid, end);
-            const geometry = new THREE.BufferGeometry().setFromPoints(curve.getPoints(12));
-            const line = new THREE.Line(geometry, branchMaterial);
-            treeGroup.add(line);
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var isSmall = window.matchMedia('(max-width: 720px)').matches;
+  var W = window.innerWidth, H = window.innerHeight;
 
-            const subBranches = depth > 3 ? 2 : 3;
-            for (let i = 0; i < subBranches; i++) {
-                const nextDir = direction.clone();
-                nextDir.x += (Math.random() - 0.5) * 1.2;
-                nextDir.y += Math.random() * 0.5 + 0.1;
-                nextDir.z += (Math.random() - 0.5) * 1.2;
-                nextDir.normalize();
+  var scene = new THREE.Scene();
+  var camera = new THREE.PerspectiveCamera(50, W / H, 0.1, 300);
+  camera.position.set(0, 0.5, W < 720 ? 52 : 46);
+  camera.lookAt(0, 0.5, 0);
 
-                buildBranch(end, nextDir, length * 0.68, depth - 1);
-            }
+  var renderer = new THREE.WebGLRenderer({
+    canvas: canvas, antialias: !isSmall, alpha: true,
+    powerPreference: 'high-performance'
+  });
+  renderer.setClearColor(0x000000, 0);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, isSmall ? 1.3 : 1.7));
+  renderer.setSize(W, H);
+
+  var pivot = new THREE.Group();
+  scene.add(pivot);
+  var tree = new THREE.Group();
+  pivot.add(tree);
+  tree.scale.x = 1.22;
+
+  var introActive = false;      // the fly-in owns the pivot while true
+  var introFX = { badge: 1 };   // extra scale for the hanging app badges
+  var idleBase = 0;             // lets the slow idle spin continue seamlessly
+
+  /* Resting pose. On desktop the tree sits in the right column — its left
+     edge meets the centre line, so the type column and the tree never
+     overlap. On narrow screens it falls back to a centred backdrop. */
+  function homePose() {
+    if (W < 900) return { x: 0, y: -6.6, z: 0, s: 0.94 };
+    return { x: 13.0, y: -1.5, z: 0, s: 1.24 };
+  }
+  var HOME = homePose();
+
+  function placeTree() {
+    if (introActive) return;
+    HOME = homePose();
+    pivot.position.set(HOME.x, HOME.y, HOME.z);
+    pivot.scale.setScalar(HOME.s);
+  }
+  placeTree();
+
+  /* One merged, softly lit tube builder for every solid twig. */
+  function writeTube(buf, curve, r0, r1, segs, radial, lo, hi, opts) {
+    opts = opts || {};
+    var frames = curve.computeFrenetFrames(segs, false);
+    var base = buf.p.length / 3;
+    var LX = -0.42, LY = 0.78, LZ = 0.46;
+
+    for (var i = 0; i <= segs; i++) {
+      var t = i / segs;
+      var p = curve.getPointAt(t);
+      var radius = opts.profile ? opts.profile(t) : r0 + (r1 - r0) * t;
+      var N = frames.normals[i], B = frames.binormals[i];
+
+      for (var j = 0; j <= radial; j++) {
+        var a = (j / radial) * Math.PI * 2;
+        var ca = Math.cos(a), sa = Math.sin(a);
+        var nx = ca * N.x + sa * B.x;
+        var ny = ca * N.y + sa * B.y;
+        var nz = ca * N.z + sa * B.z;
+        buf.p.push(p.x + nx * radius, p.y + ny * radius, p.z + nz * radius);
+
+        var lam = nx * LX + ny * LY + nz * LZ;
+        var sh = 0.22 + 0.78 * Math.max(0, lam);
+        var fade = (opts.fade || 0) * Math.pow(t, 1.5);
+        for (var c = 0; c < 3; c++) {
+          var v = lo[c] + (hi[c] - lo[c]) * sh;
+          buf.c.push(v * (1 - fade * 0.55));
         }
+      }
+    }
+    for (var k = 0; k < segs; k++) {
+      for (var m = 0; m < radial; m++) {
+        var a0 = base + k * (radial + 1) + m;
+        var b0 = a0 + radial + 1;
+        buf.i.push(a0, b0, a0 + 1, b0, b0 + 1, a0 + 1);
+      }
+    }
+  }
 
-        const MAIN_BRANCH_COUNT = 7;
-        for (let b = 0; b < MAIN_BRANCH_COUNT; b++) {
-            const angle = (b / MAIN_BRANCH_COUNT) * Math.PI * 2;
-            const dir = new THREE.Vector3(
-                Math.cos(angle) * 0.8,
-                Math.random() * 0.4 + 0.4,
-                Math.sin(angle) * 0.8
-            ).normalize();
+  function meshFrom(buf, mat) {
+    var g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute(buf.p, 3));
+    g.setAttribute('color', new THREE.Float32BufferAttribute(buf.c, 3));
+    g.setIndex(buf.i);
+    return new THREE.Mesh(g, mat);
+  }
+  function surfaceMat() {
+    return new THREE.MeshBasicMaterial({
+      vertexColors: true, side: THREE.DoubleSide,
+      transparent: true, opacity: 1, depthWrite: true
+    });
+  }
 
-            const branchStart = new THREE.Vector3(
-                Math.cos(angle) * 1.2,
-                TRUNK_HEIGHT * 0.7,
-                Math.sin(angle) * 1.2
-            );
+  var foliageMat = surfaceMat();
+  var barkMat = surfaceMat();
+  var fadeMats = [foliageMat, barkMat];
 
-            buildBranch(branchStart, dir, 5.5, 4);
-        }
+  var GREEN_LO = [0.03, 0.15, 0.08];
+  var GREEN_HI = [0.09, 0.36, 0.19];
+  var BARK_LO  = [0.20, 0.14, 0.09];
+  var BARK_HI  = [0.42, 0.30, 0.18];
 
-        // 3. Spreading Massive Root System
-        function buildRoot(start, direction, length, depth) {
-            if (depth <= 0) return;
-            const end = start.clone().add(direction.clone().multiplyScalar(length));
-            const mid = start.clone().add(end).multiplyScalar(0.5);
-            mid.x += (Math.random() - 0.5) * length * 0.5;
-            mid.z += (Math.random() - 0.5) * length * 0.5;
+  /* trunk */
+  var barkBuf = { p: [], c: [], i: [] };
+  var trunkPts = [];
+  for (var ty = -10.5; ty <= 11; ty += 1.0) {
+    trunkPts.push(new THREE.Vector3(Math.sin(ty * 0.2) * 0.06, ty, 0));
+  }
+  writeTube(barkBuf, new THREE.CatmullRomCurve3(trunkPts),
+    0.44, 0.15, 30, 10, BARK_LO, BARK_HI, {});
+  tree.add(meshFrom(barkBuf, barkMat));
 
-            const curve = new THREE.QuadraticBezierCurve3(start, mid, end);
-            const geometry = new THREE.BufferGeometry().setFromPoints(curve.getPoints(10));
-            const line = new THREE.Line(geometry, rootMaterial);
-            treeGroup.add(line);
+  var woodBuf = { p: [], c: [], i: [] };
+  var needleP = [], needleC = [], edgeLines = [];
 
-            for (let i = 0; i < 2; i++) {
-                const nextDir = direction.clone();
-                nextDir.x += (Math.random() - 0.5) * 1.1;
-                nextDir.y -= Math.random() * 0.4 + 0.3;
-                nextDir.z += (Math.random() - 0.5) * 1.1;
-                nextDir.normalize();
+  /* Each tier is an opaque, softly shaded skirt. The skirts overlap to
+     build a full silhouette; boughs and needles only add the ragged edge. */
+  function addSkirt(buf, y, R, idx, phase) {
+    var seg = isSmall ? 48 : 72;
+    var base = buf.p.length / 3;
+    var LO = [0.045, 0.20, 0.11], HI = [0.15, 0.58, 0.31];
+    var edge = [];
+    for (var i = 0; i <= seg; i++) {
+      var a = (i / seg) * Math.PI * 2;
+      // A ragged, uneven hem on every tier: no two boughs share a length
+      // or a droop, so the silhouette never reads as stacked cones.
+      var wob = 1 + Math.sin(a * 5 + phase) * 0.13
+                  + Math.sin(a * 11 - idx) * 0.075
+                  + Math.cos(a * 19 + idx * 2) * 0.045
+                  + Math.sin(a * 31 + idx * 3) * 0.022;
+      // One soft key light: a lit side and a shaded side on every tier, so
+      // the canopy has volume instead of reading as flat concentric rings.
+      var lit = 0.46 + 0.54 * Math.pow(Math.max(0, Math.cos(a + 0.7)), 1.2);
+      var dim = 1 - idx * 0.012;   // lower tiers sit a touch deeper in shade
+      var ca = Math.cos(a), sa = Math.sin(a);
+      var ex = ca * R * wob;
+      var ey = y - 1.25 - Math.sin(a * 6 + phase) * 0.46
+                        - Math.sin(a * 13 + idx) * 0.26
+                        - Math.sin(a * 23 + idx * 1.7) * 0.12;
+      var ez = sa * R * wob;
+      buf.p.push(ca * 0.24, y + 1.55, sa * 0.24);
+      buf.c.push(LO[0] * lit * dim, LO[1] * lit * dim, LO[2] * lit * dim);
+      buf.p.push(ex, ey, ez);
+      buf.c.push(HI[0] * lit * dim, HI[1] * lit * dim, HI[2] * lit * dim);
+      edge.push(new THREE.Vector3(ex, ey + 0.04, ez));
+    }
+    edgeLines.push(edge);
+    for (var k = 0; k < seg; k++) {
+      var a0 = base + k * 2;
+      buf.i.push(a0, a0 + 1, a0 + 2, a0 + 1, a0 + 3, a0 + 2);
+    }
+  }
 
-                buildRoot(end, nextDir, length * 0.75, depth - 1);
-            }
-        }
+  var TIERS = isSmall ? 9 : 14;
+  var TOP = 11.4, GAP = isSmall ? 2.35 : 1.55;
+  var tierShape = [];
+  for (var tier = 0; tier < TIERS; tier++) {
+    var u = tier / (TIERS - 1);
+    tierShape.push({
+      y: TOP - tier * GAP + (Math.random() - 0.5) * 0.72,
+      R: (1.05 + Math.pow(u, 0.84) * 7.2) * (0.88 + Math.random() * 0.22),
+      phase: Math.random() * Math.PI * 2
+    });
+    addSkirt(woodBuf, tierShape[tier].y, tierShape[tier].R, tier, tierShape[tier].phase);
+  }
 
-        for (let r = 0; r < 10; r++) {
-            const angle = (r / 10) * Math.PI * 2;
-            const dir = new THREE.Vector3(
-                Math.cos(angle),
-                -0.8,
-                Math.sin(angle)
-            ).normalize();
-            buildRoot(new THREE.Vector3(0, -8, 0), dir, 5.0, 4);
-        }
+  // Boughs are deliberately irregular: no equal angles, no equal lengths.
+  for (var tier2 = 0; tier2 < TIERS; tier2++) {
+    var sh = tierShape[tier2];
+    var u2 = tier2 / (TIERS - 1);
+    var arms = Math.round((isSmall ? 13 : 17) + tier2 * (isSmall ? 1.2 : 1.5) + Math.random() * 3);
 
-        // 4. Massive Leaf Star-Cloud Particles
-        const particlesGeo = new THREE.BufferGeometry();
-        const pPositions = [];
-        const pColors = [];
+    for (var a = 0; a < arms; a++) {
+      var ang = (a / arms) * Math.PI * 2 + sh.phase + (Math.random() - 0.5) * 0.62;
+      var rr = sh.R * (0.70 + Math.random() * 0.44);
+      var drop = 0.75 + Math.random() * 1.65 + u2 * 0.55;
+      var ca2 = Math.cos(ang), sa2 = Math.sin(ang);
+      var p0 = new THREE.Vector3(ca2 * 0.30, sh.y + 0.55 + Math.random() * 0.5, sa2 * 0.30);
+      var p1 = new THREE.Vector3(ca2 * rr * 0.55, sh.y + 0.10 + Math.random() * 0.35, sa2 * rr * 0.55);
+      var p2 = new THREE.Vector3(ca2 * rr * 1.03, sh.y - drop, sa2 * rr * 1.03);
+      var curve = new THREE.QuadraticBezierCurve3(p0, p1, p2);
+      writeTube(woodBuf, curve, 0.075 + u2 * 0.065, 0.012, 8, 5,
+        GREEN_LO, GREEN_HI, { fade: 0.12 });
 
-        leafPositions.forEach(pos => {
-            pPositions.push(pos.x, pos.y, pos.z);
-            const isGold = Math.random() > 0.35;
-            if (isGold) {
-                pColors.push(0.96, 0.85, 0.4);
-            } else {
-                pColors.push(0.0, 0.95, 0.99);
-            }
-        });
+      // dense, uneven needles make the outline fluffy instead of geometric
+      var nn = isSmall ? 8 : 11;
+      for (var q = 0; q < nn; q++) {
+        var tq = Math.min(0.99, 0.24 + Math.random() * 0.74);
+        var at = curve.getPointAt(tq);
+        var side = ang + (Math.random() - 0.5) * 2.1;
+        var len = 0.10 + Math.random() * 0.28;
+        var lift = 0.14 + Math.random() * 0.36;
+        needleP.push(at.x, at.y, at.z);
+        needleP.push(
+          at.x + Math.cos(side) * len,
+          at.y + len * lift,
+          at.z + Math.sin(side) * len
+        );
+        var shade = 0.50 + Math.random() * 0.48;
+        needleC.push(0.05 * shade, 0.30 * shade, 0.16 * shade,
+                     0.14 * shade, 0.56 * shade, 0.30 * shade);
+      }
+    }
+  }
+  edgeLines.forEach(function (pts, i) {
+    var em = new THREE.LineBasicMaterial({
+      color: i % 2 ? 0x143A26 : 0x1A4A30,
+      transparent: true, opacity: 0.10
+    });
+    tree.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), em));
+    fadeMats.push(em);
+  });
+  tree.add(meshFrom(woodBuf, foliageMat));
 
-        for (let i = 0; i < 720; i++) {
-            pPositions.push(
-                (Math.random() - 0.5) * 50,
-                (Math.random() - 0.5) * 40 + 5,
-                (Math.random() - 0.5) * 50
-            );
-            pColors.push(0.85, 0.75, 0.4);
-        }
+  var needleGeo = new THREE.BufferGeometry();
+  needleGeo.setAttribute('position', new THREE.Float32BufferAttribute(needleP, 3));
+  needleGeo.setAttribute('color', new THREE.Float32BufferAttribute(needleC, 3));
+  var needleMat = new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.32 });
+  tree.add(new THREE.LineSegments(needleGeo, needleMat));
+  fadeMats.push(needleMat);
 
-        particlesGeo.setAttribute('position', new THREE.Float32BufferAttribute(pPositions, 3));
-        particlesGeo.setAttribute('color', new THREE.Float32BufferAttribute(pColors, 3));
+  /* soft round dot used for lights and baubles */
+  function dotTexture() {
+    var c = document.createElement('canvas');
+    c.width = c.height = 64;
+    var x = c.getContext('2d');
+    var g = x.createRadialGradient(32, 32, 0, 32, 32, 32);
+    g.addColorStop(0, 'rgba(255,255,255,1)');
+    g.addColorStop(0.55, 'rgba(255,255,255,.92)');
+    g.addColorStop(0.82, 'rgba(255,255,255,.35)');
+    g.addColorStop(1, 'rgba(255,255,255,0)');
+    x.fillStyle = g;
+    x.fillRect(0, 0, 64, 64);
+    return new THREE.CanvasTexture(c);
+  }
+  var dot = dotTexture();
 
-        function createParticleTexture() {
-            const canvas = document.createElement('canvas');
-            canvas.width = 64;
-            canvas.height = 64;
-            const ctx = canvas.getContext('2d');
-            const grad = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
-            grad.addColorStop(0, 'rgba(255,255,255,1)');
-            grad.addColorStop(0.25, 'rgba(212,175,55,0.85)');
-            grad.addColorStop(1, 'rgba(0,0,0,0)');
-            ctx.fillStyle = grad;
-            ctx.fillRect(0, 0, 64, 64);
-            return new THREE.CanvasTexture(canvas);
-        }
+  function pointsMesh(pos, col, size, opacity) {
+    var g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+    g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
+    var m = new THREE.PointsMaterial({
+      size: size, map: dot, vertexColors: true, transparent: true,
+      opacity: opacity, depthWrite: false, sizeAttenuation: true
+    });
+    tree.add(new THREE.Points(g, m));
+    fadeMats.push(m);
+    return m;
+  }
 
-        const pMaterial = new THREE.PointsMaterial({
-            size: 0.38,
-            vertexColors: true,
-            map: createParticleTexture(),
-            transparent: true,
-            blending: THREE.AdditiveBlending,
-            depthWrite: false
-        });
+  /* coloured glass baubles */
+  var BAUBLE = [0xE4534B, 0xE9B44C, 0x4C8FD1, 0xD97BA6, 0x55B98C, 0x9B7BD4, 0xE9724A];
+  var ballP = [], ballC = [];
+  var ballCount = isSmall ? 26 : 46;
+  for (var bi = 0; bi < ballCount; bi++) {
+    var bt = Math.random();
+    var by = 9.6 - bt * 18.0;
+    var bR = (1.05 + Math.pow(bt, 0.84) * 7.2) * (0.82 + Math.random() * 0.16);
+    var bang = Math.random() * Math.PI * 2;
+    ballP.push(Math.cos(bang) * bR, by, Math.sin(bang) * bR);
+    var bc = new THREE.Color(BAUBLE[bi % BAUBLE.length]);
+    ballC.push(bc.r, bc.g, bc.b);
+  }
+  pointsMesh(ballP, ballC, isSmall ? 0.80 : 1.04, 0.95);
 
-        const particleSystem = new THREE.Points(particlesGeo, pMaterial);
-        treeGroup.add(particleSystem);
+  /* a fine garland of warm lights winding down the tree */
+  var garlandP = [], lampP = [], lampC = [];
+  var STEPS = 260;
+  for (var gi = 0; gi <= STEPS; gi++) {
+    var gt = gi / STEPS;
+    var gy = 10.0 - gt * 19.2;
+    var gR = (1.05 + Math.pow(gt, 0.84) * 7.2) * 0.93;
+    var ga = gt * Math.PI * 2 * 5.2;
+    garlandP.push(new THREE.Vector3(Math.cos(ga) * gR, gy, Math.sin(ga) * gR));
+    if (gi % 9 === 0) {
+      lampP.push(Math.cos(ga) * gR, gy, Math.sin(ga) * gR);
+      var warm = (gi % 27 === 0) ? [0.98, 0.60, 0.40] : [1.0, 0.86, 0.56];
+      lampC.push(warm[0], warm[1], warm[2]);
+    }
+  }
+  var garlandMat = new THREE.LineBasicMaterial({ color: 0x8A6E3C, transparent: true, opacity: 0.30 });
+  tree.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(garlandP), garlandMat));
+  fadeMats.push(garlandMat);
+  pointsMesh(lampP, lampC, isSmall ? 0.48 : 0.60, 0.98);
 
-        // Render loop
-        let clock = new THREE.Clock();
-        function animate() {
-            requestAnimationFrame(animate);
-            const elapsedTime = clock.getElapsedTime();
-            treeGroup.rotation.y = elapsedTime * 0.021;
-            renderer.render(scene, camera);
-        }
-        animate();
+  /* the star on top */
+  function starTexture() {
+    var c = document.createElement('canvas');
+    c.width = c.height = 256;
+    var x = c.getContext('2d');
+    var g = x.createRadialGradient(128, 128, 4, 128, 128, 128);
+    g.addColorStop(0, 'rgba(255,224,146,.80)');
+    g.addColorStop(0.35, 'rgba(255,214,120,.26)');
+    g.addColorStop(1, 'rgba(255,214,120,0)');
+    x.fillStyle = g;
+    x.fillRect(0, 0, 256, 256);
+    x.translate(128, 128);
+    x.beginPath();
+    for (var s2 = 0; s2 < 10; s2++) {
+      var rad = s2 % 2 ? 22 : 54;
+      var an = -Math.PI / 2 + s2 * Math.PI / 5;
+      var px = Math.cos(an) * rad, py = Math.sin(an) * rad;
+      if (s2) x.lineTo(px, py); else x.moveTo(px, py);
+    }
+    x.closePath();
+    var sg = x.createLinearGradient(-50, -50, 50, 50);
+    sg.addColorStop(0, '#FFE9A8');
+    sg.addColorStop(0.5, '#F5C455');
+    sg.addColorStop(1, '#D89B32');
+    x.fillStyle = sg;
+    x.fill();
+    x.lineWidth = 2.5;
+    x.strokeStyle = 'rgba(255,226,158,.72)';
+    x.stroke();
+    return new THREE.CanvasTexture(c);
+  }
+  var starMat = new THREE.SpriteMaterial({ map: starTexture(), transparent: true, opacity: 0.95, depthWrite: false });
+  var star = new THREE.Sprite(starMat);
+  star.position.set(0, 13.1, 0);
+  star.scale.set(4.4, 4.4, 1);
+  tree.add(star);
+  fadeMats.push(starMat);
 
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
+  /* Real app icons hang from the boughs as little swinging badges.
+     They are DOM elements projected from 3D, so they stay crisp on any DPI. */
+  var ORN = ['apple', 'google', 'github', 'chatgpt', 'claude', 'amazon',
+             'discord', 'spotify', 'netflix', 'youtube', 'instagram', 'telegram',
+             'tiktok', 'twitch', 'steam', 'microsoft', 'adobe', 'android',
+             'primevideo', 'binance'];
+  if (isSmall) ORN = ORN.slice(0, 9);
+  else ORN = ORN.slice(0, 17);
 
-        // --- GSAP SCROLLTRIGGER: CAMERA ZOOM INTO LEAF CLUSTERS ---
-        gsap.registerPlugin(ScrollTrigger);
+  var ornaments = [];
+  var proj = new THREE.Vector3();
+  ORN.forEach(function (name, i) {
+    var el = document.createElement('span');
+    el.className = 'orn';
+    var img = document.createElement('img');
+    img.src = './assets/icons/' + name + '.png';
+    img.alt = '';
+    el.appendChild(img);
+    layer.appendChild(el);
 
-        const timeline = gsap.timeline({
-            scrollTrigger: {
-                trigger: "#scroll-container",
-                start: "top top",
-                end: "bottom bottom",
-                scrub: 1.2
-            }
-        });
+    var u = (i + 0.5) / ORN.length;
+    var yy = 8.4 - u * 15.6;
+    var RR = (1.05 + Math.pow(u, 0.84) * 7.2) * 0.96;
+    var aa = i * 2.39996;
+    ornaments.push({
+      el: el,
+      pos: new THREE.Vector3(Math.cos(aa) * RR, yy, Math.sin(aa) * RR),
+      phase: Math.random() * Math.PI * 2,
+      base: 0.82 + Math.random() * 0.28
+    });
+  });
 
-        // Section 1 -> 2: Shift down to focus on Deep Roots
-        timeline.to(treeGroup.position, {
-            y: 10,
-            z: 6,
-            duration: 2,
-            ease: "power2.inOut"
-        }, 0)
-        .to(treeGroup.rotation, {
-            x: 0.25,
-            duration: 2
-        }, 0);
+  /* App badges must never sit on top of type. Measure the real text boxes
+     and keep a narrow, clean falloff around them — a crisp cut, not a haze. */
+  var clearBoxes = [];
+  // Measure the actual glyphs, not the full-width block boxes. A headline
+  // element is 900px wide but its letters may only cover 580px — the wings
+  // on either side are exactly where the hanging badges belong.
+  function inkRect(el) {
+    var range;
+    try {
+      range = document.createRange();
+      range.selectNodeContents(el);
+      var rects = range.getClientRects();
+      var x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+      for (var i = 0; i < rects.length; i++) {
+        var q = rects[i];
+        if (q.width < 1 || q.height < 1) continue;
+        x0 = Math.min(x0, q.left); x1 = Math.max(x1, q.right);
+        y0 = Math.min(y0, q.top);  y1 = Math.max(y1, q.bottom);
+      }
+      if (x0 !== Infinity) return { left: x0, right: x1, top: y0, bottom: y1 };
+    } catch (e) {}
+    return el.getBoundingClientRect();
+  }
+  function measureClear() {
+    clearBoxes = [];
+    var sel = ['.hero-icon', '.hero h1', '.hero-tag', '.hero .lede',
+               '.cta-row', '.hero-stats', '.scroll-hint'];
+    for (var i = 0; i < sel.length; i++) {
+      var el = document.querySelector(sel[i]);
+      if (!el) continue;
+      var r = inkRect(el);
+      clearBoxes.push({
+        x0: r.left - 14, x1: r.right + 14,
+        y0: r.top + window.scrollY - 10,
+        y1: r.bottom + window.scrollY + 10
+      });
+    }
+  }
+  function clearance(x, y) {
+    var best = 1;
+    for (var i = 0; i < clearBoxes.length; i++) {
+      var b = clearBoxes[i];
+      var inside = (x > b.x0 && x < b.x1 && y > b.y0 && y < b.y1);
+      var d;
+      if (inside) {
+        d = -Math.min(x - b.x0, b.x1 - x, y - b.y0, b.y1 - y);
+      } else {
+        var dx = Math.max(b.x0 - x, 0, x - b.x1);
+        var dy = Math.max(b.y0 - y, 0, y - b.y1);
+        d = Math.sqrt(dx * dx + dy * dy);
+      }
+      var k = Math.max(0, Math.min(1, (d + 4) / 30));
+      if (k < best) best = k;
+    }
+    return best;
+  }
+  measureClear();
+  window.addEventListener('resize', measureClear);
+  window.addEventListener('load', function () { setTimeout(measureClear, 80); });
+  // Reveal transitions shift the boxes by 26px; remeasure once they settle.
+  setTimeout(measureClear, 1100);
+  setTimeout(measureClear, 3200);
 
-        // Section 2 -> 3: CAMERA ZOOM INTO LEAF CLUSTER NODES
-        timeline.to(treeGroup.position, {
-            x: 6,
-            y: -11,
-            z: 18,
-            duration: 2,
-            ease: "power2.inOut"
-        }, 2)
-        .to(treeGroup.rotation, {
-            x: -0.2,
-            z: 0.2,
-            duration: 2
-        }, 2);
+  /* render loop */
+  var clock = new THREE.Clock();
+  var pointerX = 0, pointerY = 0, smoothX = 0, smoothY = 0;
+  if (!reduceMotion) {
+    window.addEventListener('mousemove', function (e) {
+      pointerX = (e.clientX / W - 0.5) * 2;
+      pointerY = (e.clientY / H - 0.5) * 2;
+    }, { passive: true });
+  }
 
-        // Section 3 -> 4: Lift up to Canopy Zenith
-        timeline.to(treeGroup.position, {
-            x: 0,
-            y: -3,
-            z: 4,
-            duration: 2,
-            ease: "power2.inOut"
-        }, 4)
-        .to(treeGroup.scale, {
-            x: 1.15,
-            y: 1.15,
-            z: 1.15,
-            duration: 2
-        }, 4);
+  function animate() {
+    requestAnimationFrame(animate);
+    var t = clock.getElapsedTime();
+    smoothX += (pointerX - smoothX) * 0.045;
+    smoothY += (pointerY - smoothY) * 0.045;
 
-    </script>
+    if (!reduceMotion) {
+      starMat.rotation = Math.sin(t * 0.6) * 0.06;
+      if (!introActive) {
+        pivot.rotation.y = idleBase + t * 0.045 + smoothX * 0.16;
+        pivot.rotation.x = smoothY * 0.035;
+      }
+    }
+    scene.updateMatrixWorld(true);
+
+    for (var oi = 0; oi < ornaments.length; oi++) {
+      var o = ornaments[oi];
+      proj.copy(o.pos);
+      if (!reduceMotion) {
+        proj.x += Math.sin(t * 0.75 + o.phase) * 0.16;
+        proj.y += Math.cos(t * 0.6 + o.phase) * 0.10;
+      }
+      tree.localToWorld(proj);
+      var wz = proj.z;
+      proj.project(camera);
+      var sx = (proj.x * 0.5 + 0.5) * W;
+      var sy = (-proj.y * 0.5 + 0.5) * H;
+      var depth = Math.max(0.55, Math.min(1.18, 0.80 + wz * 0.022));
+      var scale = o.base * depth * introFX.badge;
+      var rot = Math.sin(t * 0.7 + o.phase) * 7;
+      o.el.style.transform = 'translate3d(' + sx.toFixed(1) + 'px,' +
+        sy.toFixed(1) + 'px,0) rotate(' + rot.toFixed(1) + 'deg) scale(' +
+        scale.toFixed(3) + ')';
+      // Only the badges on the near side of the tree stay bright; the ones
+      // behind the canopy recede. Depth reads clearly instead of turning
+      // into a flat pile of semi-transparent squares.
+      var facing = Math.max(0.04, Math.min(1, (wz + 2.5) / 6.5));
+      var vis = proj.z < 1 ? facing : 0;
+      var veil = introActive ? 1 : (W < 900 ? 0 : clearance(sx, sy));
+      o.el.style.opacity = (vis * veil).toFixed(2);
+    }
+    renderer.render(scene, camera);
+  }
+  animate();
+
+  /* ── One-time entrance ───────────────────────────────────────
+     A huge close-up tree rushes in from the right, sweeps across the
+     screen, rises to the top of the page, then drops behind the
+     wordmark and settles into its slow idle spin.
+     Plays on the first load only; afterwards the page opens straight
+     into the calm state. ?intro=1 replays it, ?intro=0 skips it.
+     Written by hand so it plays even if the animation CDN is down.  */
+  var INTRO_KEY = 'yggdrasil:intro:v3';
+  var forceIntro = /[?&]intro=1/.test(location.search);
+  var skipIntro = /[?&]intro=0/.test(location.search);
+  var seen = false;
+  try { seen = window.localStorage.getItem(INTRO_KEY) === '1'; } catch (e) {}
+  var playIntro = !reduceMotion && !skipIntro && (!seen || forceIntro);
+  var heroReveals = document.querySelectorAll('.hero [data-reveal]');
+
+  function eachHero(fn) { Array.prototype.forEach.call(heroReveals, fn); }
+
+  // Hide every hero element at once — no staggered fades during the entrance.
+  if (playIntro) document.body.classList.add('intro-stage');
+
+  var heroArrived = false;
+  function finishHero() {
+    if (heroArrived) return;
+    heroArrived = true;
+    eachHero(function (el) {
+      el.classList.add('is-in');
+      // Keep the settled values inline: no paused transition can ever leave
+      // the headline looking ghosted.
+      el.style.transition = 'none';
+      el.style.opacity = '1';
+      el.style.transform = 'none';
+    });
+  }
+
+  // All hero copy arrives together, as one short unified move. Driven by a
+  // timer so it cannot be left half-faded by a paused CSS animation.
+  function showHero() {
+    document.body.classList.remove('intro-stage');
+    eachHero(function (el) {
+      el.style.transition = 'none';
+      el.style.opacity = '0';
+      el.style.transform = 'translate3d(0,20px,0)';
+    });
+    var h0 = Date.now(), ht = 0;
+    ht = setInterval(function () {
+      if (heroArrived) { clearInterval(ht); return; }
+      var p = Math.min(1, (Date.now() - h0) / 620);
+      var e = 1 - Math.pow(1 - p, 3);
+      eachHero(function (el) {
+        el.style.opacity = e.toFixed(3);
+        el.style.transform = 'translate3d(0,' + (20 * (1 - e)).toFixed(1) + 'px,0)';
+      });
+      if (p >= 1) { clearInterval(ht); finishHero(); }
+    }, 16);
+    setTimeout(function () { clearInterval(ht); finishHero(); }, 900);
+  }
+
+  function afterImages(cb) {
+    var imgs = Array.prototype.slice.call(layer.querySelectorAll('img'));
+    var left = imgs.length, done = false;
+    function fire() { if (!done) { done = true; cb(); } }
+    function tick() { if (--left <= 0) fire(); }
+    if (!left) return fire();
+    imgs.forEach(function (im) {
+      if (im.complete) { tick(); return; }
+      im.addEventListener('load', tick, { once: true });
+      im.addEventListener('error', tick, { once: true });
+    });
+    setTimeout(fire, 1200);
+  }
+
+  function whenLoaded(cb) {
+    var done = false;
+    function fire() { if (!done) { done = true; cb(); } }
+    function start() { afterImages(fire); }
+    if (document.readyState === 'complete') start();
+    else window.addEventListener('load', start, { once: true });
+    setTimeout(fire, 2400); // never hold the page hostage on a slow network
+  }
+
+  function runIntro() {
+    var mobile = W < 720;
+    var camZ = camera.position.z;
+    // A dolly-in, not a giant scaled object pushed toward the lens: keeps
+    // every vertex safely in front of the camera and the badges in sync.
+    var closeZ = mobile ? 30 : 26;
+    var halfW = Math.tan(50 * Math.PI / 360) * (W / H) * closeZ;
+    var startS = mobile ? 1.9 : 2.0;
+    var startY = 4.2 * startS;
+    var startX = halfW * 0.26;
+
+    var hoverY = mobile ? 11 : 10.5;
+    var hoverS = HOME.s * 0.82;
+
+    // Three moves only: fill the screen, slide left and hover above the page,
+    // then drop straight down behind the wordmark. No spin, no tilt, no fuss.
+    var K = [
+      { t: 0.00, x: startX, y: startY, s: startS,  cz: closeZ, sz: .45, b: 1.55 },
+      { t: 1.15, x: HOME.x, y: hoverY, s: hoverS,  cz: camZ,   sz: 1,   b: 1.10 },
+      { t: 1.48, x: HOME.x, y: hoverY, s: hoverS,  cz: camZ,   sz: 1,   b: 1.10 },
+      { t: 2.55, x: HOME.x, y: HOME.y, s: HOME.s, cz: camZ,   sz: 1,   b: 1 }
+    ];
+
+    function easeInOut(t) { return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+    function easeOutBack(t) { var c = .62; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); }
+    function mix(a, b, u) { return a + (b - a) * u; }
+    function apply(k) {
+      pivot.position.set(k.x, k.y, 0);
+      pivot.scale.setScalar(k.s);
+      pivot.rotation.set(0, 0, 0);
+      tree.scale.z = k.sz;
+      camera.position.z = k.cz;
+      camera.updateProjectionMatrix();
+      introFX.badge = k.b;
+    }
+
+    introActive = true;
+    canvas.classList.add('intro-fly');
+    var t0 = Date.now(), heroShown = false, ticker = 0, finished = false;
+    apply(K[0]);
+
+    function frame() {
+      var e = (Date.now() - t0) / 1000;
+      var seg = e < K[1].t ? 0 : (e < K[2].t ? 1 : 2);
+      var a = K[seg], b = K[seg + 1];
+      var u = Math.max(0, Math.min(1, (e - a.t) / (b.t - a.t)));
+      var w = seg === 2 ? easeOutBack(u) : easeInOut(u);
+      var k = {};
+      ['x', 'y', 's', 'cz', 'sz', 'b'].forEach(function (p) { k[p] = mix(a[p], b[p], w); });
+      apply(k);
+
+      if (!heroShown && e >= K[2].t) { heroShown = true; showHero(); }
+      if (e >= K[3].t) finish();
+    }
+
+    function finish() {
+      if (finished) return;
+      finished = true;
+      clearInterval(ticker);
+      introActive = false;
+      canvas.classList.remove('intro-fly'); // CSS fades the tree into a background
+      document.body.classList.remove('intro-stage');
+      pivot.position.set(HOME.x, HOME.y, 0);
+      pivot.scale.setScalar(HOME.s);
+      pivot.rotation.set(0, 0, 0);
+      tree.scale.z = 1;
+      camera.position.z = camZ;
+      camera.updateProjectionMatrix();
+      introFX.badge = 1;
+      idleBase = -clock.getElapsedTime() * 0.045; // resume the idle spin without a jump
+      if (!heroShown) showHero();
+      finishHero();
+      measureClear();
+      // JS-driven fade into the background — no CSS transition dependency.
+      canvas.style.opacity = '1';
+      canvas.classList.remove('intro-fly');
+      var targetOpacity = W < 900 ? .42 : .92;
+      var f0 = Date.now(), ft = 0;
+      ft = setInterval(function () {
+        var p = Math.min(1, (Date.now() - f0) / 700);
+        canvas.style.opacity = (1 + (targetOpacity - 1) * p).toFixed(3);
+        if (p >= 1) { clearInterval(ft); canvas.style.opacity = String(targetOpacity); }
+      }, 16);
+      setTimeout(function () {
+        clearInterval(ft);
+        canvas.style.opacity = String(targetOpacity);
+      }, 1000);
+      try { window.localStorage.setItem(INTRO_KEY, '1'); } catch (e2) {}
+    }
+
+    // Timer-driven on purpose: the pose always settles, even on a throttled
+    // tab where animation frames stop firing. The WebGL loop does the drawing.
+    ticker = setInterval(frame, 16);
+    // Absolute stop: the entrance can never get stuck as a full-screen shot,
+    // even if timers are throttled or wall-clock sampling misbehaves.
+    setTimeout(finish, 3400);
+  }
+
+  if (playIntro) whenLoaded(runIntro);
+
+  window.addEventListener('resize', function () {
+    W = window.innerWidth;
+    H = window.innerHeight;
+    camera.aspect = W / H;
+    if (!introActive) camera.position.z = W < 720 ? 52 : 46;
+    camera.updateProjectionMatrix();
+    renderer.setSize(W, H);
+    HOME = homePose();
+    if (!introActive) placeTree();
+  });
+
+  /* The tree belongs to the hero only. Once the hero scrolls away the
+     stage scrolls with it, so there is no cross-Section parallax to run. */
+})();
+</script>
+
+<script>
+/* ── Warm sparkles around the edges, gently reactive to the pointer ── */
+(function () {
+  var canvas = document.getElementById('sparkles');
+  if (!canvas) return;
+  var ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var W = 0, H = 0, dpr = 1, pts = [];
+  var mx = -9999, my = -9999;
+  var RADIUS = 155;
+
+  // One pre-rendered glow, reused for every sparkle.
+  var sprite = document.createElement('canvas');
+  sprite.width = sprite.height = 64;
+  var sc = sprite.getContext('2d');
+  var glow = sc.createRadialGradient(32, 32, 0, 32, 32, 32);
+  glow.addColorStop(0, 'rgba(255,240,186,1)');
+  glow.addColorStop(.22, 'rgba(255,211,98,.92)');
+  glow.addColorStop(.55, 'rgba(255,190,60,.26)');
+  glow.addColorStop(1, 'rgba(255,180,40,0)');
+  sc.fillStyle = glow;
+  sc.fillRect(0, 0, 64, 64);
+
+  function point() {
+    // Evenly, sparsely scattered — not clustered along the edges.
+    return { x: 24 + Math.random() * (W - 48), y: 24 + Math.random() * (H - 48) };
+  }
+
+  function build() {
+    var n = W < 720 ? 16 : 30;
+    pts = [];
+    for (var i = 0; i < n; i++) {
+      var p = point();
+      pts.push({
+        x: p.x, y: p.y, dx: 0, dy: 0,
+        r: 0.7 + Math.random() * 1.0,
+        a: .20 + Math.random() * .34,
+        ph: Math.random() * Math.PI * 2,
+        sp: .35 + Math.random() * .9,
+        drift: 5 + Math.random() * 12
+      });
+    }
+  }
+
+  function resize() {
+    W = window.innerWidth; H = window.innerHeight;
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.round(W * dpr);
+    canvas.height = Math.round(H * dpr);
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    build();
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  window.addEventListener('pointermove', function (e) {
+    mx = e.clientX; my = e.clientY;
+  }, { passive: true });
+  window.addEventListener('pointerleave', function () { mx = my = -9999; });
+  document.addEventListener('mouseleave', function () { mx = my = -9999; });
+
+  var t0 = performance.now();
+  function draw(now) {
+    if (!reduce) requestAnimationFrame(draw);
+    var t = reduce ? 0 : (now - t0) / 1000;
+    ctx.clearRect(0, 0, W, H);
+
+    for (var i = 0; i < pts.length; i++) {
+      var p = pts[i];
+      var px = p.x + Math.sin(t * p.sp + p.ph) * p.drift;
+      var py = p.y + Math.cos(t * p.sp * .8 + p.ph) * p.drift * .7;
+      var ddx = px - mx, ddy = py - my;
+      var d = Math.sqrt(ddx * ddx + ddy * ddy);
+      var near = (!reduce && d < RADIUS) ? (1 - d / RADIUS) : 0;
+      // The only interaction: drift away from the pointer, spring back after.
+      var tx = near * 72 * (ddx / (d || 1));
+      var ty = near * 72 * (ddy / (d || 1));
+      p.dx += (tx - p.dx) * .075;
+      p.dy += (ty - p.dy) * .075;
+
+      var x = px + p.dx, y = py + p.dy;
+      var twinkle = .62 + .38 * Math.sin(t * 1.9 + p.ph);
+      ctx.globalAlpha = Math.min(1, p.a * twinkle);
+      var size = p.r;
+      ctx.drawImage(sprite, x - size * 3.5, y - size * 3.5, size * 7, size * 7);
+    }
+    ctx.globalAlpha = 1;
+  }
+  requestAnimationFrame(draw);
+})();
+</script>
 </body>
 </html>
