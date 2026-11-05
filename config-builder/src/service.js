@@ -27,14 +27,15 @@ export function serviceOrigin(value) {
   return url.origin;
 }
 
+// The wizard is served by the same origin as the subscription service. There
+// is no unconfigured / offline-only mode: a failed probe is a hard error.
 // Probe only the public health route. Airport credentials are never included.
 export async function probeService(origin, version, fetcher = fetch) {
   const base = serviceOrigin(origin);
   if (!base)
     return {
-      state: "unconfigured",
-      message:
-        "可直接读取允许跨域的订阅。连接可信服务后，可代取订阅并生成持久链接。",
+      state: "offline",
+      message: "当前站点未提供订阅服务，请通过已部署服务的地址访问。",
     };
   let response;
   try {
@@ -50,7 +51,7 @@ export async function probeService(origin, version, fetcher = fetch) {
       message:
         error.name === "TimeoutError"
           ? "连接订阅服务超时，请重试。"
-          : "无法连接订阅服务，请检查地址、网络及服务的访问权限。",
+          : "无法连接订阅服务，请检查网络或稍后重试。",
     };
   }
   let health;
@@ -59,7 +60,7 @@ export async function probeService(origin, version, fetcher = fetch) {
   } catch {
     return {
       state: "offline",
-      message: "服务响应无效，请确认填写的是订阅服务地址。",
+      message: "服务响应无效，请确认当前站点已部署订阅服务。",
     };
   }
   if (!response.ok || health?.ready !== true)

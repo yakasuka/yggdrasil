@@ -2,7 +2,6 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { probeService, serviceOrigin } from "../src/service.js";
-import { browserRecords, sourceFailureMessage } from "../src/subscriptions.js";
 import gateway from "../worker/gateway/index.js";
 import { environment } from "./helpers.mjs";
 
@@ -13,18 +12,13 @@ const health = {
   version: "fixture-version",
   capabilities: { tcp: true },
 };
-const provider = {
-  name: "Fixture",
-  url: "https://airport.example/sub?token=fixture-secret",
-};
-const records = (fetcher) =>
-  browserRecords([provider], new Map(), new AbortController().signal, fetcher);
 
-test("local mode does not probe an invented subscription endpoint", async () => {
+test("a missing service is an offline error, never a local mode", async () => {
   const result = await probeService("", health.version, () => {
     throw Error("No network expected");
   });
-  assert.equal(result.state, "unconfigured");
+  assert.equal(result.state, "offline");
+  assert.ok(!result.message.includes("本地"));
 });
 
 test("service connections validate the origin before any request and omit credentials", async () => {
@@ -86,75 +80,51 @@ test("health checks distinguish static sites, missing storage and incompatible t
   assert.ok(!failed.message.includes("private request detail"));
 });
 
-test("direct subscription failures retain HTTP, format and timeout distinctions without credentials", async () => {
-  for (const [fetcher, code] of [
-    [
-      async () => new Response("fixture-secret", { status: 403 }),
-      "SOURCE_HTTP",
-    ],
-    [async () => new Response("<html>fixture-secret</html>"), "SOURCE_FORMAT"],
-    [
-      async () => {
-        throw new DOMException("fixture-secret", "TimeoutError");
-      },
-      "SOURCE_TIMEOUT",
-    ],
-    [
-      async () => {
-        throw new TypeError(provider.url);
-      },
-      "SOURCE_NETWORK",
-    ],
-  ]) {
-    await assert.rejects(records(fetcher), (error) => {
-      assert.equal(error.code, code);
-      assert.ok(!error.message.includes("fixture-secret"));
-      const message = sourceFailureMessage(error, "unconfigured");
-      assert.ok(!message.includes("等待"));
-      if (code === "SOURCE_HTTP" || code === "SOURCE_FORMAT")
-        assert.ok(!message.includes("跨域"));
-      else assert.ok(message.includes("连接服务"));
-      return true;
-    });
-  }
+test("the browser entry has no local-mode fallback or manual service setup", () => {
+  const app = readFileSync(new URL("../src/app.js", import.meta.url), "utf8");
+  assert.ok(app.includes("location.origin"), "frontend must use the same origin");
+  for (const removed of [
+    "browserRecords",
+    "sourceFailureMessage",
+    "config.json",
+    "localStorage",
+    "inlineProxies",
+    "ctx.files",
+    "本地配置模式",
+    "unconfigured",
+  ])
+    assert.ok(!app.includes(removed), `local-mode code remains: ${removed}`);
+  const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
+  for (const removed of [
+    "service-form",
+    "service-origin",
+    "connect-service",
+    "reset-service",
+    "连接设置",
+  ])
+    assert.ok(!html.includes(removed), `local-mode markup remains: ${removed}`);
+  assert.ok(html.includes('id="retry-service"'));
 });
 
-test("invalid imported files are identified without replacing them with remote sources", async () => {
-  await assert.rejects(
-    browserRecords(
-      [provider],
-      new Map([[0, { text: async () => "invalid fixture-secret" }]]),
-      new AbortController().signal,
-      () => {
-        throw Error("No remote request expected");
-      },
-    ),
-    (error) => {
-      assert.equal(error.code, "SOURCE_FILE");
-      assert.ok(!error.message.includes("fixture-secret"));
-      return true;
-    },
-  );
-});
-
-test("the Pages deployment defaults allow the project's GitHub frontend and reject other origins", async () => {
+test("the Pages deployment serves its own origin and rejects unapproved cross-origin calls", async () => {
   const config = JSON.parse(
     readFileSync(new URL("../wrangler.jsonc", import.meta.url), "utf8").replace(
       /,\s*([}\]])/g,
       "$1",
     ),
   );
+  assert.equal(config.vars.ALLOWED_ORIGINS, "");
   const env = { ...environment(), ...config.vars };
-  const allowed = await gateway.fetch(
+  const sameOrigin = await gateway.fetch(
     new Request("https://service.example/api/status", {
-      headers: { Origin: "https://yakasuka.github.io" },
+      headers: { Origin: "https://service.example" },
     }),
     env,
   );
-  assert.equal(allowed.status, 200);
+  assert.equal(sameOrigin.status, 200);
   assert.equal(
-    allowed.headers.get("Access-Control-Allow-Origin"),
-    "https://yakasuka.github.io",
+    sameOrigin.headers.get("Access-Control-Allow-Origin"),
+    "https://service.example",
   );
   const denied = await gateway.fetch(
     new Request("https://service.example/api/status", {

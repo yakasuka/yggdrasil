@@ -892,9 +892,6 @@ details > div {
   font-size: 0.6875rem;
   overflow-wrap: anywhere;
 }
-.service-settings .field {
-  margin-top: 16px;
-}
 .service-actions {
   display: flex;
   flex-wrap: wrap;

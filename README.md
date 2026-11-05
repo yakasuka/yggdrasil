@@ -11,7 +11,7 @@
 
 <p align="center">
   <a href="docs/zh-CN.md">简体中文</a>　·　<a href="docs/en.md">English</a><br />
-  <a href="https://yakasuka.github.io/yggdrasil/config-builder/">打开配置工坊 →</a>
+  <a href="config-builder/docs/DEPLOYMENT.md">部署并打开配置工坊 →</a>
 </p>
 
 <p align="center">

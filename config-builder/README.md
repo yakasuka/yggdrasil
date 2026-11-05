@@ -1,19 +1,17 @@
 # Yggdrasil · config-builder
 
-**[打开配置工坊](https://yakasuka.github.io/yggdrasil/config-builder/)** · [部署指南与复盘](docs/DEPLOYMENT.md) · [项目介绍](../README.md) · [完整实现路径](docs/IMPLEMENTATION.md) · [服务准备](worker/README.md)
+**配置工坊** · [部署指南与复盘](docs/DEPLOYMENT.md) · [项目介绍](../README.md) · [完整实现路径](docs/IMPLEMENTATION.md) · [服务准备](worker/README.md)
 
 五步配置：机场订阅 → 解析节点 → 地区节点 → 节点策略 → APP 分流 → 最终确认。“解析节点”是第 1、2 步之间的状态项，不可选择。
 
 ```text
 config-builder/
 ├── index.html                 # Pages 入口与底部操作按钮
-├── config.json                # 静态预览配置；Pages 运行时动态返回同源地址
 ├── wrangler.jsonc             # Pages 项目、KV 与统一发布输出目录
 ├── src/
-│   ├── app.js                 # 状态、解析和五步引导调度
+│   ├── app.js                 # 状态、五步引导调度与同源接口调用
 │   ├── panels/                # 订阅 / 地区 / 策略 / APP / 确认，分别维护
 │   ├── service.js             # 地址校验、健康检查与返回链接校验
-│   ├── subscriptions.js       # 浏览器拉取与节点文件导入
 │   ├── ui.js                  # 文本转义、流量卡片与显示格式
 │   └── styles.css
 ├── shared/
@@ -41,10 +39,10 @@ npm --prefix config-builder test
 npm --prefix config-builder run service:dev
 ```
 
-打开 `http://localhost:8788/config-builder/`。旧 `/webui/`、`/builder/` 和 `/Configurator/` 会跳转到新入口。
+打开 `http://localhost:8788/config-builder/` 可本地开发预览；正式的公开入口是部署后的 `https://<项目名>.pages.dev/config-builder/`。旧 `/webui/`、`/builder/` 和 `/Configurator/` 会跳转到新入口。
 
 修改源码后构建并提交 `assets/` 与 `shared/catalog.json`。新增模板内容的格式、相同 Token 跟随模板更新的机制，以及流量和 TCP 检测的实际边界，见 [完整实现路径](docs/IMPLEMENTATION.md)。
 
-网页先尝试直接拉取订阅并解码 Base64；无法跨域读取时由 Pages 代取。KV 保存加密的用户选择和 YAML 快照，订阅拉取会更新节点与真实流量。完整配置保留所选地区和 P1/P2 来源标识。
+页面与订阅服务同源部署在 Cloudflare Pages：浏览器只把机场链接提交给 `/api/inspect`，由服务拉取、解码并只返回节点清单与真实流量；预览、下载与持久订阅分别由 `/api/preview`、`/api/subscriptions` 生成。KV 保存加密的用户选择和 YAML 快照，完整配置保留所选地区和 P1/P2 来源标识。
 
-GitHub Pages 的默认 `apiBase` 留空，页面会显示本地模式。订阅服务部署后，可在“连接设置”填写可信服务地址，或由维护者更新 `config.json`；Cloudflare Pages 会自动连接同源服务。未部署后端时，跨域代取和持久订阅仍不可用，文件导入、预览和下载可独立使用。
+没有独立的本地 / 离线模式，也没有手动填写服务地址的入口：服务未就绪时向导会停止并给出明确提示。GitHub 负责代码托管与 Actions 构建测试，Cloudflare Pages 负责静态资源、Functions 接口与 KV，两者免费额度即可运行，不需要自建或租用服务器。部署与验收见 [部署指南](docs/DEPLOYMENT.md)。

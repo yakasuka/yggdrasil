@@ -25,7 +25,7 @@ export function reviewPanel(ctx) {
       ? notice(
           "订阅服务已连接。Token 在有效期内保持不变，拉取时按最新模板生成配置。",
         )
-      : notice("在线订阅尚未连接。你可以预览或下载当前配置。", true)) +
+      : notice("订阅服务暂不可用，请重试连接或联系维护者。", true)) +
     '<div id="result-area"></div>'
   );
 }
