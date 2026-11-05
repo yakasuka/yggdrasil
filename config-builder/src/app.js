@@ -9,17 +9,14 @@ import {
   compile,
   normalize,
   normalizeProviders,
-  STRATEGIES,
 } from "../shared/compiler.js";
-import { publicInspection } from "../shared/nodes.js";
 import { filename } from "../shared/profile.js";
 import {
   SERVICE_ROUTES,
-  serviceOrigin,
   subscriptionURL,
   probeService,
 } from "./service.js";
-import { esc, usageCards } from "./ui.js";
+import { esc } from "./ui.js";
 import {
   sourcesPanel,
   providerCard,
@@ -29,33 +26,28 @@ import { regionsPanel } from "./panels/regions.js";
 import { strategiesPanel } from "./panels/strategies.js";
 import { appsPanel } from "./panels/apps.js";
 import { reviewPanel, resultPanel } from "./panels/review.js";
-import { browserRecords, sourceFailureMessage } from "./subscriptions.js";
 const $ = (s) => document.querySelector(s);
 const steps = ["订阅来源", "地区节点", "节点策略", "APP 分流", "最终确认"];
+// The page and the subscription service are always deployed together. All
+// parsing, preview, download and subscription creation happen in the service.
+const apiBase = location.origin;
 const ctx = {
   profile: defaults(),
-  files: new Map(),
   inspection: null,
   service: "checking",
   serviceMessage: "正在检查订阅服务…",
   search: "",
   phase: "idle",
   probeDone: 0,
-  tcp: false,
 };
-let sourceProxies = null;
 let step = 0,
   furthest = 0,
   busy = false,
-  apiBase = "",
   revision = 0,
   result = null,
   inspectionController,
   probeController;
-const serviceStorageKey =
-  "yggdrasil:service-origin:" + new URL(".", location.href).pathname;
-let serviceTask = null,
-  serviceRevision = 0;
+let serviceRevision = 0;
 let pointToStep;
 const panels = [
   sourcesPanel,
@@ -84,7 +76,6 @@ function invalidate() {
   inspectionController?.abort();
   probeController?.abort();
   ctx.inspection = null;
-  sourceProxies = null;
   ctx.phase = "idle";
   ctx.probeDone = 0;
   furthest = 0;
@@ -158,10 +149,11 @@ function renderNav() {
 }
 function footer() {
   const final = step === 4;
+  const ready = ctx.service === "ready";
   $("#back").disabled = busy || step === 0;
   $("#download").hidden = !final;
-  $("#download").disabled = busy;
-  $("#next").disabled = busy || (final && ctx.service !== "ready");
+  $("#download").disabled = busy || !ready;
+  $("#next").disabled = busy || !ready;
   $("#next").innerHTML = busy
     ? ctx.phase === "loading"
       ? "正在解析…"
@@ -251,69 +243,39 @@ function navigate(next) {
 function renderService() {
   $("#service-label").textContent = {
     checking: "正在检查订阅服务",
-    unconfigured: "本地配置模式",
     ready: "订阅服务已连接",
     offline: "订阅服务未连接",
     mismatch: "订阅服务版本不一致",
   }[ctx.service];
   $("#service-description").textContent = ctx.serviceMessage;
   $("#service-settings").dataset.state = ctx.service;
-  for (const input of $("#service-form").querySelectorAll("input,button"))
-    input.disabled = busy || ctx.service === "checking";
+  $("#retry-service").disabled = busy || ctx.service === "checking";
 }
-function checkService(origin) {
+function checkService() {
   const ticket = ++serviceRevision;
   ctx.service = "checking";
   ctx.serviceMessage = "正在检查订阅服务…";
-  ctx.tcp = false;
   renderService();
-  serviceTask = (async () => {
-    let target = origin,
-      status;
+  return (async () => {
+    let status;
     try {
-      if (target === undefined) {
-        const response = await fetch("./config.json", {
-          cache: "no-store",
-          credentials: "omit",
-          signal: AbortSignal.timeout(10000),
-        });
-        if (!response.ok) throw Error();
-        const settings = await response.json();
-        const configured = serviceOrigin(settings.apiBase) || "";
-        let saved = "";
-        try {
-          saved = serviceOrigin(localStorage.getItem(serviceStorageKey)) || "";
-        } catch {}
-        // A same-origin Pages deployment remains authoritative after migration.
-        target =
-          configured === location.origin ? configured : saved || configured;
-      }
-      status = await probeService(target, catalog.version);
+      status = await probeService(apiBase, catalog.version);
     } catch {
       status = {
         state: "offline",
-        message: "无法读取服务配置，请重试连接或填写有效的服务地址。",
+        message: "订阅服务暂不可用，请稍后重试或联系维护者。",
       };
     }
     if (ticket !== serviceRevision) return status;
-    apiBase = target || "";
     ctx.service = status.state;
     ctx.serviceMessage = status.message;
-    ctx.tcp = status.tcp === true;
-    if (status.state === "ready" && origin !== undefined) {
-      try {
-        localStorage.setItem(serviceStorageKey, apiBase);
-      } catch {}
-    }
-    $("#service-origin").value = apiBase;
     if (!busy && step === 4) render();
     else footer();
     return status;
   })();
-  return serviceTask;
 }
 async function resolveSources() {
-  if (busy) return;
+  if (busy || ctx.service !== "ready") return;
   let providers;
   try {
     providers = normalizeProviders(ctx.profile.providers);
@@ -321,7 +283,6 @@ async function resolveSources() {
     error(e.message);
     return;
   }
-  const local = ctx.files.size === providers.length;
   busy = true;
   ctx.phase = "loading";
   clearError();
@@ -330,39 +291,17 @@ async function resolveSources() {
   const rev = revision;
   inspectionController = new AbortController();
   try {
-    let inspection;
-    try {
-      const records = await browserRecords(
-        providers,
-        ctx.files,
+    const response = await fetch(apiBase + SERVICE_ROUTES.inspect, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ providers }),
+      signal: AbortSignal.any([
         inspectionController.signal,
-      );
-      sourceProxies = records.map((r) => r.proxies);
-      inspection = publicInspection(records, catalog, {
-        tcp: !ctx.files.size && ctx.service === "ready" && ctx.tcp,
-      });
-    } catch (directError) {
-      sourceProxies = null;
-      if (local || directError.code === "SOURCE_FILE") throw directError;
-      if (rev !== revision || inspectionController.signal.aborted) return;
-      if (ctx.service === "checking") await serviceTask;
-      else if (ctx.service !== "ready" && apiBase) await checkService(apiBase);
-      if (rev !== revision || inspectionController.signal.aborted) return;
-      if (ctx.service !== "ready")
-        throw Error(sourceFailureMessage(directError, ctx.service));
-      const response = await fetch(apiBase + SERVICE_ROUTES.inspect, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ providers }),
-        signal: AbortSignal.any([
-          inspectionController.signal,
-          AbortSignal.timeout(90000),
-        ]),
-      });
-      const data = await response.json();
-      if (!response.ok) throw Error(data.error || "解析暂时不可用。");
-      inspection = data;
-    }
+        AbortSignal.timeout(90000),
+      ]),
+    });
+    const inspection = await response.json();
+    if (!response.ok) throw Error(inspection.error || "解析暂时不可用。");
     if (rev !== revision) return;
     if (inspection.providers.some((p) => p.error))
       throw Error(
@@ -444,16 +383,13 @@ async function updateSummary() {
         title: ctx.profile.title || "未命名",
       },
       catalog,
-      sourceProxies ? { inlineProxies: sourceProxies } : {},
     );
     if (step !== 4 || rev !== revision) return;
     $("#rule-count").textContent = output.summary.rules;
     $("#file-name").textContent = ctx.profile.title
       ? filename(ctx.profile.title)
       : "名字-ratatoskr.yaml";
-    $("#file-size").textContent = sourceProxies
-      ? `${(output.summary.bytes / 1024).toFixed(1)} KiB · ${output.summary.groups} 个策略组`
-      : `节点在生成时写入 · ${output.summary.groups} 个策略组`;
+    $("#file-size").textContent = `节点在生成时写入 · ${output.summary.groups} 个策略组`;
   } catch (e) {
     if (step === 4 && rev === revision)
       $("#file-size").textContent = "请检查配置选择";
@@ -522,21 +458,18 @@ async function download() {
   }
 }
 async function configurationOutput() {
+  if (ctx.service !== "ready")
+    throw Error("订阅服务未连接，请稍后重试。");
   const profile = normalize(ctx.profile);
-  if (sourceProxies)
-    return compile(profile, catalog, { inlineProxies: sourceProxies });
-  if (ctx.service === "ready") {
-    const response = await fetch(apiBase + SERVICE_ROUTES.preview, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(profile),
-      signal: AbortSignal.timeout(90000),
-    });
-    const data = await response.json();
-    if (!response.ok) throw Error(data.error || "配置暂时无法生成。");
-    return data;
-  }
-  throw Error("请先解析订阅。");
+  const response = await fetch(apiBase + SERVICE_ROUTES.preview, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(profile),
+    signal: AbortSignal.timeout(90000),
+  });
+  const data = await response.json();
+  if (!response.ok) throw Error(data.error || "配置暂时无法生成。");
+  return data;
 }
 let toastTimer;
 function toast(text) {
@@ -545,23 +478,6 @@ function toast(text) {
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => ($("#toast").hidden = true), 2500);
 }
-document.addEventListener("submit", async (e) => {
-  if (e.target.id !== "service-form") return;
-  e.preventDefault();
-  if (busy || ctx.service === "checking") return;
-  let origin;
-  try {
-    origin = serviceOrigin($("#service-origin").value);
-    if (!origin) throw Error("请先填写订阅服务的公开地址。");
-  } catch (e) {
-    $("#service-description").textContent = e.message;
-    return;
-  }
-  invalidate();
-  step = 0;
-  render();
-  await checkService(origin);
-});
 document.addEventListener("input", (e) => {
   const el = e.target;
   if (el.dataset.provider !== undefined) {
@@ -622,21 +538,10 @@ document.addEventListener("change", (e) => {
 document.addEventListener("click", async (e) => {
   const el = e.target.closest("button");
   if (!el || el.disabled) return;
-  if (el.id === "retry-service" || el.id === "reset-service") {
-    if (el.id === "reset-service") {
-      invalidate();
-      step = 0;
-      render();
-      try {
-        localStorage.removeItem(serviceStorageKey);
-      } catch {}
-    } else {
-      changed();
-      probeController?.abort();
-    }
-    await checkService(
-      el.id === "retry-service" ? apiBase || undefined : undefined,
-    );
+  if (el.id === "retry-service") {
+    changed();
+    probeController?.abort();
+    await checkService();
     return;
   }
   if (el.id === "next") {
@@ -668,11 +573,6 @@ document.addEventListener("click", async (e) => {
     const index = Number(el.dataset.remove),
       slot = el.closest(".provider-slot");
     ctx.profile.providers.splice(index, 1);
-    ctx.files = new Map(
-      [...ctx.files]
-        .filter(([i]) => i !== index)
-        .map(([i, file]) => [i > index ? i - 1 : i, file]),
-    );
     slot.classList.add("is-removing");
     slot.setAttribute("aria-hidden", "true");
     slot

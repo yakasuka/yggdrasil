@@ -2,11 +2,10 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { parse } from "yaml";
 import { parseSubscription, nodeInventory } from "../shared/subscription.js";
-import { publicInspection } from "../shared/nodes.js";
+import { publicInspection, parseUsage } from "../shared/nodes.js";
 import { compile, catalog } from "../shared/compiler.js";
 import { createWorker } from "../worker/application.js";
 import { open, seal, secret } from "../worker/crypto.js";
-import { browserRecords } from "../src/subscriptions.js";
 import { profile, environment, post } from "./helpers.mjs";
 
 const b64 = (text) => Buffer.from(text).toString("base64");
@@ -84,23 +83,16 @@ test("common URI formats convert to Mihomo nodes and unsupported entries are cou
   );
 });
 
-test("browser reads and decodes sources before service access, while only inventory reaches wizard data", async () => {
-  let calls = 0;
-  const records = await browserRecords(
-    profile().providers,
-    new Map(),
-    new AbortController().signal,
-    async (_url, init) => {
-      calls++;
-      assert.equal(init.mode, "cors");
-      assert.equal(init.credentials, "omit");
-      return new Response(b64(vmess()), {
-        headers: { "Subscription-Userinfo": "upload=1; download=2; total=10" },
-      });
+test("decoded sources expose only the inventory, never node credentials", () => {
+  const parsed = parseSubscription(b64(vmess()));
+  const records = [
+    {
+      name: "Fixture",
+      nodes: nodeInventory(parsed.proxies, 0),
+      proxies: parsed.proxies,
+      usage: parseUsage("upload=1; download=2; total=10"),
     },
-  );
-  assert.equal(calls, 1);
-  assert.equal(records[0].proxies[0].uuid, uuid);
+  ];
   const visible = publicInspection(records, catalog);
   assert.equal(visible.regions[0].id, "JP");
   assert.equal(visible.usage.remaining, 7);

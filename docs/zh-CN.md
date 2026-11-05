@@ -42,21 +42,21 @@ Yggdrasil 面向一站式的使用体验：使用者通过 config-builder 模块
 
 <p align="center"><strong>选择所需内容 → 组装个人配置 → 获取文件或订阅 → 导入客户端</strong></p>
 
-打开 **[Ratatoskr 配置工坊](https://yakasuka.github.io/yggdrasil/config-builder/)**，依次完成五步：
+打开部署后的 **Ratatoskr 配置工坊**（`https://<项目名>.pages.dev/config-builder/`，[部署方式](../config-builder/docs/DEPLOYMENT.md)），依次完成五步：
 
 1. **订阅来源。** 填写机场名称与 YAML、Base64 或常见节点链接订阅，随后解析节点和机场报告的流量信息。
 2. **地区节点。** 只展示订阅中确实拥有的地区，选择需要保留的节点范围。
 3. **节点策略。** 四种自动策略按需保留，默认出口为手动选择。
 4. **APP 分流。** 默认全部启用并跟随代理，也可指定已保留的地区、Direct 或 Reject。规则和最终出口由模板统一维护。
-5. **最终确认。** 预览配置，下载 `名字-ratatoskr.yaml`，或在服务上线后生成持久订阅链接。
+5. **最终确认。** 预览配置，下载 `名字-ratatoskr.yaml`，或生成持久订阅链接。
 
 **[ratatoskr-template.yaml](../resources/template/ratatoskr-template.yaml)** 是 APP、地区与规则的唯一目录来源。模板新增 APP 或地区后，构建会同步页面目录和后端模板；重新部署 Pages 后，同一 Token 可取得新的配置。完整的数据流与每项功能的位置见 **[实现路径](../config-builder/docs/IMPLEMENTATION.md)**。
 
 个人订阅使用独立随机 Token，持续时间可选 **3 小时 / 7 天 / 30 天 / 永久**。配置标题下的 catalog 指纹只标识模板版本，不用作访问凭据。节点来源保留 `[P1]`、`[P2]` 标识。
 
-GitHub Pages 提供静态前端入口；完整在线服务使用 Cloudflare Pages 同时承载前端与接口，直接连接 KV 保存加密配置与 YAML 快照。网页优先直接读取与解码订阅；遇到跨域限制时由同源接口代取。生成配置包含所选地区的完整节点，支持文件下载与持久订阅链接。仓库提供通用部署模板，使用自己的项目名称与 KV 绑定接入，见 **[部署指南与故障复盘](../config-builder/docs/DEPLOYMENT.md)**。
+配置工坊与订阅服务同源部署在 Cloudflare Pages：页面把机场链接提交给同源接口，由服务端拉取与解码，直接连接 KV 保存加密配置与 YAML 快照。生成配置包含所选地区的完整节点，支持文件下载与持久订阅链接。GitHub 负责代码托管与 Actions 构建，Cloudflare Pages 负责静态资源、Functions 接口与 KV，两者免费额度即可运行，无需自建或租用服务器；公开入口为 `https://<项目名>.pages.dev/config-builder/`。仓库提供通用部署模板，使用自己的项目名称与 KV 绑定接入，见 **[部署指南与故障复盘](../config-builder/docs/DEPLOYMENT.md)**。
 
-尚未部署服务时，GitHub Pages 入口明确显示本地模式，可直接解析允许跨域的订阅或导入节点文件，完成预览和下载。服务上线后，在页面“连接设置”中接入，或由维护者填写默认公开地址；跨域代取和持久订阅需要该服务实际可用。
+没有独立的本地模式，也没有手动填写服务地址的入口：服务未就绪时向导会停止并提示重试；GitHub Pages 上的静态副本不提供可用功能。
 
 机场流量来自 `Subscription-Userinfo`，随订阅或手动刷新更新；缺失时明确显示未知。可选检测测量服务器到节点的 TCP 建连耗时，不将其标为 ICMP ping 或完整代理延迟。
 

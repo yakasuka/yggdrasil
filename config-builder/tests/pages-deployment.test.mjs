@@ -63,7 +63,7 @@ test("same-origin site can create subscriptions and unconfigured cross-origin si
   );
 });
 
-test("public site discovers its own service and does not expose private source paths", async () => {
+test("public site serves its own assets and does not expose private source paths", async () => {
   const served = [],
     env = {
       ASSETS: {
@@ -77,9 +77,7 @@ test("public site discovers its own service and does not expose private source p
     new Request("https://configurator.example/config-builder/config.json"),
     env,
   );
-  assert.deepEqual(await settings.json(), {
-    apiBase: "https://configurator.example",
-  });
+  assert.equal(settings.status, 404);
   for (const path of [
     "/",
     "/config-builder/",
