@@ -1,0 +1,5 @@
+# Custom_Proxy_Classical_IP.yaml - 代理经典规则增量 (behavior: classical)
+# 示例（classical 支持完整规则行）：
+#   - IP-CIDR,192.0.2.0/24,no-resolve
+#   - DOMAIN-SUFFIX,example.org
+payload:

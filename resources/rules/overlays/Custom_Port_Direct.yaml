@@ -1,0 +1,5 @@
+# Custom_Port_Direct.yaml - 端口规则增量 (behavior: classical)
+# 示例：
+#   - DST-PORT,8080
+#   - DST-PORT,9000-9100
+payload:

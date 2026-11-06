@@ -1,0 +1,60 @@
+name: Sync Aethersailor rule providers
+
+# An external repo cannot trigger this workflow directly, so we poll every 15
+# minutes and let scripts/sync-rule-providers.mjs decide (via per-file blob SHA)
+# whether a merge is actually needed. Offsets avoid the top-of-hour rush.
+# A push to overlays/ (adding OR removing rules) rebuilds immediately, so the
+# generated files never lag behind the overlay even if the author did not run
+# the sync script locally.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'resources/rules/overlays/**'
+      - 'scripts/sync-rule-providers.mjs'
+      - '.github/workflows/sync-rules.yml'
+  schedule:
+    - cron: '7,22,37,52 * * * *'
+  workflow_dispatch:
+    inputs:
+      force:
+        description: 'Rebuild every file, ignoring change detection'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-upstream-rules
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Detect upstream changes and merge overlays
+        id: sync
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node scripts/sync-rule-providers.mjs ${{ inputs.force && '--force' || '' }}
+      - name: Commit merged rule files
+        if: steps.sync.outputs.changed == 'true'
+        run: |
+          git add -- resources/rules
+          if git diff --cached --quiet; then
+            echo 'content unchanged, nothing to commit'
+            exit 0
+          fi
+          git -c user.name='github-actions[bot]' \
+              -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \
+              commit -m 'chore(rules): sync Aethersailor rule providers' \
+              -m 'Changed: ${{ steps.sync.outputs.files }}'
+          git push origin HEAD:main

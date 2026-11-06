@@ -1,0 +1,22 @@
+# GENERATED - DO NOT EDIT. Add your rules to overlays/Custom_Proxy_Domain.yaml
+# upstream: Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Proxy_Domain.yaml
+# upstream blob: 53df2124316f8728ece110f47d32f6e1d6a6fc75
+# total: 17 (upstream 17, extra 0)
+payload:
+  - '+.7pzzv.us'
+  - '+.arduino.cc'
+  - '+.clientservices.googleapis.com'
+  - '+.cloudsync-prod.s3.us-east-1.amazonaws.com'
+  - '+.dmhy.org'
+  - '+.googleapis.cn'
+  - '+.gstatic.com'
+  - '+.hoyolab.com'
+  - '+.hoyoverse.com'
+  - '+.ip.sb'
+  - '+.ipify.org'
+  - '+.mtalk.google.com'
+  - '+.onedrive.live.com'
+  - '+.platformio.org'
+  - '+.services.googleapis.cn'
+  - '+.stun.playstation.net'
+  - '+.xn--ngstr-lra8j.com'
