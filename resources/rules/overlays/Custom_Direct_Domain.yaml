@@ -2,10 +2,23 @@
 # 只写要追加的条目，一行一条；domain 类型不能放 DST-PORT / IP-CIDR。
 # 对应 ratatoskr.yaml:185 RULE-SET,🪐 Astra Domain,DIRECT（优先于 Steam 主规则）
 payload:
-  # ── Steam 下载调度 / 区域检测服务器 (来源: Aethersailor Steam_CDN.list) ──
-  - '+.cm.steampowered.com'
-  - '+.steamserver.net'
+  # ── Steam 登录地区检测 / CM 与下载服务器列表下发 ──
+  # 这些请求必须从国内 IP 出口发出，Steam 才会判定 IPCountry=CN 并下发国内 CDN。
+  # 它们属于 GEOSITE,steam，未补丁时会落到 👾 Steam 走代理 → 下发香港/东京节点。
+  - '+.steamserver.net'                      # CM 发现 / 登录地区检测（最关键）
+  - '+.cm.steampowered.com'                  # Connection Manager
+  - '+.api.steampowered.com'                 # WebAPI：CM 列表 / 下载服务器下发
+  - '+.test.steampowered.com'                # 测速 / 区域探测
+  - '+.cloudflare.steamstatic.com'           # 客户端配置 / CDN 调度
+  - '+.clientconfig.akamai.steamstatic.com'  # 客户端配置下发
 
-  # ── Steam 下载 CDN：覆盖 cache*-*.steamcontent.com 香港 / 东京等就近节点 ──
+  # ── 国内下载 CDN（Steam 下发国内服务器时实际连接的域名）──
+  - '+.dl.steam.clngaa.com'
+  - '+.st.dl.eccdnx.com'
+  - '+.xz.pphimalayanrt.com'
+  - '+.content.steamchina.com'
+  - '+.steamcommunity-a.akamaihd.net'
+
+  # ── 下载 CDN 通配兜底（含 cache*-*.steamcontent.com 香港/东京节点）──
   - '+.steamcontent.com'
   - '+.steamcdn-a.akamaihd.net'
