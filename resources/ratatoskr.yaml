@@ -263,10 +263,10 @@ rule-anchor:
   classical: &RP-classical {type: http, behavior: classical, format: yaml, interval: 28800}
 
 rule-providers:
-  🪐 Astra Domain:         {<<: *RP-domain,    url: "https://testingcf.jsdelivr.net/gh/yakasuka/yggdrasil@main/resources/rules/Custom_Direct_Domain.yaml"}
-  🔮 Prism IP:           {<<: *RP-classical, url: "https://testingcf.jsdelivr.net/gh/yakasuka/yggdrasil@main/resources/rules/Custom_Direct_Classical_IP.yaml"}
-  🪐 Orbit Domain:         {<<: *RP-domain,    url: "https://testingcf.jsdelivr.net/gh/yakasuka/yggdrasil@main/resources/rules/Custom_Proxy_Domain.yaml"}
-  🚀 Voyager IP:          {<<: *RP-classical, url: "https://testingcf.jsdelivr.net/gh/yakasuka/yggdrasil@main/resources/rules/Custom_Proxy_Classical_IP.yaml"}
-  ⚡ Matrix Port:     {<<: *RP-classical, url: "https://testingcf.jsdelivr.net/gh/yakasuka/yggdrasil@main/resources/rules/Custom_Port_Direct.yaml"}
-  📦 Cargo Downloads:          {<<: *RP-domain, url: "https://testingcf.jsdelivr.net/gh/yakasuka/yggdrasil@main/resources/rules/Custom_Proxy_Download.yaml"}
+  🪐 Astra Domain:         {<<: *RP-domain,    url: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/resources/rules/Custom_Direct_Domain.yaml"}
+  🔮 Prism IP:           {<<: *RP-classical, url: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/resources/rules/Custom_Direct_Classical_IP.yaml"}
+  🪐 Orbit Domain:         {<<: *RP-domain,    url: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/resources/rules/Custom_Proxy_Domain.yaml"}
+  🚀 Voyager IP:          {<<: *RP-classical, url: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/resources/rules/Custom_Proxy_Classical_IP.yaml"}
+  ⚡ Matrix Port:     {<<: *RP-classical, url: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/resources/rules/Custom_Port_Direct.yaml"}
+  📦 Cargo Downloads:          {<<: *RP-domain, url: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/resources/rules/Custom_Proxy_Download.yaml"}
 # =======================================================
