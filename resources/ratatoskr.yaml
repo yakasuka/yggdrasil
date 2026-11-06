@@ -199,7 +199,6 @@ rules:
   # category-game-platforms-download 含各平台下载 CDN（含 Steam 的 cache*-*.steamcontent.com 海外缓存节点，
   # 这些条目不带 @cn 标记）；去掉 @cn 后该分类整体直连，缓存节点不再落到 👾 Steam 走代理
   - GEOSITE,steam@cn,DIRECT
-  - GEOSITE,category-game-platforms-download,DIRECT
   - GEOSITE,steam,👾 Steam
   - GEOSITE,epicgames,🎁 Epic
   - GEOSITE,taptap,🕹️ TapTap
