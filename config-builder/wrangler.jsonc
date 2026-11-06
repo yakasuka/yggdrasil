@@ -7,6 +7,6 @@
     "ALLOWED_ORIGINS": "",
   },
   "kv_namespaces": [
-    { "binding": "SUBSCRIPTIONS", "id": "REPLACE_WITH_KV_NAMESPACE_ID" },
+    { "binding": "SUBSCRIPTIONS", "id": "c3d90e38612a440aba6e1b31152e8f6d" },
   ],
 }
