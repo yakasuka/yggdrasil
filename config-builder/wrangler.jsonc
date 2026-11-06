@@ -5,6 +5,7 @@
   "compatibility_date": "2026-10-01",
   "vars": {
     "ALLOWED_ORIGINS": "",
+    "PUBLIC_CONFIG_URL": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/resources/ratatoskr.yaml",
   },
   "kv_namespaces": [
     { "binding": "SUBSCRIPTIONS", "id": "c3d90e38612a440aba6e1b31152e8f6d" },
