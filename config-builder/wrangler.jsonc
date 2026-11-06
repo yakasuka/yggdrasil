@@ -1,6 +1,6 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
-  "name": "yggdrasil-configurator",
+  "name": "yggdrasil",
   "pages_build_output_dir": "./worker/gateway/dist",
   "compatibility_date": "2026-10-01",
   "vars": {
