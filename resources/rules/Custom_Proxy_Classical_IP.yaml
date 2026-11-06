@@ -1,0 +1,6 @@
+# GENERATED - DO NOT EDIT. Add your rules to overlays/Custom_Proxy_Classical_IP.yaml
+# upstream: Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Proxy_Classical_IP.yaml
+# upstream blob: 6e41e19ba410338a53b35d2c176a24bf588d0740
+# total: 1 (upstream 1, extra 0)
+payload:
+  - 'IP-CIDR,207.241.224.2/32,no-resolve'

@@ -1,0 +1,11 @@
+# Custom_Direct_Domain.yaml - 直连域名增量 (behavior: domain)
+# 只写要追加的条目，一行一条；domain 类型不能放 DST-PORT / IP-CIDR。
+# 对应 ratatoskr.yaml:185 RULE-SET,🪐 Astra Domain,DIRECT（优先于 Steam 主规则）
+payload:
+  # ── Steam 下载调度 / 区域检测服务器 (来源: Aethersailor Steam_CDN.list) ──
+  - '+.cm.steampowered.com'
+  - '+.steamserver.net'
+
+  # ── Steam 下载 CDN：覆盖 cache*-*.steamcontent.com 香港 / 东京等就近节点 ──
+  - '+.steamcontent.com'
+  - '+.steamcdn-a.akamaihd.net'

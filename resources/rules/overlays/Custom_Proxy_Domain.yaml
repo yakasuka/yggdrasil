@@ -1,0 +1,5 @@
+# Custom_Proxy_Domain.yaml - 代理域名增量 (behavior: domain)
+# 示例：
+#   - '+.my-proxy-domain.com'
+# 注意：domain 类型只能放域名，不能放 DST-PORT / IP-CIDR。
+payload:

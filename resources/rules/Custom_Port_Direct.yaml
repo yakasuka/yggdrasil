@@ -1,0 +1,8 @@
+# GENERATED - DO NOT EDIT. Add your rules to overlays/Custom_Port_Direct.yaml
+# upstream: Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Port_Direct.yaml
+# upstream blob: 57d081f41ccc4d4be458ea635ab8073719a39e80
+# total: 3 (upstream 3, extra 0)
+payload:
+  - 'DST-PORT,1-79'
+  - 'DST-PORT,81-442'
+  - 'DST-PORT,444-65535'
