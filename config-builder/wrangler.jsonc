@@ -1,12 +1,13 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
-  "name": "yggdrasil-configurator",
+  "name": "yggdrasil",
   "pages_build_output_dir": "./worker/gateway/dist",
   "compatibility_date": "2026-10-01",
   "vars": {
     "ALLOWED_ORIGINS": "",
+    "PUBLIC_CONFIG_URL": "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/resources/ratatoskr.yaml",
   },
   "kv_namespaces": [
-    { "binding": "SUBSCRIPTIONS", "id": "REPLACE_WITH_KV_NAMESPACE_ID" },
+    { "binding": "SUBSCRIPTIONS", "id": "c3d90e38612a440aba6e1b31152e8f6d" },
   ],
 }
