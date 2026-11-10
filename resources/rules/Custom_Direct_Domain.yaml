@@ -1,7 +1,7 @@
 # GENERATED - DO NOT EDIT. Add your rules to overlays/Custom_Direct_Domain.yaml
 # upstream: Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Direct_Domain.yaml
-# upstream blob: b75f2c57b6f0291240edf20f520e239bf3fdf230
-# total: 1204 (upstream 1191, extra 13)
+# upstream blob: 420e2c4a36af7170eef930ad36a7c0a74e0c8be6
+# total: 1205 (upstream 1192, extra 13)
 payload:
   - '+.00333118.com'
   - '+.0044696.com'
@@ -648,6 +648,7 @@ payload:
   - '+.lg3000.top'
   - '+.lhndksn.com'
   - '+.lianguo-tech.com'
+  - '+.liangyuji.com'
   - '+.libtv.com'
   - '+.lightmake.site'
   - '+.linka2a.net'
