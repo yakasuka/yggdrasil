@@ -39,7 +39,7 @@ dns: {enable: true, ipv6: false, enhanced-mode: fake-ip, fake-ip-range: 198.18.0
 # =======================================================
 # 2.2 TUN（整机 DNS 接管，默认关闭，客户端开 TUN 即生效）
 # =======================================================
-tun: {enable: false, stack: gvisor, dns-hijack: ['0.0.0.0:53', 'tcp://0.0.0.0:53'], auto-route: true, auto-detect-interface: true}
+tun: {enable: true, stack: gvisor, dns-hijack: ['0.0.0.0:53', 'tcp://0.0.0.0:53'], auto-route: true, auto-detect-interface: true}
 
 # =======================================================
 # 3. 手动节点 Proxies
