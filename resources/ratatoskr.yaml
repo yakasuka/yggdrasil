@@ -32,6 +32,16 @@ external-controller: 127.0.0.1:9090  # REST API 监听地址：仅本机访问
 unified-delay: true                  # 统一延迟测速
 
 # =======================================================
+# 2.1 DNS（防 DNS 泄露核心）
+# =======================================================
+dns: {enable: true, ipv6: false, enhanced-mode: fake-ip, fake-ip-range: 198.18.0.1/16, default-nameserver: [223.5.5.5, 119.29.29.29], nameserver: ["https://doh.pub/dns-query", "https://dns.alidns.com/dns-query"], fake-ip-filter: ['GEOSITE,cn', '+.*.lan', '+.*.local', localhost, '+.stun.*.*']}
+
+# =======================================================
+# 2.2 TUN（整机 DNS 接管，默认关闭，客户端开 TUN 即生效）
+# =======================================================
+tun: {enable: false, stack: gvisor, dns-hijack: ['0.0.0.0:53', 'tcp://0.0.0.0:53'], auto-route: true, auto-detect-interface: true}
+
+# =======================================================
 # 3. 手动节点 Proxies
 # =======================================================
 
