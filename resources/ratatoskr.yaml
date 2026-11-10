@@ -34,7 +34,7 @@ unified-delay: true                  # 统一延迟测速
 # =======================================================
 # 2.1 DNS（防 DNS 泄露核心）
 # =======================================================
-dns: {enable: true, ipv6: false, enhanced-mode: fake-ip, fake-ip-range: 198.18.0.1/16, default-nameserver: [223.5.5.5, 119.29.29.29], nameserver: ["https://doh.pub/dns-query", "https://dns.alidns.com/dns-query"], fake-ip-filter: ['GEOSITE,cn', '+.*.lan', '+.*.local', localhost, '+.stun.*.*']}
+dns: {enable: true, ipv6: false, enhanced-mode: fake-ip, fake-ip-range: 198.18.0.1/16, default-nameserver: [223.5.5.5], nameserver: ["https://dns.alidns.com/dns-query"], fake-ip-filter: ['GEOSITE,cn', '+.*.lan', '+.*.local', localhost, '+.stun.*.*']}
 
 # =======================================================
 # 2.2 TUN（整机 DNS 接管，默认关闭，客户端开 TUN 即生效）
