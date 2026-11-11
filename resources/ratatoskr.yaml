@@ -142,7 +142,7 @@ proxy-groups:
   - {name: ⚡ Speedtest,   type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/speedtest.png"}   # 测速
 
   - {name: 🔌 特殊端口,     type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/port.png"}                  # 特殊端口流量
- 
+  - {name: ❎ 广告拦截,       type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/adguard.png"}       # 未匹配流量
   # ── 可选内容 / R18 ──
   #- {name: 😈 R18,         type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/r18.png"}         # 成人内容
 
@@ -173,6 +173,9 @@ rules:
 
   # ── 优先规则 / Priority ──
   - GEOSITE,adobe,🎨 Adobe
+
+  # ── 广告拦截 / Ad Block（OpenClash 自带 GEOSITE 数据库）──
+  - GEOSITE,category-ads-all,❎ 广告拦截          # 直接拦截广告与追踪域名
 
   # ── 私网直连 ──
   - GEOSITE,private,DIRECT
