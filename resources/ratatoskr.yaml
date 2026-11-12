@@ -82,6 +82,9 @@ FilterOthers: &FilterOthers '^(?!.*(?:(?i)=>|(?i:🇭🇰|香港|Hong\s?Kong|\b(
 proxy-groups:
 
   # ── 策略入口 / Switch ──
+  - {name: ✨ AI Agent, type: select, proxies: [🚀 手动切换, ⚡ 自动选择, 🔯 故障转移, 🔮 负载均衡, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others, DIRECT], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/hermes.png"}   # 全部节点开关
+
+  # ── 策略入口 / Switch ──
   - {name: 🎚️ 节点选择, type: select, proxies: [🚀 手动切换, ⚡ 自动选择, 🔯 故障转移, 🔮 负载均衡, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others, DIRECT], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/switch.png"}   # 全部节点开关
 
   # ── 全部节点 / Proxy ──
