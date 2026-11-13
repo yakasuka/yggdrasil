@@ -1,7 +1,7 @@
 # GENERATED - DO NOT EDIT. Add your rules to overlays/Custom_Direct_Domain.yaml
 # upstream: Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Direct_Domain.yaml
-# upstream blob: 6b1211009196aac922fee5f93e0ab03b039623cc
-# total: 1213 (upstream 1200, extra 13)
+# upstream blob: d5d9bab588392de95cece02ac2c02c91bf4a07d2
+# total: 1214 (upstream 1201, extra 13)
 payload:
   - '+.00333118.com'
   - '+.0044696.com'
@@ -1165,6 +1165,7 @@ payload:
   - '+.zcloud.world'
   - '+.zctnet.top'
   - '+.zeekrline.com'
+  - '+.zendao8.top'
   - '+.zhaiad.com'
   - '+.zhangleglobal.com'
   - '+.zhewx.com'
