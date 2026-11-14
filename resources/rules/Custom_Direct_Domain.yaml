@@ -1,7 +1,7 @@
 # GENERATED - DO NOT EDIT. Add your rules to overlays/Custom_Direct_Domain.yaml
 # upstream: Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Direct_Domain.yaml
-# upstream blob: 849e518b226e0aa2ca4e50cff4a2568bcbf89e55
-# total: 1232 (upstream 1219, extra 13)
+# upstream blob: 67375a5ad4263811e166486af33d08f6e79570ba
+# total: 1236 (upstream 1223, extra 13)
 payload:
   - '+.00333118.com'
   - '+.0044696.com'
@@ -62,6 +62,7 @@ payload:
   - '+.618208.xyz'
   - '+.657192.com'
   - '+.66990000.xyz'
+  - '+.6apzfdx.com'
   - '+.6v520.net'
   - '+.71.am'
   - '+.737698.xyz'
@@ -148,6 +149,7 @@ payload:
   - '+.argotunnel.com'
   - '+.argslink.com'
   - '+.armvm.com'
+  - '+.aroychmdcl.cc'
   - '+.asgardion.space'
   - '+.astrobox.online'
   - '+.atticus.vip'
@@ -755,6 +757,7 @@ payload:
   - '+.neihang.net'
   - '+.netzz.net'
   - '+.nhjdixj.com'
+  - '+.nht5dbh.cc'
   - '+.nicezhuanye.com'
   - '+.njlisi.top'
   - '+.njonemall.com'
@@ -857,6 +860,7 @@ payload:
   - '+.qweatherapi.com'
   - '+.qzy.xyz'
   - '+.qzyun.net'
+  - '+.r11cc.com'
   - '+.ranwen.tw'
   - '+.rayws.top'
   - '+.redenmc.com'
