@@ -1,7 +1,7 @@
 # GENERATED - DO NOT EDIT. Add your rules to overlays/Custom_Direct_Domain.yaml
 # upstream: Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Direct_Domain.yaml
-# upstream blob: 5090ae0e825c127995541d98dfd45f02830cd950
-# total: 1222 (upstream 1209, extra 13)
+# upstream blob: 1fe9ed21fff1112bd65663e632707638eca6d3db
+# total: 1228 (upstream 1215, extra 13)
 payload:
   - '+.00333118.com'
   - '+.0044696.com'
@@ -489,6 +489,7 @@ payload:
   - '+.hf-mirror.com'
   - '+.hfhs8x.info'
   - '+.hhtvc.com'
+  - '+.hi3d.ai'
   - '+.higgsweb.com'
   - '+.hijin.vip'
   - '+.hiocloud.com'
@@ -551,6 +552,7 @@ payload:
   - '+.ifconfig.co'
   - '+.ifengmap.com'
   - '+.ifish7.com'
+  - '+.iflytck.com'
   - '+.igpsport.com'
   - '+.ijdhend.com'
   - '+.ijingyi.com'
@@ -661,6 +663,7 @@ payload:
   - '+.linkease.net'
   - '+.linux.sb'
   - '+.listenai.com'
+  - '+.litemob.vip'
   - '+.liunn.com'
   - '+.liveperson.net'
   - '+.liyunol.com'
@@ -856,6 +859,7 @@ payload:
   - '+.rayws.top'
   - '+.redenmc.com'
   - '+.registry.dockermirror.com'
+  - '+.remo.video'
   - '+.rewards.bing.com'
   - '+.rkgamingstore.com'
   - '+.ro1029mango.com'
@@ -1170,6 +1174,7 @@ payload:
   - '+.yzcsoft.com'
   - '+.z-tek.com'
   - '+.z6e.com'
+  - '+.zaohaowu.net'
   - '+.zcloud.world'
   - '+.zctnet.top'
   - '+.zeekrline.com'
@@ -1204,6 +1209,7 @@ payload:
   - '+.zxp7.cc'
   - '+.zxstech.com'
   - '+.zysou.com'
+  - '+.zyxwvutsrqpo.com'
   - '+.zyyct.com'
   - '+.zzclass.com'
   - '+.zzqrgs3148.vip'
