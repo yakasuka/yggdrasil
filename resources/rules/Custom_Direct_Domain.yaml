@@ -1,7 +1,7 @@
 # GENERATED - DO NOT EDIT. Add your rules to overlays/Custom_Direct_Domain.yaml
 # upstream: Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Direct_Domain.yaml
-# upstream blob: 10a44ea29639f68ead119d42e362eda757fe01c5
-# total: 1240 (upstream 1227, extra 13)
+# upstream blob: 07ac7915f89bbad8125eea7a25379d56618236bb
+# total: 1242 (upstream 1229, extra 13)
 payload:
   - '+.00333118.com'
   - '+.0044696.com'
@@ -684,6 +684,7 @@ payload:
   - '+.lucky.gd'
   - '+.luxiangwu.com'
   - '+.lw5.co'
+  - '+.lx51ib3szv.cc'
   - '+.lyihub.com'
   - '+.lyilife.com'
   - '+.lzgame.top'
@@ -712,6 +713,7 @@ payload:
   - '+.meloong.com'
   - '+.members.3322.org'
   - '+.meoof-pet.com'
+  - '+.metrix.bar'
   - '+.mfdqsc.com'
   - '+.miaona.app'
   - '+.miaotixing.com'
