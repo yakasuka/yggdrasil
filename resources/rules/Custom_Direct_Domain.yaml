@@ -1,7 +1,7 @@
 # GENERATED - DO NOT EDIT. Add your rules to overlays/Custom_Direct_Domain.yaml
 # upstream: Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Direct_Domain.yaml
-# upstream blob: 024dff84ebb572a5a0b1766274b64769946016e7
-# total: 1259 (upstream 1246, extra 13)
+# upstream blob: 1c9f8b4b1382fc2040292ce51da85ffa290ad20f
+# total: 1269 (upstream 1256, extra 13)
 payload:
   - '+.00333118.com'
   - '+.0044696.com'
@@ -30,6 +30,7 @@ payload:
   - '+.264788.xyz'
   - '+.2mcnxs.cc'
   - '+.33442805.com'
+  - '+.360luxiang.com'
   - '+.365ting.com'
   - '+.365wp.top'
   - '+.3688baihuo.com'
@@ -157,6 +158,7 @@ payload:
   - '+.aroychmdcl.cc'
   - '+.asgardion.space'
   - '+.astrobox.online'
+  - '+.ataw.top'
   - '+.atticus.vip'
   - '+.awstme.top'
   - '+.ax1x.com'
@@ -180,6 +182,7 @@ payload:
   - '+.belongme.top'
   - '+.betahub.tech'
   - '+.betaints.com'
+  - '+.bfr2.top'
   - '+.bhduhs.com'
   - '+.biandangroup.com'
   - '+.biaoda.me'
@@ -468,6 +471,7 @@ payload:
   - '+.gxcould.com'
   - '+.gxnnjidingkeji.top'
   - '+.gxnnxsqy.top'
+  - '+.gxqmeiwujun.com'
   - '+.gxrke1715.com'
   - '+.gzjkoa.com'
   - '+.gzybao.com'
@@ -589,6 +593,7 @@ payload:
   - '+.ipshu.com'
   - '+.iq.com'
   - '+.iquantumad.com'
+  - '+.isbestgame.com'
   - '+.istoreos.com'
   - '+.itptg.com'
   - '+.itui.cc'
@@ -726,6 +731,7 @@ payload:
   - '+.metrix.bar'
   - '+.mfdqsc.com'
   - '+.mfosunhani.com'
+  - '+.mfpt8g.com'
   - '+.miaona.app'
   - '+.miaotixing.com'
   - '+.micu.hk'
@@ -740,6 +746,7 @@ payload:
   - '+.miraiemby.com'
   - '+.mixly.org'
   - '+.mobai.sbs'
+  - '+.mobbananagame.com'
   - '+.mochadj.com'
   - '+.moctory.com'
   - '+.modaiyun.com'
@@ -792,6 +799,7 @@ payload:
   - '+.oai.sb'
   - '+.oath.com'
   - '+.oceando.cloud'
+  - '+.oemdss.com'
   - '+.ohdnhxj.com'
   - '+.ok321.top'
   - '+.omq.cc'
@@ -969,6 +977,7 @@ payload:
   - '+.suyur.com'
   - '+.svyun.com'
   - '+.sxdidc.com'
+  - '+.sxjd.ink'
   - '+.sxjiabeide.com'
   - '+.sxjkj22.top'
   - '+.sxlljm.com'
@@ -1096,6 +1105,7 @@ payload:
   - '+.wlups.com'
   - '+.wlygrowth.com'
   - '+.wmvbo.com'
+  - '+.woca.fun'
   - '+.wologic.net'
   - '+.wpurl.cc'
   - '+.wshifen.com'
