@@ -1,7 +1,7 @@
 # GENERATED - DO NOT EDIT. Add your rules to overlays/Custom_Direct_Domain.yaml
 # upstream: Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Direct_Domain.yaml
-# upstream blob: 5989d74a3d9ebd41dc9b43572637495c545df4fe
-# total: 1276 (upstream 1263, extra 13)
+# upstream blob: 9023ca76d194ab066a76c69bf791be23fc365831
+# total: 1278 (upstream 1265, extra 13)
 payload:
   - '+.00333118.com'
   - '+.0044696.com'
@@ -1078,6 +1078,7 @@ payload:
   - '+.vip-cdn.com'
   - '+.vip666ai.com'
   - '+.vipjiapu.com'
+  - '+.visaselectrewardhk.com'
   - '+.visionariopro.com'
   - '+.vlan5.com'
   - '+.volcanomob.com'
@@ -1101,6 +1102,7 @@ payload:
   - '+.wewillpro.com'
   - '+.wget.la'
   - '+.wildfirechat.net'
+  - '+.wirefee.site'
   - '+.wisecleaner.net'
   - '+.wjx.top'
   - '+.wlcdn88.com'
