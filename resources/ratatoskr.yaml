@@ -10,8 +10,12 @@
 #     url: "https://example.com/sub?token=YOUR_SUBSCRIPTION_TOKEN"  # 机场提供的节点订阅地址
 #     type: http  # HTTP 型订阅，下载远程节点内容
 #     interval: 86400  # 订阅更新间隔：86400 秒 / 24 小时
-#     health-check: {enable: true, lazy: true, url: "http://cp.cloudflare.com/generate_204",interval: 3600, timeout: 8000}  # 启用延迟测试，间隔 3600 秒；lazy 表示未使用时不主动定时测速
+#     health-check: {enable: true, lazy: true, url: "https://cp.cloudflare.com/generate_204",interval: 3600, timeout: 8000}  # 启用延迟测试，间隔 3600 秒；lazy 表示未使用时不主动定时测速
 #     proxy: DIRECT  # 订阅下载 / 更新使用的出口：直连
+#     override:  # 覆写订阅下发的节点参数（可选）
+#       override-expr:
+#         - 'del(.up)'    # 删掉机场按服务器带宽填的 up，回退 BBR 自适应，避免 Brutal 硬发导致视频卡顿 / 测速超时
+#         - 'del(.down)'  # 同上，删掉 down
 
 # ── 自动订阅区域 / Auto Providers ──
 # 预留自动写入区域；使用自动注入功能时保留下面的起止标记
@@ -91,10 +95,10 @@ proxy-groups:
   - {name: 🚀 手动切换, type: select, include-all: true, filter: *FilterAll, icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/proxy.png"}                                            # 全部节点手动选择入口
 
   # ── 自动选择 / Auto ──
-  - {name: ⚡ 自动选择, type: url-test, include-all: true, filter: *FilterAll, url: "http://www.gstatic.com/generate_204", interval: 300, tolerance: 50, icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/yggdrasil.png"}
+  - {name: ⚡ 自动选择, type: url-test, include-all: true, filter: *FilterAll, url: "https://www.gstatic.com/generate_204", interval: 300, tolerance: 50, icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/yggdrasil.png"}
 
   # ── 故障转移 / Fallback ──
-  - {name: 🔯 故障转移, type: fallback, include-all: true, filter: *FilterAll, url: "http://www.gstatic.com/generate_204", interval: 300, icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/fallback.png"}
+  - {name: 🔯 故障转移, type: fallback, include-all: true, filter: *FilterAll, url: "https://www.gstatic.com/generate_204", interval: 300, icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/fallback.png"}
 
   # ── 负载均衡 / Load Balance ──
   - {name: 🔮 负载均衡, type: load-balance, include-all: true, filter: *FilterAll, strategy: consistent-hashing, icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/global.png"}   # 域名专用负载均衡入口
