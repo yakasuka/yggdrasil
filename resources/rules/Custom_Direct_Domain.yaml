@@ -1,7 +1,7 @@
 # GENERATED - DO NOT EDIT. Add your rules to overlays/Custom_Direct_Domain.yaml
 # upstream: Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Direct_Domain.yaml
-# upstream blob: 422182da28c803165590a9fef0ba5c1f60a6a7b0
-# total: 1279 (upstream 1266, extra 13)
+# upstream blob: 2369b47cd060d7ae465891047b51332f3124b569
+# total: 1273 (upstream 1260, extra 13)
 payload:
   - '+.00333118.com'
   - '+.0044696.com'
@@ -147,7 +147,6 @@ payload:
   - '+.aocdisplays.com'
   - '+.aoxox.com'
   - '+.ap-leasing.com'
-  - '+.api.myip.com'
   - '+.apm-log-upload-os.hoyoverse.com'
   - '+.appracle.com'
   - '+.aqtwwx.net'
@@ -232,8 +231,6 @@ payload:
   - '+.chatlabs.net'
   - '+.chaxunjiao.com'
   - '+.chaz.fun'
-  - '+.checkip.dyndns.org'
-  - '+.checkipv6.dyndns.org'
   - '+.chengguodj.com'
   - '+.chenyuxia.com'
   - '+.cheriexsky.love'
@@ -433,7 +430,6 @@ payload:
   - '+.github.moeyy.xyz'
   - '+.github.site'
   - '+.github.store'
-  - '+.giveup.top'
   - '+.gjjwgp3n.com'
   - '+.gjtool.com'
   - '+.gmoj.net'
@@ -565,7 +561,6 @@ payload:
   - '+.idphotoplus.com'
   - '+.idsduf.com'
   - '+.ifawj9hvvl.com'
-  - '+.ifconfig.co'
   - '+.ifengmap.com'
   - '+.ifish7.com'
   - '+.iflytck.com'
@@ -587,8 +582,6 @@ payload:
   - '+.iotrix.net'
   - '+.ip.plus'
   - '+.ip159.com'
-  - '+.ip6.seeip.org'
-  - '+.ipapi.co'
   - '+.ipjrh.com'
   - '+.iposl.com'
   - '+.ipshu.com'
@@ -648,7 +641,6 @@ payload:
   - '+.kelexuexi.com'
   - '+.keyoo.com'
   - '+.kgithub.com'
-  - '+.kit327.com'
   - '+.kiwiot.com'
   - '+.kke.com.hk'
   - '+.kkmmy.com'
@@ -1216,6 +1208,7 @@ payload:
   - '+.yrqvlchq5.com'
   - '+.yshoufa.com'
   - '+.yueti.vip'
+  - '+.yueyouqu.com'
   - '+.yunqin.online'
   - '+.yunzuoye.net'
   - '+.yydsys.de'
@@ -1248,6 +1241,7 @@ payload:
   - '+.zllinks.com'
   - '+.zmaticoo.com'
   - '+.zmis.me'
+  - '+.znigddzwz.cc'
   - '+.znnu.com'
   - '+.znztv.com'
   - '+.zqin758.xyz'
