@@ -1,8 +1,8 @@
 {
   "Custom_Direct_Domain.yaml": {
-    "upstream": "9023ca76d194ab066a76c69bf791be23fc365831",
+    "upstream": "422182da28c803165590a9fef0ba5c1f60a6a7b0",
     "overlay": "b81710cde55e84f2",
-    "syncedAt": "2026-11-18T19:30:21.964Z"
+    "syncedAt": "2026-11-19T01:24:00.412Z"
   },
   "Custom_Direct_Classical_IP.yaml": {
     "upstream": "7dc3df345f4e8f68d28ecbf4eec408ac4e69a136",
