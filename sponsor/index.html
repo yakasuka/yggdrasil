@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="支持 Yggdrasil 项目 — 微信、支付宝、PayPal 打赏赞助" />
+<title>支持 Yggdrasil · 打赏赞助</title>
+<style>
+  :root {
+    --bg: #07070e;
+    --text: #f2f2f7;
+    --muted: #9a9ab2;
+    --wechat: #07c160;
+    --alipay: #1677ff;
+    --paypal: #00a0e0;
+    --ease: cubic-bezier(.22, 1, .36, 1);
+  }
+
+  * { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: radial-gradient(120% 90% at 50% -10%, #1b1740 0%, #0c0b1c 42%, var(--bg) 78%);
+    color: var(--text);
+    font-family: "PingFang SC", "Microsoft YaHei", "Hiragino Sans GB", system-ui, -apple-system, sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ---------- 背景流动光斑 ---------- */
+  .ambient { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+  .orb {
+    position: absolute; border-radius: 50%; filter: blur(90px); opacity: .28;
+    will-change: transform;
+  }
+  .orb.a { width: 46vw; height: 46vw; left: -8vw; top: -6vw; background: #7b2ff7; animation: drift1 18s ease-in-out infinite alternate; }
+  .orb.b { width: 40vw; height: 40vw; right: -6vw; top: 18vh; background: #1677ff; animation: drift2 22s ease-in-out infinite alternate; }
+  .orb.c { width: 34vw; height: 34vw; left: 30vw; bottom: -12vw; background: #ff2e88; opacity: .18; animation: drift3 26s ease-in-out infinite alternate; }
+  @keyframes drift1 { to { transform: translate(9vw, 7vh) scale(1.15); } }
+  @keyframes drift2 { to { transform: translate(-8vw, 10vh) scale(1.2); } }
+  @keyframes drift3 { to { transform: translate(6vw, -9vh) scale(1.1); } }
+
+  .page { position: relative; z-index: 1; max-width: 860px; margin: 0 auto; padding: 72px 24px 60px; text-align: center; }
+
+  /* ---------- 顶部出场 ---------- */
+  .mascot-wrap {
+    width: 124px; height: 124px; margin: 0 auto 22px; position: relative;
+    animation: mascotDrop 1.05s var(--ease) both;
+  }
+  .mascot-wrap::before {
+    content: ""; position: absolute; inset: -14px; border-radius: 34%;
+    background: conic-gradient(from 0deg, #ff2e88, #ffb300, #7bff5a, #16d9ff, #7b2ff7, #ff2e88);
+    filter: blur(16px); opacity: .5; animation: spin 9s linear infinite;
+  }
+  .mascot {
+    position: relative; width: 100%; height: 100%; object-fit: contain;
+    filter: drop-shadow(0 12px 26px rgba(0,0,0,.55));
+    animation: floaty 5s ease-in-out 1.05s infinite;
+  }
+  @keyframes mascotDrop {
+    0% { opacity: 0; transform: translateY(-52px) scale(.55) rotate(-18deg); }
+    60% { opacity: 1; transform: translateY(8px) scale(1.06) rotate(4deg); }
+    100% { opacity: 1; transform: translateY(0) scale(1) rotate(0); }
+  }
+  @keyframes floaty { 0%,100% { transform: translateY(0) rotate(-1.5deg); } 50% { transform: translateY(-10px) rotate(1.5deg); } }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .author {
+    display: inline-flex; align-items: center; gap: 10px; padding: 6px 16px 6px 7px;
+    border: 1px solid rgba(255,255,255,.12); border-radius: 999px;
+    background: rgba(255,255,255,.045); backdrop-filter: blur(10px);
+    font-size: 14px; color: var(--muted);
+    animation: fadeUp .8s var(--ease) .25s both;
+  }
+  .author img {
+    width: 30px; height: 30px; border-radius: 50%; object-fit: cover;
+    border: 2px solid rgba(255,255,255,.2);
+  }
+  .author b { color: var(--text); font-weight: 600; }
+
+  h1 {
+    margin: 26px 0 12px; font-size: clamp(30px, 5.2vw, 50px); line-height: 1.2;
+    background: linear-gradient(100deg, #fff 20%, #c9b8ff 55%, #8ad8ff 85%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    animation: fadeUp .85s var(--ease) .35s both;
+  }
+  .lead {
+    max-width: 620px; margin: 0 auto; color: var(--muted);
+    font-size: 16px; line-height: 1.9;
+    animation: fadeUp .85s var(--ease) .5s both;
+  }
+  .lead em { color: #d9c8ff; font-style: normal; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: none; } }
+
+  /* ---------- 液态舞台 ---------- */
+  .stage-title {
+    margin: 62px 0 6px; font-size: 13px; letter-spacing: 3px; color: var(--muted);
+    animation: fadeUp .8s var(--ease) .7s both;
+  }
+  .hint { font-size: 13px; color: #6f6f88; margin: 0 0 12px; animation: fadeUp .8s var(--ease) .8s both; }
+
+  .liquid-wrap {
+    position: relative; width: 100%; max-width: 680px; height: 340px; margin: 0 auto;
+    touch-action: none; user-select: none;
+    animation: stageIn 1s var(--ease) .6s both;
+  }
+  @keyframes stageIn { from { opacity: 0; transform: scale(.9); } to { opacity: 1; transform: none; } }
+
+  .goo-layer {
+    position: absolute; inset: 0; filter: url(#goo);
+  }
+  .blob {
+    position: absolute; width: 132px; height: 132px; border-radius: 50%;
+    top: 50%; transform: translate(-50%, -50%); will-change: transform, border-radius;
+  }
+  .blob-wechat { left: 22%; background: var(--wechat); }
+  .blob-alipay { left: 50%; background: var(--alipay); }
+  .blob-paypal  { left: 78%; background: var(--paypal); }
+  .cursor-blob {
+    position: absolute; width: 62px; height: 62px; border-radius: 50%;
+    background: #b983ff; left: 0; top: 0; transform: translate(-50%, -50%) scale(0);
+    will-change: transform; transition: opacity .3s ease;
+  }
+
+  .ui-layer { position: absolute; inset: 0; pointer-events: none; }
+  .blob-label {
+    position: absolute; top: 50%; width: 132px; height: 132px;
+    transform: translate(-50%, -50%); pointer-events: auto; cursor: pointer;
+    border: 0; background: transparent; color: #fff; font: inherit;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px;
+    transition: transform .45s var(--ease); outline: none;
+    animation: labelIn .9s var(--ease) both;
+  }
+  .blob-label:nth-child(1) { left: 22%; animation-delay: .95s; }
+  .blob-label:nth-child(2) { left: 50%; animation-delay: 1.05s; }
+  .blob-label:nth-child(3) { left: 78%; animation-delay: 1.15s; }
+  @keyframes labelIn { from { opacity: 0; transform: translate(-50%,-50%) scale(.4); } to { opacity: 1; transform: translate(-50%,-50%) scale(1); } }
+  .blob-label .glyph { font-size: 30px; font-weight: 700; line-height: 1; text-shadow: 0 2px 8px rgba(0,0,0,.25); }
+  .blob-label .name { font-size: 14px; font-weight: 600; letter-spacing: 1px; opacity: .95; }
+
+  /* ---------- 方式卡片 ---------- */
+  .cards {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+    max-width: 680px; margin: 26px auto 0;
+    animation: fadeUp .85s var(--ease) 1.25s both;
+  }
+  .card {
+    border: 1px solid rgba(255,255,255,.1); border-radius: 18px; padding: 20px 14px;
+    background: rgba(255,255,255,.04); backdrop-filter: blur(12px);
+    transition: transform .4s var(--ease), border-color .4s ease, background .4s ease;
+    cursor: pointer;
+  }
+  .card:hover { transform: translateY(-6px); border-color: rgba(255,255,255,.26); background: rgba(255,255,255,.075); }
+  .card .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 8px; vertical-align: middle; }
+  .card h3 { margin: 0 0 6px; font-size: 15px; font-weight: 600; }
+  .card p { margin: 0; font-size: 12px; color: var(--muted); line-height: 1.6; }
+  .card.wechat .dot { background: var(--wechat); box-shadow: 0 0 12px var(--wechat); }
+  .card.alipay .dot { background: var(--alipay); box-shadow: 0 0 12px var(--alipay); }
+  .card.paypal  .dot { background: var(--paypal); box-shadow: 0 0 12px var(--paypal); }
+
+  footer { margin-top: 58px; font-size: 12px; color: #5e5e76; line-height: 1.8; }
+  footer a { color: #9a8ac0; text-decoration: none; }
+  footer a:hover { color: #c9b8ff; }
+
+  /* ---------- 弹层 ---------- */
+  .modal {
+    position: fixed; inset: 0; z-index: 20; display: flex; align-items: center; justify-content: center;
+    padding: 24px; background: rgba(4,4,10,.72); backdrop-filter: blur(8px);
+    opacity: 0; visibility: hidden; transition: opacity .35s ease, visibility .35s;
+  }
+  .modal.open { opacity: 1; visibility: visible; }
+  .modal-box {
+    position: relative; width: min(420px, 100%); padding: 30px 26px 26px; text-align: center;
+    border: 1px solid rgba(255,255,255,.14); border-radius: 24px;
+    background: linear-gradient(160deg, #1b1836, #0e0d1c);
+    box-shadow: 0 30px 80px rgba(0,0,0,.6);
+    transform: translateY(26px) scale(.94); transition: transform .45s var(--ease);
+  }
+  .modal.open .modal-box { transform: none; }
+  .modal-box h2 { margin: 0 0 4px; font-size: 20px; }
+  .modal-box .sub { margin: 0 0 18px; font-size: 13px; color: var(--muted); }
+  .modal-box img.qr {
+    width: 240px; height: 240px; object-fit: contain; border-radius: 16px;
+    background: #fff; padding: 10px; display: block; margin: 0 auto;
+  }
+  .paypal-block { padding: 26px 0 12px; }
+  .paypal-block .handle { font-size: 30px; font-weight: 700; color: var(--paypal); margin-bottom: 20px; }
+  .paypal-block a {
+    display: inline-block; padding: 12px 26px; border-radius: 999px; text-decoration: none;
+    font-weight: 600; color: #04121c; background: linear-gradient(100deg, #00a0e0, #0070ba);
+    transition: transform .3s var(--ease), box-shadow .3s ease;
+  }
+  .paypal-block a:hover { transform: translateY(-3px); box-shadow: 0 10px 24px rgba(0,160,224,.35); }
+  .close {
+    position: absolute; top: 14px; right: 16px; width: 34px; height: 34px; cursor: pointer;
+    border: 0; border-radius: 50%; background: rgba(255,255,255,.08); color: #fff; font-size: 20px;
+    line-height: 34px; transition: background .25s ease;
+  }
+  .close:hover { background: rgba(255,255,255,.18); }
+
+  @media (max-width: 640px) {
+    .page { padding-top: 48px; }
+    .liquid-wrap { height: 280px; }
+    .blob, .blob-label { width: 108px; height: 108px; }
+    .cards { grid-template-columns: 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SVG goo 滤镜：模糊 + alpha 阈值化，使相邻液滴自然融合 -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <filter id="goo">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="12" result="blur" />
+      <feColorMatrix in="blur" mode="matrix"
+        values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -10" result="goo" />
+    </filter>
+  </defs>
+</svg>
+
+<div class="ambient">
+  <div class="orb a"></div><div class="orb b"></div><div class="orb c"></div>
+</div>
+
+<main class="page">
+  <div class="mascot-wrap">
+    <img class="mascot" src="../assets/favicon.png" alt="Yggdrasil 小羊图标" />
+  </div>
+
+  <div class="author">
+    <img src="https://avatars.githubusercontent.com/u/39859629?v=4" alt="yakasuka 头像" />
+    由 <b>@yakasuka</b> 制作与维护
+  </div>
+
+  <h1>感谢你的支持</h1>
+  <p class="lead">
+    如果 Yggdrasil 让你的网络配置变得<em>更清爽、更自由</em>，<br />
+    一杯咖啡的心意，就是我继续维护与打磨的最大动力。
+  </p>
+
+  <div class="stage-title">选择打赏方式</div>
+  <p class="hint">把鼠标移到光球上 · 点击展开收款码</p>
+
+  <div class="liquid-wrap" id="liquidWrap">
+    <div class="goo-layer" id="gooLayer">
+      <div class="blob blob-wechat" data-key="wechat"></div>
+      <div class="blob blob-alipay" data-key="alipay"></div>
+      <div class="blob blob-paypal"  data-key="paypal"></div>
+      <div class="cursor-blob" id="cursorBlob"></div>
+    </div>
+    <div class="ui-layer">
+      <button class="blob-label" data-key="wechat" aria-label="微信打赏"><span class="glyph">微</span><span class="name">微信</span></button>
+      <button class="blob-label" data-key="alipay" aria-label="支付宝打赏"><span class="glyph">支</span><span class="name">支付宝</span></button>
+      <button class="blob-label" data-key="paypal"  aria-label="PayPal 打赏"><span class="glyph">P</span><span class="name">PayPal</span></button>
+    </div>
+  </div>
+
+  <div class="cards">
+    <div class="card wechat" data-key="wechat"><h3><span class="dot"></span>微信支付</h3><p>微信扫一扫，即刻支持</p></div>
+    <div class="card alipay" data-key="alipay"><h3><span class="dot"></span>支付宝</h3><p>支付宝扫一扫，即刻支持</p></div>
+    <div class="card paypal"  data-key="paypal"><h3><span class="dot"></span>PayPal</h3><p>@yakasuka · 海外朋友适用</p></div>
+  </div>
+
+  <footer>
+    本项目开源免费，任何打赏都不是义务，只是善意的回馈。<br />
+    <a href="https://github.com/yakasuka/yggdrasil" target="_blank" rel="noopener">返回项目主页</a>
+  </footer>
+</main>
+
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-label="打赏详情">
+  <div class="modal-box">
+    <button class="close" id="closeBtn" aria-label="关闭">&times;</button>
+    <h2 id="modalTitle">打赏</h2>
+    <p class="sub" id="modalSub">扫码支持</p>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var wrap = document.getElementById('liquidWrap');
+  var gooLayer = document.getElementById('gooLayer');
+  var cursorBlob = document.getElementById('cursorBlob');
+  var blobs = Array.prototype.slice.call(gooLayer.querySelectorAll('.blob:not(.cursor-blob)'));
+  var labels = Array.prototype.slice.call(document.querySelectorAll('.blob-label'));
+
+  // 三个液滴的基准中心（相对 wrap），由 CSS left 百分比决定
+  var baseX = [0.22, 0.50, 0.78];
+  var mouse = { x: -9999, y: -9999, active: false };
+  var cursor = { x: 0, y: 0, init: false };
+
+  function wrapPoint(e) {
+    var r = wrap.getBoundingClientRect();
+    var cx = (e.touches ? e.touches[0].clientX : e.clientX) - r.left;
+    var cy = (e.touches ? e.touches[0].clientY : e.clientY) - r.top;
+    return { x: cx, y: cy, w: r.width, h: r.height };
+  }
+
+  function onMove(e) {
+    var p = wrapPoint(e);
+    mouse.x = p.x; mouse.y = p.y; mouse.w = p.w; mouse.h = p.h; mouse.active = true;
+    if (!cursor.init) { cursor.x = p.x; cursor.y = p.y; cursor.init = true; }
+  }
+  wrap.addEventListener('mousemove', onMove);
+  wrap.addEventListener('touchmove', onMove, { passive: true });
+  wrap.addEventListener('mouseleave', function () { mouse.active = false; });
+  wrap.addEventListener('touchend', function () { mouse.active = false; });
+
+  // 呼吸形变：让每个液滴即使静止也像活的液体
+  var t = 0;
+  function frame() {
+    t += 0.016;
+    var w = wrap.clientWidth, h = wrap.clientHeight;
+    var cy = h / 2;
+
+    // 游离液滴带阻尼跟随鼠标，制造被"拉扯"的液态感
+    if (mouse.active) {
+      cursor.x += (mouse.x - cursor.x) * 0.16;
+      cursor.y += (mouse.y - cursor.y) * 0.16;
+      cursorBlob.style.opacity = 1;
+    } else {
+      cursorBlob.style.opacity = 0;
+    }
+    var cScale = mouse.active ? 1 : 0;
+    cursorBlob.style.transform = 'translate(' + (cursor.x - 31) + 'px,' + (cursor.y - 31) + 'px) scale(' + cScale + ')';
+
+    blobs.forEach(function (b, i) {
+      var bx = baseX[i] * w;
+      var dx = mouse.x - bx, dy = mouse.y - cy;
+      var dist = mouse.active ? Math.sqrt(dx * dx + dy * dy) : 9999;
+      var range = 215;
+      var influence = Math.max(0, 1 - dist / range);
+      influence = influence * influence * (3 - 2 * influence); // smoothstep
+
+      // 鼠标指向的液滴面积增大（半径放大）
+      var target = 1 + influence * 1.32;
+      b._scale = b._scale === undefined ? 1 : b._scale + (target - b._scale) * 0.12;
+      // 轻微朝鼠标方向偏移，增强吸附/流动感
+      var pull = influence * 16;
+      var ox = mouse.active ? (dx / (dist || 1)) * pull : 0;
+      var oy = mouse.active ? (dy / (dist || 1)) * pull : 0;
+
+      // border-radius 呼吸，让边缘像液体一样蠕动
+      var r1 = 48 + Math.sin(t * 1.6 + i * 2) * 3;
+      var r2 = 52 + Math.cos(t * 1.3 + i) * 3;
+      b.style.borderRadius = r1 + '% ' + r2 + '% ' + (100 - r1) + '% ' + (100 - r2) + '% / ' + r2 + '% ' + r1 + '% ' + (100 - r2) + '% ' + (100 - r1) + '%';
+      b.style.transform = 'translate(-50%,-50%) translate(' + ox + 'px,' + oy + 'px) scale(' + b._scale.toFixed(3) + ')';
+
+      // 标签同步放大与偏移，始终贴合液滴中心
+      var lab = labels[i];
+      lab._scale = lab._scale === undefined ? 1 : lab._scale + (target - lab._scale) * 0.12;
+      lab.style.transform = 'translate(-50%,-50%) translate(' + ox + 'px,' + oy + 'px) scale(' + lab._scale.toFixed(3) + ')';
+    });
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  // ---------- 弹层 ----------
+  var modal = document.getElementById('modal');
+  var mTitle = document.getElementById('modalTitle');
+  var mSub = document.getElementById('modalSub');
+  var mContent = document.getElementById('modalContent');
+
+  function open(key) {
+    if (key === 'wechat') {
+      mTitle.textContent = '微信支付'; mSub.textContent = '请用微信扫一扫';
+      mContent.innerHTML = '<img class="qr" src="../assets/sponsor/wechat-pay.png" alt="微信赞赏码" />';
+    } else if (key === 'alipay') {
+      mTitle.textContent = '支付宝'; mSub.textContent = '请用支付宝扫一扫';
+      mContent.innerHTML = '<img class="qr" src="../assets/sponsor/alipay.png" alt="支付宝收款码" />';
+    } else {
+      mTitle.textContent = 'PayPal'; mSub.textContent = '海外朋友可通过 PayPal 支持';
+      mContent.innerHTML = '<div class="paypal-block"><div class="handle">@yakasuka</div>' +
+        '<a href="https://paypal.me/yakasuka" target="_blank" rel="noopener">打开 PayPal.me</a></div>';
+    }
+    modal.classList.add('open');
+  }
+  function close() { modal.classList.remove('open'); }
+
+  labels.forEach(function (b) { b.addEventListener('click', function () { open(b.dataset.key); }); });
+  document.querySelectorAll('.card').forEach(function (c) { c.addEventListener('click', function () { open(c.dataset.key); }); });
+  document.getElementById('closeBtn').addEventListener('click', close);
+  modal.addEventListener('click', function (e) { if (e.target === modal) close(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
+})();
+</script>
+</body>
+</html>

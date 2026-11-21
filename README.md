@@ -83,6 +83,14 @@ Yggdrasil 是一套面向 **Mihomo / Clash / OpenClash / Clash Verge** 的配置
 - [Ratatoskr 主配置](resources/template/ratatoskr-template.yaml) · [Release 下载](https://github.com/yakasuka/yggdrasil/releases/latest/download/ratatoskr-template.yaml)
 - [部署指南](config-builder/docs/DEPLOYMENT.md) · [实现路径](config-builder/docs/IMPLEMENTATION.md) · [图标来源](assets/icons/macosicons/README.md) · [配置工坊 README](config-builder/README.md)
 
+### 赞助支持
+
+如果 Yggdrasil 帮到了你，可以用一杯咖啡支持后续维护。项目提供 **微信 / 支付宝 / PayPal** 三种打赏方式：
+
+<pre><code><a href="https://yakasuka.github.io/yggdrasil/sponsor/">https://yakasuka.github.io/yggdrasil/sponsor/</a>  →  打开打赏页面（微信 / 支付宝 / PayPal）</code></pre>
+
+<sub>或访问项目主页的 <a href="https://yakasuka.github.io/yggdrasil/sponsor/">赞助页面</a>，扫码即可支持。</sub>
+
 ### 贡献者
 
 <p align="center">
