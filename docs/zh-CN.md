@@ -238,14 +238,18 @@ Geo 数据分类、补充规则源、节点订阅和出口策略分别维护。�
 
 ### 贡献者
 
-项目由 [yakasuka](https://github.com/yakasuka) 主导维护。以下 AI 助手以协作方式参与了配置整理、脚本编写与文档工作：
+项目由 [yakasuka](https://github.com/yakasuka) 主导维护，以下协作者以不同方式参与了配置整理、脚本编写、文档与自动化工作：
 
 | 贡献者 | 角色 |
 | :--- | :--- |
+| [yakasuka](https://github.com/yakasuka) | 项目主导与维护 |
 | [Codex](https://github.com/codex) | 配置整理与脚本编写 |
 | [Claude](https://github.com/claude) | 代码与文档协作 |
+| [Eaibee Kitajima](https://github.com/EaibeeKitajima) | 早期规则与配置贡献 |
+| [github-actions[bot]](https://github.com/apps/github-actions) | 规则与目录自动同步 |
+| [dependabot[bot]](https://github.com/apps/dependabot) | 依赖更新 |
 
-GitHub 侧栏的 Contributors 列表由提交作者与 `Co-authored-by` 共同作者聚合；Codex 与 Claude 使用各自官方账号的署名邮箱，因此头像与主页可正确显示。
+GitHub 侧栏的 Contributors 列表由提交作者与 `Co-authored-by` 共同作者聚合；AI 助手与 bot 使用各自官方账号的署名邮箱，因此头像与主页可正确显示。
 
 ### 致谢与参考
 

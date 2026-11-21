@@ -77,14 +77,18 @@ The local service is available at `http://localhost:8788/config-builder/`. To ad
 
 ## Contributors
 
-The project is led and maintained by [yakasuka](https://github.com/yakasuka). The following AI assistants contributed to configuration work, scripts, and documentation:
+The project is led and maintained by [yakasuka](https://github.com/yakasuka). The following collaborators contributed to configuration work, scripts, documentation, and automation:
 
 | Contributor | Role |
 | :--- | :--- |
+| [yakasuka](https://github.com/yakasuka) | Project lead and maintenance |
 | [Codex](https://github.com/codex) | Configuration organization and scripting |
 | [Claude](https://github.com/claude) | Code and documentation collaboration |
+| [Eaibee Kitajima](https://github.com/EaibeeKitajima) | Early rules and configuration contributions |
+| [github-actions[bot]](https://github.com/apps/github-actions) | Automated rules and catalog sync |
+| [dependabot[bot]](https://github.com/apps/dependabot) | Dependency updates |
 
-GitHub's sidebar Contributors list is aggregated from commit authors and `Co-authored-by` co-authors. Codex and Claude use the signature emails of their official accounts, so their avatars and profile links display correctly.
+GitHub's sidebar Contributors list is aggregated from commit authors and `Co-authored-by` co-authors. AI assistants and bots use the signature emails of their official accounts, so their avatars and profile links display correctly.
 
 ## License
 

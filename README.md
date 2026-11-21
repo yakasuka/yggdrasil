@@ -82,3 +82,16 @@ Yggdrasil 是一套面向 **Mihomo / Clash / OpenClash / Clash Verge** 的配置
 - [中文指南：架构、规则、配置选择与使用说明](docs/zh-CN.md)　·　[English guide](docs/en.md)
 - [Ratatoskr 主配置](resources/template/ratatoskr-template.yaml) · [Release 下载](https://github.com/yakasuka/yggdrasil/releases/latest/download/ratatoskr-template.yaml)
 - [部署指南](config-builder/docs/DEPLOYMENT.md) · [实现路径](config-builder/docs/IMPLEMENTATION.md) · [图标来源](assets/icons/macosicons/README.md) · [配置工坊 README](config-builder/README.md)
+
+### 贡献者
+
+<p align="center">
+  <a href="https://github.com/yakasuka"><img src="https://avatars.githubusercontent.com/u/39859629?v=4" width="40" alt="yakasuka" /></a>&nbsp;
+  <a href="https://github.com/codex"><img src="https://avatars.githubusercontent.com/u/267193182?v=4" width="40" alt="Codex" /></a>&nbsp;
+  <a href="https://github.com/claude"><img src="https://avatars.githubusercontent.com/u/81847?v=4" width="40" alt="Claude" /></a>&nbsp;
+  <a href="https://github.com/EaibeeKitajima"><img src="https://avatars.githubusercontent.com/u/105159380?v=4" width="40" alt="Eaibee Kitajima" /></a>&nbsp;
+  <a href="https://github.com/apps/github-actions"><img src="https://avatars.githubusercontent.com/in/15368?v=4" width="40" alt="github-actions[bot]" /></a>&nbsp;
+  <a href="https://github.com/apps/dependabot"><img src="https://avatars.githubusercontent.com/in/29110?v=4" width="40" alt="dependabot[bot]" /></a>
+</p>
+
+<p align="center"><sub>项目由 yakasuka 主导维护，AI 助手与自动化机器人共同参与配置、脚本、文档与依赖维护。</sub></p>
