@@ -86,17 +86,17 @@ Yggdrasil 是一套面向 **Mihomo / Clash / OpenClash / Clash Verge** 的配置
 ### 贡献者
 
 <p align="center">
-  <a href="https://github.com/yakasuka"><img src="https://avatars.githubusercontent.com/u/39859629?v=4" width="40" alt="yakasuka" /></a>&nbsp;
-  <a href="https://github.com/codex"><img src="https://avatars.githubusercontent.com/u/267193182?v=4" width="40" alt="Codex" /></a>&nbsp;
-  <a href="https://github.com/claude"><img src="https://avatars.githubusercontent.com/u/81847?v=4" width="40" alt="Claude" /></a>&nbsp;
-  <a href="https://github.com/EaibeeKitajima"><img src="https://avatars.githubusercontent.com/u/105159380?v=4" width="40" alt="Eaibee Kitajima" /></a>&nbsp;
-  <a href="https://github.com/tobyxdd"><img src="https://avatars.githubusercontent.com/u/1414953?v=4" width="40" alt="tobyxdd" /></a>&nbsp;
-  <a href="https://github.com/Zephyruso"><img src="https://avatars.githubusercontent.com/u/176294927?v=4" width="40" alt="Zephyruso" /></a>&nbsp;
-  <a href="https://github.com/Dreamacro"><img src="https://avatars.githubusercontent.com/u/8615343?v=4" width="40" alt="Dreamacro" /></a>&nbsp;
-  <a href="https://github.com/Aethersailor"><img src="https://avatars.githubusercontent.com/u/22260104?v=4" width="40" alt="Aethersailor" /></a>&nbsp;
-  <a href="https://github.com/Fndroid"><img src="https://avatars.githubusercontent.com/u/16091562?v=4" width="40" alt="Fndroid" /></a>&nbsp;
-  <a href="https://github.com/apps/github-actions"><img src="https://avatars.githubusercontent.com/in/15368?v=4" width="40" alt="github-actions[bot]" /></a>&nbsp;
-  <a href="https://github.com/apps/dependabot"><img src="https://avatars.githubusercontent.com/in/29110?v=4" width="40" alt="dependabot[bot]" /></a>
+  <a href="https://github.com/yakasuka"><img src="https://avatars.githubusercontent.com/u/39859629?v=4" width="40" height="40" alt="yakasuka" /></a>&nbsp;
+  <a href="https://github.com/codex"><img src="https://avatars.githubusercontent.com/u/267193182?v=4" width="40" height="40" alt="Codex" /></a>&nbsp;
+  <a href="https://github.com/claude"><img src="https://avatars.githubusercontent.com/u/81847?v=4" width="40" height="40" alt="Claude" /></a>&nbsp;
+  <a href="https://github.com/EaibeeKitajima"><img src="https://avatars.githubusercontent.com/u/105159380?v=4" width="40" height="40" alt="Eaibee Kitajima" /></a>&nbsp;
+  <a href="https://github.com/tobyxdd"><img src="https://avatars.githubusercontent.com/u/1414953?v=4" width="40" height="40" alt="tobyxdd" /></a>&nbsp;
+  <a href="https://github.com/Zephyruso"><img src="https://avatars.githubusercontent.com/u/176294927?v=4" width="40" height="40" alt="Zephyruso" /></a>&nbsp;
+  <a href="https://github.com/Dreamacro"><img src="https://avatars.githubusercontent.com/u/8615343?v=4" width="40" height="40" alt="Dreamacro" /></a>&nbsp;
+  <a href="https://github.com/Aethersailor"><img src="https://avatars.githubusercontent.com/u/22260104?v=4" width="40" height="40" alt="Aethersailor" /></a>&nbsp;
+  <a href="https://github.com/Fndroid"><img src="https://avatars.githubusercontent.com/u/16091562?v=4" width="40" height="40" alt="Fndroid" /></a>&nbsp;
+  <a href="https://github.com/apps/github-actions"><img src="https://avatars.githubusercontent.com/in/15368?v=4" width="40" height="40" alt="github-actions[bot]" /></a>&nbsp;
+  <a href="https://github.com/apps/dependabot"><img src="https://avatars.githubusercontent.com/in/29110?v=4" width="40" height="40" alt="dependabot[bot]" /></a>
 </p>
 
 <p align="center"><sub>项目由 yakasuka 主导维护，AI 助手、自动化机器人与开源社区的上游作者共同参与。</sub></p>
