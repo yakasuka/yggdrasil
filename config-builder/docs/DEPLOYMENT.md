@@ -218,11 +218,11 @@ npm run service:deploy -- --branch main
 6. 加入不写 KV 的预览接口、加密 v3 YAML 快照与旧 v2 读取兼容。
 7. 兼容公网 IP 与自定义端口的订阅，保留 TLS 验证和地址限制。
 8. 统一 Git 与 CLI 发布目录，发布包只包含明确允许的页面资源，附第三方许可证。
-9. 保留模板驱动的 APP、国家和规则目录，新增内容通过构建与重新部署生效。
+9. 保留静态目录数据驱动的 APP、国家和规则目录，新增内容通过构建与重新部署生效。
 
 此前在独立部署环境完成过 43 项自动测试、真实 Base64 源在线解析、KV 创建与读取、预览/下载/订阅一致性及 Mihomo 配置校验；旧 v2 记录换域名读取也通过。**这些是实现的验收记录，不代表本仓库模板已经部署为公共在线服务。** 新部署必须使用自己的资源重新执行第 4 节验收。
 
-APP、地区与规则只维护 [ratatoskr-template.yaml](../../resources/template/ratatoskr-template.yaml)。修改后运行完整 `npm run build`，提交 `shared/catalog.json` 与 `assets/`，重新部署 Pages，并核对页面目录、健康接口和生产提交版本。只提交模板或看到 GitHub 检查成功，不代表线上模板已经生效。
+APP、地区与规则只维护静态目录 [shared/catalog.json](../../config-builder/shared/catalog.json)。修改后运行完整 `npm run build`，提交 `shared/catalog.json` 与 `assets/`，重新部署 Pages，并核对页面目录、健康接口和生产提交版本。只提交目录数据或看到 GitHub 检查成功，不代表线上页面已经生效。
 
 ## 9. 维护资料
 

@@ -23,6 +23,7 @@ Yggdrasil is the application and tooling around **Ratatoskr**, its core Mihomo c
 | [Getting started](#getting-started) | Build a personal configuration |
 | [Configuration files](#configuration-files) | Choose a template for your use case |
 | [Development and deployment](#development-and-deployment) | Build commands and maintenance documentation |
+| [Contributors](#contributors) | AI assistants involved in the project |
 | [License](#license) | Usage terms and feedback |
 
 ## Architecture
@@ -59,8 +60,7 @@ Without a deployed service, local node-file import, preview, and download remain
 
 | File | Use |
 | :--- | :--- |
-| [Ratatoskr](../resources/ratatoskr.yaml) | Main configuration with common region groups and general node strategies |
-| [Ratatoskr template](../resources/template/ratatoskr-template.yaml) | Shared source for builder application and region catalogs |
+| [Ratatoskr](../resources/template/ratatoskr-template.yaml) | Main configuration with common region groups and general node strategies |
 | [Ratatosk-Eb](../resources/template/ratatosk-Eb.yaml) | Expanded country and region groups with macOSicons artwork |
 | [Yggdrasil network-stack reference](../resources/yggdrasil.yaml) | Reference configuration with DNS, TUN, sniffing, and external rule sets |
 
@@ -68,7 +68,7 @@ These configurations are maintained for different needs and do not share identic
 
 ## Development and deployment
 
-The front end and shared template compiler are in `config-builder/`. Legacy `/merge` and `/sub` endpoints are in `functions/`. See the [implementation map](../config-builder/docs/IMPLEMENTATION.md) for code paths and the [deployment guide](../config-builder/docs/DEPLOYMENT.md) for Pages, Worker, and KV setup.
+The front end and shared template compiler are in `config-builder/`. Legacy `/merge` and `/sub` endpoints are in `scripts/endpoints/`. See the [implementation map](../config-builder/docs/IMPLEMENTATION.md) for code paths and the [deployment guide](../config-builder/docs/DEPLOYMENT.md) for Pages, Worker, and KV setup.
 
 ```sh
 npm --prefix config-builder ci
@@ -77,7 +77,11 @@ npm --prefix config-builder test
 npm --prefix config-builder run service:dev
 ```
 
-The local service is available at `http://localhost:8788/config-builder/`. To add an application or region to the builder, update the metadata in the [Ratatoskr template](../resources/template/ratatoskr-template.yaml), then rebuild and review the generated catalog.
+The local service is available at `http://localhost:8788/config-builder/`. To add an application or region to the builder, edit the static [catalog.json](../config-builder/shared/catalog.json), then rebuild and review the generated catalog.
+
+## Contributors
+
+AI assistants that contributed through configuration work, scripts, and documentation are listed in [CONTRIBUTORS.md](../CONTRIBUTORS.md). GitHub's sidebar Contributors list only tracks accounts that authored commits.
 
 ## License
 

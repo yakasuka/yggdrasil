@@ -1,13 +1,14 @@
 /**
- * Sync Aethersailor rule files into resources/rules and re-apply local overlays.
+ * Sync Aethersailor rule files into resources/rules/aethersailor and re-apply
+ * local overlays from resources/rules/aethersailor/overlays.
  *
  * Change detection is per file: the GitHub blob SHA of the upstream file plus a
  * hash of that file's local overlay. A file is rebuilt only when one of them
  * changes, so unrelated commits in the upstream repo never cause a rebuild.
  *
  * Usage:
- *   node scripts/sync-rule-providers.mjs            # rebuild only changed files
- *   node scripts/sync-rule-providers.mjs --force   # rebuild everything
+ *   node scripts/rules/sync-rule-providers.mjs            # rebuild only changed files
+ *   node scripts/rules/sync-rule-providers.mjs --force   # rebuild everything
  *
  * Optional env: GITHUB_TOKEN / GH_TOKEN (raises the GitHub API rate limit).
  * In Actions, GITHUB_OUTPUT receives changed=true|false and the changed file list.
@@ -20,7 +21,7 @@ const UPSTREAM_REPO = 'Aethersailor/Custom_OpenClash_Rules';
 const UPSTREAM_BRANCH = 'main';
 const API_ROOT = `https://api.github.com/repos/${UPSTREAM_REPO}/contents/rule`;
 
-const ROOT = 'resources/rules';
+const ROOT = 'resources/rules/aethersailor';
 const OVERLAY_DIR = path.join(ROOT, 'overlays');
 const STATE_FILE = path.join(ROOT, '.upstream-state.json');
 

@@ -3,15 +3,64 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Yggdrasil — 全自动分布式网络订阅中枢</title>
-<meta name="description" content="Yggdrasil 以 Ratatoskr 为核心配置模板，将全球节点、路由规则与分流策略收敛为一份会自我进化的 Mihomo 配置。">
+<title>Yggdrasil — Mihomo/Clash 配置工坊与 Ratatoskr 分流模板</title>
+<meta name="description" content="Yggdrasil 是面向 Mihomo、Clash、OpenClash 的配置与订阅工具。以 Ratatoskr 为核心模板，提供桌面级 AdGuard 广告拦截、GeoSite/GeoIP 精准分流与可视化配置工坊，规则自动懒更新。">
+<meta name="keywords" content="Mihomo, Clash, OpenClash, Clash Verge, Ratatoskr, Yggdrasil, AdGuard, 广告拦截, GeoSite, GeoIP, 分流规则, 配置生成器, 订阅转换, YAML, 代理配置">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="author" content="yakasuka">
 <meta name="theme-color" content="#06100c">
+<link rel="canonical" href="https://yakasuka.github.io/yggdrasil/">
 <link rel="icon" type="image/png" sizes="512x512" href="./assets/favicon.png?v=b9d535601980">
 
+<!-- Open Graph -->
 <meta property="og:type" content="website">
-<meta property="og:title" content="Yggdrasil — 全自动分布式网络订阅中枢">
-<meta property="og:description" content="把上万节点、路由规则与分流策略，收敛成一份会自我进化的配置。">
-<meta property="og:image" content="./assets/favicon.png?v=b9d535601980">
+<meta property="og:site_name" content="Yggdrasil">
+<meta property="og:url" content="https://yakasuka.github.io/yggdrasil/">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:locale:alternate" content="en_US">
+<meta property="og:title" content="Yggdrasil — Mihomo/Clash 配置工坊与 Ratatoskr 分流模板">
+<meta property="og:description" content="面向 Mihomo、Clash、OpenClash 的配置与订阅工具：桌面级 AdGuard 广告拦截、GeoSite/GeoIP 精准分流与可视化配置工坊，规则自动懒更新。">
+<meta property="og:image" content="https://yakasuka.github.io/yggdrasil/assets/favicon.png">
+<meta property="og:image:alt" content="Yggdrasil 项目标识">
+
+<!-- Twitter / X Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Yggdrasil — Mihomo/Clash 配置工坊与 Ratatoskr 分流模板">
+<meta name="twitter:description" content="桌面级 AdGuard 广告拦截 + GeoSite/GeoIP 精准分流的 Mihomo / Clash 配置与订阅工具。">
+<meta name="twitter:image" content="https://yakasuka.github.io/yggdrasil/assets/favicon.png">
+
+<!-- Structured data for search engines -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://yakasuka.github.io/yggdrasil/#website",
+      "url": "https://yakasuka.github.io/yggdrasil/",
+      "name": "Yggdrasil",
+      "description": "面向 Mihomo、Clash、OpenClash 的配置与订阅工具：桌面级 AdGuard 广告拦截、GeoSite/GeoIP 精准分流与可视化配置工坊。",
+      "inLanguage": "zh-CN"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://yakasuka.github.io/yggdrasil/#software",
+      "name": "Yggdrasil",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Windows, macOS, Linux, iOS, Android",
+      "description": "以 Ratatoskr 为核心模板的 Mihomo / Clash / OpenClash 配置与订阅工具，内置桌面级 AdGuard 广告拦截规则（约 31.6 万域名）、GeoSite/GeoIP 精准分流与多策略出口编排。",
+      "url": "https://github.com/yakasuka/yggdrasil",
+      "image": "https://yakasuka.github.io/yggdrasil/assets/favicon.png",
+      "author": {
+        "@type": "Person",
+        "name": "yakasuka",
+        "url": "https://github.com/yakasuka"
+      },
+      "keywords": "Mihomo, Clash, OpenClash, Ratatoskr, AdGuard, GeoSite, GeoIP, 配置生成, 分流规则, YAML"
+    }
+  ]
+}
+</script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1147,7 +1196,7 @@ footer{
       <a href="./docs/zh-CN.md">中文指南</a>
       <a href="./docs/en.md">English</a>
       <a href="./config-builder/">配置工坊</a>
-      <a href="./resources/ratatoskr.yaml">Ratatoskr 模板</a>
+      <a href="./resources/template/ratatoskr-template.yaml">Ratatoskr 模板</a>
       <a href="./LICENSE">授权协议</a>
     </nav>
 

@@ -50,7 +50,7 @@ Yggdrasil 面向一站式的使用体验：使用者通过 config-builder 模块
 4. **APP 分流。** 默认全部启用并跟随代理，也可指定已保留的地区、Direct 或 Reject。规则和最终出口由模板统一维护。
 5. **最终确认。** 预览配置，下载 `名字-ratatoskr.yaml`，或生成持久订阅链接。
 
-**[ratatoskr-template.yaml](../resources/template/ratatoskr-template.yaml)** 是 APP、地区与规则的唯一目录来源。模板新增 APP 或地区后，构建会同步页面目录和后端模板；重新部署 Pages 后，同一 Token 可取得新的配置。完整的数据流与每项功能的位置见 **[实现路径](../config-builder/docs/IMPLEMENTATION.md)**。
+**[shared/catalog.json](../config-builder/shared/catalog.json)** 是 APP、地区与规则的静态目录数据。新增 APP 或地区时直接编辑该文件，构建后页面目录和后端模板随之更新；重新部署 Pages 后，同一 Token 可取得新的配置。完整的数据流与每项功能的位置见 **[实现路径](../config-builder/docs/IMPLEMENTATION.md)**。
 
 个人订阅使用独立随机 Token，持续时间可选 **3 小时 / 7 天 / 30 天 / 永久**。配置标题下的 catalog 指纹只标识模板版本，不用作访问凭据。节点来源保留 `[P1]`、`[P2]` 标识。
 
@@ -128,7 +128,7 @@ Ratatoskr 将庞大的分类数据交给 Geo 数据库，将清晰的分流意�
 
 | 文件 | 定位 | 主要内容 |
 | :--- | :--- | :--- |
-| **[Ratatoskr](../resources/ratatoskr.yaml)** | 日常主配置 | Geo 驱动的轻量分流，6 个常用地区与其他节点入口 |
+| **[Ratatoskr](../resources/template/ratatoskr-template.yaml)** | 日常主配置 | Geo 驱动的轻量分流，6 个常用地区与其他节点入口 |
 | **[Ratatosk · Eb](../resources/template/ratatosk-Eb.yaml)** | 地区扩展 | 24 个国家 / 地区分组，使用 macOSicons 图标 |
 | **[yggdrasil.yaml](../resources/yggdrasil.yaml)** | 完整网络栈参考 | DNS、TUN、流量嗅探与详细外部规则集 |
 
@@ -139,7 +139,7 @@ Ratatoskr 将庞大的分类数据交给 Geo 数据库，将清晰的分流意�
 
 取得授权后，可下载文件或将配置地址导入客户端：
 
-- [ratatoskr.yaml](https://raw.githubusercontent.com/yakasuka/yggdrasil/main/resources/ratatoskr.yaml)
+- [ratatoskr-template.yaml](https://raw.githubusercontent.com/yakasuka/yggdrasil/main/resources/template/ratatoskr-template.yaml)
 - [Ratatosk-Eb.yaml](https://raw.githubusercontent.com/yakasuka/yggdrasil/main/resources/template/ratatosk-Eb.yaml)
 - [yggdrasil.yaml](https://raw.githubusercontent.com/yakasuka/yggdrasil/main/resources/yggdrasil.yaml)
 
@@ -156,7 +156,7 @@ Ratatoskr 将庞大的分类数据交给 Geo 数据库，将清晰的分流意�
 推荐从 [配置工坊](https://yakasuka.github.io/yggdrasil/config-builder/) 开始；也可以手动使用模板：
 
 1. **确认授权。** 取得相应原作者或权利人的书面许可，条款见 [LICENSE](../LICENSE)。
-2. **选择配置。** 日常使用从 `ratatoskr.yaml` 开始；需要更细地区分组时选择 Eb 版。
+2. **选择配置。** 日常使用从 `ratatoskr-template.yaml` 开始；需要更细地区分组时选择 Eb 版。
 3. **准备节点与数据。** 在本地维护自己的 `proxy-providers` 或 `proxies`，并准备包含所用分类的 GeoSite / GeoIP 数据。
 4. **导入并选择出口。** 在 Mihomo 客户端中加载配置，按应用或地区选择策略，重新执行延迟测试。
 
@@ -198,8 +198,8 @@ Ratatoskr 将庞大的分类数据交给 Geo 数据库，将清晰的分流意�
 
 | 接口 | 实现与职责 |
 | :--- | :--- |
-| `/merge?token=…` | [merge.js](../functions/merge.js)：读取公开模板，将私有 `providers.yaml` 注入自动订阅标记区 |
-| `/sub?token=…` | [sub.js](../functions/sub.js)：读取私有 `nodes.yaml`，原样返回节点订阅 YAML |
+| `/merge?token=…` | [merge.js](../scripts/endpoints/merge.js)：读取公开模板，将私有 `providers.yaml` 注入自动订阅标记区 |
+| `/sub?token=…` | [sub.js](../scripts/endpoints/sub.js)：读取私有 `nodes.yaml`，原样返回节点订阅 YAML |
 
 环境变量：`TOKEN` 用于接口鉴权，`GH_TOKEN` 用于读取私有仓库，`PUBLIC_CONFIG_URL` 指定合并接口使用的模板地址。
 
@@ -256,6 +256,10 @@ Geo 数据分类、补充规则源、节点订阅和出口策略分别维护。�
 项目原创内容的使用、运行、修改、再分发、公开部署及商业使用，须事先取得相应原作者或权利人的书面许可；个人与非商业用途同样适用。完整范围、例外与免责条款见 [LICENSE](../LICENSE)。第三方素材继续遵循各自许可，适用法律、GitHub 平台条款和既有有效授权不受排除。
 
 通过 [Issues](https://github.com/yakasuka/yggdrasil/issues) 反馈问题或申请授权。问题反馈请附客户端与内核版本、所用配置和预期分流结果，并移除订阅令牌与节点凭据。
+
+### 贡献者
+
+以协作方式参与项目配置整理、脚本编写与文档工作的 AI 助手见 [CONTRIBUTORS.md](../CONTRIBUTORS.md)。GitHub 侧栏的 Contributors 列表仅统计实际提交 commit 的账号。
 
 ### 致谢与参考
 

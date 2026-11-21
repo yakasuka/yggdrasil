@@ -2,7 +2,7 @@
 
 ## 数据流
 
-`resources/template/ratatoskr-template.yaml` 是 APP、国家/地区与规则的唯一来源。`scripts/generate-catalog.mjs` 调用 `shared/template.js` 生成共享目录，页面和 Pages 服务随同一次构建更新。目录不提取个人订阅与节点凭据。
+`config-builder/shared/catalog.json` 是 APP、国家/地区与规则的静态目录数据，前端与 Pages 服务在构建时直接读取它，不提取个人订阅与节点凭据。新增 APP 或地区时直接编辑该文件并重新构建。`shared/template.js` 的 `catalogFromTemplate` 只在 `TEMPLATE_URL` 指向远程模板时于运行时解析目录，测试夹具位于 `tests/fixtures/template-with-metadata.yaml`，均不读取本地目录模板。
 
 前端与订阅服务同源部署在 Cloudflare Pages。`src/app.js` 固定以 `location.origin` 为 API 地址：把机场链接提交给 `/api/inspect`，由 Pages 服务端通过 `worker/subscriptions.js` 拉取，`shared/subscription.js` 解码 Base64、YAML 或节点链接，`shared/nodes.js` 用模板 filter 分类并只返回脱敏清单。浏览器不直连机场、不缓存完整节点、不写入本地存储，因此不受 CORS 限制。
 

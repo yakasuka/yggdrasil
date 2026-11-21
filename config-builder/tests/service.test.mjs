@@ -59,7 +59,7 @@ test("the same token serves a newly added template APP without regenerating the 
   const data = await made.json();
   const source = parse(
     fs.readFileSync(
-      new URL("../../resources/template/ratatoskr-template.yaml", import.meta.url),
+      new URL("./fixtures/template-with-metadata.yaml", import.meta.url),
       "utf8",
     ),
     { merge: true },

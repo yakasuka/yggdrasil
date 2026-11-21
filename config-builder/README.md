@@ -30,7 +30,7 @@ config-builder/
 └── assets/                    # 自动生成的页面资源
 ```
 
-目录来源是 **[resources/template/ratatoskr-template.yaml](../resources/template/ratatoskr-template.yaml)**。新增 APP 策略组和规则、或带元数据的地区组后，Actions 会测试并同步生成资源；重新部署 Pages 后会使用新模板。不在前端维护第二份 APP 或国家列表。Pages 与 KV 的部署、验收和常见故障，见 [部署指南](docs/DEPLOYMENT.md)。
+目录数据是 **[shared/catalog.json](shared/catalog.json)**（静态维护）。新增 APP 策略组或地区时，直接编辑该目录文件，然后重新构建、测试并部署 Pages；前端不维护第二份 APP 或国家列表。`catalogFromTemplate` 仅用于 `TEMPLATE_URL` 指向的远程模板解析，测试夹具位于 `tests/fixtures/`，不参与生产构建。Pages 与 KV 的部署、验收和常见故障，见 [部署指南](docs/DEPLOYMENT.md)。
 
 ```sh
 npm --prefix config-builder ci

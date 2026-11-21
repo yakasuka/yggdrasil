@@ -112,7 +112,7 @@ test("hidden rule mutations, invalid app regions, lifetimes and duplicate source
 test("new template APP and country require no browser lists or backend code changes", async () => {
   const source = parse(
     fs.readFileSync(
-      new URL("../../resources/template/ratatoskr-template.yaml", import.meta.url),
+      new URL("./fixtures/template-with-metadata.yaml", import.meta.url),
       "utf8",
     ),
     { merge: true },

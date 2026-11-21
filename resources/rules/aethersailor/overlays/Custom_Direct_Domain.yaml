@@ -1,6 +1,6 @@
 # Custom_Direct_Domain.yaml - 直连域名增量 (behavior: domain)
 # 只写要追加的条目，一行一条；domain 类型不能放 DST-PORT / IP-CIDR。
-# 对应 ratatoskr.yaml:185 RULE-SET,🪐 Astra Domain,DIRECT（优先于 Steam 主规则）
+# 对应 ratatoskr-template.yaml: RULE-SET,🪐 Astra Domain,DIRECT（优先于 Steam 主规则）
 payload:
   # ── Steam 登录地区检测 / CM 与下载服务器列表下发 ──
   # 这些请求必须从国内 IP 出口发出，Steam 才会判定 IPCountry=CN 并下发国内 CDN。

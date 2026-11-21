@@ -146,7 +146,7 @@ export async function catalogFromTemplate(text) {
     });
   const model = {
     schema: 2,
-    source: "resources/template/ratatoskr-template.yaml",
+    source: "remote template (TEMPLATE_URL)",
     testUrl: meta.testUrl || "https://www.gstatic.com/generate_204",
     cleanFilter: t.FilterAll,
     groups,

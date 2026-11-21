@@ -95,7 +95,7 @@ test("public site serves its own assets and does not expose private source paths
     );
   for (const path of [
     "/.git/config",
-    "/functions/sub.js",
+    "/scripts/endpoints/sub.js",
     "/config-builder/src/app.js",
     "/config-builder/worker/wrangler.jsonc",
     "/config-builder/shared/catalog.json",

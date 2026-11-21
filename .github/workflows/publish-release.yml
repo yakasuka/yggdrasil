@@ -1,0 +1,96 @@
+name: Publish core config to Releases
+
+# Ratatoskr main config is the core deliverable of this project.
+# Publish it as a downloadable Release asset with a professional,
+# template-driven changelog so users can grab it without navigating
+# the repository tree.
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag (e.g. v1.0.1). Existing releases are updated in place.'
+        required: true
+        default: 'v1.0.0'
+      name:
+        description: 'Release name (optional)'
+        required: false
+        default: ''
+      changelog:
+        description: 'This release changelog (Markdown). Leave blank for the default.'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-core-config
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Verify required files
+        run: |
+          test -f resources/template/ratatoskr-template.yaml
+          test -f .github/release-notes.md
+
+      - name: Render release notes
+        env:
+          TAG: ${{ inputs.tag || github.ref_name }}
+          CHANGELOG_INPUT: ${{ inputs.changelog }}
+        run: |
+          set -euo pipefail
+          CONFIG="resources/template/ratatoskr-template.yaml"
+
+          DATE="$(date -u '+%Y-%m-%d')"
+          SHA256="$(sha256sum "$CONFIG" | awk '{print $1}')"
+
+          CHANGELOG="$CHANGELOG_INPUT"
+          if [ -z "$CHANGELOG" ]; then
+            CHANGELOG="- 同步上游 AdGuard 桌面规则与补充规则源，保持拦截覆盖最新。\n- 维护配置模板、文档与自动化流程，修复已知问题。"
+          fi
+
+          # Substitute placeholders in the release notes template.
+          # Uses python for safe multiline replacement.
+          python3 - "$TAG" "$DATE" "$SHA256" "$CHANGELOG" <<'PY'
+          import sys
+          tag, date, sha256, changelog = sys.argv[1:5]
+          with open(".github/release-notes.md", encoding="utf-8") as f:
+              notes = f.read()
+          changelog = changelog.replace("\\n", "\n")
+          notes = (notes
+                   .replace("{{TAG}}", tag)
+                   .replace("{{DATE}}", date)
+                   .replace("{{SHA256}}", sha256)
+                   .replace("{{CHANGELOG}}", changelog))
+          with open("release-notes.rendered.md", "w", encoding="utf-8") as f:
+              f.write(notes)
+          PY
+
+      - name: Create or update Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ inputs.tag || github.ref_name }}
+          RELEASE_NAME: ${{ inputs.name || format('Ratatoskr 主配置 · {0}', inputs.tag || github.ref_name) }}
+        run: |
+          set -euo pipefail
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" resources/template/ratatoskr-template.yaml --clobber
+            gh release edit "$TAG" \
+              --title "$RELEASE_NAME" \
+              --notes-file release-notes.rendered.md
+          else
+            gh release create "$TAG" resources/template/ratatoskr-template.yaml \
+              --title "$RELEASE_NAME" \
+              --notes-file release-notes.rendered.md
+          fi

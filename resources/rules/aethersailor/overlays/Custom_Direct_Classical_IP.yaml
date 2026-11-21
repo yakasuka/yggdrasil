@@ -1,5 +1,5 @@
 # Custom_Direct_Classical_IP.yaml - 直连经典规则增量 (behavior: classical)
-# 对应 ratatoskr.yaml:186 RULE-SET,🔮 Prism IP,DIRECT
+# 对应 ratatoskr-template.yaml: RULE-SET,🔮 Prism IP,DIRECT
 # Steam 下载 CDN 网段，来源: Aethersailor Steam_CDN.list (23 条)
 # no-resolve 避免为直连规则触发额外 DNS 解析，保留 CDN 就近调度
 payload:
