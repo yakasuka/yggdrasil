@@ -35,7 +35,7 @@ https://github.com/yakasuka/yggdrasil/releases/latest/download/ratatoskr-templat
 2. 下载上方附件或导入固定直链到 Mihomo / OpenClash 客户端。
 3. 填入自己的节点订阅，按应用或地区选择出口并执行延迟测试。
 
-> 使用前请阅读文档中的 [许可与反馈](https://github.com/yakasuka/yggdrasil/blob/main/docs/zh-CN.md#许可与反馈) 一节。
+> 使用前请阅读文档中的 [许可与反馈](https://github.com/yakasuka/yggdrasil/blob/main/docs/i18n/README.zh-CN.md#许可与反馈) 一节。
 
 ### 本次更新
 
@@ -43,7 +43,7 @@ https://github.com/yakasuka/yggdrasil/releases/latest/download/ratatoskr-templat
 
 ### 文档与链接
 
-- [中文指南](https://github.com/yakasuka/yggdrasil/blob/main/docs/zh-CN.md) · [English](https://github.com/yakasuka/yggdrasil/blob/main/docs/en.md)
+- [中文指南](https://github.com/yakasuka/yggdrasil/blob/main/docs/i18n/README.zh-CN.md) · [English](https://github.com/yakasuka/yggdrasil/blob/main/docs/i18n/README.en.md) · [全部语言文档](https://github.com/yakasuka/yggdrasil/tree/main/docs/i18n)
 - [配置工坊部署](https://github.com/yakasuka/yggdrasil/blob/main/config-builder/docs/DEPLOYMENT.md) · [项目主页](https://yakasuka.github.io/yggdrasil/) · [源码仓库](https://github.com/yakasuka/yggdrasil)
 
 ### 更新机制

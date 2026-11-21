@@ -81,7 +81,7 @@ The local service is available at `http://localhost:8788/config-builder/`. To ad
 
 ## Contributors
 
-AI assistants that contributed through configuration work, scripts, and documentation are listed in [CONTRIBUTORS.md](../CONTRIBUTORS.md). GitHub's sidebar Contributors list only tracks accounts that authored commits.
+AI assistants that contributed through configuration work, scripts, and documentation are listed in [Contributors](i18n/CONTRIBUTORS.en.md). The full multilingual wiki is in [docs/i18n/](i18n/README.en.md). GitHub's sidebar Contributors list only tracks accounts that authored commits.
 
 ## License
 

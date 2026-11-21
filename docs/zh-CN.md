@@ -259,7 +259,7 @@ Geo 数据分类、补充规则源、节点订阅和出口策略分别维护。�
 
 ### 贡献者
 
-以协作方式参与项目配置整理、脚本编写与文档工作的 AI 助手见 [CONTRIBUTORS.md](../CONTRIBUTORS.md)。GitHub 侧栏的 Contributors 列表仅统计实际提交 commit 的账号。
+以协作方式参与项目配置整理、脚本编写与文档工作的 AI 助手见 [贡献者](i18n/CONTRIBUTORS.zh-CN.md)。完整的多语言文档见 [docs/i18n/](i18n/README.zh-CN.md)。GitHub 侧栏的 Contributors 列表仅统计实际提交 commit 的账号。
 
 ### 致谢与参考
 
