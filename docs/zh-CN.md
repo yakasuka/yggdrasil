@@ -124,30 +124,17 @@ Ratatoskr 将庞大的分类数据交给 Geo 数据库，将清晰的分流意�
 
 ## 配置选择
 
-以 Ratatoskr 为主配置，根据地区分类和网络接管需求选择对应文件。
-
-| 文件 | 定位 | 主要内容 |
-| :--- | :--- | :--- |
-| **[Ratatoskr](../resources/template/ratatoskr-template.yaml)** | 日常主配置 | Geo 驱动的轻量分流，6 个常用地区与其他节点入口 |
-| **[Ratatosk · Eb](../resources/template/ratatosk-Eb.yaml)** | 地区扩展 | 24 个国家 / 地区分组，使用 macOSicons 图标 |
-| **[yggdrasil.yaml](../resources/yggdrasil.yaml)** | 完整网络栈参考 | DNS、TUN、流量嗅探与详细外部规则集 |
-
-`Ratatosk-Eb.yaml` 沿用仓库现有文件名。三份配置独立维护，规则与策略组并不完全相同；当前主模板的轻量 Geo 架构不代表所有参考配置使用同一种规则组织方式。
+仓库以 **[Ratatoskr](../resources/template/ratatoskr-template.yaml)** 作为唯一主配置模板：Geo 驱动的轻量分流，内置常用地区分组与其他节点入口。DNS、TUN、流量嗅探等网络接管功能按客户端环境自行配置。
 
 <details>
 <summary><strong>查看配置直链与地区覆盖</strong></summary>
 
 取得授权后，可下载文件或将配置地址导入客户端：
 
-- [ratatoskr-template.yaml](https://raw.githubusercontent.com/yakasuka/yggdrasil/main/resources/template/ratatoskr-template.yaml)
-- [Ratatosk-Eb.yaml](https://raw.githubusercontent.com/yakasuka/yggdrasil/main/resources/template/ratatosk-Eb.yaml)
-- [yggdrasil.yaml](https://raw.githubusercontent.com/yakasuka/yggdrasil/main/resources/yggdrasil.yaml)
+- [Release 直链](https://github.com/yakasuka/yggdrasil/releases/latest/download/ratatoskr-template.yaml)（推荐）
+- [ratatoskr-template.yaml 源文件](https://raw.githubusercontent.com/yakasuka/yggdrasil/main/resources/template/ratatoskr-template.yaml)
 
-**常用地区**：香港、台湾、日本、韩国、新加坡、美国。
-
-**Eb 扩展地区**：香港、台湾、澳门、日本、韩国、新加坡、泰国、马来西亚、越南、菲律宾、印度尼西亚、印度、澳大利亚、美国、加拿大、英国、德国、法国、荷兰、瑞士、俄罗斯、土耳其、巴西、阿根廷。
-
-另设“其他”入口，具体范围由各模板的筛选规则决定。
+**常用地区**：香港、台湾、日本、韩国、新加坡、美国，另设“其他”入口；具体范围由模板的筛选规则决定。
 
 </details>
 
@@ -156,19 +143,11 @@ Ratatoskr 将庞大的分类数据交给 Geo 数据库，将清晰的分流意�
 推荐从 [配置工坊](https://yakasuka.github.io/yggdrasil/config-builder/) 开始；也可以手动使用模板：
 
 1. **确认授权。** 取得相应原作者或权利人的书面许可，条款见 [LICENSE](../LICENSE)。
-2. **选择配置。** 日常使用从 `ratatoskr-template.yaml` 开始；需要更细地区分组时选择 Eb 版。
+2. **选择配置。** 使用 `resources/template/ratatoskr-template.yaml`，或从 Release 获取固定直链。
 3. **准备节点与数据。** 在本地维护自己的 `proxy-providers` 或 `proxies`，并准备包含所用分类的 GeoSite / GeoIP 数据。
 4. **导入并选择出口。** 在 Mihomo 客户端中加载配置，按应用或地区选择策略，重新执行延迟测试。
 
-部署了合并接口的维护者，可将生成的 `/merge?token=…` 地址作为订阅入口。具体地址、令牌和可用功能以实际部署为准。
-
-| 配置 | HTTP | SOCKS5 |
-| :--- | :--- | :--- |
-| Ratatoskr / Eb 手动模板 | `7890` | `7891` |
-| 配置工坊生成文件 | `7890` | `7890` |
-| 完整网络栈参考 | `7890` | `7890` |
-
-配置工坊与完整网络栈参考使用混合端口；工坊可自定义端口。个人订阅地址、节点凭据与访问令牌应在本地或私有流程中维护。
+配置默认 HTTP / SOCKS5 混合端口为 `7890`，配置工坊可自定义端口。个人订阅地址、节点凭据与访问令牌应在本地或私有流程中维护。
 
 ## 自定义与扩展
 
@@ -211,7 +190,7 @@ Ratatoskr 将庞大的分类数据交给 Geo 数据库，将清晰的分流意�
 
 ## 图标与视觉
 
-应用和地区图标用于标识策略组，在配置工坊和 Mihomo 面板中帮助使用者快速识别出口。日常模板的图标位于 `assets/icons/`；Eb 版使用 macOSicons 图标集。
+应用和地区图标用于标识策略组，在配置工坊和 Mihomo 面板中帮助使用者快速识别出口。图标位于 `assets/icons/` 与 `assets/icons/macosicons/`。
 
 <p align="center">
   <img src="../assets/icons/macosicons/chatgpt.png" width="46" alt="ChatGPT 图标" />
@@ -222,14 +201,14 @@ Ratatoskr 将庞大的分类数据交给 Geo 数据库，将清晰的分流意�
   <img src="../assets/icons/macosicons/maps.png" width="46" alt="地区分组图标" />
 </p>
 
-[品牌标识](../assets/README.md) · [Eb 图标预览](../assets/icons/macosicons/preview.png) · [图标作者与来源](../assets/icons/macosicons/README.md) · [映射清单](../assets/icons/macosicons/manifest.json)
+[品牌标识](../assets/README.md) · [图标预览](../assets/icons/macosicons/preview.png) · [图标作者与来源](../assets/icons/macosicons/README.md) · [映射清单](../assets/icons/macosicons/manifest.json)
 
-日常模板使用 `assets/icons/` 中的图标；Eb 版使用 42 张 macOSicons PNG。图标作品、品牌标识及面板素材的权利归各自权利人所有。
+图标作品、品牌标识及面板素材的权利归各自权利人所有。
 
 <details>
 <summary><strong>查看 Mihomo 控制面板参考</strong></summary>
 
-![Zashboard 代理面板效果参考](../assets/icons/zashboard-pc-dark.png)
+![Zashboard 代理面板效果参考](../assets/icons/Demo/zashboard-pc-dark.png)
 
 Mihomo 运行时的 Zashboard 控制面板参考；分组名称、节点状态与数值以所选配置和实际运行结果为准。
 
@@ -259,14 +238,21 @@ Geo 数据分类、补充规则源、节点订阅和出口策略分别维护。�
 
 ### 贡献者
 
-以协作方式参与项目配置整理、脚本编写与文档工作的 AI 助手见 [贡献者](i18n/CONTRIBUTORS.zh-CN.md)。完整的多语言文档见 [docs/i18n/](i18n/README.zh-CN.md)。GitHub 侧栏的 Contributors 列表仅统计实际提交 commit 的账号。
+项目由 [yakasuka](https://github.com/yakasuka) 主导维护。以下 AI 助手以协作方式参与了配置整理、脚本编写与文档工作：
+
+| 贡献者 | 角色 |
+| :--- | :--- |
+| [Codex](https://github.com/codex) | 配置整理与脚本编写 |
+| [Claude](https://github.com/claude) | 代码与文档协作 |
+
+GitHub 侧栏的 Contributors 列表由提交作者与 `Co-authored-by` 共同作者聚合；Codex 与 Claude 使用各自官方账号的署名邮箱，因此头像与主页可正确显示。
 
 ### 致谢与参考
 
 - [Mihomo](https://github.com/MetaCubeX/mihomo)：配置所面向的内核与文档。
 - [ACL4SSR](https://github.com/ACL4SSR/ACL4SSR)：README 的版本对照、规则分类与使用入口组织参考。
 - [Custom OpenClash Rules](https://github.com/Aethersailor/Custom_OpenClash_Rules)：自定义补充规则来源。
-- [macOSicons](https://macosicons.com/)：Eb 版图标作品，逐项署名见图标来源表。
+- [macOSicons](https://macosicons.com/)：图标作品，逐项署名见图标来源表。
 - [uhovohu/clash](https://github.com/uhovohu/clash)：日常模板历史图标地址的引用来源。
 
 ---

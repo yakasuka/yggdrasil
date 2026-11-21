@@ -58,13 +58,9 @@ Without a deployed service, local node-file import, preview, and download remain
 
 ## Configuration files
 
-| File | Use |
-| :--- | :--- |
-| [Ratatoskr](../resources/template/ratatoskr-template.yaml) | Main configuration with common region groups and general node strategies |
-| [Ratatosk-Eb](../resources/template/ratatosk-Eb.yaml) | Expanded country and region groups with macOSicons artwork |
-| [Yggdrasil network-stack reference](../resources/yggdrasil.yaml) | Reference configuration with DNS, TUN, sniffing, and external rule sets |
+The repository ships one main template: **[Ratatoskr](../resources/template/ratatoskr-template.yaml)**, a Geo-driven compact configuration with common region groups and general node strategies. Get it from the file link or the pinned [Release download](https://github.com/yakasuka/yggdrasil/releases/latest/download/ratatoskr-template.yaml).
 
-These configurations are maintained for different needs and do not share identical rules or strategy groups. They target Mihomo; make sure your client supports the fields and has the referenced Geo data.
+Network takeover features such as DNS, TUN, and sniffing are configured per client environment. The template targets Mihomo; make sure your client supports the fields and has the referenced Geo data.
 
 ## Development and deployment
 
@@ -81,7 +77,14 @@ The local service is available at `http://localhost:8788/config-builder/`. To ad
 
 ## Contributors
 
-AI assistants that contributed through configuration work, scripts, and documentation are listed in [Contributors](i18n/CONTRIBUTORS.en.md). The full multilingual wiki is in [docs/i18n/](i18n/README.en.md). GitHub's sidebar Contributors list only tracks accounts that authored commits.
+The project is led and maintained by [yakasuka](https://github.com/yakasuka). The following AI assistants contributed to configuration work, scripts, and documentation:
+
+| Contributor | Role |
+| :--- | :--- |
+| [Codex](https://github.com/codex) | Configuration organization and scripting |
+| [Claude](https://github.com/claude) | Code and documentation collaboration |
+
+GitHub's sidebar Contributors list is aggregated from commit authors and `Co-authored-by` co-authors. Codex and Claude use the signature emails of their official accounts, so their avatars and profile links display correctly.
 
 ## License
 
