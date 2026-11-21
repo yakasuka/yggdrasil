@@ -23,7 +23,8 @@ Yggdrasil is the application and tooling around **Ratatoskr**, its core Mihomo c
 | [Getting started](#getting-started) | Build a personal configuration |
 | [Configuration files](#configuration-files) | Choose a template for your use case |
 | [Development and deployment](#development-and-deployment) | Build commands and maintenance documentation |
-| [Contributors](#contributors) | AI assistants involved in the project |
+| [Contributors](#contributors) | Maintainers, assistants, and upstream authors |
+| [Acknowledgments](#acknowledgments) | Open-source projects this build relies on |
 | [License](#license) | Usage terms and feedback |
 
 ## Architecture
@@ -82,13 +83,35 @@ The project is led and maintained by [yakasuka](https://github.com/yakasuka). Th
 | Contributor | Role |
 | :--- | :--- |
 | [yakasuka](https://github.com/yakasuka) | Project lead and maintenance |
+| [tobyxdd](https://github.com/tobyxdd) | Hysteria protocol support |
+| [Zephyruso](https://github.com/Zephyruso) | zashboard panel reference |
+| [Dreamacro](https://github.com/Dreamacro) | Clash configuration ecosystem pioneer |
+| [Aethersailor](https://github.com/Aethersailor) | Custom routing rules source |
+| [Fndroid](https://github.com/Fndroid) | Client ecosystem reference |
 | [Codex](https://github.com/codex) | Configuration organization and scripting |
 | [Claude](https://github.com/claude) | Code and documentation collaboration |
 | [Eaibee Kitajima](https://github.com/EaibeeKitajima) | Early rules and configuration contributions |
 | [github-actions[bot]](https://github.com/apps/github-actions) | Automated rules and catalog sync |
 | [dependabot[bot]](https://github.com/apps/dependabot) | Dependency updates |
 
-GitHub's sidebar Contributors list is aggregated from commit authors and `Co-authored-by` co-authors. AI assistants and bots use the signature emails of their official accounts, so their avatars and profile links display correctly.
+GitHub's sidebar Contributors list is aggregated from commit authors and `Co-authored-by` co-authors. Individual accounts use their own signature emails, so their avatars and profile links display correctly. Organization-level upstreams (such as Mihomo / AdGuard / ACL4SSR) are credited below.
+
+## Acknowledgments
+
+This project builds on the following open-source work. All works belong to their respective upstream authors; this project only references and integrates them:
+
+| Upstream project | Author / Organization | Role in this project |
+| :--- | :--- | :--- |
+| [Mihomo](https://github.com/MetaCubeX/mihomo) | [MetaCubeX](https://github.com/MetaCubeX) | Core kernel and documentation |
+| [Hysteria](https://github.com/apernet/hysteria) | [tobyxdd](https://github.com/tobyxdd) | Hysteria2 protocol support |
+| [AdGuard Filters](https://github.com/AdguardTeam/AdguardFilters) | [AdGuardTeam](https://github.com/AdguardTeam) | Desktop ad-blocking rules source |
+| [zashboard](https://github.com/Zephyruso/zashboard) | [Zephyruso](https://github.com/Zephyruso) | Dashboard UI reference |
+| [Custom OpenClash Rules](https://github.com/Aethersailor/Custom_OpenClash_Rules) | [Aethersailor](https://github.com/Aethersailor) | Custom routing rules source |
+| [ACL4SSR](https://github.com/ACL4SSR/ACL4SSR) | [ACL4SSR](https://github.com/ACL4SSR) | Rule classification and organization reference |
+| [Clash ecosystem](https://github.com/Dreamacro) | [Dreamacro](https://github.com/Dreamacro) | Founded the Clash configuration ecosystem (original repo archived) |
+| [Clash for Android](https://github.com/Fndroid) | [Fndroid](https://github.com/Fndroid) | Client ecosystem reference (original repo archived) |
+| [macOSicons](https://macosicons.com/) | see [icon credits](../assets/icons/macosicons/README.md) | Strategy group icon artwork |
+| [uhovohu/clash](https://github.com/uhovohu/clash) | uhovohu | Source of historical icon URLs in the daily template |
 
 ## License
 

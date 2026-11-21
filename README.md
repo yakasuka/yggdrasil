@@ -90,8 +90,31 @@ Yggdrasil 是一套面向 **Mihomo / Clash / OpenClash / Clash Verge** 的配置
   <a href="https://github.com/codex"><img src="https://avatars.githubusercontent.com/u/267193182?v=4" width="40" alt="Codex" /></a>&nbsp;
   <a href="https://github.com/claude"><img src="https://avatars.githubusercontent.com/u/81847?v=4" width="40" alt="Claude" /></a>&nbsp;
   <a href="https://github.com/EaibeeKitajima"><img src="https://avatars.githubusercontent.com/u/105159380?v=4" width="40" alt="Eaibee Kitajima" /></a>&nbsp;
+  <a href="https://github.com/tobyxdd"><img src="https://avatars.githubusercontent.com/u/1414953?v=4" width="40" alt="tobyxdd" /></a>&nbsp;
+  <a href="https://github.com/Zephyruso"><img src="https://avatars.githubusercontent.com/u/176294927?v=4" width="40" alt="Zephyruso" /></a>&nbsp;
+  <a href="https://github.com/Dreamacro"><img src="https://avatars.githubusercontent.com/u/8615343?v=4" width="40" alt="Dreamacro" /></a>&nbsp;
+  <a href="https://github.com/Aethersailor"><img src="https://avatars.githubusercontent.com/u/22260104?v=4" width="40" alt="Aethersailor" /></a>&nbsp;
+  <a href="https://github.com/Fndroid"><img src="https://avatars.githubusercontent.com/u/16091562?v=4" width="40" alt="Fndroid" /></a>&nbsp;
   <a href="https://github.com/apps/github-actions"><img src="https://avatars.githubusercontent.com/in/15368?v=4" width="40" alt="github-actions[bot]" /></a>&nbsp;
   <a href="https://github.com/apps/dependabot"><img src="https://avatars.githubusercontent.com/in/29110?v=4" width="40" alt="dependabot[bot]" /></a>
 </p>
 
-<p align="center"><sub>项目由 yakasuka 主导维护，AI 助手与自动化机器人共同参与配置、脚本、文档与依赖维护。</sub></p>
+<p align="center"><sub>项目由 yakasuka 主导维护，AI 助手、自动化机器人与开源社区的上游作者共同参与。</sub></p>
+
+### 致谢 / 上游项目
+
+本项目的内核、规则与界面建立在以下开源成果之上，谨此致谢：
+
+| 上游项目 | 作者 / 组织 | 在本项目中的作用 |
+| :--- | :--- | :--- |
+| [Mihomo](https://github.com/MetaCubeX/mihomo) | [MetaCubeX](https://github.com/MetaCubeX) | 配置所面向的核心内核 |
+| [Hysteria](https://github.com/apernet/hysteria) | [tobyxdd](https://github.com/tobyxdd) | Hysteria2 协议支持 |
+| [AdGuard Filters](https://github.com/AdguardTeam/AdguardFilters) | [AdGuardTeam](https://github.com/AdguardTeam) | 桌面级广告拦截规则来源 |
+| [zashboard](https://github.com/Zephyruso/zashboard) | [Zephyruso](https://github.com/Zephyruso) | 面板界面参考 |
+| [Custom OpenClash Rules](https://github.com/Aethersailor/Custom_OpenClash_Rules) | [Aethersailor](https://github.com/Aethersailor) | 自定义分流规则来源 |
+| [ACL4SSR](https://github.com/ACL4SSR/ACL4SSR) | [ACL4SSR](https://github.com/ACL4SSR) | 规则分类与组织方式参考 |
+| [Clash 配置生态](https://github.com/Dreamacro) | [Dreamacro](https://github.com/Dreamacro) | Clash 配置生态奠基（原仓库已归档） |
+| [Clash for Android](https://github.com/Fndroid) | [Fndroid](https://github.com/Fndroid) | 客户端生态参考（原仓库已归档） |
+| [macOSicons](https://macosicons.com/) | 见[图标来源表](assets/icons/macosicons/README.md) | 策略组图标素材 |
+
+<p align="center"><sub>以上均为各自上游项目的作品，权利归原作者所有；本项目仅作引用与整合。</sub></p>

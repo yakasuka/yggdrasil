@@ -243,21 +243,35 @@ Geo 数据分类、补充规则源、节点订阅和出口策略分别维护。�
 | 贡献者 | 角色 |
 | :--- | :--- |
 | [yakasuka](https://github.com/yakasuka) | 项目主导与维护 |
+| [tobyxdd](https://github.com/tobyxdd) | Hysteria 协议支持 |
+| [Zephyruso](https://github.com/Zephyruso) | zashboard 面板参考 |
+| [Dreamacro](https://github.com/Dreamacro) | Clash 配置生态奠基 |
+| [Aethersailor](https://github.com/Aethersailor) | 自定义分流规则来源 |
+| [Fndroid](https://github.com/Fndroid) | 客户端生态参考 |
 | [Codex](https://github.com/codex) | 配置整理与脚本编写 |
 | [Claude](https://github.com/claude) | 代码与文档协作 |
 | [Eaibee Kitajima](https://github.com/EaibeeKitajima) | 早期规则与配置贡献 |
 | [github-actions[bot]](https://github.com/apps/github-actions) | 规则与目录自动同步 |
 | [dependabot[bot]](https://github.com/apps/dependabot) | 依赖更新 |
 
-GitHub 侧栏的 Contributors 列表由提交作者与 `Co-authored-by` 共同作者聚合；AI 助手与 bot 使用各自官方账号的署名邮箱，因此头像与主页可正确显示。
+GitHub 侧栏的 Contributors 列表由提交作者与 `Co-authored-by` 共同作者聚合；个人账号使用各自的署名邮箱，因此头像与主页可正确显示。组织类上游（如 Mihomo / AdGuard / ACL4SSR）见下方致谢。
 
 ### 致谢与参考
 
-- [Mihomo](https://github.com/MetaCubeX/mihomo)：配置所面向的内核与文档。
-- [ACL4SSR](https://github.com/ACL4SSR/ACL4SSR)：README 的版本对照、规则分类与使用入口组织参考。
-- [Custom OpenClash Rules](https://github.com/Aethersailor/Custom_OpenClash_Rules)：自定义补充规则来源。
-- [macOSicons](https://macosicons.com/)：图标作品，逐项署名见图标来源表。
-- [uhovohu/clash](https://github.com/uhovohu/clash)：日常模板历史图标地址的引用来源。
+本项目建立在以下开源成果之上，谨此致谢。以下均为各自上游项目的作品，权利归原作者所有；本项目仅作引用与整合：
+
+| 上游项目 | 作者 / 组织 | 在本项目中的作用 |
+| :--- | :--- | :--- |
+| [Mihomo](https://github.com/MetaCubeX/mihomo) | [MetaCubeX](https://github.com/MetaCubeX) | 配置所面向的核心内核与文档 |
+| [Hysteria](https://github.com/apernet/hysteria) | [tobyxdd](https://github.com/tobyxdd) | Hysteria2 协议支持 |
+| [AdGuard Filters](https://github.com/AdguardTeam/AdguardFilters) | [AdGuardTeam](https://github.com/AdguardTeam) | 桌面级广告拦截规则来源 |
+| [zashboard](https://github.com/Zephyruso/zashboard) | [Zephyruso](https://github.com/Zephyruso) | 面板界面参考 |
+| [Custom OpenClash Rules](https://github.com/Aethersailor/Custom_OpenClash_Rules) | [Aethersailor](https://github.com/Aethersailor) | 自定义分流规则来源 |
+| [ACL4SSR](https://github.com/ACL4SSR/ACL4SSR) | [ACL4SSR](https://github.com/ACL4SSR) | README 版本对照、规则分类与组织方式参考 |
+| [Clash 配置生态](https://github.com/Dreamacro) | [Dreamacro](https://github.com/Dreamacro) | Clash 配置生态奠基（原仓库已归档） |
+| [Clash for Android](https://github.com/Fndroid) | [Fndroid](https://github.com/Fndroid) | 客户端生态参考（原仓库已归档） |
+| [macOSicons](https://macosicons.com/) | 见[图标来源表](../assets/icons/macosicons/README.md) | 策略组图标素材，逐项署名见来源表 |
+| [uhovohu/clash](https://github.com/uhovohu/clash) | uhovohu | 日常模板历史图标地址的引用来源 |
 
 ---
 
