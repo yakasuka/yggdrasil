@@ -30,12 +30,43 @@ export function fileStorage(directory) {
     return record;
   }
 
+  // Enumerate live records for the owner's admin API. The key is embedded in
+  // each file so hashed filenames never leak as identifiers.
+  async function list() {
+    let entries;
+    try {
+      entries = await readdir(directory, { withFileTypes: true });
+    } catch {
+      return [];
+    }
+    const result = [];
+    for (const entry of entries) {
+      if (!entry.isFile() || !entry.name.endsWith(".json")) continue;
+      let record;
+      try {
+        record = JSON.parse(
+          await readFile(join(directory, entry.name), "utf8"),
+        );
+      } catch {
+        continue;
+      }
+      if (record.expiresAt && record.expiresAt <= Date.now()) {
+        await unlink(join(directory, entry.name)).catch(() => {});
+        continue;
+      }
+      if (typeof record.key === "string" && record.key)
+        result.push({ key: record.key, value: record.value, expiresAt: record.expiresAt || null });
+    }
+    return result;
+  }
+
   return {
     directory,
     async put(key, value, options = {}) {
       await mkdir(directory, { recursive: true, mode: 0o700 });
       const ttl = Number(options?.expirationTtl);
       const record = {
+        key,
         value,
         expiresAt: Number.isFinite(ttl) && ttl > 0 ? Date.now() + ttl * 1000 : null,
       };
@@ -57,6 +88,10 @@ export function fileStorage(directory) {
       if (!record) return null;
       return type === "json" ? JSON.parse(record.value) : record.value;
     },
+    async delete(key) {
+      await unlink(pathFor(key)).catch(() => {});
+    },
+    list,
     async purge() {
       let entries = [];
       try {

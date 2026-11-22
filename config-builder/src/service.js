@@ -97,8 +97,11 @@ export async function probeService(origin, version, fetcher = fetch) {
   };
 }
 
-function configToken(url, status) {
-  const expected = SERVICE_ROUTES.config + (status ? "/status" : "");
+function configToken(url, status, pathPrefix) {
+  const expected =
+    (pathPrefix ? url.pathname.slice(0, pathPrefix.length) : "") +
+    SERVICE_ROUTES.config +
+    (status ? "/status" : "");
   if (
     url.pathname !== expected ||
     url.hash ||
@@ -110,8 +113,22 @@ function configToken(url, status) {
   return url.searchParams.toString();
 }
 
-export function subscriptionURL(value, origin) {
+function publicBase(origin, publicURL) {
+  if (!publicURL) return { origin, prefix: "" };
+  const url = new URL(publicURL);
+  if (!["http:", "https:"].includes(url.protocol))
+    throw Error("公开链接地址无效。");
+  // The configured base ends at the config-builder path; strip it so the
+  // canonical /config-builder[/status] path can be appended under any mount.
+  const prefix = url.pathname.endsWith(SERVICE_ROUTES.config)
+    ? url.pathname.slice(0, -SERVICE_ROUTES.config.length).replace(/\/+$/, "")
+    : url.pathname.replace(/\/+$/, "");
+  return { origin: url.origin, prefix };
+}
+
+export function subscriptionURL(value, origin, publicURL = "") {
   const url = new URL(value);
+  const base = publicBase(origin, publicURL);
   if (
     url.origin !== origin ||
     url.username ||
@@ -120,11 +137,13 @@ export function subscriptionURL(value, origin) {
     !configToken(url, false)
   )
     throw Error("服务返回的订阅地址无效。");
-  return url.href;
+  if (base.origin === origin && !base.prefix) return url.href;
+  return base.origin + base.prefix + url.pathname + url.search;
 }
 
-export function usageURL(value, origin) {
+export function usageURL(value, origin, publicURL = "") {
   const url = new URL(value);
+  const base = publicBase(origin, publicURL);
   if (
     url.origin !== origin ||
     url.username ||
@@ -133,5 +152,6 @@ export function usageURL(value, origin) {
     !configToken(url, true)
   )
     throw Error("服务返回的流量地址无效。");
-  return url.href;
+  if (base.origin === origin && !base.prefix) return url.href;
+  return base.origin + base.prefix + url.pathname + url.search;
 }

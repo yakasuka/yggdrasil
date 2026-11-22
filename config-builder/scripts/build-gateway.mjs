@@ -75,20 +75,29 @@ const existing = await stat(new URL("service.json", repository)).then(
 if (service || !existing)
   await writeFile(new URL("service.json", repository), descriptor);
 
-// Cloudflare Pages rewrite/redirect rules for legacy builder route aliases.
-await writeFile(
-  new URL("_redirects", output),
-  [
-    "/config-builder /config-builder/ 308",
-    "/builder /config-builder/ 308",
-    "/builder/ /config-builder/ 308",
-    "/webui /config-builder/ 308",
-    "/webui/ /config-builder/ 308",
-    "/Configurator /config-builder/ 308",
-    "/Configurator/ /config-builder/ 308",
-    "",
-  ].join("\n"),
-);
+// Cloudflare Pages rewrite/redirect rules. The public subscription links use
+// the Pages origin so the backend address never appears in a copied link;
+// these paths 302 (with the query string preserved) to the self-hosted
+// service. The wizard itself stays static at /config-builder/ and /yggdrasil/.
+const redirects = [
+  "/config-builder /config-builder/ 308",
+  "/builder /config-builder/ 308",
+  "/builder/ /config-builder/ 308",
+  "/webui /config-builder/ 308",
+  "/webui/ /config-builder/ 308",
+  "/Configurator /config-builder/ 308",
+  "/Configurator/ /config-builder/ 308",
+];
+if (service) {
+  // Public subscription links live at /yggdrasil/config-builder[?token=…],
+  // which has no static asset. A 302 forwards them (query string preserved)
+  // to the self-hosted service; the wizard at /config-builder/ stays static.
+  redirects.unshift(
+    `/yggdrasil/config-builder/status ${service}/config-builder/status 302`,
+    `/yggdrasil/config-builder ${service}/config-builder 302`,
+  );
+}
+await writeFile(new URL("_redirects", output), redirects.join("\n") + "\n");
 
 console.log(
   `Static frontend built for Cloudflare Pages and GitHub Pages (no _worker.js).` +

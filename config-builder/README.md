@@ -18,6 +18,7 @@
   ├─ /api/latency               可选 TCP 检测
   ├─ /api/endpoints             后端吐出所有公开链接
   ├─ /api/presets               分享码：保存 / 读取配置选择
+  ├─ /api/admin/configs         管理员专用：列出 / 删除配置（Basic Auth）
   ├─ /config-builder?token=<名称>[&pwd=<口令>]  唯一订阅链接，浏览器可直接查看
   └─ server/data/               加密记录（替代 Cloudflare KV）
 ```
@@ -25,6 +26,10 @@
 服务是公开 API：用户把自己机场 / 自建节点的订阅地址交给后端，在页面选择地区、策略、APP 与规则模块，创建订阅后得到一条以配置名称为凭据的链接 `/config-builder?token=guagua`，可直接放入任意 Mihomo / Clash Meta 客户端，也可粘贴到浏览器直接查看 YAML（不强制下载）。配置由 `shared/template-render.js` 在 `ratatoskr-template.yaml` 原文上定点编辑生成：完整保留分区注释、flow 单行格式、锚点与 `GEOSITE`/`GEOIP` 客户端规则；节点通过 `proxy-providers` 引用机场原始订阅地址，由客户端直接远程拉取，节点更新即时生效，且配置文件不内联节点、不写 `geox-url`。旧的 `/subscription/<id>/<key>.yaml` 链接已彻底移除。没有共享 TOKEN，也不需要私有 GitHub 仓库。
 
 链接里的 `token` 来自用户填写的「配置名称」（3–60 位字母、数字、`_` 或 `-`，空格转 `-`，不区分大小写）。确认页还可填 1–64 位的「访问口令」（可选）：口令参与存储键派生，同名配置配不同口令就能各自保留好记的名字；同名同口令仍返回 409。口令以 SHA-256 摘要参与键名，明文不落盘，但会原样出现在订阅链接里——它不是私密密码，知道链接的人都能读取配置，请只通过私密渠道传递。不带口令的历史链接继续有效。
+
+**订阅链接的公开域名：** 页面填的「配置名称/口令」决定 token，链接前缀由 `yggdrasil:public` meta（或构建期 `PUBLIC_LINK_BASE`）决定，默认 `https://yggdrasil-afx.pages.dev/yggdrasil/config-builder`。Cloudflare Pages 用 `_redirects` 把 `/yggdrasil/config-builder[?token=…]` 以 302（保留 query）转到自建服务，因此用户复制/分发的链接里不会出现后端地址；浏览器打开会跳到后端显示 YAML，客户端跟随 302 直接拉取。GitHub Pages 是纯静态、无法转发，但从它生成的链接同样指向 CF 域名，保证可用。没有公开域名配置时回退为后端直链。
+
+**配置管理（仅管理员）：** 服务端用 `ADMIN_USERS=用户名:密码[,...]` 开启 `GET /api/admin/configs`（列出名称、是否带口令、创建/过期时间）与 `DELETE /api/admin/configs`（body `{token,pwd}` 删除配置）。HTTP Basic 认证，定时安全比较；不配置则接口返回 401，前端和 `/api/endpoints` 都不会暴露它。不是普通用户功能。
 
 **分享配置：** 最终确认页可生成一串 36 位十六进制分享码（例如 `fffa18b5ff005bba7a19928f3e8626974ebe`），别人在「订阅来源」页粘贴该码即可导入地区、策略、APP、规则模块与客户端选项。分享码默认**不含机场订阅地址**；只有勾选「同时包含机场订阅地址」才会保存，导入后可直接解析。持有分享码即可读取其中内容，含机场地址时请勿公开传播。分享码与订阅链接是两套独立凭据：前者分享选择，后者读取节点配置。
 

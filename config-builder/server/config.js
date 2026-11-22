@@ -5,6 +5,23 @@ const text = (value) => (typeof value === "string" ? value.trim() : "");
 const defaultDataDir = resolve(dirname(fileURLToPath(import.meta.url)), "data");
 
 // Only bare origins are accepted: no path, query, fragment or credentials.
+// Owner-only credentials for the management API. Format: "user:pass,user2:pass2".
+// Never shipped to the static frontend or advertised by /api/endpoints.
+export function adminUsers(value) {
+  return String(value || "")
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .map((item) => {
+      const at = item.indexOf(":");
+      if (at < 1) return null;
+      const user = item.slice(0, at);
+      const pass = item.slice(at + 1);
+      return pass ? { user, pass } : null;
+    })
+    .filter(Boolean);
+}
+
 export function originOf(value, label = "address") {
   let url;
   try {
@@ -41,6 +58,7 @@ export function loadConfig(source = process.env) {
       ? originOf(text(source.PUBLIC_BASE_URL), "PUBLIC_BASE_URL")
       : "",
     allowedOrigins,
+    adminUsers: adminUsers(text(source.ADMIN_USERS)),
     dataDir: text(source.DATA_DIR) ? resolve(text(source.DATA_DIR)) : defaultDataDir,
     presetTtl: Number(text(source.PRESET_TTL) || 0) || 0,
     templateURL: text(source.TEMPLATE_URL) || "bundled",

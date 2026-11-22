@@ -12,6 +12,12 @@
     <!-- Static host only. Point this at the self-hosted service; leaving it
          empty uses the SERVICE_BASE_URL injected at build time. -->
     <meta name="yggdrasil:service" content="https://yggdrasil.xyang.cyou" />
+    <!-- Public origin shown in subscription links. A Pages domain redirects
+         the config path to the backend, so the service address stays hidden. -->
+    <meta
+      name="yggdrasil:public"
+      content="https://yggdrasil-afx.pages.dev/yggdrasil/config-builder"
+    />
     <title>config-builder · Yggdrasil</title>
     <script>
       (() => {
@@ -34,7 +40,7 @@
     <link rel="icon" href="../assets/favicon.png" type="image/png" />
     <link rel="preload" as="image" href="../assets/favicon.png" />
     <link rel="stylesheet" href="./assets/app.css?v=d32f99f11a56" />
-    <script type="module" src="./assets/app.js?v=cba6608373fe"></script>
+    <script type="module" src="./assets/app.js?v=014791f75dd3"></script>
   </head>
   <body>
     <div

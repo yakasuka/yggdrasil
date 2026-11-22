@@ -1,3 +1,4 @@
+import { timingSafeEqual } from "node:crypto";
 import { SERVICE_ROUTES } from "../shared/service-routes.js";
 import { SHARE_CODE_RE, shareIncludesProviders } from "../shared/share.js";
 import {
@@ -24,6 +25,7 @@ const CONFIG_PATH = SERVICE_ROUTES.config;
 const INTERNAL_PARTS = /^([A-Za-z0-9_-]{22})\/([A-Za-z0-9_-]{43})$/;
 const ID_RE = /^[A-Za-z0-9_-]{22}$/;
 const KEY_RE = /^[A-Za-z0-9_-]{43}$/;
+const ADMIN_PATH = "/api/admin/configs";
 
 function aliasFromFilename(filename) {
   const raw = String(filename || "")
@@ -43,6 +45,41 @@ const json = (data, status = 200, headers = {}) =>
       ...headers,
     },
   });
+
+const unauthorized = () =>
+  json(
+    { error: "需要管理员凭据。" },
+    401,
+    { "WWW-Authenticate": 'Basic realm="yggdrasil-admin", charset="UTF-8"' },
+  );
+
+// Constant-time comparison avoids leaking credentials through response timing.
+function equal(a, b) {
+  const x = Buffer.from(String(a));
+  const y = Buffer.from(String(b));
+  if (x.length !== y.length) return false;
+  return timingSafeEqual(x, y);
+}
+
+function adminAuthorized(request, config) {
+  if (!config.adminUsers.length) return false;
+  const header = request.headers.get("Authorization") || "";
+  const match = /^Basic\s+([A-Za-z0-9+/=]+)$/i.exec(header);
+  if (!match) return false;
+  let decoded;
+  try {
+    decoded = Buffer.from(match[1], "base64").toString("utf8");
+  } catch {
+    return false;
+  }
+  const at = decoded.indexOf(":");
+  if (at < 0) return false;
+  const user = decoded.slice(0, at);
+  const pass = decoded.slice(at + 1);
+  return config.adminUsers.some(
+    (entry) => equal(entry.user, user) && equal(entry.pass, pass),
+  );
+}
 
 const REWRITES = [
   [SERVICE_ROUTES.status, ["GET"], "/api/health"],
@@ -171,6 +208,59 @@ export function createService({
       });
 
     try {
+      // Owner-only management API. Not linked from any frontend or endpoint
+      // discovery response; requires HTTP Basic credentials from ADMIN_USERS.
+      if (path === ADMIN_PATH && !adminAuthorized(request, config))
+        return withCors(request, unauthorized(), config);
+      if (path === ADMIN_PATH && method === "GET") {
+        const records = await storage.list();
+        const configs = [];
+        for (const record of records) {
+          if (!record.key.startsWith("alias:")) continue;
+          const alias = record.key.slice("alias:".length);
+          let mapping;
+          try {
+            mapping = JSON.parse(record.value);
+          } catch {
+            continue;
+          }
+          if (!ID_RE.test(mapping?.id) || !KEY_RE.test(mapping?.key)) continue;
+          const profile = await storage.get("profile:" + mapping.id, "json");
+          const pwdParts = alias.split(":");
+          configs.push({
+            token: pwdParts[0],
+            hasPwd: pwdParts.length > 1,
+            id: mapping.id,
+            createdAt: profile?.createdAt || null,
+            expiresAt: profile?.expiresAt || null,
+          });
+        }
+        configs.sort((a, b) =>
+          String(b.createdAt || "").localeCompare(String(a.createdAt || "")),
+        );
+        return withCors(request, json({ configs }), config);
+      }
+      if (path === ADMIN_PATH && method === "DELETE") {
+        const raw = await request.text();
+        let payload;
+        try {
+          payload = JSON.parse(raw);
+        } catch {
+          return withCors(request, json({ error: "请求内容无效。" }, 400), config);
+        }
+        const token = String(payload?.token || "").toLowerCase();
+        const pwd = String(payload?.pwd || "");
+        if (!CONFIG_NAME_RE.test(token) || (pwd && !(CONFIG_PWD_RE.test(pwd))))
+          return withCors(request, json({ error: "标识无效。" }, 400), config);
+        const key = await configAliasKey(token, pwd);
+        const mapping = await storage.get(key, "json");
+        if (!mapping || !ID_RE.test(mapping.id))
+          return withCors(request, json({ error: "配置不存在。" }, 404), config);
+        await storage.delete(key);
+        await storage.delete("profile:" + mapping.id);
+        return withCors(request, json({ removed: true }), config);
+      }
+
       // The backend is the only place that emits real links. The only
       // credential is the random id/key carried in each subscription URL itself.
       if (path === "/api/endpoints" && ["GET", "HEAD"].includes(method))

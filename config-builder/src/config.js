@@ -7,7 +7,9 @@
 //   2. SERVICE_BASE_URL injected at build time by scripts/build.mjs.
 //   3. Same origin, for a reverse proxy that serves UI and API together.
 const META = "yggdrasil:service";
+const PUBLIC_META = "yggdrasil:public";
 let discovered = "";
+let discoveredPublic = "";
 
 function configured() {
   const meta =
@@ -17,6 +19,27 @@ function configured() {
   const injected =
     typeof __SERVICE_BASE_URL__ === "string" ? __SERVICE_BASE_URL__ : "";
   return meta || injected || "";
+}
+
+// The public origin shown in subscription links. It can differ from the
+// backend origin: a Pages domain redirects the config path to the backend via
+// _redirects, keeping the service address out of links users copy around.
+export function publicLinkBase() {
+  const meta =
+    typeof document === "undefined"
+      ? ""
+      : document.querySelector(`meta[name="${PUBLIC_META}"]`)?.content?.trim();
+  const injected =
+    typeof __PUBLIC_LINK_BASE__ === "string" ? __PUBLIC_LINK_BASE__ : "";
+  const raw = meta || injected || discoveredPublic || "";
+  if (!raw) return "";
+  try {
+    const url = new URL(raw);
+    if (!["http:", "https:"].includes(url.protocol)) return "";
+    return url.href.replace(/\/+$/, "");
+  } catch {
+    return "";
+  }
 }
 
 // When neither the meta tag nor the build-time value is present, read the
@@ -30,10 +53,11 @@ export async function discoverService() {
       cache: "no-store",
     });
     if (!response.ok) return "";
-    const value = (await response.json()).service;
-    const url = new URL(value);
+    const data = await response.json();
+    const url = new URL(data.service);
     if (!["http:", "https:"].includes(url.protocol)) return "";
     discovered = url.origin;
+    if (data.public) discoveredPublic = String(data.public);
     return discovered;
   } catch {
     return "";

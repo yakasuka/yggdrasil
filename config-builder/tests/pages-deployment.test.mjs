@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { existsSync, readdirSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { catalog } from "../shared/compiler.js";
 import { catalogLoader } from "../worker/catalog.js";
 import gateway from "../worker/gateway/index.js";
@@ -132,6 +132,23 @@ test("Pages output includes the frontend and excludes source and private configu
     ),
   );
   assert.ok(!files.some((p) => /\.(?:yaml|jsonc|env)$/.test(p)));
+});
+
+test("Pages redirects forward public subscription paths to the self-hosted service", () => {
+  const redirects = readFileSync(
+    new URL("../worker/gateway/dist/_redirects", import.meta.url),
+    "utf8",
+  );
+  assert.match(
+    redirects,
+    /\/yggdrasil\/config-builder\/status https:\/\/yggdrasil\.xyang\.cyou\/config-builder\/status 302/,
+  );
+  assert.match(
+    redirects,
+    /\/yggdrasil\/config-builder https:\/\/yggdrasil\.xyang\.cyou\/config-builder 302/,
+  );
+  // The static wizard route is not hijacked by the subscription redirect.
+  assert.match(redirects, /\/config-builder \/config-builder\/ 308/);
 });
 
 test("legacy page entrances redirect to the canonical config-builder route", async () => {

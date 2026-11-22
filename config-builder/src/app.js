@@ -17,7 +17,12 @@ import {
   usageURL,
   probeService,
 } from "./service.js";
-import { serviceBase, discoverService, apiFetch } from "./config.js";
+import {
+  serviceBase,
+  discoverService,
+  apiFetch,
+  publicLinkBase,
+} from "./config.js";
 import { esc } from "./ui.js";
 import { renderEmoji } from "./emoji.js";
 import {
@@ -465,10 +470,11 @@ async function generate() {
     const data = await response.json();
     if (!response.ok) throw Error(data.error || "订阅暂时无法生成。");
     if (rev !== revision) return;
+    const publicURL = publicLinkBase();
     result = {
       ...data,
-      url: subscriptionURL(data.url, serviceBase()),
-      usageUrl: usageURL(data.usageUrl, serviceBase()),
+      url: subscriptionURL(data.url, serviceBase(), publicURL),
+      usageUrl: usageURL(data.usageUrl, serviceBase(), publicURL),
     };
     celebrate($("#next"));
     showResult();
