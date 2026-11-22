@@ -12,11 +12,12 @@
     <!-- Static host only. Point this at the self-hosted service; leaving it
          empty uses the SERVICE_BASE_URL injected at build time. -->
     <meta name="yggdrasil:service" content="https://yggdrasil.xyang.cyou" />
-    <!-- Public origin shown in subscription links. A Pages domain redirects
-         the config path to the backend, so the service address stays hidden. -->
+    <!-- Public origin shown in subscription links. A Pages Function proxies
+         the config path to the backend, so no redirect happens and the service
+         address stays hidden at /config-builder (no extra path layer). -->
     <meta
       name="yggdrasil:public"
-      content="https://yggdrasil-afx.pages.dev/yggdrasil/config-builder"
+      content="https://yggdrasil-afx.pages.dev/config-builder"
     />
     <title>config-builder · Yggdrasil</title>
     <script>

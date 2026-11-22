@@ -75,10 +75,11 @@ const existing = await stat(new URL("service.json", repository)).then(
 if (service || !existing)
   await writeFile(new URL("service.json", repository), descriptor);
 
-// Cloudflare Pages rewrite/redirect rules. The public subscription links use
-// the Pages origin so the backend address never appears in a copied link;
-// these paths 302 (with the query string preserved) to the self-hosted
-// service. The wizard itself stays static at /config-builder/ and /yggdrasil/.
+// Cloudflare Pages rewrite/redirect rules. Subscription links are served by
+// the Pages Function at functions/config-builder.js, which reverse-proxies the
+// backend IN PLACE (no redirect). Since _redirects is ignored for routes
+// handled by a Function, no subscription redirect belongs here anymore. These
+// rules only normalize the legacy static wizard entrances.
 const redirects = [
   "/config-builder /config-builder/ 308",
   "/builder /config-builder/ 308",
@@ -88,15 +89,6 @@ const redirects = [
   "/Configurator /config-builder/ 308",
   "/Configurator/ /config-builder/ 308",
 ];
-if (service) {
-  // Public subscription links live at /yggdrasil/config-builder[?token=…],
-  // which has no static asset. A 302 forwards them (query string preserved)
-  // to the self-hosted service; the wizard at /config-builder/ stays static.
-  redirects.unshift(
-    `/yggdrasil/config-builder/status ${service}/config-builder/status 302`,
-    `/yggdrasil/config-builder ${service}/config-builder 302`,
-  );
-}
 const redirectsText = redirects.join("\n") + "\n";
 await writeFile(new URL("_redirects", output), redirectsText);
 // Both Cloudflare Pages and GitHub Pages publish the repository root, so the
@@ -105,6 +97,7 @@ await writeFile(new URL("_redirects", output), redirectsText);
 await writeFile(new URL("_redirects", repository), redirectsText);
 
 console.log(
-  `Static frontend built for Cloudflare Pages and GitHub Pages (no _worker.js).` +
+  `Static frontend built for Cloudflare Pages and GitHub Pages.` +
+    `\nSubscriptions are proxied in place by functions/config-builder.js (no redirect).` +
     (service ? `\nService base: ${service}` : "\nService base: set via the yggdrasil:service meta tag."),
 );

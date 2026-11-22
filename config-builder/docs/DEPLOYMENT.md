@@ -22,7 +22,7 @@
 
 没有共享 TOKEN、不读私有 GitHub 仓库。默认的规则与模板来自仓库示例 `resources/template/ratatoskr-template.yaml` 的同源快照 `shared/catalog.json`。
 
-Cloudflare **只托管静态文件**：没有 `_worker.js`、Pages Functions 业务逻辑或 KV 绑定，也不返回任何节点或订阅正文，因此不会因识别节点内容而误封账号。`worker/` 目录的节点解析、编译、加密等逻辑现在是**被 `server/` 直接 import 的普通模块**；`worker/gateway/index.js` 是弃用的旧 CF 网关，仅用于历史回归测试，任何构建都不会打包它，不要部署。
+Cloudflare 托管静态文件，**外加两个仅做透明反向代理的 Pages Functions**：`functions/config-builder.js` 与 `functions/config-builder/status.js`（共享逻辑在 `config-builder/shared/pages-proxy.js`，由仓库根 `_routes.json` 限定只在这两条路径激活）。它们只把带 `token` 的订阅请求 `fetch` 到自建后端、原样回传 YAML/流量 JSON——**不做重定向、不解析、不存储任何节点数据**，因此不会因识别节点内容而误封账号。若不接受任何 Functions，可删除 `functions/` 与 `_routes.json`，此时公开链接需改回后端直链（把 `yggdrasil:public` meta 指向后端域名）。`worker/` 目录的节点解析、编译、加密等逻辑是**被 `server/` 直接 import 的普通模块**；`worker/gateway/index.js` 是弃用的旧 CF 网关，仅用于历史回归测试，任何构建都不会打包它，不要部署。
 
 旧的 `/merge`、`/sub` 私有仓库链路（TOKEN + GH_TOKEN + 静态跳转页 + CF Functions）已完全移除。
 
@@ -47,7 +47,7 @@ cp server/.env.example server/.env
 | `TRUST_PROXY` | 是否信任 `X-Forwarded-*` | 前面有反代时设为 `true` |
 | `ALLOWED_ORIGINS` | 允许调用 API 的前端源，逗号分隔 | `https://yggdrasil-afx.pages.dev,https://yakasuka.github.io` |
 | `ADMIN_USERS` | 管理后台与 API 的 Basic 账号，逗号分隔 `用户:密码` | 例如 `admin:change-me`；留空则禁用管理端 |
-| `PUBLIC_LINK_BASE` | 管理后台里展示的订阅链接前缀（含挂载路径） | `https://yggdrasil-afx.pages.dev/yggdrasil/config-builder`；留空则用后端自身地址 |
+| `PUBLIC_LINK_BASE` | 管理后台里展示的订阅链接前缀（含挂载路径） | `https://yggdrasil-afx.pages.dev/config-builder`；留空则用后端自身地址 |
 | `TEMPLATE_URL` | `bundled`（用 `shared/catalog.json`，仓库示例模板快照）或带 `x-configurator` 元数据的远程模板 | 默认 `bundled` |
 | `TCP_PROBE_ENABLED` | 可选 TCP 检测 | 默认 `false`，需要时设 `true` |
 
@@ -57,7 +57,7 @@ cp server/.env.example server/.env
 
 **管理后台：** 设置 `ADMIN_USERS` 后，浏览器打开 `https://<后端域名>/config-builder/dashboard` 并用同一组 Basic 账号密码登录，即可列出全部配置（名称、是否带口令、创建/过期时间、可复制的订阅链接）并删除任意配置——带口令的配置也能删（按内部 id 定位，无需明文口令）。它复用 `GET/DELETE /api/admin/configs`，不配置 `ADMIN_USERS` 时后台与接口都返回 401，且不在前端或 `/api/endpoints` 中暴露。Nginx 需把 `/config-builder/dashboard` 一起反代到后端（常规路径反代已覆盖）。
 
-若从旧的 Cloudflare Worker / Pages Functions 架构迁移：删除 CF 项目里的 `TOKEN`、`GH_TOKEN`、`SERVICE_TOKEN` 变量，下线旧 Worker 与 Pages Functions（`worker/wrangler.jsonc` 含 KV 绑定，已弃用，不要执行 `worker:deploy`），只保留静态站点；两个静态站的 `service.json` / `SERVICE_BASE_URL` 都指向同一个后端域名。
+若从旧的私有仓库链路迁移：删除 CF 项目里的 `TOKEN`、`GH_TOKEN`、`SERVICE_TOKEN` 变量，下线旧的独立 Worker（`worker/wrangler.jsonc` 含 KV 绑定，已弃用，不要执行 `worker:deploy`），也不要保留任何读取节点正文的旧 Pages Functions。当前唯一需要的是仓库根 `functions/` 下的两个透明代理函数；CF Git 集成部署会自动识别它们，无需手动配置 KV 或环境变量。两个静态站的 `service.json` / `SERVICE_BASE_URL` 都指向同一个后端域名。
 
 ### 2.2 运行
 
@@ -179,9 +179,9 @@ curl https://api.example.com/api/endpoints
 2. 填入测试订阅，由后端 `/api/inspect` 解析节点与地区。
 3. 在「规则模块」步骤切换几个按钮块，预览配置，核对对应规则确实出现 / 消失。
 4. 预览并下载 `Example-ratatoskr.yaml`，核对节点、地区去留与 `[P1]` / `[P2]` 标识。
-5. 创建订阅，确认 `/api/subscriptions` 返回 201，链接形如 `https://api.example.com/config-builder?token=<配置名称>[&pwd=<口令>]`；浏览器打开应显示 YAML 文本（响应头 `Content-Type: text/plain`、无 `Content-Disposition`），且带 `Subscription-Userinfo`。同名同口令重复创建应返回 409；同名不同口令应各自成功。
+5. 创建订阅，确认 `/api/subscriptions` 返回 201；前端改写后的链接形如 `https://<CF Pages 域名>/config-builder?token=<配置名称>[&pwd=<口令>]`（**无 `/yggdrasil` 层级、无 `.yaml` 后缀**）。用 `curl -I` 检查该链接应返回 **200 而非 302/308**，`Location` 头为空，响应体是 YAML 文本（`Content-Type: text/plain`、`Subscription-Userinfo` 存在）；即 CF 边缘函数就地代理，地址栏始终停在 CF 域名。同名同口令重复创建应返回 409；同名不同口令应各自成功。流量链接 `https://<CF Pages 域名>/config-builder/status?token=…&pwd=…` 同样应为 200 且不跳转。
 6. 在确认页生成分享码并在另一浏览器打开静态站，于「订阅来源」页粘贴导入，核对地区 / 策略 / 规则模块一致且机场地址未被带入（除非已勾选包含）；服务日志不应出现分享码内容。
-7. 访问静态站的 `/config-builder/wrangler.jsonc`、`/config-builder/src/app.js`、`/_worker.js`，应返回 404；确认 CF 构建输出目录里没有 `_worker.js`。
+7. 访问静态站的 `/config-builder/wrangler.jsonc`、`/config-builder/src/app.js`、`/_worker.js`，应返回 404；仓库里没有独立的 `_worker.js`（站点只用 `functions/` 下的两个 Pages Functions 做透明代理）。无 token 访问 `/config-builder/` 应正常显示向导页，而非被代理函数拦截。
 8. 旧的 `/merge`、`/sub` 应返回 404，静态站不应再有对应跳转页。
 9. 用支持相应 Geo 数据的 Mihomo 检查配置：
 
@@ -219,8 +219,10 @@ mihomo -t -d /path/to/mihomo-data -f /path/to/Example-ratatoskr.yaml
 | 创建订阅返回内网链接 | 未设置 `PUBLIC_BASE_URL`，或反代未透传 `X-Forwarded-Proto/Host` |
 | 浏览器请求 403 | 前端 origin 不在 `ALLOWED_ORIGINS`；逗号分隔、只填源地址 |
 | 订阅链接返回 404 | 链接已过期、记录被清理，或迁移域名时未保留 `server/data/` |
-| CF 项目仍显示 Functions/KV | 部署的是旧项目或旧产物；确认输出目录为 `worker/gateway/dist` 且无 `_worker.js` |
-| 页面正常但 CF 仍告警 | 检查是否还有旧的独立 Worker / Pages Functions 在返回节点；新架构下 CF 只有静态文件 |
+| 订阅链接跳到后端域名 | `functions/config-builder.js` 未部署，或 `_routes.json` 没把 `/config-builder` 纳入 include；确认仓库根两份文件已推送并由 CF Git 集成部署 |
+| 订阅链接跳到 `/config-builder/` 向导页 | 链接带了 token 但函数未激活，或 `yggdrasil:public` meta 仍指向旧域名；检查 meta 是否为 `https://<CF Pages 域名>/config-builder` |
+| CF 项目仍显示 KV 绑定 | 部署的是旧项目；当前架构不需要 KV，`worker/wrangler.jsonc` 已弃用不要部署 |
+| 页面正常但 CF 仍告警 | 检查是否还有旧的独立 Worker 在返回节点；当前 Pages Functions 只做透明代理，不读取节点正文 |
 
 排查日志前先移除机场 URL、节点密码和完整订阅链接。
 

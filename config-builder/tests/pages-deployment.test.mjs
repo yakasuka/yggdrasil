@@ -134,21 +134,33 @@ test("Pages output includes the frontend and excludes source and private configu
   assert.ok(!files.some((p) => /\.(?:yaml|jsonc|env)$/.test(p)));
 });
 
-test("Pages redirects forward public subscription paths to the self-hosted service", () => {
+test("Pages Functions proxy subscriptions in place; no 302 redirect to the backend", () => {
   const redirects = readFileSync(
     new URL("../worker/gateway/dist/_redirects", import.meta.url),
     "utf8",
   );
-  assert.match(
-    redirects,
-    /\/yggdrasil\/config-builder\/status https:\/\/yggdrasil\.xyang\.cyou\/config-builder\/status 302/,
-  );
-  assert.match(
-    redirects,
-    /\/yggdrasil\/config-builder https:\/\/yggdrasil\.xyang\.cyou\/config-builder 302/,
-  );
-  // The static wizard route is not hijacked by the subscription redirect.
+  // Subscriptions are served by functions/config-builder.js, which reverse-
+  // proxies the backend without a redirect. No /yggdrasil path layer and no
+  // absolute backend URL may appear in the redirect rules.
+  assert.ok(!redirects.includes("/yggdrasil/"), "no yggdrasil path layer");
+  assert.ok(!redirects.includes("yggdrasil.xyang.cyou"), "no backend redirect");
+  assert.ok(!/302/.test(redirects), "no subscription 302 jump");
+  // The static wizard route keeps its trailing-slash normalization.
   assert.match(redirects, /\/config-builder \/config-builder\/ 308/);
+});
+
+test("Pages Function routes and proxy source are published at the repo root", () => {
+  const repo = new URL("../../", import.meta.url);
+  const routes = JSON.parse(readFileSync(new URL("_routes.json", repo), "utf8"));
+  assert.equal(routes.version, 1);
+  assert.deepEqual(routes.include, ["/config-builder", "/config-builder/status"]);
+  for (const file of [
+    "functions/config-builder.js",
+    "functions/config-builder/status.js",
+    "config-builder/shared/pages-proxy.js",
+  ]) {
+    assert.ok(existsSync(new URL(file, repo)), `${file} must exist`);
+  }
 });
 
 test("legacy page entrances redirect to the canonical config-builder route", async () => {

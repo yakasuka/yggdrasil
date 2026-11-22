@@ -14,6 +14,8 @@
 
 生成订阅时，`worker/application.js` 将用户选择经 AES-GCM 加密后交给 `server/storage.js` 写入 `server/data/`；`server/create-server.js` 把配置名称与可选口令映射到内部随机 ID/密钥，对外只暴露 `/config-builder?token=<名称>[&pwd=<口令>]`。后端是公开 API，没有共享 TOKEN、不读私有仓库；旧的 `/merge`、`/sub`、`/subscription/…` 链路及其静态跳转页均已移除。后端 `/api/endpoints` 吐出所有公开链接模板。
 
+前端用 `yggdrasil:public` meta（`src/config.js` 的 `publicLinkBase()`）把后端返回的链接改写成公开域名，默认 `https://<CF Pages 域名>/config-builder`，不带 `/yggdrasil` 路径层。Cloudflare Pages 由仓库根 `functions/config-builder.js`（订阅）与 `functions/config-builder/status.js`（流量）拦截这两条路径，共享逻辑 `shared/pages-proxy.js` 用 `fetch` 把请求原样转发到后端并把响应（含 `Subscription-Userinfo`）回传——**全程 302/308 都不存在，地址栏与分享链接始终是 CF 域名**。仓库根 `_routes.json` 只把这两条路径纳入函数，静态向导与资源仍由 Pages 直接托管。无 token 的 `/config-builder` 由函数做尾斜杠规范化，`/config-builder/` 交给静态向导页。`_redirects` 只保留旧的向导入口别名（`/builder`、`/webui` 等），不含任何订阅跳转；`_redirects` 对 Functions 处理的请求本就不生效。
+
 ## 功能对应位置
 
 | 功能 | 维护入口 |
