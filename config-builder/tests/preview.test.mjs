@@ -30,11 +30,15 @@ test("wizard exposes an early-configuration entry and unlocked steps", async () 
   assert.match(html, /id="skip-sources"/);
   assert.match(html, /先配置其他步骤/);
   assert.match(html, /id="preview-banner"/);
+  assert.match(html, /导入配置/);
+  assert.match(html, /分享配置/);
   assert.match(html, /预览模式 · 尚未解析节点/);
 
   const app = await readFile(new URL("../src/app.js", import.meta.url), "utf8");
   assert.match(app, /button\.disabled = busy;/);
   assert.doesNotMatch(app, /furthest/);
+  assert.doesNotMatch(app, /validateStep/);
+  assert.match(app, /if \(next > 0 && !ctx\.inspection && !ctx\.preview\)/);
   assert.match(app, /if \(ctx\.preview\) changed\(\);/);
   assert.match(app, /const wasPreview = ctx\.preview;/);
 });

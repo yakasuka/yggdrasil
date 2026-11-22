@@ -425,14 +425,16 @@ button:active:not(:disabled),
 .icon-text-button {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 7px 10px;
-  border: 1px solid var(--line);
-  border-radius: 9px;
-  background: var(--soft);
+  justify-content: center;
+  gap: 8px;
+  min-width: 112px;
+  padding: 11px 14px;
+  border: 1px solid var(--selected-line);
+  border-radius: 11px;
+  background: var(--tint);
   color: var(--ink);
-  font-size: 0.6875rem;
-  font-weight: 550;
+  font-size: 0.8125rem;
+  font-weight: 600;
   line-height: 1;
   cursor: pointer;
 }
@@ -446,8 +448,11 @@ button:active:not(:disabled),
   cursor: not-allowed;
 }
 .icon-text-button span {
-  font-size: 0.875rem;
+  font-size: 1rem;
   color: var(--accent);
+}
+#skip-sources {
+  min-width: 148px;
 }
 .preview-banner {
   display: flex;

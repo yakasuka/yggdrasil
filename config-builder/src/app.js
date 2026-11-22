@@ -208,7 +208,7 @@ function footer() {
   $("#back").disabled = busy || step === 0;
   $("#download").hidden = !final;
   $("#download").disabled = busy || !ready;
-  $("#next").disabled = busy || ((step === 0 || final) && !ready);
+  $("#next").disabled = busy || (final && !ready);
   $("#skip-sources").hidden = busy || step !== 0 || ctx.preview;
   $("#next").innerHTML = busy
     ? ctx.phase === "loading"
@@ -217,7 +217,9 @@ function footer() {
     : final
       ? "生成订阅链接 ↗"
       : step === 0
-        ? "解析并继续 →"
+        ? ctx.service === "ready"
+          ? "解析并继续 →"
+          : "先配置其他步骤 →"
         : "下一步 →";
   $("#progress-note").textContent = ctx.preview
     ? "预览模式：填写订阅后可生成"
@@ -284,12 +286,12 @@ function resetPolicies() {
     )
       delete ctx.profile.appPolicy[id];
 }
-function validateStep() {
-  if (step === 1 && !ctx.profile.countries.length && !ctx.profile.other) {
-    error("至少保留一个有节点的地区。");
-    return false;
-  }
-  return true;
+function goToStep(next) {
+  // Later steps can be explored before a subscription is parsed. Enter the
+  // preview first so region policies and app routing have real choices.
+  if (next > 0 && !ctx.inspection && !ctx.preview)
+    enterPreview({ stay: true });
+  navigate(next);
 }
 function navigate(next) {
   step = next;
@@ -783,15 +785,14 @@ document.addEventListener("click", async (e) => {
     return;
   }
   if (el.id === "next") {
-    if (step === 0) await resolveSources();
-    else if (step === FINAL_STEP) await generate();
-    else if (validateStep()) navigate(step + 1);
+    if (step === 0) {
+      if (ctx.service === "ready") await resolveSources();
+      else enterPreview();
+    } else if (step === FINAL_STEP) await generate();
+    else goToStep(step + 1);
   }
   if (el.id === "back" && step > 0) navigate(step - 1);
-  if (el.dataset.step !== undefined) {
-    const next = Number(el.dataset.step);
-    if (next < step || validateStep()) navigate(next);
-  }
+  if (el.dataset.step !== undefined) goToStep(Number(el.dataset.step));
   if (el.id === "add-provider") {
     if (busy || ctx.profile.providers.length >= 10) return;
     ctx.profile.providers.push({ name: "", url: "" });

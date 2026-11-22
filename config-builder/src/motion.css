@@ -136,14 +136,22 @@ html:not([data-intro="done"]):not([data-intro="skip"])
   height: 100%;
 }
 #steps .step-button,
-#steps .step-button[aria-current="step"],
-#steps .step-button:hover:not(:disabled) {
+#steps .step-button[aria-current="step"] {
   background: transparent;
   box-shadow: none;
   border-color: transparent;
 }
 #steps .step-button {
   color: var(--muted);
+}
+#steps .step-button:not(:disabled) {
+  color: var(--ink);
+  cursor: pointer;
+}
+#steps .step-button:not(:disabled):hover {
+  background: var(--soft);
+  border-color: var(--line);
+  color: var(--accent);
 }
 #steps .step-button[aria-current="step"]:disabled {
   opacity: 1;
