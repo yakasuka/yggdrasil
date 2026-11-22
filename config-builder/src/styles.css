@@ -919,6 +919,11 @@ textarea {
   font-size: 0.6875rem;
   text-align: center;
 }
+.region-count.is-empty {
+  opacity: 0.55;
+  border: 1px dashed var(--line);
+  background: transparent;
+}
 .flag {
   font-size: 1.375rem;
 }

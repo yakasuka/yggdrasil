@@ -1,7 +1,8 @@
 import { catalog } from "../../shared/compiler.js";
+import { selectableRegions } from "../../shared/preview.js";
 import { esc, checked, selected, title, notice } from "../ui.js";
 export function appsPanel(ctx) {
-  const regions = (ctx.inspection?.regions || []).filter((r) =>
+  const regions = selectableRegions(catalog, ctx.inspection).filter((r) =>
     r.id === "OTHER" ? ctx.profile.other : ctx.profile.countries.includes(r.id),
   );
   const options = [

@@ -65,6 +65,9 @@ const ctx = {
   importSelection: null,
   linkPwd: "",
   preview: false,
+  // Once the user touches the region pickers, a later subscription parse
+  // must not discard their choices — even regions with no live nodes.
+  selectedRegions: false,
 };
 let step = 0,
   busy = false,
@@ -124,6 +127,7 @@ function enterPreview({ stay = false } = {}) {
   ctx.profile.countries = chosen.length
     ? chosen
     : previewRegions(catalog).filter((id) => id !== "OTHER");
+  ctx.selectedRegions = true;
   clearError();
   if (!stay) navigate(1);
   else render();
@@ -353,7 +357,6 @@ async function resolveSources() {
     return;
   }
   busy = true;
-  const wasPreview = ctx.preview;
   ctx.phase = "loading";
   clearError();
   renderNav();
@@ -386,28 +389,16 @@ async function resolveSources() {
     ctx.phase = "ready";
     ctx.preview = false;
     if (ctx.importSelection) {
-      // Shared choices win, but only for regions that actually exist in the
-      // importer's subscription.
-      ctx.profile.countries = ctx.importSelection.countries.filter((id) =>
-        inspection.regions.some((r) => r.id === id),
-      );
-      ctx.profile.other =
-        ctx.importSelection.other &&
-        inspection.regions.some((r) => r.id === "OTHER");
+      // Every template region is a valid option, so restore shared choices
+      // as-is instead of dropping regions the importer has no nodes for.
+      ctx.profile.countries = ctx.importSelection.countries;
+      ctx.profile.other = ctx.importSelection.other;
       ctx.importSelection = null;
-    } else if (wasPreview) {
-      // Keep choices made before the subscription was filled in, dropping
-      // only regions the real subscription does not contain.
-      const available = inspection.regions.map((r) => r.id);
-      ctx.profile.countries = ctx.profile.countries.filter((id) =>
-        available.includes(id),
-      );
-      ctx.profile.other = ctx.profile.other && available.includes("OTHER");
-      if (!ctx.profile.countries.length && !ctx.profile.other)
-        ctx.profile.countries = inspection.regions
-          .filter((r) => r.id !== "OTHER")
-          .map((r) => r.id);
-    } else {
+      ctx.selectedRegions = true;
+    } else if (!ctx.selectedRegions) {
+      // Only seed from the subscription before the user has chosen anything.
+      // Once they pick regions, re-parsing must never discard their picks —
+      // a region with zero live nodes is still intentionally selectable.
       ctx.profile.countries = inspection.regions
         .filter((r) => r.id !== "OTHER")
         .map((r) => r.id);
@@ -725,6 +716,7 @@ document.addEventListener("change", (e) => {
   if (el.dataset.region) {
     if (el.dataset.region === "OTHER") ctx.profile.other = el.checked;
     else toggle(ctx.profile.countries, el.dataset.region, el.checked);
+    ctx.selectedRegions = true;
     resetPolicies();
     changed();
   }
@@ -853,15 +845,13 @@ document.addEventListener("click", async (e) => {
     $("#add-provider").focus({ preventScroll: true });
   }
   if (el.dataset.regions) {
+    // "全部保留" covers every template region, not just those with nodes.
     ctx.profile.countries =
       el.dataset.regions === "all"
-        ? ctx.inspection.regions
-            .filter((r) => r.id !== "OTHER")
-            .map((r) => r.id)
+        ? catalog.regions.map((r) => r.id)
         : [];
-    ctx.profile.other =
-      el.dataset.regions === "all" &&
-      ctx.inspection.regions.some((r) => r.id === "OTHER");
+    ctx.profile.other = el.dataset.regions === "all";
+    ctx.selectedRegions = true;
     resetPolicies();
     changed();
     render();

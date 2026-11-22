@@ -4,6 +4,8 @@ import { readFile } from "node:fs/promises";
 import { catalog, defaults } from "../shared/compiler.js";
 import { previewInspection, previewRegions } from "../shared/preview.js";
 import { regionsPanel } from "../src/panels/regions.js";
+import { appsPanel } from "../src/panels/apps.js";
+import { selectableRegions } from "../shared/preview.js";
 
 test("preview inspection offers template regions without inventing nodes", () => {
   const inspection = previewInspection(catalog);
@@ -25,6 +27,40 @@ test("preview inspection offers template regions without inventing nodes", () =>
   assert.match(html, /预览模式下不显示节点与连接耗时/);
 });
 
+test("all template regions stay selectable even when the subscription has only a few", () => {
+  const inspection = {
+    providers: [],
+    nodes: [],
+    regions: [{ id: "JP", label: "日本", flag: "🇯🇵", count: 2 }],
+    capabilities: { tcp: false },
+  };
+  const profile = defaults(catalog);
+  profile.countries = ["JP", "HK"]; // HK has no live nodes in this subscription
+  profile.other = false;
+
+  const list = selectableRegions(catalog, inspection);
+  assert.deepEqual(
+    list.map((r) => r.id),
+    [...catalog.regions.map((r) => r.id), "OTHER"],
+  );
+  assert.equal(list.find((r) => r.id === "HK").count, 0);
+  assert.equal(list.find((r) => r.id === "JP").count, 2);
+
+  const html = regionsPanel({ profile, inspection, preview: false });
+  for (const region of catalog.regions)
+    assert.match(html, new RegExp(`data-region="${region.id}"`));
+  assert.match(html, /data-region="OTHER"/);
+  assert.match(html, /即使订阅里没有对应节点也可以勾选/);
+  assert.match(html, /订阅中暂无节点，仍可勾选/);
+  // HK is still checked despite having zero nodes.
+  assert.match(html, /data-region="HK" checked/);
+
+  // The APP exit selector and the final summary use the same full list.
+  const apps = appsPanel({ profile, inspection, preview: false, search: "" });
+  assert.match(apps, /value="region:HK"/);
+  assert.doesNotMatch(apps, /value="region:SG"/); // not selected
+});
+
 test("wizard exposes an early-configuration entry and unlocked steps", async () => {
   const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
   assert.match(html, /id="skip-sources"/);
@@ -40,7 +76,9 @@ test("wizard exposes an early-configuration entry and unlocked steps", async () 
   assert.doesNotMatch(app, /validateStep/);
   assert.match(app, /if \(next > 0 && !ctx\.inspection && !ctx\.preview\)/);
   assert.match(app, /if \(ctx\.preview\) changed\(\);/);
-  assert.match(app, /const wasPreview = ctx\.preview;/);
+  assert.match(app, /ctx\.selectedRegions/);
+  assert.match(app, /else if \(!ctx\.selectedRegions\)/);
+  assert.match(app, /catalog\.regions\.map\(\(r\) => r\.id\)/);
 });
 
 test("theme follows the system while no manual choice is stored", async () => {

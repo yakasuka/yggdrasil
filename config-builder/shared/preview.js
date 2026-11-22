@@ -24,3 +24,25 @@ export function previewInspection(model) {
 export function previewRegions(model) {
   return model.regions.map((region) => region.id);
 }
+
+// A subscription only reports regions it actually found nodes for, but the
+// generated YAML writes every template region as a selectable option. Offer
+// the complete template list in the UI too: a region with zero nodes can
+// still be picked and becomes useful as soon as the subscription carries
+// nodes for it. The live count is merged in purely for display.
+export function selectableRegions(model, inspection) {
+  const live = new Map((inspection?.regions || []).map((r) => [r.id, r]));
+  const merge = (region) => {
+    const found = live.get(region.id);
+    return { ...region, ...(found || {}), count: found?.count || 0 };
+  };
+  return [
+    ...model.regions.map(merge),
+    merge({
+      id: "OTHER",
+      label: "其他地区",
+      flag: "🌐",
+      name: model.groups.other,
+    }),
+  ];
+}

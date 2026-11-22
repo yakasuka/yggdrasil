@@ -1,4 +1,5 @@
 import { catalog, STRATEGIES, RULE_MODULES } from "../../shared/compiler.js";
+import { selectableRegions } from "../../shared/preview.js";
 import { filename, LIFETIMES } from "../../shared/profile.js";
 import {
   esc,
@@ -16,7 +17,7 @@ export function shareResult(share) {
 
 export function reviewPanel(ctx) {
   const p = ctx.profile,
-    regions = (ctx.inspection?.regions || []).filter((r) =>
+    regions = selectableRegions(catalog, ctx.inspection).filter((r) =>
       r.id === "OTHER" ? p.other : p.countries.includes(r.id),
     ),
     moduleLabels = RULE_MODULES.filter((m) => p.modules.includes(m.id)).map(
