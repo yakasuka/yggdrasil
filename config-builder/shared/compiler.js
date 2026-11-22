@@ -106,15 +106,18 @@ export function defaults(model = catalog) {
     title: "",
     providers: [{ name: "", url: "" }],
     countries: [],
-    other: false,
-    strategies: ["auto", "fallback"],
+    // Match the example template: all switch groups, all four automatic
+    // strategies, all rule modules, other-region group and LAN access start
+    // enabled. Users can still switch any of them off in the wizard.
+    other: true,
+    strategies: STRATEGIES.map((s) => s.id),
     defaultStrategy: "manual",
     appsMode: "all",
     apps: model.apps.map((a) => a.id),
     appPolicy: {},
     modules: ruleModules(model),
     port: 7890,
-    allowLan: false,
+    allowLan: true,
     lifetime: "30d",
   };
 }
@@ -308,6 +311,9 @@ export async function compile(input, model = catalog, options = {}) {
     "REJECT",
   ]);
   const groups = [
+    // Template-authored switch groups are always kept: they are part of the
+    // example config even though no rule points at them.
+    { name: g.hermes || "✨ Hermes", type: "select", proxies: exits },
     { name: g.gateway, type: "select", proxies: exits },
     { name: g.manual, type: "select", "include-all": true, filter: allFilter },
   ];
@@ -362,7 +368,9 @@ export async function compile(input, model = catalog, options = {}) {
     groups.push({
       name: app.name,
       type: "select",
-      proxies: unique([target, ...optionsList]),
+      proxies: app.firstProxyDirect
+        ? unique(["DIRECT", target, ...optionsList])
+        : unique([target, ...optionsList]),
       ...(app.icon ? { icon: app.icon } : {}),
     });
   }
@@ -381,6 +389,11 @@ export async function compile(input, model = catalog, options = {}) {
   );
   if (selected.some((r) => r.rule.split(",")[2] === g.ports))
     groups.push({ name: g.ports, type: "select", proxies: optionsList });
+  groups.push({
+    name: g.china || "🏯 China",
+    type: "select",
+    proxies: unique(["DIRECT", ...optionsList]),
+  });
   groups.push({
     name: g.final,
     type: "select",
@@ -407,9 +420,16 @@ export async function compile(input, model = catalog, options = {}) {
       },
     ]),
   );
-  const providers = new Set(
-    rules.filter((r) => r.startsWith("RULE-SET,")).map((r) => r.split(",")[1]),
-  );
+  const providers = new Set([
+    ...rules
+      .filter((r) => r.startsWith("RULE-SET,"))
+      .map((r) => r.split(",")[1]),
+    // Keep every rule provider authored in the template whose module is on,
+    // even when its rule is commented out there (e.g. Cargo Downloads).
+    ...model.providerModules
+      .filter((x) => p.modules.includes(x.module))
+      .map((x) => x.name),
+  ]);
   const inlineNames = new Set();
   const inline = options.inlineProxies?.flatMap((nodes, i) => {
     const kept = new Set(

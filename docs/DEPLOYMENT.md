@@ -22,7 +22,7 @@
 
 没有共享 TOKEN、不读私有 GitHub 仓库。默认的规则与模板来自仓库示例 `resources/template/ratatoskr-template.yaml` 的同源快照 `shared/catalog.json`。
 
-Cloudflare 托管静态文件，**外加两个仅做透明反向代理的 Pages Functions**：`functions/config-builder.js` 与 `functions/config-builder/status.js`（共享逻辑在 `config-builder/shared/pages-proxy.js`，由仓库根 `_routes.json` 限定只在这两条路径激活）。它们只把带 `token` 的订阅请求 `fetch` 到自建后端、原样回传 YAML/流量 JSON——**不做重定向、不解析、不存储任何节点数据**，因此不会因识别节点内容而误封账号。若不接受任何 Functions，可删除 `functions/` 与 `_routes.json`，此时公开链接需改回后端直链（把 `yggdrasil:public` meta 指向后端域名）。`worker/` 目录的节点解析、编译、加密等逻辑是**被 `server/` 直接 import 的普通模块**；`worker/gateway/index.js` 是弃用的旧 CF 网关，仅用于历史回归测试，任何构建都不会打包它，不要部署。
+Cloudflare 托管静态文件，**外加仅做透明反向代理的 Pages Functions**：`functions/config-builder.js` 与 `functions/config-builder/status.js` 负责订阅/status，`functions/config-builder/dashboard.js`、`functions/config-builder/dashboard/login.js`、`functions/config-builder/dashboard/logout.js` 与 `functions/api/admin/configs.js` 负责管理后台登录与代理（共享逻辑在 `config-builder/shared/pages-proxy.js`，由仓库根 `_routes.json` 限定路径）。它们只把带 `token` 的订阅请求 `fetch` 到自建后端、原样回传 YAML/流量 JSON——**不做重定向、不解析、不存储任何节点数据**，因此不会因识别节点内容而误封账号。若不接受任何 Functions，可删除 `functions/` 与 `_routes.json`，此时公开链接需改回后端直链（把 `yggdrasil:public` meta 指向后端域名）。`worker/` 目录的节点解析、编译、加密等逻辑是**被 `server/` 直接 import 的普通模块**；`worker/gateway/index.js` 是弃用的旧 CF 网关，仅用于历史回归测试，任何构建都不会打包它，不要部署。
 
 旧的 `/merge`、`/sub` 私有仓库链路（TOKEN + GH_TOKEN + 静态跳转页 + CF Functions）已完全移除。
 
@@ -55,9 +55,9 @@ cp server/.env.example server/.env
 
 **没有需要保密的共享凭据**。新订阅的对外凭据是用户在「配置名称」里填写的 token（3–60 位字母、数字、`_` 或 `-`，空格转 `-`，不区分大小写），外加确认页可选的 1–64 位访问口令；口令以 SHA-256 摘要参与存储键派生，同时明文另存进映射记录，仅供管理员后台调试展示真实订阅链接使用（公开接口不返回它），同名配置配不同口令即可共存，同名同口令返回 409。服务端把「名称 + 口令」映射到内部随机 128 位 ID 与独立 256 位密钥，密钥不落盘。口令会原样出现在链接里，不是私密密码，把整条链接当作凭据保管；不带口令的历史链接继续有效。旧的 `/subscription/<id>/<key>.yaml` 路由已移除。`service.json`、静态文件与 workflow 里都只有公开 URL。
 
-**管理后台：** 设置 `ADMIN_USERS` 后，推荐打开 `https://yggdrasil-afx.pages.dev/config-builder/dashboard`——CF Pages 边缘函数就地代理到后端，地址栏不跳后端；浏览器 Basic 弹框的凭据与 401 质询原样透传，页面内的 `GET/DELETE /api/admin/configs` 也由 `functions/api/admin/configs.js` 在同源代理。也可直连 `https://<后端域名>/config-builder/dashboard`（Nginx 常规路径反代已覆盖该路径）。用同一组 Basic 账号密码登录，即可列出全部配置（名称、真实口令、创建/过期时间、可复制的**真实**订阅链接）并删除任意配置——带口令的配置也能删（按内部 id 定位，无需明文口令）。列表里展示的口令与链接来自服务端明文映射记录，仅供管理员调试，公开接口不返回；不配置 `ADMIN_USERS` 时后台与接口都返回 401，且不在前端或 `/api/endpoints` 中暴露。
+**管理后台：** 设置 `ADMIN_USERS` 后，推荐打开 `https://yggdrasil-afx.pages.dev/config-builder/dashboard`——CF Pages 边缘函数就地代理到后端，地址栏不跳后端；未登录时返回独立登录页，提交账号密码后由 `functions/config-builder/dashboard/login.js` 校验并写入 HttpOnly Cookie，之后的页面与 `GET/DELETE /api/admin/configs` 都由 `functions/api/admin/configs.js` 在同源代理。也可直连 `https://<后端域名>/config-builder/dashboard`（Nginx 常规路径反代已覆盖该路径，此时使用浏览器 Basic 弹窗）。用同一组 Basic 账号密码登录，即可列出全部配置（名称、真实口令、生成时间、到期时间、有效期、可复制的**真实**订阅链接）并删除任意配置——带口令的配置也能删（按内部 id 定位，无需明文口令）。列表里展示的口令与链接来自服务端明文映射记录，仅供管理员调试，公开接口不返回；不配置 `ADMIN_USERS` 时后台与接口都返回 401，且不在前端或 `/api/endpoints` 中暴露。
 
-若从旧的私有仓库链路迁移：删除 CF 项目里的 `TOKEN`、`GH_TOKEN`、`SERVICE_TOKEN` 变量，下线旧的独立 Worker（`worker/wrangler.jsonc` 含 KV 绑定，已弃用，不要执行 `worker:deploy`），也不要保留任何读取节点正文的旧 Pages Functions。当前唯一需要的是仓库根 `functions/` 下的两个透明代理函数；CF Git 集成部署会自动识别它们，无需手动配置 KV 或环境变量。两个静态站的 `service.json` / `SERVICE_BASE_URL` 都指向同一个后端域名。
+若从旧的私有仓库链路迁移：删除 CF 项目里的 `TOKEN`、`GH_TOKEN`、`SERVICE_TOKEN` 变量，下线旧的独立 Worker（`worker/wrangler.jsonc` 含 KV 绑定，已弃用，不要执行 `worker:deploy`），也不要保留任何读取节点正文的旧 Pages Functions。当前需要的是仓库根 `functions/` 下的透明代理与登录函数；CF Git 集成部署会自动识别它们，无需手动配置 KV 或环境变量。两个静态站的 `service.json` / `SERVICE_BASE_URL` 都指向同一个后端域名。
 
 ### 2.2 运行
 

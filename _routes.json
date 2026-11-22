@@ -4,6 +4,8 @@
     "/config-builder",
     "/config-builder/status",
     "/config-builder/dashboard",
+    "/config-builder/dashboard/login",
+    "/config-builder/dashboard/logout",
     "/api/admin/configs"
   ],
   "exclude": []

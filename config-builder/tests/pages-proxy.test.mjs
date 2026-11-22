@@ -143,6 +143,16 @@ test("admin proxy relays Basic credentials and the 401 challenge", async () => {
   assert.equal(ok.status, 200);
   assert.equal(seen[0].path, "/config-builder/dashboard");
   assert.equal(seen[1].auth, BASIC);
+
+  const viaCookie = await proxyAdmin(
+    req("https://pages.dev/config-builder/dashboard", {
+      cookie: "other=1; ygg_admin=" + encodeURIComponent(BASIC.slice(6)),
+    }),
+    DEFAULT_SERVICE,
+    fetcher,
+  );
+  assert.equal(viaCookie.status, 200);
+  assert.equal(seen[2].auth, BASIC);
 });
 
 test("admin proxy forwards the admin API path and DELETE body", async () => {

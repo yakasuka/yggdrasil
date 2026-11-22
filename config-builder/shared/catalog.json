@@ -10,7 +10,9 @@
     "final": "🏁 Final",
     "other": "🌌",
     "otherGroupName": "🌌 Others",
-    "ports": "🔌 特殊端口"
+    "ports": "🔌 特殊端口",
+    "hermes": "✨ Hermes",
+    "china": "🏯 China"
   },
   "regions": [
     {
@@ -97,6 +99,7 @@
       "label": "OpenAI",
       "category": "AI 与开发",
       "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/chatgpt.png",
+      "firstProxyDirect": false,
       "rules": [
         "GEOSITE,openai,⚡ OpenAI"
       ]
@@ -107,6 +110,7 @@
       "label": "Anthropic",
       "category": "AI 与开发",
       "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/claude.png",
+      "firstProxyDirect": false,
       "rules": [
         "GEOSITE,anthropic,🪐 Anthropic"
       ]
@@ -117,6 +121,7 @@
       "label": "AI 服务",
       "category": "AI 与开发",
       "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/ai.png",
+      "firstProxyDirect": false,
       "rules": [
         "GEOSITE,category-ai-!cn,✨ AI 服务"
       ]
@@ -127,6 +132,7 @@
       "label": "OKX",
       "category": "数字资产",
       "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/okx.png",
+      "firstProxyDirect": false,
       "rules": [
         "GEOSITE,okx,⬛ OKX"
       ]
@@ -137,6 +143,7 @@
       "label": "Binance",
       "category": "数字资产",
       "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/binance.png",
+      "firstProxyDirect": false,
       "rules": [
         "GEOSITE,binance,🟨 Binance"
       ]
@@ -147,6 +154,7 @@
       "label": "Bybit",
       "category": "数字资产",
       "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/bybit.png",
+      "firstProxyDirect": false,
       "rules": [
         "GEOSITE,bybit,🟧 Bybit"
       ]
@@ -157,6 +165,7 @@
       "label": "Crypto",
       "category": "数字资产",
       "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/crypto.png",
+      "firstProxyDirect": false,
       "rules": [
         "GEOSITE,category-cryptocurrency,🪙 Crypto"
       ]
@@ -167,6 +176,7 @@
       "label": "YouTube",
       "category": "影音娱乐",
       "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/youtube.png",
+      "firstProxyDirect": false,
       "rules": [
         "GEOSITE,youtube,📺 YouTube"
       ]
@@ -177,6 +187,7 @@
       "label": "Google",
       "category": "其他服务",
       "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/google.png",
+      "firstProxyDirect": false,
       "rules": [
         "GEOSITE,google,✨ Google"
       ]
@@ -187,6 +198,7 @@
       "label": "Cloudflare",
       "category": "其他服务",
       "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/cloudflare.png",
+      "firstProxyDirect": false,
       "rules": [
         "GEOSITE,cloudflare,☁️ Cloudflare"
       ]
@@ -197,6 +209,7 @@
       "label": "Amazon",
       "category": "其他服务",
       "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/amazon.png",
+      "firstProxyDirect": false,
       "rules": [
         "GEOSITE,amazon,📦 Amazon"
       ]
@@ -207,6 +220,7 @@
       "label": "GitHub",
       "category": "其他服务",
       "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/github.png",
+      "firstProxyDirect": false,
       "rules": [
         "GEOSITE,github,🐙 GitHub"
       ]
@@ -217,6 +231,7 @@
       "label": "Microsoft",
       "category": "其他服务",
       "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/microsoft.png",
+      "firstProxyDirect": true,
       "rules": [
         "GEOSITE,microsoft,🪟 Microsoft"
       ]
@@ -227,6 +242,7 @@
       "label": "Adobe",
       "category": "其他服务",
       "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/adobe.png",
+      "firstProxyDirect": false,
       "rules": [
         "GEOSITE,adobe,🎨 Adobe"
       ]
@@ -237,6 +253,7 @@
       "label": "Apple",
       "category": "其他服务",
       "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/apple.png",
+      "firstProxyDirect": true,
       "rules": [
         "GEOSITE,apple,⚪ Apple"
       ]
@@ -247,6 +264,7 @@
       "label": "𝕏 X",
       "category": "社交与通信",
       "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/x.png",
+      "firstProxyDirect": false,
       "rules": [
         "GEOSITE,twitter,𝕏 X"
       ]
@@ -257,6 +275,7 @@
       "label": "Meta",
       "category": "社交与通信",
       "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/meta.png",
+      "firstProxyDirect": false,
       "rules": [
         "GEOSITE,instagram,♾️ Meta"
       ]
@@ -267,6 +286,7 @@
       "label": "Telegram",
       "category": "社交与通信",
       "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/telegram.png",
+      "firstProxyDirect": false,
       "rules": [
         "GEOSITE,telegram,🪽 Telegram"
       ]
@@ -277,6 +297,7 @@
       "label": "Discord",
       "category": "社交与通信",
       "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/discord.png",
+      "firstProxyDirect": false,
       "rules": [
         "GEOSITE,discord,🎮 Discord"
       ]
@@ -287,6 +308,7 @@
       "label": "Chat",
       "category": "社交与通信",
       "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/message.png",
+      "firstProxyDirect": false,
       "rules": [
         "GEOSITE,category-communication,💬 Chat"
       ]
@@ -297,6 +319,7 @@
       "label": "Social",
       "category": "社交与通信",
       "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/social.png",
+      "firstProxyDirect": false,
       "rules": [
         "GEOSITE,category-social-media-!cn,🫂 Social"
       ]
@@ -307,6 +330,7 @@
       "label": "TikTok",
       "category": "社交与通信",
       "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/tiktok.png",
+      "firstProxyDirect": false,
       "rules": [
         "GEOSITE,tiktok,🎶 TikTok"
       ]
@@ -317,6 +341,7 @@
       "label": "Netflix",
       "category": "影音娱乐",
       "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/netflix.png",
+      "firstProxyDirect": false,
       "rules": [
         "GEOSITE,netflix,🍿 Netflix"
       ]
@@ -327,6 +352,7 @@
       "label": "Hulu",
       "category": "影音娱乐",
       "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/hulu.png",
+      "firstProxyDirect": false,
       "rules": [
         "GEOSITE,hulu,📺 Hulu"
       ]
@@ -337,6 +363,7 @@
       "label": "Prime Video",
       "category": "影音娱乐",
       "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/primevideo.png",
+      "firstProxyDirect": false,
       "rules": [
         "GEOSITE,primevideo,📦 Prime Video"
       ]
@@ -347,6 +374,7 @@
       "label": "HBO",
       "category": "影音娱乐",
       "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/hbo.png",
+      "firstProxyDirect": false,
       "rules": [
         "GEOSITE,hbo,🎬 HBO"
       ]
@@ -357,6 +385,7 @@
       "label": "Disney+",
       "category": "影音娱乐",
       "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/disney.png",
+      "firstProxyDirect": false,
       "rules": [
         "GEOSITE,disney,🏰 Disney+"
       ]
@@ -367,6 +396,7 @@
       "label": "Twitch",
       "category": "影音娱乐",
       "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/twitch.png",
+      "firstProxyDirect": false,
       "rules": [
         "GEOSITE,twitch,🟣 Twitch"
       ]
@@ -377,6 +407,7 @@
       "label": "Spotify",
       "category": "影音娱乐",
       "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/spotify.png",
+      "firstProxyDirect": false,
       "rules": [
         "GEOSITE,spotify,💚 Spotify"
       ]
@@ -387,6 +418,7 @@
       "label": "Entertainment",
       "category": "影音娱乐",
       "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/media.png",
+      "firstProxyDirect": false,
       "rules": [
         "GEOSITE,category-entertainment,🍿 Entertainment"
       ]
@@ -397,6 +429,7 @@
       "label": "News",
       "category": "影音娱乐",
       "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/news.png",
+      "firstProxyDirect": false,
       "rules": [
         "GEOSITE,category-media,📰 News"
       ]
@@ -407,6 +440,7 @@
       "label": "Bilibili",
       "category": "影音娱乐",
       "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/bilibili.png",
+      "firstProxyDirect": true,
       "rules": [
         "GEOSITE,bilibili,📺 Bilibili"
       ]
@@ -417,6 +451,7 @@
       "label": "Steam",
       "category": "游戏与下载",
       "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/steam.png",
+      "firstProxyDirect": false,
       "rules": [
         "GEOSITE,steam,👾 Steam"
       ]
@@ -427,6 +462,7 @@
       "label": "Epic",
       "category": "游戏与下载",
       "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/epic.png",
+      "firstProxyDirect": true,
       "rules": [
         "GEOSITE,epicgames,🎁 Epic"
       ]
@@ -437,6 +473,7 @@
       "label": "TapTap",
       "category": "游戏与下载",
       "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/taptap.png",
+      "firstProxyDirect": true,
       "rules": [
         "GEOSITE,taptap,🕹️ TapTap"
       ]
@@ -447,6 +484,7 @@
       "label": "Speedtest",
       "category": "其他服务",
       "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/speedtest.png",
+      "firstProxyDirect": false,
       "rules": [
         "GEOSITE,category-speedtest,⚡ Speedtest"
       ]
@@ -457,6 +495,7 @@
       "label": "广告拦截",
       "category": "其他服务",
       "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/adguard.png",
+      "firstProxyDirect": false,
       "rules": [
         "RULE-SET,❎ AdGuard,❎ 广告拦截"
       ]
@@ -813,5 +852,5 @@
       "module": "proxy-extra"
     }
   ],
-  "version": "97228d286c5d"
+  "version": "1cc99e19887d"
 }

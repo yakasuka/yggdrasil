@@ -9,6 +9,16 @@
 export const DEFAULT_SERVICE = "https://yggdrasil.xyang.cyou";
 export const CONFIG_PATH = "/config-builder";
 export const STATUS_PATH = "/config-builder/status";
+export const ADMIN_COOKIE = "ygg_admin";
+
+// Read the HttpOnly session cookie set by the dashboard login function.
+export function adminSession(request) {
+  const cookie = request.headers.get("cookie") || "";
+  const match = cookie.match(
+    new RegExp("(?:^|;\\s*)" + ADMIN_COOKIE + "=([^;]+)"),
+  );
+  return match ? decodeURIComponent(match[1]) : "";
+}
 
 // Only requests carrying a token are subscriptions. Everything else (the
 // wizard, its assets) must fall through to the static site.
@@ -74,6 +84,13 @@ export async function proxyAdmin(
   for (const name of ADMIN_REQUEST_HEADERS) {
     const value = request.headers.get(name);
     if (value) headers.set(name, value);
+  }
+  // The sign-in form stores the validated Basic credential in an HttpOnly
+  // cookie. Translate it back into an Authorization header for the backend so
+  // the dashboard can be reloaded and its fetch() calls stay on this origin.
+  if (!headers.has("authorization")) {
+    const session = adminSession(request);
+    if (session) headers.set("authorization", "Basic " + session);
   }
 
   const init = { method: request.method, headers, redirect: "manual" };

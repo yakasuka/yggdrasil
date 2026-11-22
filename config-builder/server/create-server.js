@@ -265,6 +265,7 @@ export function createService({
             id: mapping.id,
             createdAt: profile?.createdAt || null,
             expiresAt: profile?.expiresAt || null,
+            lifetime: profile?.lifetime || null,
           });
         }
         configs.sort((a, b) =>

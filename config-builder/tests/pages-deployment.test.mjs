@@ -157,13 +157,18 @@ test("Pages Function routes and proxy source are published at the repo root", ()
     "/config-builder",
     "/config-builder/status",
     "/config-builder/dashboard",
+    "/config-builder/dashboard/login",
+    "/config-builder/dashboard/logout",
     "/api/admin/configs",
   ]);
   for (const file of [
     "functions/config-builder.js",
     "functions/config-builder/status.js",
     "functions/config-builder/dashboard.js",
+    "functions/config-builder/dashboard/login.js",
+    "functions/config-builder/dashboard/logout.js",
     "functions/api/admin/configs.js",
+    "config-builder/shared/dashboard-login.js",
     "config-builder/shared/pages-proxy.js",
   ]) {
     assert.ok(existsSync(new URL(file, repo)), `${file} must exist`);

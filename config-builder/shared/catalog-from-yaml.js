@@ -82,6 +82,10 @@ export async function catalogFromYaml(text) {
   const ports =
     groups.find((g) => g.name.includes("特殊端口"))?.name || "🔌 特殊端口";
   const othersGroup = groups.find((g) => g.name.includes("Others"));
+  const hermes =
+    groups.find((g) => g.name.includes("Hermes"))?.name || "✨ Hermes";
+  const china =
+    groups.find((g) => g.name.includes("China"))?.name || "🏯 China";
   const core = {
     gateway,
     manual,
@@ -89,6 +93,8 @@ export async function catalogFromYaml(text) {
     other: leadingIcon(othersGroup?.name) || "🌌",
     otherGroupName: othersGroup?.name || "🌌 Others",
     ports,
+    hermes,
+    china,
   };
 
   // Regions come from the template's FilterRegions anchors. Each region group
@@ -153,6 +159,8 @@ export async function catalogFromYaml(text) {
     manual,
     final,
     ports,
+    hermes,
+    china,
     leadingIcon(othersGroup?.name),
     "🏮",
     ...regionGroups.map((g) => g.name),
@@ -169,6 +177,8 @@ export async function catalogFromYaml(text) {
         label: meta.label || stripIcon(g.name),
         category: meta.category || category(g.name),
         icon: g.icon || "",
+        // Preserve the template's initial option (some apps start at DIRECT).
+        firstProxyDirect: g.proxies?.[0] === "DIRECT",
         rules,
       };
     })
