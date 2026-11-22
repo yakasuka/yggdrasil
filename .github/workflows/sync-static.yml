@@ -66,7 +66,8 @@ jobs:
                   config-builder/assets/app.css \
                   merge/index.html \
                   sub/index.html \
-                  service.json
+                  service.json \
+                  _redirects
           if git diff --cached --quiet; then
             echo "Static assets already up to date."
             exit 0

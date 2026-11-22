@@ -97,7 +97,12 @@ if (service) {
     `/yggdrasil/config-builder ${service}/config-builder 302`,
   );
 }
-await writeFile(new URL("_redirects", output), redirects.join("\n") + "\n");
+const redirectsText = redirects.join("\n") + "\n";
+await writeFile(new URL("_redirects", output), redirectsText);
+// Both Cloudflare Pages and GitHub Pages publish the repository root, so the
+// redirect rules must live there too. Git-integrated Pages builds read the
+// root _redirects; the dist copy is only used by explicit wrangler deploys.
+await writeFile(new URL("_redirects", repository), redirectsText);
 
 console.log(
   `Static frontend built for Cloudflare Pages and GitHub Pages (no _worker.js).` +
