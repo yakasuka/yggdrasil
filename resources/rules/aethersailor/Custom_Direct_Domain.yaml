@@ -1,7 +1,7 @@
 # GENERATED - DO NOT EDIT. Add your rules to overlays/Custom_Direct_Domain.yaml
 # upstream: Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Direct_Domain.yaml
-# upstream blob: 8c9279b3eb26aa69d60fe7630a8c479e5576e522
-# total: 1306 (upstream 1293, extra 13)
+# upstream blob: c94163f864044d17eb57611e72fe8e7c249ac998
+# total: 1308 (upstream 1295, extra 13)
 payload:
   - '+.00333118.com'
   - '+.0044696.com'
@@ -374,6 +374,7 @@ payload:
   - '+.fengda.me'
   - '+.fengsutb.com'
   - '+.fenno.ai'
+  - '+.fexsqz.com'
   - '+.fffff.games'
   - '+.ffhome.com'
   - '+.fgaiservice.com'
@@ -618,6 +619,7 @@ payload:
   - '+.jiangningwater.com'
   - '+.jiangyuxj.com'
   - '+.jianzhixiaoke.net'
+  - '+.jiaohukejian.com'
   - '+.jiaoyanyun.com'
   - '+.jieyoutsg.com'
   - '+.jieyunwangluokeji.com'
