@@ -63,6 +63,12 @@ test("share controls live in a dialog available from every step", async () => {
   assert.match(html, /id="share-providers"/);
   assert.match(html, /id="share-result"/);
   assert.match(html, /id="share-error"/);
+  // The two buttons open separate panes of one dialog, not one combined menu.
+  // Both panes start hidden and are revealed per mode by openShareDialog().
+  assert.match(html, /id="import-pane"[^>]*hidden/);
+  assert.match(html, /id="export-pane"[^>]*hidden/);
+  assert.match(html, /id="share-title"/);
+  assert.match(html, /id="share-eyebrow"/);
   // The old per-step boxes are gone, so no duplicate IDs are rendered.
   const ctx = { profile: fixture(), inspection: null, service: "ready" };
   assert.doesNotMatch(sourcesPanel(ctx), /share-code-input|import-share/);

@@ -40,8 +40,8 @@
     </script>
     <link rel="icon" href="../assets/favicon.png" type="image/png" />
     <link rel="preload" as="image" href="../assets/favicon.png" />
-    <link rel="stylesheet" href="./assets/app.css?v=dfd3b90e6120" />
-    <script type="module" src="./assets/app.js?v=5849b353b741"></script>
+    <link rel="stylesheet" href="./assets/app.css?v=3f2103466d6d" />
+    <script type="module" src="./assets/app.js?v=02fcf23a8cba"></script>
   </head>
   <body>
     <div
@@ -231,16 +231,18 @@
     <dialog id="share-dialog" class="share-dialog">
       <div class="dialog-header">
         <div>
-          <span class="eyebrow">SHARE CONFIGURATION</span>
-          <h2>分享与导入</h2>
+          <span class="eyebrow" id="share-eyebrow">SHARE CONFIGURATION</span>
+          <h2 id="share-title">分享配置</h2>
         </div>
         <button id="close-share" class="icon-button" aria-label="关闭分享窗口">
           ×
         </button>
       </div>
-      <p class="muted">分享码可在任意步骤生成或导入；生成与读取需要通过订阅服务。</p>
+      <p class="muted" id="share-intro">
+        生成分享码后可发给他人导入；生成需要通过订阅服务。
+      </p>
       <p id="share-error" class="error" role="alert" hidden></p>
-      <section class="share-pane">
+      <section class="share-pane" id="import-pane" hidden>
         <h3>导入配置</h3>
         <label class="field"
           >分享码或分享链接<input
@@ -254,7 +256,7 @@
           导入配置
         </button>
       </section>
-      <section class="share-pane">
+      <section class="share-pane" id="export-pane" hidden>
         <h3>分享当前配置</h3>
         <label class="inline-field"
           ><span>同时包含机场订阅地址（谨慎）</span

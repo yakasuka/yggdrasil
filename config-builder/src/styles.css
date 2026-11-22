@@ -1304,8 +1304,9 @@ dialog::backdrop {
 }
 .share-pane {
   margin-top: 22px;
-  padding-top: 18px;
-  border-top: 1px solid var(--line);
+}
+.share-pane[hidden] {
+  display: none;
 }
 .share-pane h3 {
   margin: 0 0 12px;

@@ -603,12 +603,29 @@ function openShareDialog(pane = "import") {
   const dialog = $("#share-dialog");
   if (!dialog) return;
   shareError("");
+  const exporting = pane === "export";
+  // The two buttons open distinct panes, not one combined menu. Show only the
+  // requested one and tailor the heading/caption so each mode reads cleanly.
+  const importPane = $("#import-pane");
+  const exportPane = $("#export-pane");
+  if (importPane) importPane.hidden = exporting;
+  if (exportPane) exportPane.hidden = !exporting;
+  const eyebrow = $("#share-eyebrow");
+  if (eyebrow)
+    eyebrow.textContent = exporting ? "SHARE CONFIGURATION" : "IMPORT CONFIGURATION";
+  const title = $("#share-title");
+  if (title) title.textContent = exporting ? "分享配置" : "导入配置";
+  const intro = $("#share-intro");
+  if (intro)
+    intro.textContent = exporting
+      ? "生成分享码后可发给他人导入；生成需要通过订阅服务。"
+      : "粘贴分享码或分享链接即可载入配置；读取需要通过订阅服务。";
   const checkbox = $("#share-providers");
   if (checkbox) checkbox.checked = ctx.share.includeProviders;
   const box = $("#share-result");
   if (box) box.innerHTML = shareResult(ctx.share);
   const target = dialog.querySelector(
-    pane === "export" ? "#create-share" : "#share-code-input",
+    exporting ? "#create-share" : "#share-code-input",
   );
   dialog.showModal();
   target?.focus({ preventScroll: true });
