@@ -8,6 +8,7 @@ import { catalog } from "../shared/compiler.js";
 import { probeService } from "../src/service.js";
 import { serviceBase, discoverService, apiFetch } from "../src/config.js";
 import { fileStorage } from "../server/storage.js";
+import { loadConfig } from "../server/config.js";
 import { createService } from "../server/create-server.js";
 import { createWorker } from "../worker/application.js";
 import { profile, text } from "./helpers.mjs";
@@ -101,6 +102,12 @@ test("the static frontend resolves the configured backend and omits credentials"
     else globalThis.location = previousLocation;
     globalThis.fetch = previousFetch;
   }
+});
+
+test("node latency probing is enabled by default and only explicit false turns it off", () => {
+  assert.equal(loadConfig({}).tcpProbeEnabled, true);
+  assert.equal(loadConfig({ TCP_PROBE_ENABLED: "false" }).tcpProbeEnabled, false);
+  assert.equal(loadConfig({ TCP_PROBE_ENABLED: "true" }).tcpProbeEnabled, true);
 });
 
 test("health probes accept self-hosted storage and report the backend links", async () => {

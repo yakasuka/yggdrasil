@@ -74,7 +74,7 @@ export function createWorker(options = {}) {
               format: "mihomo",
               capabilities: {
                 inspect: true,
-                tcp: env.TCP_PROBE_ENABLED === "true",
+                tcp: env.TCP_PROBE_ENABLED !== "false",
               },
             }),
           );
@@ -138,7 +138,7 @@ export function createWorker(options = {}) {
             );
           }
           if (url.pathname === "/api/probe") {
-            if (env.TCP_PROBE_ENABLED !== "true")
+            if (env.TCP_PROBE_ENABLED === "false")
               return out(json({ error: "当前服务未开启连接检测。" }, 503));
             const providers = normalizeProviders(input.providers);
             if (

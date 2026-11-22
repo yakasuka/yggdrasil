@@ -66,7 +66,10 @@ export function loadConfig(source = process.env) {
     dataDir: text(source.DATA_DIR) ? resolve(text(source.DATA_DIR)) : defaultDataDir,
     presetTtl: Number(text(source.PRESET_TTL) || 0) || 0,
     templateURL: text(source.TEMPLATE_URL) || "bundled",
-    tcpProbeEnabled: text(source.TCP_PROBE_ENABLED) === "true",
+    // Node latency probing is on by default; set TCP_PROBE_ENABLED=false to
+    // opt out. The parsed node list shows real connection latency instead of
+    // "未检测" out of the box.
+    tcpProbeEnabled: text(source.TCP_PROBE_ENABLED) !== "false",
   };
 }
 

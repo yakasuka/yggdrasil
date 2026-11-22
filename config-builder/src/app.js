@@ -407,7 +407,10 @@ async function resolveSources() {
     resetPolicies();
     busy = false;
     navigate(1);
-    if (inspection.capabilities.tcp) probeAll(providers, rev);
+    // Always measure node latency after parsing. The service probes node
+    // connectivity by default; a service with probing explicitly disabled
+    // returns 503 and probeAll simply degrades to "未检测".
+    probeAll(providers, rev);
   } catch (e) {
     if (rev === revision) {
       ctx.phase = "error";
