@@ -68,6 +68,28 @@ test("dashboard route renders a sign-in page without a session", async () => {
   assert.match(html, /id="password"/);
 });
 
+test("dashboard ignores a cached Basic header and requires the session cookie", async () => {
+  const { onRequest } = await import(
+    "../../functions/config-builder/dashboard.js"
+  );
+  // A browser that once answered a native Basic prompt keeps sending this
+  // header automatically. After logout the cookie is gone; the stale header
+  // must not let the dashboard re-open.
+  const stale = await onRequest({
+    request: new Request("https://pages.dev/config-builder/dashboard", {
+      headers: {
+        authorization: "Basic " + btoa("admin:yakasuka"),
+      },
+    }),
+    env: {},
+  });
+  assert.equal(stale.status, 200);
+  assert.equal(stale.headers.get("www-authenticate"), null);
+  const html = await stale.text();
+  assert.match(html, /配置管理登录/);
+  assert.doesNotMatch(html, /退出登录/);
+});
+
 test("dashboard page shows generation, expiry and validity columns", () => {
   const html = dashboardHTML({
     linkBase: "https://pages.dev/config-builder",

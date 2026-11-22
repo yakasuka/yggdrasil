@@ -18,10 +18,11 @@ export async function onRequest(context) {
   const service =
     (env && typeof env.SERVICE_BASE_URL === "string" && env.SERVICE_BASE_URL) ||
     DEFAULT_SERVICE;
-  const hasBasic = (request.headers.get("authorization") || "").startsWith(
-    "Basic ",
-  );
-  if (!adminSession(request) && !hasBasic)
+  // Access is granted only by the HttpOnly cookie issued by the sign-in page.
+  // A browser may still carry a Basic credential cached from an earlier native
+  // auth prompt; trusting it would let a stale credential survive sign-out and
+  // keep the dashboard reachable after its cookie has been cleared.
+  if (!adminSession(request))
     return new Response(dashboardLoginHTML(), {
       status: 200,
       headers: {

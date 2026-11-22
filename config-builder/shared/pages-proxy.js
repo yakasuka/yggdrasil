@@ -53,19 +53,18 @@ const FORWARD_RESPONSE_HEADERS = [
 ];
 
 // Admin endpoints (the dashboard shell + its JSON API) need a few headers the
-// subscription proxy deliberately drops: Basic credentials in both directions
-// (Authorization request / WWW-Authenticate challenge) and the Content-Type
-// body for DELETE. Everything runs in the browser's Basic session against the
-// Pages origin; the edge relays it to the self-hosted backend unchanged.
-const ADMIN_REQUEST_HEADERS = [
-  "accept",
-  "authorization",
-  "content-type",
-  "user-agent",
-];
+// subscription proxy deliberately drops: Content-Type for DELETE bodies, and
+// the session credential. The credential is taken ONLY from the HttpOnly cookie
+// set by the sign-in page — never from a request's own Authorization header.
+// A browser can silently attach a Basic credential cached from an old native
+// prompt; forwarding that would defeat sign-out, which only clears the cookie.
+const ADMIN_REQUEST_HEADERS = ["accept", "content-type", "user-agent"];
+// WWW-Authenticate is intentionally NOT relayed. Forwarding the backend's
+// Basic challenge makes the browser open a native auth dialog and cache a
+// credential behind our back — which would silently restore the very access
+// that logout clears. Sign-in happens exclusively through the login page.
 const ADMIN_RESPONSE_HEADERS = [
   "content-type",
-  "www-authenticate",
   "cache-control",
   "content-security-policy",
   "x-content-type-options",
@@ -88,10 +87,11 @@ export async function proxyAdmin(
   // The sign-in form stores the validated Basic credential in an HttpOnly
   // cookie. Translate it back into an Authorization header for the backend so
   // the dashboard can be reloaded and its fetch() calls stay on this origin.
-  if (!headers.has("authorization")) {
-    const session = adminSession(request);
-    if (session) headers.set("authorization", "Basic " + session);
-  }
+  // This is the sole source of admin auth: any Authorization header the browser
+  // attached on its own is deliberately ignored so clearing the cookie at
+  // logout always revokes access.
+  const session = adminSession(request);
+  if (session) headers.set("authorization", "Basic " + session);
 
   const init = { method: request.method, headers, redirect: "manual" };
   if (!["GET", "HEAD"].includes(request.method) && request.body) {

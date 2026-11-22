@@ -111,8 +111,9 @@ test("no extra path layer: upstream is /config-builder, not /yggdrasil/...", asy
   assert.ok(!called.includes("yggdrasil/"));
 });
 
-test("admin proxy relays Basic credentials and the 401 challenge", async () => {
-  const BASIC = "Basic " + Buffer.from("admin:yakasuka").toString("base64");
+test("admin proxy grants access only via the session cookie, never a cached Basic header", async () => {
+  const CRED = Buffer.from("admin:yakasuka").toString("base64");
+  const BASIC = "Basic " + CRED;
   const seen = [];
   const fetcher = async (url, init) => {
     seen.push({ path: url.pathname, auth: init.headers.get("authorization") });
@@ -127,31 +128,37 @@ test("admin proxy relays Basic credentials and the 401 challenge", async () => {
     });
   };
 
+  // No session: 401 is relayed but the Basic challenge is stripped so the
+  // browser never opens a native dialog and re-caches a credential.
   const challenge = await proxyAdmin(
     req("https://pages.dev/config-builder/dashboard"),
     DEFAULT_SERVICE,
     fetcher,
   );
   assert.equal(challenge.status, 401);
-  assert.match(challenge.headers.get("www-authenticate") || "", /Basic/);
+  assert.equal(challenge.headers.get("www-authenticate"), null);
 
-  const ok = await proxyAdmin(
+  // A stale Basic header the browser attached on its own is ignored: after
+  // logout (cookie cleared) this must NOT restore access.
+  const stale = await proxyAdmin(
     req("https://pages.dev/config-builder/dashboard", { authorization: BASIC }),
     DEFAULT_SERVICE,
     fetcher,
   );
-  assert.equal(ok.status, 200);
-  assert.equal(seen[0].path, "/config-builder/dashboard");
-  assert.equal(seen[1].auth, BASIC);
+  assert.equal(stale.status, 401);
+  assert.equal(seen[1].auth, null, "cached Basic header must not be forwarded");
 
+  // Only the HttpOnly cookie grants access.
   const viaCookie = await proxyAdmin(
     req("https://pages.dev/config-builder/dashboard", {
-      cookie: "other=1; ygg_admin=" + encodeURIComponent(BASIC.slice(6)),
+      cookie: "other=1; ygg_admin=" + encodeURIComponent(CRED),
+      authorization: BASIC,
     }),
     DEFAULT_SERVICE,
     fetcher,
   );
   assert.equal(viaCookie.status, 200);
+  assert.equal(seen[2].path, "/config-builder/dashboard");
   assert.equal(seen[2].auth, BASIC);
 });
 
@@ -170,7 +177,7 @@ test("admin proxy forwards the admin API path and DELETE body", async () => {
     new Request("https://pages.dev/api/admin/configs", {
       method: "DELETE",
       headers: {
-        authorization: "Basic abc",
+        cookie: "ygg_admin=" + encodeURIComponent("YWJjOmRlZg=="),
         "content-type": "application/json",
       },
       body,
