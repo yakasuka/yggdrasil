@@ -98,7 +98,7 @@ The project is led and maintained by [yakasuka](https://github.com/yakasuka). Th
 | [github-actions[bot]](https://github.com/apps/github-actions) | Automated rules and catalog sync |
 | [dependabot[bot]](https://github.com/apps/dependabot) | Dependency updates |
 
-GitHub's sidebar Contributors list is aggregated from commit authors and `Co-authored-by` co-authors. Individual accounts use their own signature emails, so their avatars and profile links display correctly. Organization-level upstreams (such as Mihomo / AdGuard / ACL4SSR) are credited below.
+GitHub's sidebar Contributors list is aggregated from commit authors and `Co-authored-by` co-authors. Individual accounts use their own signature emails, so their avatars and profile links display correctly. Cursor Agent is credited via `Co-authored-by: Cursor Agent <199161495+cursoragent@users.noreply.github.com>` and appears in that list. Organization-level upstreams (such as Mihomo / AdGuard / ACL4SSR) are credited below.
 
 ## Acknowledgments
 

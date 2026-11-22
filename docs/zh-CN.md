@@ -259,7 +259,7 @@ Geo 数据分类、补充规则源、节点订阅和出口策略分别维护。�
 | [github-actions[bot]](https://github.com/apps/github-actions) | 规则与目录自动同步 |
 | [dependabot[bot]](https://github.com/apps/dependabot) | 依赖更新 |
 
-GitHub 侧栏的 Contributors 列表由提交作者与 `Co-authored-by` 共同作者聚合；个人账号使用各自的署名邮箱，因此头像与主页可正确显示。组织类上游（如 Mihomo / AdGuard / ACL4SSR）见下方致谢。
+GitHub 侧栏的 Contributors 列表由提交作者与 `Co-authored-by` 共同作者聚合；个人账号使用各自的署名邮箱，因此头像与主页可正确显示。Cursor Agent 以 `Co-authored-by: Cursor Agent <199161495+cursoragent@users.noreply.github.com>` 署名计入该列表。组织类上游（如 Mihomo / AdGuard / ACL4SSR）见下方致谢。
 
 ### 致谢与参考
 
