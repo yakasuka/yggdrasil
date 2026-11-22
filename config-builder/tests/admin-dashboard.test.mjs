@@ -161,7 +161,11 @@ test("dashboard builds links from the real password, not a placeholder", () => {
   const html = dashboardHTML({ linkBase: FRONTEND + "/config-builder" });
   // The old placeholder encoded to %3C%E5%9C%A8... and must be gone.
   assert.ok(!html.includes("在生成时设置的口令"));
-  assert.ok(html.includes("encodeURIComponent(row.pwd || \"\")"));
+  assert.ok(html.includes("encodeURIComponent(row.pwd)"));
+  // Legacy protected records without a stored password get an honest note,
+  // never an empty pwd= link that would 404.
+  assert.ok(html.includes("旧配置：当时未记录口令"));
+  assert.ok(!html.includes("row.pwd ||"));
 });
 
 test("legacy name+password deletion still works alongside id deletion", async () => {

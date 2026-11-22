@@ -69,8 +69,12 @@ var body = document.getElementById("body");
 var status = document.getElementById("status");
 function el(tag, text){var n=document.createElement(tag);if(text!=null)n.textContent=text;return n}
 function linkFor(row){
+  // Old password-protected records were created before the plaintext was
+  // stored, so their real password is unrecoverable. Show an honest note
+  // instead of an empty pwd= link that would 404.
+  if(row.hasPwd && !row.pwd) return "旧配置：当时未记录口令，无法重建链接（删除后可重建）";
   var parts = CFG.linkBase + "?token=" + encodeURIComponent(row.token);
-  if(row.hasPwd) parts += "&pwd=" + encodeURIComponent(row.pwd || "");
+  if(row.hasPwd) parts += "&pwd=" + encodeURIComponent(row.pwd);
   return parts;
 }
 function render(rows){
