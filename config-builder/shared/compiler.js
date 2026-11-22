@@ -130,7 +130,7 @@ export function normalizeProviders(input) {
     const name = typeof v?.name === "string" ? v.name.trim() : "",
       raw = typeof v?.url === "string" ? v.url.trim() : "";
     if (!name || name.length > 40 || /[\x00-\x1f]/.test(name))
-      fail(`第 ${i + 1} 个机场名称需要 1–40 个字符。`, "providers");
+      fail(`第 ${i + 1} 个订阅名称需要 1–40 个字符。`, "providers");
     let url;
     try {
       url = new URL(raw);
@@ -146,7 +146,7 @@ export function normalizeProviders(input) {
       fail("订阅地址需要有效的 HTTP / HTTPS 链接。", "providers");
     url.hash = "";
     if (names.has(name.toLowerCase()) || urls.has(url.href))
-      fail("机场名称或订阅链接重复。", "providers");
+      fail("订阅名称或订阅链接重复。", "providers");
     names.add(name.toLowerCase());
     urls.add(url.href);
     return { name, url: url.href };

@@ -20,7 +20,7 @@
 
 | 功能 | 维护入口 |
 | --- | --- |
-| 机场名称、链接及 P1/P2 | `src/panels/sources.js`、`src/app.js` |
+| 订阅名称、链接及 P1/P2 | `src/panels/sources.js`、`src/app.js` |
 | 后端地址解析、跨源请求、健康检查与重试 | `src/config.js`、`src/app.js`、`src/service.js`、`index.html` |
 | Base64、YAML 和协议链接转换 | `shared/subscription.js` |
 | 脱敏节点清单、地区匹配、流量汇总 | `shared/nodes.js` |
