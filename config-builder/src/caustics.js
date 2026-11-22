@@ -186,10 +186,9 @@ function waterSurface() {
 }
 
 if (canvas && hero && stage) {
-  const skip = root.dataset.intro === "skip" || reduced.matches;
-  try {
-    localStorage.setItem("yggdrasil:config-builder:intro-seen", "yes");
-  } catch {}
+  // index.html already resolved the intro decision (including the ?intro
+  // override and reduced-motion), so honour it here without a second check.
+  const skip = root.dataset.intro === "skip";
   if (skip) {
     hero.append(canvas);
     hero.classList.add("is-visible");

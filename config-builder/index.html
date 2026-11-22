@@ -15,22 +15,18 @@
     <title>config-builder · Yggdrasil</title>
     <script>
       (() => {
-        let seen = false;
         try {
-          seen =
-            localStorage.getItem("yggdrasil:config-builder:intro-seen") ===
-            "yes";
           document.documentElement.dataset.theme =
             localStorage.getItem("yggdrasil:config-builder:theme") === "light"
               ? "light"
               : "dark";
         } catch {}
-        const reload =
-          performance.getEntriesByType("navigation")[0]?.type === "reload";
+        // The full-screen water intro plays on every visit. Use ?intro=off to
+        // skip it; ?intro=1 forces it even when the OS prefers reduced motion.
+        const choice = new URLSearchParams(location.search).get("intro");
+        const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
         document.documentElement.dataset.intro =
-          seen ||
-          reload ||
-          matchMedia("(prefers-reduced-motion: reduce)").matches
+          choice === "off" || (reduced && choice !== "1")
             ? "skip"
             : "pending";
       })();
@@ -38,7 +34,7 @@
     <link rel="icon" href="../assets/favicon.png" type="image/png" />
     <link rel="preload" as="image" href="../assets/favicon.png" />
     <link rel="stylesheet" href="./assets/app.css?v=83f4c1793bd5" />
-    <script type="module" src="./assets/app.js?v=fa3d6b5ed64a"></script>
+    <script type="module" src="./assets/app.js?v=7bd328b8fe18"></script>
   </head>
   <body>
     <div
