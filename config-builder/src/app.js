@@ -23,7 +23,7 @@ import {
   apiFetch,
   publicLinkBase,
 } from "./config.js";
-import { esc } from "./ui.js";
+import { esc, latencyPill } from "./ui.js";
 import { renderEmoji } from "./emoji.js";
 import {
   sourcesPanel,
@@ -454,9 +454,7 @@ async function probeAll(providers, rev) {
       if (step === 1)
         for (const item of data.nodes) {
           const cell = document.querySelector(`[data-latency="${item.id}"]`);
-          if (cell)
-            cell.textContent =
-              item.latencyMs === null ? "未检测" : item.latencyMs + " ms";
+          if (cell) cell.innerHTML = latencyPill(item.latencyMs);
         }
     } catch {
       break;

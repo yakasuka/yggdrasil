@@ -8,6 +8,34 @@ export const esc = (value) =>
   );
 export const checked = (value) => (value ? " checked" : "");
 export const selected = (value) => (value ? " selected" : "");
+
+// Latency health tiers, shared by the initial table render and the live
+// url-test update so both show the same colour-coded capsule.
+//   null / no probe -> 未检测 · grey
+//   < 150ms        -> 顺畅   · green
+//   < 400ms        -> 良好   · blue
+//   < 800ms        -> 堵塞   · amber
+//   >= 800ms       -> 超时   · red
+export function latencyTone(ms) {
+  if (ms === null || ms === undefined || !Number.isFinite(ms))
+    return { tone: "idle", label: "未检测" };
+  if (ms < 150) return { tone: "good", label: "顺畅" };
+  if (ms < 400) return { tone: "ok", label: "良好" };
+  if (ms < 800) return { tone: "congested", label: "堵塞" };
+  return { tone: "timeout", label: "超时" };
+}
+export function latencyPill(ms) {
+  const { tone, label } = latencyTone(ms);
+  const value = Number.isFinite(ms) ? `${Math.round(ms)} ms` : "—";
+  return `<span class="latency-pill latency-pill--${tone}" title="${label}"><i aria-hidden="true"></i><b>${value}</b><small>${label}</small></span>`;
+}
+export const latencyLegend = () =>
+  ["good", "ok", "congested", "timeout"]
+    .map(
+      (tone) =>
+        `<span class="latency-pill latency-pill--${tone}"><i aria-hidden="true"></i>${latencyTone({ good: 80, ok: 300, congested: 600, timeout: 1200 }[tone]).label}</span>`,
+    )
+    .join("");
 export const title = (heading, description) =>
   `<h2 class="panel-title">${heading}</h2><p class="panel-description">${description}</p>`;
 export const notice = (text, warning = false) =>

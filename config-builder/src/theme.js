@@ -14,7 +14,8 @@ function apply() {
   root.dataset.theme = theme;
   const light = theme === "light";
   toggle.setAttribute("aria-label", `切换到${light ? "深色" : "浅色"}模式`);
-  toggle.querySelector("#theme-toggle-icon").textContent = light ? "☾" : "☀︎";
+  // The sun/moon SVG is switched purely by CSS via :root[data-theme], so no
+  // textContent write here — that would destroy the inline SVG.
   toggle.querySelector("#theme-toggle-label").textContent = light ? "深色" : "浅色";
 }
 
