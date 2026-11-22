@@ -214,3 +214,25 @@ test("Base64 IP subscriptions produce inline Mihomo YAML and survive encrypted K
   assert.equal(config["proxy-providers"], undefined);
   assert.ok(!yaml.includes("fixture-only"));
 });
+
+test("subscription fetch rotates User-Agent when a panel rejects the first client", async () => {
+  const body = Buffer.from(source, "utf8");
+  const seen = [];
+  const client = subscriptionClient({
+    resolver: async () => ["8.8.8.8"],
+    fetcher: async (_url, init) => {
+      const ua = init.headers["User-Agent"];
+      seen.push(ua);
+      if (ua === "mihomo/Configurator")
+        return new Response("blocked", { status: 403 });
+      return new Response(body, { status: 200 });
+    },
+  });
+  const records = await client.inspect([{ name: "ua-test", url: endpoint }]);
+  assert.equal(records[0].error, undefined);
+  assert.ok(records[0].nodes.length > 0);
+  assert.deepEqual(seen, [
+    "mihomo/Configurator",
+    "Clash-for-Windows_1.0.0",
+  ]);
+});

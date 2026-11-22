@@ -195,3 +195,22 @@ test("Pages uses a bounded per-IP request budget when native rate bindings are a
   other.headers.set("CF-Connecting-IP", "203.0.113.77");
   assert.equal((await service.fetch(other, env)).status, 201);
 });
+
+test("a Base64 node list embedded in a YAML field is decoded", () => {
+  const inner = [vmess("🇭🇰 香港 01"), ss("🇺🇸 美国 02")].join("\n");
+  const doc = `proxies: "${b64(inner)}"\n`;
+  const result = parseSubscription(doc);
+  assert.equal(result.format, "base64-yaml");
+  assert.equal(result.proxies.length, 2);
+  assert.equal(result.proxies[0].name, "🇭🇰 香港 01");
+  assert.equal(result.proxies[1].name, "🇺🇸 美国 02");
+});
+
+test("a Base64 YAML embedded in payload is decoded too", () => {
+  const inner =
+    "proxies:\n  - {name: embedded, type: socks5, server: x.example.com, port: 1080}\n";
+  const doc = `payload: ${b64(inner)}\n`;
+  const result = parseSubscription(doc);
+  assert.equal(result.proxies.length, 1);
+  assert.equal(result.proxies[0].name, "embedded");
+});

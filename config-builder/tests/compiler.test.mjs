@@ -69,10 +69,16 @@ test("an empty module selection keeps only APP rules, MATCH and valid references
   p.modules = [];
   const { config } = await compile(p);
   assertReferences(config);
-  // Every RULE-SET rule belongs to a module (direct-extra / proxy-extra /
-  // ports); with all modules off none should remain, and rule-providers too.
-  assert.ok(config.rules.every((r) => !r.startsWith("RULE-SET,")));
-  assert.equal(config["rule-providers"], undefined);
+  // Module-scoped RULE-SET rules (direct-extra / proxy-extra / ports) all
+  // disappear. APP-scoped RULE-SET rules stay, because an APP can itself be
+  // implemented as a rule set (e.g. 广告拦截 / adguard) — APP routing is not
+  // module-scoped.
+  const appRuleSets = new Set(catalog.apps.map((a) => a.rules).flat().filter((r) => r.startsWith("RULE-SET,")));
+  assert.ok(
+    config.rules
+      .filter((r) => r.startsWith("RULE-SET,"))
+      .every((r) => appRuleSets.has(r)),
+  );
   assert.ok(config.rules.some((r) => r.startsWith("MATCH,")));
   // APP routing rules still work because they are not module-scoped.
   assert.ok(config.rules.some((r) => r.includes("👾 Steam")));

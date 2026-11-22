@@ -274,6 +274,61 @@ export function parseSubscription(input) {
         : Array.isArray(data)
           ? data
           : [];
+    // Some panels wrap the node list as a Base64 string inside a YAML field
+    // (e.g. `proxies: "<base64>"` or `payload: <base64>`). Decode it and parse
+    // the inner URI list / YAML so those subscriptions work too.
+    if (!proxies.length) {
+      const embedded =
+        typeof data?.proxies === "string"
+          ? data.proxies
+          : typeof data?.payload === "string"
+            ? data.payload
+            : "";
+      if (embedded.trim()) {
+        let inner = embedded.trim();
+        for (let i = 0; i < 3; i++) {
+          let next;
+          try {
+            next = decode(inner).trim();
+          } catch {
+            break;
+          }
+          if (next === inner) break;
+          inner = next;
+        }
+        if (protocols.test(inner)) {
+          const lines = inner
+            .split(/\r?\n/)
+            .map((s) => s.trim())
+            .filter((s) => s && !s.startsWith("#"));
+          proxies = [];
+          for (const line of lines) {
+            try {
+              if (protocols.test(line)) proxies.push(uri(line));
+            } catch {
+              skipped++;
+            }
+          }
+        } else {
+          try {
+            const nested = parse(inner, {
+              merge: true,
+              maxAliasCount: 100,
+              logLevel: "silent",
+              prettyErrors: false,
+            });
+            proxies = Array.isArray(nested?.proxies)
+              ? nested.proxies
+              : Array.isArray(nested?.payload)
+                ? nested.payload
+                : Array.isArray(nested)
+                  ? nested
+                  : [];
+          } catch {}
+        }
+        if (proxies.length) encoded = true;
+      }
+    }
     format = encoded ? "base64-yaml" : "mihomo";
   }
   if (proxies.length > 2000) throw Error("订阅最多支持 2000 个节点。");

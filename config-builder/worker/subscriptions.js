@@ -30,6 +30,17 @@ export async function readLimited(response, max = MAX_SUBSCRIPTION_BYTES) {
   }
   return new TextDecoder().decode(data);
 }
+// Some airport panels reject clients by User-Agent or return a transient 4xx/5xx
+// to a first request. Rotate through common proxy-client and browser agents so a
+// subscription that only answers to one of them can still be read. The body is
+// never cached across agents; only the successful response is returned.
+const USER_AGENTS = [
+  "mihomo/Configurator",
+  "Clash-for-Windows_1.0.0",
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+];
+const RETRYABLE_STATUS = new Set([401, 403, 406, 429, 500, 502, 503, 504]);
+
 export async function mapLimit(values, limit, fn) {
   const results = new Array(values.length);
   let next = 0;
@@ -85,28 +96,34 @@ export function subscriptionClient({
     let url = value;
     for (let redirects = 0; redirects < 3; redirects++) {
       const safe = await guard(url);
-      const response = await (literalIP(safe.hostname) ? requestIP : fetcher)(
-        safe,
-        {
+      const fetch = literalIP(safe.hostname) ? requestIP : fetcher;
+      let response;
+      // Try each agent until one is accepted (2xx) or the status is not a
+      // transient/UA-rejection code. Redirects are handled once below.
+      for (let attempt = 0; attempt < USER_AGENTS.length; attempt++) {
+        response = await fetch(safe, {
           method,
           redirect: "manual",
           headers: {
-            "User-Agent": "mihomo/Configurator",
+            "User-Agent": USER_AGENTS[attempt],
             Accept: "application/yaml,text/yaml,text/plain;q=0.9,*/*;q=0.5",
+            "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
           },
           signal: AbortSignal.timeout(12000),
-        },
-      );
+        });
+        if (response.ok || (response.status >= 300 && response.status < 400))
+          break;
+        const retryable = RETRYABLE_STATUS.has(response.status);
+        await response.body?.cancel();
+        if (!retryable || attempt === USER_AGENTS.length - 1)
+          throw Error("订阅服务器未返回可用内容。");
+      }
       if (response.status >= 300 && response.status < 400) {
         await response.body?.cancel();
         if (redirects === 2 || !response.headers.get("Location"))
           throw Error("订阅重定向不可用。");
         url = new URL(response.headers.get("Location"), safe).href;
         continue;
-      }
-      if (!response.ok) {
-        await response.body?.cancel();
-        throw Error("订阅服务器未返回可用内容。");
       }
       return response;
     }

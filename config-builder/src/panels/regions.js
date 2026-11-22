@@ -14,7 +14,7 @@ export function regionsPanel(ctx) {
           true,
         )
       : "") +
-    `<div class="toolbar"><span class="muted">${nodes.length} 个节点 · ${regions.length} 个地区</span><div class="toolbar-actions"><button class="text-button" data-regions="all">全部保留</button><button class="text-button" data-regions="none">全部取消</button></div></div><div class="region-grid">${regions.map((r) => `<label class="region-choice"><input type="checkbox" data-region="${r.id}"${checked(r.id === "OTHER" ? ctx.profile.other : ctx.profile.countries.includes(r.id))}><span class="flag" aria-hidden="true">${esc(r.flag)}</span><span>${esc(r.label)} <small>${r.count}</small></span></label>`).join("")}</div>` +
+    `<div class="toolbar"><span class="muted">${nodes.length} 个节点 · ${regions.length} 个地区</span><div class="toolbar-actions"><button class="text-button" data-regions="all">全部保留</button><button class="text-button" data-regions="none">全部取消</button></div></div><div class="region-bars">${regions.map((r) => `<label class="region-bar"><input type="checkbox" data-region="${r.id}"${checked(r.id === "OTHER" ? ctx.profile.other : ctx.profile.countries.includes(r.id))}>${r.icon ? `<img class="region-flag" src="${esc(r.icon)}" alt="" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'flag',textContent:'${esc(r.flag)}'}))">` : `<span class="flag" aria-hidden="true">${esc(r.flag)}</span>`}<span class="region-name">${esc(r.label)}</span><small class="region-count">${r.count}</small></label>`).join("")}</div>` +
     notice(
       "地区根据节点名称匹配。TCP 连接耗时从服务器测量，不代表经过代理隧道后的实际访问延迟。",
     ) +

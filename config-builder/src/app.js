@@ -18,6 +18,7 @@ import {
 } from "./service.js";
 import { serviceBase, discoverService, apiFetch } from "./config.js";
 import { esc } from "./ui.js";
+import { renderEmoji } from "./emoji.js";
 import {
   sourcesPanel,
   providerCard,
@@ -187,17 +188,22 @@ function footer() {
     .querySelectorAll("[data-remove]")
     .forEach((button) => (button.disabled = busy));
 }
+function showResult() {
+  $("#result-area").innerHTML = resultPanel(result);
+  renderEmoji($("#result-area"));
+}
 function render() {
   renderNav();
   $("#step-caption").textContent =
     `STEP ${String(step + 1).padStart(2, "0")} / ${String(steps.length).padStart(2, "0")}`;
   $("#panel").innerHTML = panels[step](ctx);
+  renderEmoji($("#panel"));
   clearError();
   footer();
   filterApps();
   if (step === FINAL_STEP) {
     updateSummary();
-    if (result) $("#result-area").innerHTML = resultPanel(result);
+    if (result) showResult();
   }
 }
 function filterApps() {
@@ -462,7 +468,7 @@ async function generate() {
     result = { ...data, url: subscriptionURL(data.url, serviceBase()) };
     result.usageUrl = result.url.replace(/\.yaml$/, "/status");
     celebrate($("#next"));
-    $("#result-area").innerHTML = resultPanel(result);
+    showResult();
     $("#result-area").scrollIntoView({
       block: "nearest",
       behavior: matchMedia("(prefers-reduced-motion:reduce)").matches
@@ -682,7 +688,7 @@ document.addEventListener("click", async (e) => {
       if (!response.ok) throw Error();
       const data = await response.json();
       result = { ...result, ...data };
-      $("#result-area").innerHTML = resultPanel(result);
+      showResult();
     } catch {
       toast("流量暂时无法刷新，请稍后重试");
       el.disabled = false;
