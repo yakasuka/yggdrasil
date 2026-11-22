@@ -93,6 +93,7 @@ The project is led and maintained by [yakasuka](https://github.com/yakasuka). Th
 | [Fndroid](https://github.com/Fndroid) | Client ecosystem reference |
 | [Codex](https://github.com/codex) | Configuration organization and scripting |
 | [Claude](https://github.com/claude) | Code and documentation collaboration |
+| [Cursor Agent](https://github.com/cursoragent) | AI assistant: code and documentation collaboration |
 | [Eaibee Kitajima](https://github.com/EaibeeKitajima) | Early rules and configuration contributions |
 | [github-actions[bot]](https://github.com/apps/github-actions) | Automated rules and catalog sync |
 | [dependabot[bot]](https://github.com/apps/dependabot) | Dependency updates |

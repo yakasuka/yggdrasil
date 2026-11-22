@@ -95,6 +95,7 @@ Yggdrasil 是一套面向 **Mihomo / Clash / OpenClash / Clash Verge** 的配置
   <a href="https://github.com/yakasuka"><img src="https://avatars.githubusercontent.com/u/39859629?v=4" width="40" height="40" alt="yakasuka" /></a>&nbsp;
   <a href="https://github.com/codex"><img src="https://avatars.githubusercontent.com/u/267193182?v=4" width="40" height="40" alt="Codex" /></a>&nbsp;
   <a href="https://github.com/claude"><img src="https://avatars.githubusercontent.com/u/81847?v=4" width="40" height="40" alt="Claude" /></a>&nbsp;
+  <a href="https://github.com/cursoragent"><img src="https://avatars.githubusercontent.com/u/199161495?v=4" width="40" height="40" alt="Cursor Agent" /></a>&nbsp;
   <a href="https://github.com/EaibeeKitajima"><img src="https://avatars.githubusercontent.com/u/105159380?v=4" width="40" height="40" alt="Eaibee Kitajima" /></a>&nbsp;
   <a href="https://github.com/tobyxdd"><img src="https://avatars.githubusercontent.com/u/1414953?v=4" width="40" height="40" alt="tobyxdd" /></a>&nbsp;
   <a href="https://github.com/Zephyruso"><img src="https://avatars.githubusercontent.com/u/176294927?v=4" width="40" height="40" alt="Zephyruso" /></a>&nbsp;

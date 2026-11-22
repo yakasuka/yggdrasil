@@ -254,6 +254,7 @@ Geo 数据分类、补充规则源、节点订阅和出口策略分别维护。�
 | [Fndroid](https://github.com/Fndroid) | 客户端生态参考 |
 | [Codex](https://github.com/codex) | 配置整理与脚本编写 |
 | [Claude](https://github.com/claude) | 代码与文档协作 |
+| [Cursor Agent](https://github.com/cursoragent) | AI 助手：代码与文档协作 |
 | [Eaibee Kitajima](https://github.com/EaibeeKitajima) | 早期规则与配置贡献 |
 | [github-actions[bot]](https://github.com/apps/github-actions) | 规则与目录自动同步 |
 | [dependabot[bot]](https://github.com/apps/dependabot) | 依赖更新 |
