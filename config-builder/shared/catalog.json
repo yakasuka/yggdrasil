@@ -10,6 +10,7 @@
     "final": "🏁 Final",
     "other": "🌌",
     "otherGroupName": "🌌 Others",
+    "otherIcon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/others.png",
     "ports": "🔌 特殊端口",
     "hermes": "✨ Hermes",
     "china": "🏯 China"
@@ -862,5 +863,5 @@
       "module": "proxy-extra"
     }
   ],
-  "version": "e196d491e0a0"
+  "version": "376defb3f450"
 }

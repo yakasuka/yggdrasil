@@ -18,12 +18,19 @@ export function classifyNodes(nodes, model) {
 export function regionInventory(nodes, model) {
   return [
     ...model.regions,
-    { id: "OTHER", label: "其他地区", flag: "🌐", name: model.groups.other },
+    {
+      id: "OTHER",
+      label: "其他地区",
+      flag: "🌐",
+      name: model.groups.other,
+      icon: model.groups.otherIcon || "",
+    },
   ]
     .map((r) => ({
       id: r.id,
       label: r.label,
       flag: r.flag,
+      ...(r.icon ? { icon: r.icon } : {}),
       count: nodes.filter((n) => n.region === r.id).length,
     }))
     .filter((r) => r.count > 0);

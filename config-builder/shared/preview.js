@@ -43,6 +43,9 @@ export function selectableRegions(model, inspection) {
       label: "其他地区",
       flag: "🌐",
       name: model.groups.other,
+      // Prefer the template's 🌌 Others icon (macOSicons); fall back to the
+      // generic globe only when the template defines no icon.
+      icon: model.groups.otherIcon || "",
     }),
   ];
 }

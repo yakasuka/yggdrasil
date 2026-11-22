@@ -61,6 +61,23 @@ test("all template regions stay selectable even when the subscription has only a
   assert.doesNotMatch(apps, /value="region:SG"/); // not selected
 });
 
+test("OTHER region uses the template's macOSicons icon, not a generic globe", () => {
+  const list = selectableRegions(catalog, null);
+  const other = list.find((r) => r.id === "OTHER");
+  assert.ok(other.icon, "OTHER carries an icon from the template");
+  assert.match(other.icon, /assets\/icons\/others\.png/);
+  assert.equal(catalog.groups.otherIcon, other.icon);
+  // The regions panel renders that icon as an <img> rather than a flag span.
+  const profile = defaults(catalog);
+  profile.other = true;
+  const html = regionsPanel({
+    profile,
+    inspection: { providers: [], nodes: [], regions: [], capabilities: {} },
+    preview: false,
+  });
+  assert.match(html, /region-flag/);
+});
+
 test("wizard exposes an early-configuration entry and unlocked steps", async () => {
   const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
   assert.match(html, /id="skip-sources"/);

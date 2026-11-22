@@ -92,6 +92,9 @@ export async function catalogFromYaml(text) {
     final,
     other: leadingIcon(othersGroup?.name) || "🌌",
     otherGroupName: othersGroup?.name || "🌌 Others",
+    // The template's 🌌 Others group carries its own macOSicons icon. Keep it
+    // so the "其他地区" row shows the author's icon instead of a generic globe.
+    otherIcon: othersGroup?.icon || "",
     ports,
     hermes,
     china,
