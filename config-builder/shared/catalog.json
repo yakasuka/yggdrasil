@@ -97,7 +97,7 @@
       "id": "Hermes",
       "name": "✨ Hermes",
       "label": "Hermes",
-      "category": "策略入口",
+      "category": "AI 与开发",
       "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/hermes.png",
       "firstProxyDirect": false,
       "entry": true,
@@ -509,16 +509,6 @@
       "rules": [
         "RULE-SET,❎ AdGuard,❎ 广告拦截"
       ]
-    },
-    {
-      "id": "Others",
-      "name": "🌌 Others",
-      "label": "Others",
-      "category": "策略入口",
-      "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/others.png",
-      "firstProxyDirect": false,
-      "entry": true,
-      "rules": []
     }
   ],
   "orderedRules": [
@@ -872,5 +862,5 @@
       "module": "proxy-extra"
     }
   ],
-  "version": "df30bb35238a"
+  "version": "e196d491e0a0"
 }

@@ -77,6 +77,17 @@ test("rule-less switch groups from the YAML are shown as entry pickers (Hermes)"
   );
 });
 
+test("Others is a region group, not an APP; Hermes is categorised as AI", async () => {
+  const derived = await catalogFromYaml(template);
+  // 🌌 Others selects nodes outside the six filter-defined countries. It is
+  // surfaced on the regions page (core.other), never as an APP switch card.
+  assert.ok(!derived.apps.some((a) => a.name.includes("Others")));
+  assert.equal(derived.groups.otherGroupName, "🌌 Others");
+  const hermes = derived.apps.find((a) => a.name.includes("Hermes"));
+  assert.equal(hermes.category, "AI 与开发", "Hermes belongs to the AI group");
+  assert.equal(hermes.entry, true, "Hermes stays a rule-less switch entry");
+});
+
 test("rule-set names in the catalog match the template rule-providers", async () => {
   const derived = await catalogFromYaml(template);
   const names = derived.providerModules.map((p) => p.name);

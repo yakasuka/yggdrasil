@@ -17,7 +17,7 @@ const REGION_LABELS = {
 };
 
 const category = (name) =>
-  /OpenAI|Anthropic|AI/.test(name)
+  /OpenAI|Anthropic|Hermes|AI/.test(name)
     ? "AI 与开发"
     : /OKX|Binance|Bybit|Crypto|Coin|Cryptocurrency/.test(name)
       ? "数字资产"
@@ -169,7 +169,13 @@ export async function catalogFromYaml(text) {
     final,
     ports,
     china,
+    // 🌌 Others is a REGION node group (it selects nodes outside the six
+    // filter-defined countries), not an APP switch. It is surfaced on the
+    // regions page as the "其他地区" option via core.other, so exclude its
+    // full template name from the APP list — matching only the leading icon
+    // ("🌌") left "🌌 Others" leaking into the APP picker.
     leadingIcon(othersGroup?.name),
+    ...(othersGroup ? [othersGroup.name] : []),
     "🏮",
     ...regionGroups.map((g) => g.name),
     ...strategyGroups.map((g) => g.name),
@@ -182,11 +188,19 @@ export async function catalogFromYaml(text) {
       // A rule-less select group is a switch/entry (e.g. ✨ Hermes). Give it a
       // stable id from its group name so it survives in profiles and shares.
       const isEntry = rules.length === 0;
+      // Entries still go through the classifier so Hermes lands under the AI
+      // category where the user expects it. Only entries the classifier cannot
+      // place fall back to the generic "策略入口" bucket.
+      const derivedCategory = category(g.name);
       return {
         id: meta.id || rules[0]?.split(",")[1] || stripIcon(g.name),
         name: g.name,
         label: meta.label || stripIcon(g.name),
-        category: meta.category || (isEntry ? "策略入口" : category(g.name)),
+        category:
+          meta.category ||
+          (isEntry && derivedCategory === "其他服务"
+            ? "策略入口"
+            : derivedCategory),
         icon: g.icon || "",
         // Preserve the template's initial option (some apps start at DIRECT).
         firstProxyDirect: g.proxies?.[0] === "DIRECT",
