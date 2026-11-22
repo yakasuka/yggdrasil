@@ -218,7 +218,7 @@ button:active:not(:disabled),
   overflow: hidden;
   isolation: isolate;
   color: #fff;
-  background: #07313b;
+  background: #061a2e;
 }
 #caustic-water {
   position: absolute;
@@ -228,16 +228,16 @@ button:active:not(:disabled),
   display: block;
   background: radial-gradient(
     ellipse at 68% 36%,
-    #286b72,
-    #063b49 55%,
-    #071a28
+    #1a5a8f,
+    #072c4d 55%,
+    #050f22
   );
 }
 #caustic-water.caustic-fallback {
   background:
-    radial-gradient(ellipse at 24% 45%, #61c9bb66, transparent 33%),
-    radial-gradient(ellipse at 68% 52%, #82d6c966, transparent 36%),
-    linear-gradient(145deg, #071b2a, #07505b 55%, #092a3b);
+    radial-gradient(ellipse at 24% 45%, #4fa8ff66, transparent 33%),
+    radial-gradient(ellipse at 68% 52%, #a4e5ff66, transparent 36%),
+    linear-gradient(145deg, #06152b, #0b3f6b 55%, #071d3a);
 }
 .caustic-hero::after {
   content: "";
@@ -1273,14 +1273,14 @@ noscript {
   z-index: 100;
   inset: 0;
   overflow: hidden;
-  background: #07313b;
+  background: #061a2e;
 }
 .loading-copy {
   gap: 16px;
   padding: 24px;
-  color: #f5fcfa;
+  color: #f2f9ff;
   text-align: center;
-  text-shadow: 0 2px 24px #04101680;
+  text-shadow: 0 2px 24px #030d1c80;
 }
 .loading-copy > * {
   opacity: 0;

@@ -60,14 +60,21 @@ function waterSurface() {
       float f = field(p, time);
       float caustic = pow(max(0.0, cos(f * 1.42)), 9.0);
       float wide = pow(max(0.0, cos(f * 0.7 + 1.2)), 5.0) * 0.2;
+      // Thin, fast-moving threads make the surface read as clear water rather
+      // than a flat gel; the glint layer adds small white-blue specks.
+      float thin = pow(max(0.0, cos(f * 3.1 - time * 0.9)), 18.0) * 0.34;
+      float glint = pow(max(0.0, sin(f * 6.4 + time * 2.6) * sin(p.x * 1.8 - p.y * 1.3 - time * 1.7)), 24.0);
+      float sparkle = glint * (0.25 + caustic * 0.75);
+      float pulse = 0.88 + 0.12 * sin(time * 1.6 + f * 0.4);
       float edge = smoothstep(0.0, 0.17, uv.y) * smoothstep(0.0, 0.12, 1.0 - uv.y);
-      vec3 deep = vec3(0.018, 0.115, 0.17);
-      vec3 lagoon = vec3(0.025, 0.29, 0.34);
-      vec3 light = vec3(0.38, 0.91, 0.82);
-      vec3 water = mix(deep, lagoon, (0.5 + 0.5 * sin(f * 0.48 + 1.1)) * 0.75);
-      water += light * (caustic * 0.58 + wide * 0.25 + shimmer) * edge;
-      water += vec3(0.035, 0.1, 0.13) * uv.y;
-      color = vec4(water, 1.0);
+      vec3 deep = vec3(0.010, 0.035, 0.105);
+      vec3 azure = vec3(0.020, 0.165, 0.365);
+      vec3 light = vec3(0.70, 0.94, 1.0);
+      vec3 water = mix(deep, azure, (0.5 + 0.5 * sin(f * 0.48 + 1.1)) * 0.72);
+      water += light * (caustic * 0.72 + wide * 0.16 + thin * 0.4 + shimmer) * edge * pulse;
+      water += vec3(0.86, 0.97, 1.0) * sparkle * 0.5 * edge;
+      water += vec3(0.008, 0.022, 0.055) * uv.y;
+      color = vec4(min(water, vec3(1.0)), 1.0);
     }`;
   const compile = (type, source) => {
     const shader = gl.createShader(type);
