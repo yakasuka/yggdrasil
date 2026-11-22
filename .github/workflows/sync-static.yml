@@ -47,7 +47,7 @@ jobs:
         run: |
           # The backend origin is configured by the owner after the service is
           # deployed. Until then, still build (tests need dist/) but do not
-          # rewrite service.json or the merge/sub relay pages with an empty URL.
+          # rewrite service.json with an empty URL.
           if [ -z "$SERVICE_BASE_URL" ]; then
             echo "::warning::SERVICE_BASE_URL is not set yet. Build and tests still run; static sync is skipped until the self-hosted backend origin is configured."
             echo "skip=true" >> "$GITHUB_OUTPUT"
@@ -64,8 +64,6 @@ jobs:
           git add config-builder/index.html \
                   config-builder/assets/app.js \
                   config-builder/assets/app.css \
-                  merge/index.html \
-                  sub/index.html \
                   service.json \
                   _redirects
           if git diff --cached --quiet; then

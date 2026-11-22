@@ -1,6 +1,6 @@
 # Ratatoskr 配置服务 · 共享业务模块
 
-**当前生产架构：自建 Node 服务直接运行这些模块，Cloudflare 只发布静态文件。** 入口是 [server/index.js](../server/index.js)，路由与 CORS 在 [server/create-server.js](../server/create-server.js)。部署与验收见 [部署指南](../docs/DEPLOYMENT.md)。
+**当前生产架构：自建 Node 服务直接运行这些模块，Cloudflare 只发布静态文件。** 入口是 [server/index.js](../server/index.js)，路由与 CORS 在 [server/create-server.js](../server/create-server.js)。部署与验收见 [部署指南](../../docs/DEPLOYMENT.md)。
 
 - `application.js`：节点解析、预览、创建订阅、加密快照、实时更新。被后端以 `createWorker()` 直接调用，不再运行在 Worker 运行时。
 - `subscriptions.js`：安全拉取机场订阅、真实流量、可选 TCP 检测。域名用 `fetch()`；自建环境里公网 IP 也由 Node `fetch()` 处理，DNS 与 TCP 由 `server/node-platform.js` 注入。

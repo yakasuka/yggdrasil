@@ -44,7 +44,7 @@ https://github.com/yakasuka/yggdrasil/releases/latest/download/ratatoskr-templat
 ### 文档与链接
 
 - [中文指南](https://github.com/yakasuka/yggdrasil/blob/main/docs/zh-CN.md) · [English](https://github.com/yakasuka/yggdrasil/blob/main/docs/en.md)
-- [配置工坊部署](https://github.com/yakasuka/yggdrasil/blob/main/config-builder/docs/DEPLOYMENT.md) · [项目主页](https://yakasuka.github.io/yggdrasil/) · [源码仓库](https://github.com/yakasuka/yggdrasil)
+- [配置工坊部署](https://github.com/yakasuka/yggdrasil/blob/main/docs/DEPLOYMENT.md) · [项目主页](https://yakasuka.github.io/yggdrasil/) · [源码仓库](https://github.com/yakasuka/yggdrasil)
 
 ### 更新机制
 

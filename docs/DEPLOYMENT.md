@@ -68,10 +68,10 @@ npm run server          # 或 node server/index.js
 curl http://127.0.0.1:8788/api/status
 ```
 
-systemd（把仓库放在 `/opt/yggdrasil-service`，服务单元见 `deploy/yggdrasil.service`）：
+systemd（把仓库放在 `/opt/yggdrasil-service`，服务单元见 `config-builder/deploy/yggdrasil.service`）：
 
 ```sh
-sudo cp ../deploy/yggdrasil.service /etc/systemd/system/
+sudo cp deploy/yggdrasil.service /etc/systemd/system/
 sudo systemctl daemon-reload
 sudo systemctl enable --now yggdrasil
 journalctl -u yggdrasil -f
@@ -80,7 +80,7 @@ journalctl -u yggdrasil -f
 Docker（构建上下文为**仓库根目录**）：
 
 ```sh
-docker build -f deploy/Dockerfile -t yggdrasil-service .
+docker build -f config-builder/deploy/Dockerfile -t yggdrasil-service .
 docker run -d --name yggdrasil -p 8788:8788 \
   --env-file config-builder/server/.env \
   -e HOST=0.0.0.0 -e PORT=8788 \
@@ -88,7 +88,7 @@ docker run -d --name yggdrasil -p 8788:8788 \
   yggdrasil-service
 ```
 
-TLS 建议放在前面，见 [deploy/nginx.conf.example](../../deploy/nginx.conf.example)。反代后设置 `PUBLIC_BASE_URL=https://api.example.com` 与 `TRUST_PROXY=true`，后端只监听 8788。
+TLS 建议放在前面，见 [config-builder/deploy/nginx.conf.example](../config-builder/deploy/nginx.conf.example)。反代后设置 `PUBLIC_BASE_URL=https://api.example.com` 与 `TRUST_PROXY=true`，后端只监听 8788。
 
 ## 3. 部署两个静态前端
 
@@ -115,7 +115,7 @@ GitHub Pages 发布的是仓库根目录，不是 `worker/gateway/dist`。仓库
 - `config-builder/index.html` + `config-builder/assets/app.js|css`：向导（与 CF 同一份 bundle）；
 - `service.json`：`{"service":"https://api.example.com"}`，前端在 meta 为空时读取它。
 
-在 GitHub 仓库设置 repository variable `SERVICE_BASE_URL=https://api.example.com`。之后 [sync-static.yml](../../.github/workflows/sync-static.yml) 会在源码变更时重新构建、测试并提交上述静态文件；也可手动 `workflow_dispatch`。本地等价操作：
+在 GitHub 仓库设置 repository variable `SERVICE_BASE_URL=https://api.example.com`。之后 [sync-static.yml](../.github/workflows/sync-static.yml) 会在源码变更时重新构建、测试并提交上述静态文件；也可手动 `workflow_dispatch`。本地等价操作：
 
 ```sh
 cd config-builder
@@ -164,7 +164,7 @@ cd .. && git add config-builder/index.html config-builder/assets/app.js config-b
 
 分享码只携带选择，不携带节点或订阅 YAML，也不会替换订阅链接。含机场地址的分享码等于把节点访问能力交出去，应通过私下渠道传递。
 
-GitHub 侧的 [call-service.yml](../../.github/workflows/call-service.yml) 仅做只读冒烟测试：读取 `/api/status` 与 `/api/endpoints`，只输出状态码与链接模板，不保存任何节点内容到仓库或日志。
+GitHub 侧的 [call-service.yml](../.github/workflows/call-service.yml) 仅做只读冒烟测试：读取 `/api/status` 与 `/api/endpoints`，只输出状态码与链接模板，不保存任何节点内容到仓库或日志。
 
 ## 5. 发布后验收
 
@@ -228,8 +228,8 @@ mihomo -t -d /path/to/mihomo-data -f /path/to/Example-ratatoskr.yaml
 
 ## 8. 维护资料
 
-- [项目 README](../README.md) · [完整实现路径](IMPLEMENTATION.md) · [服务文件说明](../worker/README.md)
-- [server/.env.example](../server/.env.example) · [deploy/yggdrasil.service](../../deploy/yggdrasil.service) · [deploy/Dockerfile](../../deploy/Dockerfile) · [deploy/nginx.conf.example](../../deploy/nginx.conf.example)
-- [sync-static.yml](../../.github/workflows/sync-static.yml) · [call-service.yml](../../.github/workflows/call-service.yml)
+- [项目 README](../README.md) · [完整实现路径](IMPLEMENTATION.md) · [服务文件说明](../config-builder/worker/README.md)
+- [server/.env.example](../config-builder/server/.env.example) · [deploy/yggdrasil.service](../config-builder/deploy/yggdrasil.service) · [deploy/Dockerfile](../config-builder/deploy/Dockerfile) · [deploy/nginx.conf.example](../config-builder/deploy/nginx.conf.example)
+- [sync-static.yml](../.github/workflows/sync-static.yml) · [call-service.yml](../.github/workflows/call-service.yml)
 
 平台界面、权限与限制可能变化，后续以官方文档与实际配置为准，并同步更新本指南。

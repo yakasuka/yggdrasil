@@ -252,7 +252,7 @@ test("Docker builds never bake service credentials into the image", () => {
   assert.ok(ignore.includes("!**/.env.example"), "keep the config template");
   assert.ok(ignore.includes("config-builder/server/data"), "records must be a volume");
   const dockerfile = readFileSync(
-    new URL("../../deploy/Dockerfile", import.meta.url),
+    new URL("../deploy/Dockerfile", import.meta.url),
     "utf8",
   );
   assert.ok(dockerfile.includes('"node", "server/index.js"'));

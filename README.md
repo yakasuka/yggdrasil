@@ -11,7 +11,7 @@
 
 <p align="center">
   <a href="docs/zh-CN.md">简体中文</a>　·　<a href="docs/en.md">English</a><br />
-  <a href="https://yakasuka.github.io/yggdrasil/">项目主页</a>　·　<a href="https://yakasuka.github.io/yggdrasil/config-builder/">配置工坊</a>　·　<a href="config-builder/docs/DEPLOYMENT.md">部署指南</a>
+  <a href="https://yakasuka.github.io/yggdrasil/">项目主页</a>　·　<a href="https://yakasuka.github.io/yggdrasil/config-builder/">配置工坊</a>　·　<a href="docs/DEPLOYMENT.md">部署指南</a>
 </p>
 
 <!-- SEO: keywords, positioning and key facts. Keep in sync with scripts/repo-metadata.mjs and index.html. -->
@@ -81,7 +81,26 @@ Yggdrasil 是一套面向 **Mihomo / Clash / OpenClash / Clash Verge** 的配置
 
 - [中文指南：架构、规则、配置选择与使用说明](docs/zh-CN.md)　·　[English guide](docs/en.md)
 - [Ratatoskr 主配置](resources/template/ratatoskr-template.yaml) · [Release 下载](https://github.com/yakasuka/yggdrasil/releases/latest/download/ratatoskr-template.yaml)
-- [部署指南](config-builder/docs/DEPLOYMENT.md) · [实现路径](config-builder/docs/IMPLEMENTATION.md) · [图标来源](assets/icons/macosicons/README.md) · [配置工坊 README](config-builder/README.md)
+- [部署指南](docs/DEPLOYMENT.md) · [实现路径](docs/IMPLEMENTATION.md) · [图标来源](assets/icons/macosicons/README.md) · [配置工坊 README](config-builder/README.md)
+
+### 目录结构
+
+```text
+.github/workflows/   CI：规则同步、静态站构建、Release、后端冒烟测试
+assets/             站点首页与配置工坊共用的图标、图片
+config-builder/     配置工坊：静态前端 + Node 后端 + 测试 + 部署模板
+docs/               项目级文档：中文 / English / 部署指南 / 实现路径
+functions/          Cloudflare Pages 边缘代理（订阅、流量、管理后台）
+resources/          Ratatoskr 模板与自动生成的规则源
+scripts/            仓库自动化脚本（元数据、规则生成）
+sponsor/            打赏页静态资源
+index.html          项目主页（GitHub Pages 根）
+service.json        静态站指向后端的地址（必须在仓库根）
+_redirects / _routes.json / robots.txt / sitemap.xml
+                    Cloudflare Pages 路由与 SEO 文件（必须在仓库根）
+```
+
+`index.html`、`assets/`、`config-builder/`、`sponsor/`、`functions/` 与根级路由文件由 GitHub Pages / Cloudflare Pages 直接读取，路径不可更改；其他内容按用途归类，后端部署模板已收进 `config-builder/deploy/`。
 
 ### 赞助支持
 

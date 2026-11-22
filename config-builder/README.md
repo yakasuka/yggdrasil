@@ -1,6 +1,6 @@
 # Yggdrasil · config-builder
 
-**配置工坊** · [部署指南与复盘](docs/DEPLOYMENT.md) · [项目介绍](../README.md) · [完整实现路径](docs/IMPLEMENTATION.md) · [服务准备](worker/README.md)
+**配置工坊** · [部署指南与复盘](../docs/DEPLOYMENT.md) · [项目介绍](../README.md) · [完整实现路径](../docs/IMPLEMENTATION.md) · [服务准备](worker/README.md)
 
 五步配置：机场订阅 → 解析节点 → 地区节点 → 节点策略 → APP 分流 → 最终确认。“解析节点”是第 1、2 步之间的状态项，不可选择。
 
@@ -43,30 +43,27 @@ Cloudflare Pages 与 GitHub Pages **只发布静态资源**：`index.html`、`as
 3. 仓库根 / 静态站根目录的 `service.json`（`{"service":"https://…"}`，页面加载时动态读取）；
 4. 同源（仅用于把页面与 API 反代到同一域名时）。
 
-前三项都不需要重新构建即可切换后端。`merge/index.html` 和 `sub/index.html` 是纯跳转页，同样按 meta → `service.json` 的顺序解析，把 `?token=` 原样转给后端；它们本身不读取、不缓存、不展示节点。
+前三项都不需要重新构建即可切换后端。旧的 `merge/` `sub/` 跳转页已删除，订阅链接由 CF Pages 边缘函数在 CF 域名下就地代理。
 
 ## 目录
 
 ```text
 config-builder/
-├── server/                    # 自建后端：入口、配置、文件存储、路由、Node 适配
-│   ├── index.js               # node server/index.js
-│   ├── create-server.js       # 公开路由、CORS、链接改写、merge/sub
-│   ├── config.js / storage.js / node-platform.js / env-file.js
+├── index.html / assets/       # 静态向导页面与构建后的 JS/CSS
+├── src/                       # 向导源码：app.js、panels/、config.js、service.js 等
+├── shared/                    # 前后端共用：模板渲染、编译器、分享码、路由常量
+├── worker/                    # 可复用业务逻辑（编译、订阅解析、加密），不部署为 Worker
+├── server/                    # 自建 Node 后端：路由、存储、管理后台、Node 适配
 │   └── .env.example           # 复制为 server/.env 后填写
-├── src/                       # 向导：app.js、panels/、config.js、service.js、ui.js
-├── shared/                    # 模板解析、节点、编译器、公开路径（前后端共用）
-├── worker/                    # 可复用的业务逻辑模块（不再部署为 CF Worker）
-├── scripts/                   # 前端构建与统一静态产物生成
-├── tests/                     # 测试与测试订阅文件
-├── assets/                    # 自动生成的页面资源
-├── wrangler.jsonc             # CF Pages 纯静态项目配置（无 KV）
-└── docs/DEPLOYMENT.md         # 后端、CF Pages、GitHub Pages 部署与验收
-仓库根 deploy/                 # systemd / Docker / Nginx 示例
-仓库根 merge/ sub/ service.json # GitHub Pages 的跳转页与服务地址
+├── deploy/                    # systemd / Docker / Nginx 部署模板
+├── scripts/                   # 构建与目录生成脚本
+├── tests/                     # 测试与测试订阅样例
+└── wrangler.jsonc             # CF Pages 纯静态项目配置（无 KV）
 ```
 
-目录数据由 [shared/catalog.json](shared/catalog.json) 静态维护。修改后运行完整 `npm run build`、测试，再同步 `assets/` 与 `shared/catalog.json`。
+项目级文档统一放在仓库根 [docs/](../docs/)：[部署指南](../docs/DEPLOYMENT.md)、[实现路径](../docs/IMPLEMENTATION.md)、[中文说明](../docs/zh-CN.md)、[English](../docs/en.md)。仓库根的 `functions/` 与 `_routes.json` 是 CF Pages 的透明代理，`assets/`、`sponsor/`、`service.json` 供两个静态站直接使用。
+
+[shared/catalog.json](shared/catalog.json) 由 `resources/template/ratatoskr-template.yaml` 自动生成。修改模板后运行 `npm run catalog`（`npm run build` 也会自动触发）再提交，选择器与后端共享同一份目录。
 
 ## 命令
 
@@ -83,7 +80,7 @@ npm run server                         # http://127.0.0.1:8788
 SERVICE_BASE_URL=https://api.example.com npm run build
 ```
 
-`worker/gateway/dist/` 是 Cloudflare Pages 的构建输出目录；GitHub Pages 发布仓库根目录，由 [sync-static.yml](../.github/workflows/sync-static.yml) 把同一批产物提交到 `config-builder/` 和 `service.json`。
+`worker/gateway/dist/` 是构建校验用的静态产物副本；线上 Cloudflare Pages 与 GitHub Pages 都发布仓库根目录，由 [sync-static.yml](../.github/workflows/sync-static.yml) 把同一批产物提交到 `config-builder/` 和 `service.json`。
 
 ## 订阅、存储与链接
 
@@ -91,4 +88,4 @@ SERVICE_BASE_URL=https://api.example.com npm run build
 
 KV v3 的 AES-GCM 加密记录改存 `server/data/`（每记录一个文件，按有效期清理）。服务端为每条订阅保留随机 128 位 ID 与独立 256 位密钥，并把「配置名称 + 可选口令」的 SHA-256 摘要映射到这对凭据；配制时填入的口令明文另存进该映射记录，仅供管理员后台调试展示真实链接使用，公开接口不返回它——没有共享 TOKEN、不读私有仓库。后端 `/api/endpoints` 只返回链接模板，不返回任何凭据。
 
-完整订阅链接与生成的 YAML 都包含敏感访问能力，分享问题时应移除凭据。平台界面与额度可能变化，部署与验收细节见 [部署指南](docs/DEPLOYMENT.md)。
+完整订阅链接与生成的 YAML 都包含敏感访问能力，分享问题时应移除凭据。平台界面与额度可能变化，部署与验收细节见 [部署指南](../docs/DEPLOYMENT.md)。
