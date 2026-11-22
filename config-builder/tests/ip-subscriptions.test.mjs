@@ -189,7 +189,7 @@ test("IP redirects are checked before reaching another destination", async () =>
   assert.equal(calls, 1);
 });
 
-test("Base64 IP subscriptions produce inline Mihomo YAML and survive encrypted KV reads", async () => {
+test("Base64 IP subscriptions produce template-based YAML with remote providers and survive encrypted KV reads", async () => {
   const wire = `HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: ${source.length}\r\n\r\n${source}`;
   const service = createWorker({
     loadCatalog: async () => catalog,
@@ -208,11 +208,14 @@ test("Base64 IP subscriptions produce inline Mihomo YAML and survive encrypted K
   const read = await service.fetch(new Request(made.url), env);
   assert.equal(read.status, 200);
   const yaml = await read.text(),
-    config = parse(yaml);
-  assert.equal(config.proxies.length, 1);
-  assert.equal(config.proxies[0].type, "vmess");
-  assert.equal(config["proxy-providers"], undefined);
-  assert.ok(!yaml.includes("fixture-only"));
+    config = parse(yaml, { merge: true, maxAliasCount: 100 });
+  // Nodes are now fetched remotely by the client from the airport URL, not
+  // inlined into the config. No node credential ever lands in the YAML.
+  assert.equal(config.proxies, undefined);
+  assert.ok(config["proxy-providers"]);
+  assert.ok(Object.values(config["proxy-providers"]).some((p) => p.url === endpoint));
+  assert.ok(!yaml.includes("11111111-1111-4111-8111-111111111111"));
+  assert.ok(yaml.includes("GEOSITE,"));
 });
 
 test("subscription fetch rotates User-Agent when a panel rejects the first client", async () => {

@@ -14,12 +14,11 @@
    └─ 数据：自建 Node 服务（唯一的节点数据来源，公开 API）
             /api/status /api/inspect /api/preview /api/subscriptions
             /api/latency /api/endpoints /api/presets
-            /config-builder?token=<名称>   友好订阅链接，内联返回 YAML
-            /subscription/<id>/<key>.yaml   旧版订阅链接（继续兼容）
+            /config-builder?token=<名称>   唯一订阅链接，内联返回 YAML
             server/data/  加密记录
 ```
 
-服务是**公开 API**：用户在页面填入自己的机场 / 自建节点订阅地址，选择地区、策略、APP 与规则模块，创建订阅后得到一条以配置名称为凭据的链接 `/config-builder?token=guagua`，可直接放进任意 Mihomo / Clash Meta 客户端；浏览器打开时以 `text/plain` 内联显示 YAML，不触发下载。每次拉取都会重新解析机场、按最新模板与所选规则模块实时生成配置。旧的 `/subscription/<id>/<key>.yaml` 链接继续有效。
+服务是**公开 API**：用户在页面填入自己的机场 / 自建节点订阅地址，选择地区、策略、APP 与规则模块，创建订阅后得到一条以配置名称为凭据的链接 `/config-builder?token=guagua`，可直接放进任意 Mihomo / Clash Meta 客户端；浏览器打开时以 `text/plain` 内联显示 YAML，不触发下载。配置由 `shared/template-render.js` **在模板 `ratatoskr-template.yaml` 原文上定点编辑**生成：完整保留分区注释、flow 单行格式、锚点与 `GEOSITE`/`GEOIP` 客户端规则，节点通过 `proxy-providers` 引用机场原始订阅地址由客户端直接远程拉取，不内联节点、不写 `geox-url`。旧的 `/subscription/<id>/<key>.yaml` 链接已彻底移除。
 
 没有共享 TOKEN、不读私有 GitHub 仓库。默认的规则与模板来自仓库示例 `resources/template/ratatoskr-template.yaml` 的同源快照 `shared/catalog.json`。
 
@@ -52,7 +51,7 @@ cp server/.env.example server/.env
 
 `ALLOWED_ORIGINS` 留空时允许任意来源（服务日志会提示 `cors: open`）；上线前务必填成自己的两个静态站域名。`GET /api/status` 返回 `cors: restricted | open`，可用于核对。
 
-**没有需要保密的共享凭据**。新订阅的对外凭据是用户在「配置名称」里填写的 token（3–60 位字母、数字、`_` 或 `-`，空格转 `-`，不区分大小写，重名返回 409）；服务端把它映射到内部随机 128 位 ID 与独立 256 位密钥，密钥不落盘。名称可猜，因此把整条链接当作口令保管；旧版 `/subscription/<id>/<key>.yaml` 链接仍按随机凭据工作。`service.json`、静态文件与 workflow 里都只有公开 URL。
+**没有需要保密的共享凭据**。新订阅的对外凭据是用户在「配置名称」里填写的 token（3–60 位字母、数字、`_` 或 `-`，空格转 `-`，不区分大小写，重名返回 409）；服务端把它映射到内部随机 128 位 ID 与独立 256 位密钥，密钥不落盘。名称可猜，因此把整条链接当作口令保管；旧的 `/subscription/<id>/<key>.yaml` 路由已移除。`service.json`、静态文件与 workflow 里都只有公开 URL。
 
 若从旧的 Cloudflare Worker / Pages Functions 架构迁移：删除 CF 项目里的 `TOKEN`、`GH_TOKEN`、`SERVICE_TOKEN` 变量，下线旧 Worker 与 Pages Functions（`worker/wrangler.jsonc` 含 KV 绑定，已弃用，不要执行 `worker:deploy`），只保留静态站点；两个静态站的 `service.json` / `SERVICE_BASE_URL` 都指向同一个后端域名。
 
@@ -138,7 +137,7 @@ cd .. && git add config-builder/index.html config-builder/assets/app.js config-b
 {
   "service": "https://api.example.com",
   "create": "https://api.example.com/api/subscriptions",
-  "subscription": "https://api.example.com/subscription/",
+  "config": "https://api.example.com/config-builder",
   "config": "https://api.example.com/config-builder",
   "preset": "https://api.example.com/api/presets",
   "frontends": ["https://yggdrasil-afx.pages.dev", "https://yakasuka.github.io"]
@@ -153,7 +152,7 @@ cd .. && git add config-builder/index.html config-builder/assets/app.js config-b
 4. 「生成订阅链接」→ `POST /api/subscriptions`，后端把选择与节点快照 AES-GCM 加密写入 `server/data/`，并把配置名称映射到内部随机凭据，返回 `https://api.example.com/config-builder?token=guagua`（流量接口为 `/config-builder/status?token=guagua`）。
 5. 把这条链接放进 Mihomo / Clash Meta 客户端，或直接在浏览器打开查看 YAML。每次更新订阅时，后端重新解析机场、刷新节点与流量，按最新模板与用户所选规则模块实时生成配置。
 
-链接本身即凭据：对外是用户选择的配置名称（可猜，请私密传递或直接打开时留意），对内是随机 128 位 ID + 独立 256 位密钥，不依赖共享 TOKEN。`GET /config-builder/status?token=<名称>` 可刷新流量报告；旧 `GET /subscription/<id>/<key>/status` 继续有效。分享问题时务必移除完整链接。
+链接本身即凭据：对外是用户选择的配置名称（可猜，请私密传递或直接打开时留意），对内是随机 128 位 ID + 独立 256 位密钥，不依赖共享 TOKEN。`GET /config-builder/status?token=<名称>` 可刷新流量报告。分享问题时务必移除完整链接。
 
 ### 分享码
 

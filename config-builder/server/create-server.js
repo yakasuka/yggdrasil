@@ -6,15 +6,13 @@ import { fileStorage } from "./storage.js";
 import { createPresetStore } from "./presets.js";
 import { fetcher, ipFetcher, probe, resolver } from "./node-platform.js";
 
-const SUBSCRIPTION_PATH =
-  /^\/subscription\/([A-Za-z0-9_-]{22})\/([A-Za-z0-9_-]{43})(\.yaml|\/status)$/;
 const INTERNAL_SUBSCRIPTION =
   /^\/s\/([A-Za-z0-9_-]{22})\/([A-Za-z0-9_-]{43})\.yaml$/;
 const PRESET_READ = /^\/api\/presets\/([0-9a-f]{36})$/i;
 const MAX_PRESET_BODY = 64 * 1024;
-// Friendly subscription links use the configuration name as their token.
-// The random id/key stay internal, so existing /subscription/ links keep
-// working while new links are short and browser-readable.
+// Friendly config links use the configuration name as their token; the random
+// id/key stay internal. The legacy /subscription/<id>/<key>.yaml alias has
+// been removed.
 const CONFIG_PATH = SERVICE_ROUTES.config;
 const ALIAS_RE = /^[\p{L}\p{N}_-]{3,60}$/u;
 const INTERNAL_PARTS = /^([A-Za-z0-9_-]{22})\/([A-Za-z0-9_-]{43})$/;
@@ -147,7 +145,6 @@ export function createService({
       latency: base + SERVICE_ROUTES.probe,
       preset: base + SERVICE_ROUTES.preset,
       config: base + CONFIG_PATH,
-      subscription: base + SERVICE_ROUTES.subscription,
       frontends: config.allowedOrigins,
     };
   }
@@ -257,9 +254,6 @@ export function createService({
           break;
         }
       }
-      const read = path.match(SUBSCRIPTION_PATH);
-      if (!target && read && ["GET", "HEAD"].includes(method))
-        target = new URL(`/s/${read[1]}/${read[2]}${read[3]}`, url);
       if (!target) return withCors(request, json({ error: "链接不存在。" }, 404), config);
 
       const response = await application.fetch(
@@ -278,9 +272,8 @@ export function createService({
           !INTERNAL_SUBSCRIPTION.test(internal.pathname)
         )
           return withCors(request, json({ error: "服务返回的订阅地址无效。" }, 502), config);
-        // The friendly link uses the configuration name the user typed. The
-        // random id/key stay server-side, and old /subscription/ links remain
-        // valid for tokens issued before this change.
+        // The friendly link uses the configuration name the user typed; the
+        // random id/key stay server-side.
         const parts = internal.pathname
           .slice("/s/".length)
           .replace(/\.yaml$/, "")

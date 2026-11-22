@@ -65,8 +65,10 @@ export default {
         return env.ASSETS ? env.ASSETS.fetch(request) : failure();
     }
     const create = publicURL.pathname === SERVICE_ROUTES.create;
+    // The legacy /subscription/<id>/<key>.yaml alias is gone. The gateway is
+    // deprecated/not deployed; it forwards the service's internal /s/ links.
     const read = publicURL.pathname.match(
-      /^\/subscription\/([A-Za-z0-9_-]{22})\/([A-Za-z0-9_-]{43})(\.yaml|\/status)$/,
+      /^\/s\/([A-Za-z0-9_-]{22})\/([A-Za-z0-9_-]{43})(\.yaml|\/status)$/,
     );
     if (
       publicURL.pathname === SERVICE_ROUTES.status &&
@@ -92,6 +94,11 @@ export default {
       target.pathname = "/api/probe";
     else if (read && ["GET", "HEAD"].includes(request.method))
       target.pathname = "/s/" + read[1] + "/" + read[2] + read[3];
+    else if (
+      publicURL.pathname === SERVICE_ROUTES.config &&
+      ["GET", "HEAD"].includes(request.method)
+    )
+      return failure(404);
     else return failure();
     const service = env.SUBSCRIPTIONS
       ? {
@@ -129,10 +136,8 @@ export default {
           )
         )
           return failure(502);
-        data.url =
-          publicURL.origin +
-          SERVICE_ROUTES.subscription +
-          internal.pathname.slice(3);
+        // Pass the service's internal /s/ link through verbatim. The old
+        // /subscription/<id>/<key>.yaml alias has been removed.
         data.usageUrl = data.url.replace(/\.yaml$/, "/status");
         const headers = new Headers(response.headers);
         headers.delete("Content-Length");

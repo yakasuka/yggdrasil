@@ -87,6 +87,7 @@ export async function catalogFromYaml(text) {
     manual,
     final,
     other: leadingIcon(othersGroup?.name) || "🌌",
+    otherGroupName: othersGroup?.name || "🌌 Others",
     ports,
   };
 
@@ -102,7 +103,11 @@ export async function catalogFromYaml(text) {
       id,
       label: REGION_LABELS[id] || id,
       flag: flagFrom(filter),
+      // `name` is the short icon used inside the configurator's own generated
+      // config. `groupName` is the faithful full name from the template, used
+      // by the template renderer to keep the author's original group lines.
       name: leadingIcon(group?.name) || id,
+      groupName: group?.name || leadingIcon(group?.name) || id,
       filter,
       icon: group?.icon || "",
     };
@@ -197,6 +202,10 @@ export async function catalogFromYaml(text) {
   const model = {
     schema: 2,
     source: "ratatoskr-template.yaml (derived)",
+    // Keep the original template text so compile() can render configs by
+    // editing the template in place (comments, anchors, flow style intact)
+    // instead of rebuilding the YAML from scratch. No fs needed in workers.
+    templateText: text,
     testUrl:
       strategyGroups.find((g) => g.type === "url-test")?.url ||
       "https://www.gstatic.com/generate_204",

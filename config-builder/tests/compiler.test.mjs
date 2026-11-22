@@ -13,6 +13,26 @@ import {
   ruleModules,
 } from "../shared/compiler.js";
 import { catalogFromTemplate } from "../shared/template.js";
+
+// The template-rendered YAML keeps the author's full group names, so validate
+// references against its own group/provider names rather than the compiled
+// config (which uses short icon names for regions).
+function assertValidTemplateRefs(doc) {
+  const names = doc["proxy-groups"].map((g) => g.name);
+  assert.equal(new Set(names).size, names.length);
+  const valid = new Set([...names, "DIRECT", "REJECT"]);
+  for (const g of doc["proxy-groups"])
+    for (const p of g.proxies || [])
+      assert.ok(valid.has(p), `group ${g.name} references missing ${p}`);
+  const providers = new Set(Object.keys(doc["rule-providers"] || {}));
+  for (const rule of doc.rules) {
+    const parts = rule.split(",");
+    if (parts.at(-1) === "no-resolve") parts.pop();
+    assert.ok(valid.has(parts.at(-1)), `rule targets missing ${parts.at(-1)}`);
+    if (parts[0] === "RULE-SET")
+      assert.ok(providers.has(parts[1]), `missing rule provider ${parts[1]}`);
+  }
+}
 import {
   classifyNodes,
   parseNodes,
@@ -50,7 +70,15 @@ test("turning a rule module off removes only its rules and keeps references vali
     p.modules = ruleModules(catalog).filter((m) => m !== id);
     const { config, yaml } = await compile(p);
     assertReferences(config);
-    assert.deepEqual(parse(yaml), config);
+    // The YAML is rendered from the author's template, so it carries extra
+    // keys (socks-port, anchors, comments). Validate that the rendered rules
+    // match the compiled decision and references stay resolvable.
+    const rendered = parse(yaml, { merge: true, maxAliasCount: 100 });
+    // Same rule set as the compiled decision; order follows the template
+    // (the author's section layout), which is intentional.
+    assert.deepEqual([...rendered.rules].sort(), [...config.rules].sort());
+    assertValidTemplateRefs(rendered);
+    assert.ok(yaml.includes("GEOSITE,"));
     const removed = catalog.orderedRules.filter((r) => r.module === id).map((r) => r.rule);
     assert.ok(
       removed.every((rule) => !config.rules.includes(rule)),
@@ -103,8 +131,16 @@ test("APP routing uses only chosen regional groups, follow proxy, Direct and Rej
   const p = profile();
   p.appPolicy = { openai: "region:US", apple: "direct", telegram: "reject" };
   const { config, yaml } = await compile(p);
-  assert.deepEqual(parse(yaml), config);
+  const rendered = parse(yaml, { merge: true, maxAliasCount: 100 });
+  assertValidTemplateRefs(rendered);
   assertReferences(config);
+  // APP default routes are reflected in the rendered group's first proxy.
+  const renderedGroup = (name) =>
+    rendered["proxy-groups"].find((g) => g.name === name);
+  assert.equal(
+    renderedGroup(catalog.apps.find((a) => a.id === "openai").name).proxies[0],
+    "🗽 United States",
+  );
   const group = (id) =>
     config["proxy-groups"].find(
       (g) => g.name === catalog.apps.find((a) => a.id === id).name,

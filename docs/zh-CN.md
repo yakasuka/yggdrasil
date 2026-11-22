@@ -32,7 +32,7 @@
 
 **Yggdrasil 是应用与工具集合，Ratatoskr 是其中的核心配置。** Yggdrasil 提供配置工坊、模板解析、配置生成与可选订阅服务；Ratatoskr 定义 Mihomo 的应用规则、地区目录、节点筛选和策略组。
 
-配置工坊读取 Ratatoskr 模板中的目录与规则，将用户选择的节点和出口组合成 YAML。这样模板既是可直接使用的配置基础，也是应用目录与生成器共同遵循的数据来源。
+配置工坊读取 Ratatoskr 模板中的目录与规则，在模板原文上按用户选择做定点编辑：保留分区注释、锚点与 `GEOSITE`/`GEOIP` 客户端规则，把机场订阅地址写入 `proxy-providers` 由客户端远程拉节点。这样模板既是可直接使用的配置基础，也是应用目录与生成器共同遵循的数据来源。
 
 **Yggdrasil 负责组织、生成与交付；Ratatoskr 是抵达使用者手中的配置本体。**
 
@@ -52,7 +52,7 @@ Yggdrasil 面向一站式的使用体验：使用者通过 config-builder 模块
 
 **[shared/catalog.json](../config-builder/shared/catalog.json)** 是 APP、地区与规则的静态目录数据。新增 APP 或地区时直接编辑该文件，构建后页面目录和后端模板随之更新；重新部署 Pages 后，同一 Token 可取得新的配置。完整的数据流与每项功能的位置见 **[实现路径](../config-builder/docs/IMPLEMENTATION.md)**。
 
-持久订阅链接形如 `https://<后端域名>/config-builder?token=<配置名称>`，不带 `.yaml` 后缀，浏览器打开即可查看 YAML；配置名称就是访问凭据，请用不易猜到的名称并私密传递。持续时间可选 **3 小时 / 7 天 / 30 天 / 永久**。配置标题下的 catalog 指纹只标识模板版本，不用作访问凭据。节点来源保留 `[P1]`、`[P2]` 标识。
+持久订阅链接形如 `https://<后端域名>/config-builder?token=<配置名称>`，不带 `.yaml` 后缀，浏览器打开即可查看 YAML；配置名称就是访问凭据，请用不易猜到的名称并私密传递。持续时间可选 **3 小时 / 7 天 / 30 天 / 永久**。配置标题下的 catalog 指纹只标识模板版本，不用作访问凭据。生成的配置不内联节点，机场订阅地址以 `proxy-providers` 形式远程调用，节点更新即时生效。
 
 配置工坊与订阅服务同源部署在 Cloudflare Pages：页面把机场链接提交给同源接口，由服务端拉取与解码，直接连接 KV 保存加密配置与 YAML 快照。生成配置包含所选地区的完整节点，支持文件下载与持久订阅链接。GitHub 负责代码托管与 Actions 构建，Cloudflare Pages 负责静态资源、Functions 接口与 KV，两者免费额度即可运行，无需自建或租用服务器；公开入口为 `https://<项目名>.pages.dev/config-builder/`。仓库提供通用部署模板，使用自己的项目名称与 KV 绑定接入，见 **[部署指南与故障复盘](../config-builder/docs/DEPLOYMENT.md)**。
 
@@ -180,8 +180,7 @@ Ratatoskr 将庞大的分类数据交给 Geo 数据库，将清晰的分流意�
 | `/api/inspect` | 后端拉取用户输入的机场订阅，只返回脱敏节点与流量清单 |
 | `/api/preview` | 按网页选择实时生成完整 YAML，供预览 / 下载 |
 | `/api/subscriptions` | 加密保存选择，返回自带随机密钥的订阅链接 |
-| `/config-builder?token=<名称>` | 按配置名称返回订阅，内联 YAML，浏览器可直接查看；名称映射到内部随机凭据 |
-| `/subscription/<id>/<key>.yaml` | 旧版随机链接，继续兼容；客户端拉取时实时生成配置 |
+| `/config-builder?token=<名称>` | 唯一订阅链接：按配置名称返回订阅，内联 YAML，浏览器可直接查看；名称映射到内部随机凭据 |
 | `/api/presets`、`/api/presets/<code>` | 生成与读取分享码（36 位十六进制），默认不含机场地址，可选加密包含 |
 | `/api/endpoints` | 由后端直接吐出上述链接模板，不含任何凭据 |
 

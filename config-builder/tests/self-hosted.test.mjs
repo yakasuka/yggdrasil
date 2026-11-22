@@ -138,7 +138,8 @@ test("the backend emits only subscription links and never advertises a shared to
   assert.equal(links.status, 200);
   const data = JSON.parse(payload);
   assert.equal(data.create, ORIGIN + "/api/subscriptions");
-  assert.equal(data.subscription, ORIGIN + "/subscription/");
+  assert.equal(data.config, ORIGIN + "/config-builder");
+  assert.equal(data.subscription, undefined);
   assert.equal(data.merge, undefined);
   assert.equal(data.sub, undefined);
   assert.equal(data.tokenHint, undefined);
@@ -206,7 +207,7 @@ test("configuration names must be valid and unique", async () => {
   assert.equal(unknown.status, 404);
 });
 
-test("legacy random subscription links keep working", async () => {
+test("legacy random subscription links are gone; only friendly links work", async () => {
   const s = await service();
   const worker = createWorker(platform);
   const created = await worker.fetch(post("/api/profiles", profile()), s.env);
@@ -214,8 +215,7 @@ test("legacy random subscription links keep working", async () => {
   const internal = new URL((await created.json()).url);
   const legacy = internal.pathname.replace(/^\/s\//, "/subscription/");
   const read = await s.fetch(new Request(ORIGIN + legacy));
-  assert.equal(read.status, 200);
-  assert.ok((await read.text()).includes("proxies:"));
+  assert.equal(read.status, 404);
 });
 
 test("legacy merge / sub routes and static relays no longer exist", async () => {

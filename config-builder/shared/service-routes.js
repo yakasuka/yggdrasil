@@ -7,5 +7,4 @@ export const SERVICE_ROUTES = Object.freeze({
   preview: "/api/preview",
   preset: "/api/presets",
   config: "/config-builder",
-  subscription: "/subscription/",
 });

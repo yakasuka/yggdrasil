@@ -1,7 +1,8 @@
-import { stringify } from "yaml";
+import { parse, stringify } from "yaml";
 import catalog from "./catalog.json" with { type: "json" };
 import { filename, lifetime } from "./profile.js";
 import { classifyNodes } from "./nodes.js";
+import { renderFromTemplate } from "./template-render.js";
 export { catalog };
 export const STRATEGIES = [
   {
@@ -468,13 +469,13 @@ export async function compile(input, model = catalog, options = {}) {
     rules,
   };
   assertReferences(config);
-  const yaml =
-    "# Ratatoskr · " +
-    p.title +
-    "\n# Yggdrasil catalog " +
-    model.version +
-    " | Mihomo / Clash Meta\n" +
-    stringify(config, { lineWidth: 0, aliasDuplicateObjects: false });
+  // Render by editing the author's template in place: preserves all section
+  // banners, inline comments, flow-style one-liners and GEOSITE/GEOIP rules.
+  // Falls back to a parse of the built config if a template is unavailable.
+  const template = model.templateText;
+  const yaml = template
+    ? renderFromTemplate(template, config, p, model)
+    : parseConfigFallback(config, p, model);
   return {
     yaml,
     config,
@@ -490,6 +491,19 @@ export async function compile(input, model = catalog, options = {}) {
     },
   };
 }
+// Used only when a caller supplies a catalog without templateText (legacy /
+// synthetic models). The normal path always renders the real template.
+function parseConfigFallback(config, p, model) {
+  return (
+    "# Ratatoskr · " +
+    p.title +
+    "\n# Yggdrasil catalog " +
+    model.version +
+    " | Mihomo / Clash Meta\n" +
+    stringify(config, { lineWidth: 0, aliasDuplicateObjects: false })
+  );
+}
+
 export function assertReferences(config) {
   const names = config["proxy-groups"].map((g) => g.name);
   if (new Set(names).size !== names.length)

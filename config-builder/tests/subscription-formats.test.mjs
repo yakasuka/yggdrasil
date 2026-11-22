@@ -117,7 +117,7 @@ test("inline YAML contains selected countries only and retains distinct P1/P2 na
   assert.equal(result.config.proxies[0].uuid, uuid);
 });
 
-test("KV stores an encrypted YAML snapshot and the same token refreshes current nodes and traffic", async () => {
+test("KV stores an encrypted profile snapshot and the same token serves fresh config and traffic", async () => {
   let source = b64([vmess(), ss()].join("\n"));
   let traffic = "upload=1; download=2; total=100";
   const service = createWorker({
@@ -140,7 +140,10 @@ test("KV stores an encrypted YAML snapshot and the same token refreshes current 
   assert.equal(record.v, 3);
   assert.ok(!JSON.stringify(record).includes(uuid));
   const saved = await open(record, parts[2], parts[3].replace(".yaml", ""));
-  assert.ok(saved.yaml.includes(uuid));
+  // Nodes are fetched by the client from the airport; the stored YAML must
+  // contain the remote provider URL but never the node credential itself.
+  assert.ok(!saved.yaml.includes(uuid));
+  assert.ok(saved.yaml.includes("proxy-providers:"));
   assert.equal(saved.profile.title, "Eaibee");
   source = b64([vmess("日本 JP 02"), ss("美国 US 02")].join("\n"));
   traffic = "upload=5; download=20; total=100";
@@ -151,9 +154,10 @@ test("KV stores an encrypted YAML snapshot and the same token refreshes current 
     "upload=5; download=20; total=100; expire=" +
       Math.floor(Date.parse(data.expiresAt) / 1000),
   );
-  const output = parse(await response.text());
-  assert.ok(output.proxies.some((node) => node.name.includes("日本 JP 02")));
-  assert.equal(output["proxy-providers"], undefined);
+  const output = parse(await response.text(), { merge: true, maxAliasCount: 100 });
+  assert.equal(output.proxies, undefined);
+  assert.ok(output["proxy-providers"]);
+  assert.ok(output.rules.some((r) => r.startsWith("GEOSITE,")));
 });
 
 test("existing v2 capability links remain usable after the snapshot upgrade", async () => {
@@ -175,7 +179,9 @@ test("existing v2 capability links remain usable after the snapshot upgrade", as
     env,
   );
   assert.equal(response.status, 200);
-  assert.ok(parse(await response.text()).proxies.length > 0);
+  const legacy = parse(await response.text(), { merge: true, maxAliasCount: 100 });
+  assert.ok(legacy["proxy-providers"]);
+  assert.ok(legacy.rules.some((r) => r.startsWith("MATCH,")));
 });
 
 test("Pages uses a bounded per-IP request budget when native rate bindings are absent", async () => {

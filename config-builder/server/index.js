@@ -85,7 +85,7 @@ server.listen(config.port, config.host, () => {
       `[service] public base: ${config.publicBase || "(from request Host / X-Forwarded-*)"}\n` +
       `[service] store: ${config.dataDir}\n` +
       `[service] CORS: ${config.allowedOrigins.length ? config.allowedOrigins.join(", ") : "open (set ALLOWED_ORIGINS)"}\n` +
-      `[service] endpoints: /api/status /api/endpoints /api/subscriptions /api/presets /config-builder /subscription/`,
+      `[service] endpoints: /api/status /api/endpoints /api/subscriptions /api/presets /config-builder`,
   );
 });
 

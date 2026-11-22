@@ -151,7 +151,7 @@ test("the Pages deployment serves its own origin and rejects unapproved cross-or
   assert.equal(denied.status, 403);
 });
 
-test("the browser accepts friendly config links and legacy subscription links", () => {
+test("the browser accepts only friendly config links (legacy subscription links rejected)", () => {
   const origin = "https://service.example";
   const friendly = origin + "/config-builder?token=guagua";
   assert.equal(subscriptionURL(friendly, origin), friendly);
@@ -161,8 +161,9 @@ test("the browser accepts friendly config links and legacy subscription links", 
   );
   assert.throws(() => subscriptionURL(origin + "/config-builder?token=a", origin));
   assert.throws(() => subscriptionURL(origin + "/config-builder?token=guagua&x=1", origin));
+  // The legacy /subscription/<id>/<key>.yaml alias has been removed.
   const legacy =
     origin + "/subscription/" + "a".repeat(22) + "/" + "b".repeat(43) + ".yaml";
-  assert.equal(subscriptionURL(legacy, origin), legacy);
+  assert.throws(() => subscriptionURL(legacy, origin));
   assert.throws(() => subscriptionURL(origin + "/config-builder?token=guagua", "https://other.example"));
 });

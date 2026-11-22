@@ -51,7 +51,7 @@ test("same-origin site can create subscriptions and unconfigured cross-origin si
     "https://relay.example",
   );
   const data = await response.json();
-  assert.ok(data.url.startsWith("https://relay.example/subscription/"));
+  assert.ok(data.url.startsWith("https://relay.example/s/"));
   assert.equal(
     (
       await gateway.fetch(

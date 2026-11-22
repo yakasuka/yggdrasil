@@ -114,21 +114,26 @@ function configToken(url, status) {
 
 export function subscriptionURL(value, origin) {
   const url = new URL(value);
-  if (url.origin !== origin || url.username || url.password || url.hash)
-    throw Error("服务返回的订阅地址无效。");
-  // New links carry the user's configuration name; legacy links still work.
-  if (configToken(url, false)) return url.href;
-  if (url.search || !/^\/subscription\/[A-Za-z0-9_-]{22}\/[A-Za-z0-9_-]{43}\.yaml$/.test(url.pathname))
+  if (
+    url.origin !== origin ||
+    url.username ||
+    url.password ||
+    url.hash ||
+    !configToken(url, false)
+  )
     throw Error("服务返回的订阅地址无效。");
   return url.href;
 }
 
 export function usageURL(value, origin) {
   const url = new URL(value);
-  if (url.origin !== origin || url.username || url.password || url.hash)
-    throw Error("服务返回的流量地址无效。");
-  if (configToken(url, true)) return url.href;
-  if (url.search || !/^\/subscription\/[A-Za-z0-9_-]{22}\/[A-Za-z0-9_-]{43}\/status$/.test(url.pathname))
+  if (
+    url.origin !== origin ||
+    url.username ||
+    url.password ||
+    url.hash ||
+    !configToken(url, true)
+  )
     throw Error("服务返回的流量地址无效。");
   return url.href;
 }

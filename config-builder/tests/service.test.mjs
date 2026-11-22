@@ -121,7 +121,7 @@ test("public gateway aliases preserve configuration, traffic, CORS and status re
   const response = await gateway.fetch(make, bound);
   assert.equal(response.status, 201);
   const data = await response.json();
-  assert.ok(data.url.startsWith("https://relay.example/subscription/"));
+  assert.ok(data.url.startsWith("https://relay.example/s/"));
   assert.ok(data.usageUrl.endsWith("/status"));
   const read = await gateway.fetch(new Request(data.url), bound);
   assert.equal(read.status, 200);
@@ -228,10 +228,13 @@ test("multiple airports retain P1/P2 node identities and aggregate reported traf
   assert.equal(response.status, 201);
   const data = await response.json();
   const file = await service.fetch(new Request(data.url), env);
-  const config = parse(await file.text());
+  const text = await file.text();
+  const config = parse(text, { merge: true, maxAliasCount: 100 });
+  // Each airport is a remote proxy-provider using its original subscription URL.
+  assert.equal(config.proxies, undefined);
   assert.deepEqual(
-    [...new Set(config.proxies.map((p) => p.name.match(/^\[P\d+\]/)[0]))],
-    ["[P1]", "[P2]"],
+    Object.values(config["proxy-providers"]).map((v) => v.url).sort(),
+    ["https://airport.example.com/sub?token=private-fixture", "https://airport.example.com/sub?token=second-fixture"].sort(),
   );
   assert.ok(
     file.headers
