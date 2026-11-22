@@ -354,6 +354,10 @@ export async function compile(input, model = catalog, options = {}) {
   ]);
   const apps = model.apps.filter((a) => p.apps.includes(a.id));
   for (const app of apps) {
+    // Author-authored switch/entry groups (e.g. ✨ Hermes) are already emitted
+    // as core groups above. Emitting them again would create a duplicate group
+    // name; their chosen exit is applied to the core group below instead.
+    if (app.entry) continue;
     const policy = p.appPolicy[app.id];
     const target =
       policy === "direct"
@@ -399,6 +403,26 @@ export async function compile(input, model = catalog, options = {}) {
     type: "select",
     proxies: [g.gateway],
   });
+  // Switch/entry groups shown on the APP page (e.g. ✨ Hermes) map to a core
+  // group that already exists. Apply the user's chosen exit to that core
+  // group's first proxy so the picker actually controls the generated YAML.
+  for (const app of apps.filter((a) => a.entry)) {
+    const core = groups.find((x) => x.name === app.name);
+    const policy = p.appPolicy[app.id];
+    if (!core || !policy || policy === "proxy") continue;
+    const exit =
+      policy === "direct"
+        ? "DIRECT"
+        : policy === "reject"
+          ? "REJECT"
+          : policy === "region:OTHER"
+            ? g.other
+            : policy.startsWith("region:")
+              ? regions.find((r) => r.id === policy.slice(7))?.name
+              : null;
+    if (exit && core.proxies.includes(exit))
+      core.proxies = unique([exit, ...core.proxies.filter((x) => x !== exit)]);
+  }
   const entries = await Promise.all(
     p.providers.map(async (v, i) => [
       "P" + (i + 1) + " " + v.name,

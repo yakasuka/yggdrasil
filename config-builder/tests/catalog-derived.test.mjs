@@ -39,6 +39,44 @@ test("newly added template apps appear in the picker", async () => {
     assert.ok(labels.includes(added), `${added} should be selectable`);
 });
 
+test("rule-less switch groups from the YAML are shown as entry pickers (Hermes)", async () => {
+  // The author's rule: everything written in the template must be selectable.
+  // ✨ Hermes is a select group with no rule of its own; the old derivation
+  // reserved it AND dropped every rule-less group, so it never appeared on the
+  // APP page. It must be present as an entry, and its exit must reach the YAML.
+  const derived = await catalogFromYaml(template);
+  const hermes = derived.apps.find((a) => a.name.includes("Hermes"));
+  assert.ok(hermes, "Hermes must be present in the APP picker");
+  assert.equal(hermes.entry, true);
+  assert.equal(hermes.rules.length, 0);
+
+  const { compile, defaults } = await import("../shared/compiler.js");
+  const base = {
+    ...defaults(derived),
+    title: "T",
+    providers: [{ name: "x", url: "https://a.example/sub" }],
+    countries: derived.regions.map((r) => r.id),
+  };
+  const plain = await compile(base, derived);
+  const group = plain.config["proxy-groups"].find((g) => g.name === hermes.name);
+  assert.ok(group, "generated config must contain exactly one Hermes group");
+  assert.ok(plain.yaml.includes("name: ✨ Hermes"));
+
+  const picked = await compile(
+    { ...base, appPolicy: { ...base.appPolicy, [hermes.id]: "region:JP" } },
+    derived,
+  );
+  const changed = picked.config["proxy-groups"].find(
+    (g) => g.name === hermes.name,
+  );
+  assert.equal(changed.proxies[0], "⛩️", "Hermes exit must follow the picker");
+  assert.equal(
+    picked.config["proxy-groups"].filter((g) => g.name === hermes.name).length,
+    1,
+    "no duplicate Hermes group",
+  );
+});
+
 test("rule-set names in the catalog match the template rule-providers", async () => {
   const derived = await catalogFromYaml(template);
   const names = derived.providerModules.map((p) => p.name);

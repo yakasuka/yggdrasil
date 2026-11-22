@@ -94,6 +94,16 @@
   ],
   "apps": [
     {
+      "id": "Hermes",
+      "name": "✨ Hermes",
+      "label": "Hermes",
+      "category": "策略入口",
+      "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/hermes.png",
+      "firstProxyDirect": false,
+      "entry": true,
+      "rules": []
+    },
+    {
       "id": "openai",
       "name": "⚡ OpenAI",
       "label": "OpenAI",
@@ -499,6 +509,16 @@
       "rules": [
         "RULE-SET,❎ AdGuard,❎ 广告拦截"
       ]
+    },
+    {
+      "id": "Others",
+      "name": "🌌 Others",
+      "label": "Others",
+      "category": "策略入口",
+      "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/others.png",
+      "firstProxyDirect": false,
+      "entry": true,
+      "rules": []
     }
   ],
   "orderedRules": [
@@ -852,5 +872,5 @@
       "module": "proxy-extra"
     }
   ],
-  "version": "1cc99e19887d"
+  "version": "df30bb35238a"
 }

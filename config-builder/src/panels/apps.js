@@ -26,13 +26,13 @@ export function appsPanel(ctx) {
             .filter((a) => a.category === cat)
             .map(
               (a) =>
-                `<div class="app-card" data-app-card="${esc(a.label.toLowerCase())}" data-category-item="${esc(cat)}"><label><input type="checkbox" data-app="${esc(a.id)}"${checked(ctx.profile.apps.includes(a.id))}>${a.icon ? `<img src="${esc(a.icon)}" alt="" loading="lazy" onerror="this.hidden=true">` : ""}<span>${esc(a.label)}</span></label><select data-policy="${esc(a.id)}" aria-label="${esc(a.label)} 默认出口"${ctx.profile.apps.includes(a.id) ? "" : " disabled"}>${options.map(([value, label]) => `<option value="${esc(value)}"${selected((ctx.profile.appPolicy[a.id] || "proxy") === value)}>${esc(label)}</option>`).join("")}</select></div>`,
+                `<div class="app-card${a.entry ? " app-card--entry" : ""}" data-app-card="${esc(a.label.toLowerCase())}" data-category-item="${esc(cat)}"><label><input type="checkbox" data-app="${esc(a.id)}"${checked(ctx.profile.apps.includes(a.id))}>${a.icon ? `<img src="${esc(a.icon)}" alt="" loading="lazy" onerror="this.hidden=true">` : ""}<span>${esc(a.label)}</span>${a.entry ? `<small class="entry-tag">策略入口</small>` : ""}</label><select data-policy="${esc(a.id)}" aria-label="${esc(a.label)} 默认出口"${ctx.profile.apps.includes(a.id) ? "" : " disabled"}>${options.map(([value, label]) => `<option value="${esc(value)}"${selected((ctx.profile.appPolicy[a.id] || "proxy") === value)}>${esc(label)}</option>`).join("")}</select>${a.entry ? `<small class="entry-hint">模板中的全部节点开关，暂未绑定规则</small>` : ""}</div>`,
             )
             .join(""),
       )
       .join("")}</div>` +
     notice(
-      "APP 列表与地区均来自 Ratatoskr 模板。APP 分流规则与最终出口统一维护；规则集模块可在下一步「规则模块」中勾选。",
+      "APP、地区与策略入口均来自 Ratatoskr 模板，模板里写了的都会显示。带「策略入口」标记的是模板中的开关组（如 Hermes），暂时没有绑定规则，也可以选择默认出口；规则集模块可在下一步「规则模块」中勾选。",
     )
   );
 }

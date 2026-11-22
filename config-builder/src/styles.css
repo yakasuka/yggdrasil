@@ -862,6 +862,30 @@ textarea {
   padding: 5px 8px;
   font-size: 0.6875rem;
 }
+/* Author-authored switch/entry groups (e.g. Hermes) carry no rule yet, but
+   are still shown because the template defines them. Keep the label compact
+   and put the explanatory note on its own line so it never crowds the picker. */
+.app-card--entry {
+  flex-wrap: wrap;
+}
+.entry-tag {
+  flex: 0 0 auto;
+  margin-left: auto;
+  padding: 1px 6px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 0.5625rem;
+  line-height: 1.4;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.entry-hint {
+  flex: 1 0 100%;
+  margin: 2px 0 0;
+  font-size: 0.625rem;
+  line-height: 1.35;
+  color: var(--muted);
+}
 /* Compact horizontal region bars: flag + name + node count on one line. */
 .region-bars {
   display: grid;

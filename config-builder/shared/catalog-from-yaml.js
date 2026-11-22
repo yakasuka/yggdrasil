@@ -152,14 +152,22 @@ export async function catalogFromYaml(text) {
     },
   );
 
-  // Apps are select groups that are not core/region/strategy groups and that
-  // actually own at least one rule. Everything else is a switch, not an app.
+  // Apps and "switch entries" are select groups that are not core/region/
+  // strategy groups. The author's principle: EVERYTHING written in the YAML
+  // must be selectable in the configurator — including switch/entry groups
+  // like ✨ Hermes that carry no rule of their own (they are total-node
+  // switches the author may wire up with rules later). Previously such groups
+  // were dropped by `.filter(a => a.rules.length)` and hermes was hard-reserved,
+  // so Hermes never appeared anywhere in the UI. Now:
+  //   - a select group with >=1 rule  -> a normal app (routing target)
+  //   - a select group with 0 rules   -> an entry/switch (still shown)
+  // Only the true core/region/strategy groups are excluded; they already have
+  // their own dedicated pickers (地区节点 / 节点策略 / 规则模块).
   const reserved = new Set([
     gateway,
     manual,
     final,
     ports,
-    hermes,
     china,
     leadingIcon(othersGroup?.name),
     "🏮",
@@ -171,18 +179,23 @@ export async function catalogFromYaml(text) {
     .map((g) => {
       const rules = t.rules.filter((r) => r.split(",")[2] === g.name);
       const meta = g["x-configurator"] || {};
+      // A rule-less select group is a switch/entry (e.g. ✨ Hermes). Give it a
+      // stable id from its group name so it survives in profiles and shares.
+      const isEntry = rules.length === 0;
       return {
         id: meta.id || rules[0]?.split(",")[1] || stripIcon(g.name),
         name: g.name,
         label: meta.label || stripIcon(g.name),
-        category: meta.category || category(g.name),
+        category: meta.category || (isEntry ? "策略入口" : category(g.name)),
         icon: g.icon || "",
         // Preserve the template's initial option (some apps start at DIRECT).
         firstProxyDirect: g.proxies?.[0] === "DIRECT",
+        // `entry` marks author-authored switch groups that have no rule yet.
+        // They are selectable in the UI and written verbatim to the YAML.
+        ...(isEntry ? { entry: true } : {}),
         rules,
       };
-    })
-    .filter((a) => a.rules.length);
+    });
   if (
     apps.some((a) => typeof a.id !== "string" || !a.id) ||
     new Set(apps.map((a) => a.id)).size !== apps.length
