@@ -26,9 +26,18 @@ import {
 import { regionsPanel } from "./panels/regions.js";
 import { strategiesPanel } from "./panels/strategies.js";
 import { appsPanel } from "./panels/apps.js";
+import { rulesPanel } from "./panels/rules.js";
 import { reviewPanel, resultPanel } from "./panels/review.js";
 const $ = (s) => document.querySelector(s);
-const steps = ["订阅来源", "地区节点", "节点策略", "APP 分流", "最终确认"];
+const steps = [
+  "订阅来源",
+  "地区节点",
+  "节点策略",
+  "APP 分流",
+  "规则模块",
+  "最终确认",
+];
+const FINAL_STEP = steps.length - 1;
 // The page is a static asset on Cloudflare Pages / GitHub Pages. All parsing,
 // preview, download and subscription creation happen on the self-hosted
 // service; the returned subscription link also points straight at that host.
@@ -57,6 +66,7 @@ const panels = [
   regionsPanel,
   strategiesPanel,
   appsPanel,
+  rulesPanel,
   reviewPanel,
 ];
 function error(text) {
@@ -70,7 +80,7 @@ function changed() {
   revision++;
   result = null;
   clearError();
-  if (step === 4) {
+  if (step === FINAL_STEP) {
     $("#result-area").replaceChildren();
     updateSummary();
   }
@@ -151,7 +161,7 @@ function renderNav() {
   );
 }
 function footer() {
-  const final = step === 4;
+  const final = step === FINAL_STEP;
   const ready = ctx.service === "ready";
   $("#back").disabled = busy || step === 0;
   $("#download").hidden = !final;
@@ -180,12 +190,12 @@ function footer() {
 function render() {
   renderNav();
   $("#step-caption").textContent =
-    `STEP ${String(step + 1).padStart(2, "0")} / 05`;
+    `STEP ${String(step + 1).padStart(2, "0")} / ${String(steps.length).padStart(2, "0")}`;
   $("#panel").innerHTML = panels[step](ctx);
   clearError();
   footer();
   filterApps();
-  if (step === 4) {
+  if (step === FINAL_STEP) {
     updateSummary();
     if (result) $("#result-area").innerHTML = resultPanel(result);
   }
@@ -297,7 +307,7 @@ function checkService() {
     if (status.state === "ready") void loadEndpoints();
     ctx.service = status.state;
     ctx.serviceMessage = status.message;
-    if (!busy && step === 4) render();
+    if (!busy && step === FINAL_STEP) render();
     else footer();
     return status;
   })();
@@ -412,14 +422,14 @@ async function updateSummary() {
       },
       catalog,
     );
-    if (step !== 4 || rev !== revision) return;
+    if (step !== FINAL_STEP || rev !== revision) return;
     $("#rule-count").textContent = output.summary.rules;
     $("#file-name").textContent = ctx.profile.title
       ? filename(ctx.profile.title)
       : "名字-ratatoskr.yaml";
     $("#file-size").textContent = `节点在生成时写入 · ${output.summary.groups} 个策略组`;
   } catch (e) {
-    if (step === 4 && rev === revision)
+    if (step === FINAL_STEP && rev === revision)
       $("#file-size").textContent = "请检查配置选择";
   }
 }
@@ -548,6 +558,10 @@ document.addEventListener("change", (e) => {
     changed();
     render();
   }
+  if (el.dataset.module) {
+    toggle(ctx.profile.modules, el.dataset.module, el.checked);
+    changed();
+  }
   if (el.dataset.policy) {
     ctx.profile.appPolicy[el.dataset.policy] = el.value;
     changed();
@@ -574,7 +588,7 @@ document.addEventListener("click", async (e) => {
   }
   if (el.id === "next") {
     if (step === 0) await resolveSources();
-    else if (step === 4) await generate();
+    else if (step === FINAL_STEP) await generate();
     else if (validateStep()) navigate(step + 1);
   }
   if (el.id === "back" && step > 0) navigate(step - 1);
@@ -629,6 +643,14 @@ document.addEventListener("click", async (e) => {
     ctx.profile.apps =
       el.dataset.apps === "all" ? catalog.apps.map((a) => a.id) : [];
     ctx.profile.appsMode = el.dataset.apps === "all" ? "all" : "custom";
+    changed();
+    render();
+  }
+  if (el.dataset.modules) {
+    ctx.profile.modules =
+      el.dataset.modules === "all"
+        ? [...new Set(catalog.orderedRules.filter((r) => r.module).map((r) => r.module))]
+        : [];
     changed();
     render();
   }

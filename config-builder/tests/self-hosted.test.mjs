@@ -24,10 +24,6 @@ function settings(extra = {}) {
     dataDir: "",
     templateURL: "bundled",
     tcpProbeEnabled: false,
-    token: "private-token",
-    ghToken: "",
-    publicConfigURL: "",
-    privateRepo: "",
     ...extra,
   };
 }
@@ -125,7 +121,7 @@ test("health probes accept self-hosted storage and report the backend links", as
   assert.equal(result.service, ORIGIN);
 });
 
-test("the backend emits every public link itself and never leaks its token", async () => {
+test("the backend emits only subscription links and never advertises a shared token", async () => {
   const s = await service();
   const health = await s.fetch(new Request(ORIGIN + "/api/status"));
   const healthData = await health.json();
@@ -139,12 +135,13 @@ test("the backend emits every public link itself and never leaks its token", asy
   );
   const payload = await links.text();
   assert.equal(links.status, 200);
-  assert.ok(!payload.includes("private-token"));
   const data = JSON.parse(payload);
-  assert.equal(data.merge, ORIGIN + "/merge?token=");
-  assert.equal(data.sub, ORIGIN + "/sub?token=");
   assert.equal(data.create, ORIGIN + "/api/subscriptions");
   assert.equal(data.subscription, ORIGIN + "/subscription/");
+  assert.equal(data.merge, undefined);
+  assert.equal(data.sub, undefined);
+  assert.equal(data.tokenHint, undefined);
+  assert.ok(!payload.includes("token="));
 });
 
 test("cross-origin frontends are allowed, unknown origins are rejected, preflight works", async () => {
@@ -187,77 +184,25 @@ test("subscription links point at the backend and serve YAML without any static 
   assert.equal((await usage.json()).usage.remaining, 70);
 });
 
-test("/merge and /sub are served by the backend and require the service token", async () => {
+test("legacy merge / sub routes and static relays no longer exist", async () => {
   const s = await service();
-  for (const path of ["/merge", "/sub"]) {
-    const denied = await s.fetch(new Request(ORIGIN + path));
-    assert.equal(denied.status, 401);
-  }
-});
-
-test("the backend itself returns merge / sub bodies, never the static hosts", async () => {
-  const previous = globalThis.fetch;
-  try {
-    const template =
-      "# >>> AUTO-PROVIDERS-START\nold-providers\n# <<< AUTO-PROVIDERS-END\n";
-    const providers = "proxy-providers:\n  private-one: {}\n";
-    const nodes = "proxies:\n  - {name: private-node}\n";
-    globalThis.fetch = async (input) => {
-      const target = String(input);
-      if (target.includes("template.yaml")) return new Response(template);
-      const content = target.endsWith("providers.yaml") ? providers : nodes;
-      return Response.json({
-        content: Buffer.from(content, "utf8").toString("base64"),
-        encoding: "base64",
-      });
-    };
-    const s = await service({
-      ghToken: "fake-gh-token",
-      publicConfigURL: "https://example.com/template.yaml",
-    });
-    const merged = await s.fetch(
-      new Request(ORIGIN + "/merge?token=private-token"),
-    );
-    assert.equal(merged.status, 200);
-    const mergedBody = await merged.text();
-    assert.ok(mergedBody.includes("private-one"));
-    assert.ok(!mergedBody.includes("old-providers"));
-
-    const sub = await s.fetch(new Request(ORIGIN + "/sub?token=private-token"));
-    assert.equal(sub.status, 200);
-    assert.ok((await sub.text()).includes("private-node"));
-    assert.ok(sub.headers.get("Subscription-Userinfo"));
-    // Private node bodies must not be readable by cross-origin browser JS.
-    for (const response of [merged, sub]) {
-      assert.equal(response.headers.get("Access-Control-Allow-Origin"), null);
-      assert.equal(response.headers.get("Referrer-Policy"), "no-referrer");
-      assert.match(response.headers.get("Cache-Control"), /no-store/);
-    }
-  } finally {
-    globalThis.fetch = previous;
-  }
-});
-
-test("static output contains no Worker, no KV binding and only link relays", () => {
   const dist = new URL("../worker/gateway/dist/", import.meta.url);
+  for (const path of ["/merge", "/sub"]) {
+    const response = await s.fetch(new Request(ORIGIN + path));
+    assert.equal(response.status, 404);
+  }
   const files = readdirSync(dist, { recursive: true }).map(String);
   assert.ok(!files.includes("_worker.js"));
   assert.ok(!files.includes("_routes.json"));
-  for (const path of ["merge/index.html", "sub/index.html", "service.json", "_redirects"])
+  assert.ok(!files.some((p) => /(^|\/)(?:merge|sub)(\/|$)/.test(p)));
+  for (const path of ["service.json", "_redirects"])
     assert.ok(existsSync(new URL(path, dist)), `missing ${path}`);
+  const redirects = readFileSync(new URL("_redirects", dist), "utf8");
+  assert.ok(!redirects.includes("/merge"));
+  assert.ok(!redirects.includes("/sub "));
   const wrangler = readFileSync(new URL("../wrangler.jsonc", import.meta.url), "utf8");
   assert.ok(!wrangler.includes("kv_namespaces"));
   assert.ok(!wrangler.includes("REPLACE_WITH_KV_NAMESPACE_ID"));
-  // Cloudflare Functions must no longer read private node repositories.
-  for (const name of ["merge", "sub"]) {
-    const source = readFileSync(
-      new URL(`../../functions/${name}.js`, import.meta.url),
-      "utf8",
-    );
-    assert.ok(source.includes("SERVICE_BASE_URL"));
-    for (const forbidden of ["GH_TOKEN", "nodes.yaml", "providers.yaml", "yggdrasil-private"])
-      assert.ok(!source.includes(forbidden), `${name}.js still reads node data`);
-  }
 });
 
 test("Docker builds never bake service credentials into the image", () => {

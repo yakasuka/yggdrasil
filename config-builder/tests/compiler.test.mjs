@@ -9,6 +9,8 @@ import {
   catalog,
   assertReferences,
   STRATEGIES,
+  RULE_MODULES,
+  ruleModules,
 } from "../shared/compiler.js";
 import { catalogFromTemplate } from "../shared/template.js";
 import {
@@ -27,8 +29,69 @@ test("defaults select all apps, manual routing, and expose no editable rules", (
     catalog.apps.map((a) => a.id),
   );
   assert.equal(p.appsMode, "all");
+  assert.deepEqual(p.modules, ruleModules(catalog));
   for (const field of ["custom", "rules", "fallback"])
     assert.equal(Object.hasOwn(p, field), false);
+});
+
+test("rule modules are the template module IDs and every one has display text", () => {
+  const present = ruleModules(catalog);
+  assert.ok(present.length >= 5);
+  for (const id of present)
+    assert.ok(RULE_MODULES.some((m) => m.id === id), `missing display for ${id}`);
+  for (const m of RULE_MODULES)
+    assert.ok(m.label && m.description && m.symbol);
+});
+
+test("turning a rule module off removes only its rules and keeps references valid", async () => {
+  const base = await compile(profile());
+  for (const id of ruleModules(catalog)) {
+    const p = profile();
+    p.modules = ruleModules(catalog).filter((m) => m !== id);
+    const { config, yaml } = await compile(p);
+    assertReferences(config);
+    assert.deepEqual(parse(yaml), config);
+    const removed = catalog.orderedRules.filter((r) => r.module === id).map((r) => r.rule);
+    assert.ok(
+      removed.every((rule) => !config.rules.includes(rule)),
+      `rules from ${id} must be absent`,
+    );
+    // Everything outside the disabled module is still present.
+    for (const rule of base.config.rules) {
+      if (removed.includes(rule)) continue;
+      assert.ok(config.rules.includes(rule), `rule ${rule} should survive`);
+    }
+  }
+});
+
+test("an empty module selection keeps only APP rules, MATCH and valid references", async () => {
+  const p = profile();
+  p.modules = [];
+  const { config } = await compile(p);
+  assertReferences(config);
+  // Every RULE-SET rule belongs to a module (direct-extra / proxy-extra /
+  // ports); with all modules off none should remain, and rule-providers too.
+  assert.ok(config.rules.every((r) => !r.startsWith("RULE-SET,")));
+  assert.equal(config["rule-providers"], undefined);
+  assert.ok(config.rules.some((r) => r.startsWith("MATCH,")));
+  // APP routing rules still work because they are not module-scoped.
+  assert.ok(config.rules.some((r) => r.includes("👾 Steam")));
+});
+
+test("legacy saved profiles without a modules field keep every rule", async () => {
+  const legacy = profile();
+  delete legacy.modules;
+  const normalized = normalize(legacy);
+  assert.deepEqual(normalized.modules, ruleModules(catalog));
+  const withModules = await compile(profile());
+  const fromLegacy = await compile(legacy);
+  assert.deepEqual(fromLegacy.config.rules, withModules.config.rules);
+});
+
+test("unknown module ids in a profile are rejected", () => {
+  const p = profile();
+  p.modules = ["not-a-module"];
+  assert.throws(() => normalize(p));
 });
 test("APP routing uses only chosen regional groups, follow proxy, Direct and Reject", async () => {
   const p = profile();

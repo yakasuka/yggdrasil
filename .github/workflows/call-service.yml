@@ -1,8 +1,8 @@
 name: Call self-hosted service
 
-# Lets GitHub invoke the merge / sub links that the backend emits, without
-# ever storing node content in the repository. Only status codes and the
-# link template are printed; responses containing nodes are discarded.
+# Smoke-tests the public self-hosted subscription API from GitHub Actions.
+# Only status codes and link templates are printed; no subscription content is
+# stored in the repository or in logs.
 on:
   workflow_dispatch:
 
@@ -16,7 +16,6 @@ jobs:
       - name: Read the links the backend emits
         env:
           SERVICE_BASE_URL: ${{ vars.SERVICE_BASE_URL }}
-          SERVICE_TOKEN: ${{ secrets.SERVICE_TOKEN }}
         run: |
           set -euo pipefail
           test -n "$SERVICE_BASE_URL" || {
@@ -28,13 +27,4 @@ jobs:
             "$SERVICE_BASE_URL/api/status"
           echo "== /api/endpoints =="
           curl -sS --max-time 15 "$SERVICE_BASE_URL/api/endpoints" \
-            | python3 -c 'import json,sys; d=json.load(sys.stdin); print("\n".join(f"{k}: {d[k]}" for k in ("service","merge","sub","subscription") if k in d))'
-          if [ -n "${SERVICE_TOKEN:-}" ]; then
-            for path in merge sub; do
-              echo "== /$path =="
-              curl -sS --max-time 20 -o /dev/null -w "HTTP %{http_code}\n" \
-                "$SERVICE_BASE_URL/$path?token=$SERVICE_TOKEN"
-            done
-          else
-            echo "SERVICE_TOKEN secret is unset; skipped authenticated merge/sub calls."
-          fi
+            | python3 -c 'import json,sys; d=json.load(sys.stdin); print("\n".join(f"{k}: {d[k]}" for k in ("service","create","subscription") if k in d))'

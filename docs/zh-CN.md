@@ -173,19 +173,21 @@ Ratatoskr 将庞大的分类数据交给 Geo 数据库，将清晰的分流意�
 <details>
 <summary><strong>维护者：订阅接口与部署约定</strong></summary>
 
-订阅接口只运行在自建 Node 服务上，Cloudflare Pages 与 GitHub Pages 只发布静态前端，不读取或返回任何节点内容：
+订阅接口是运行在自建 Node 服务上的公开 API，Cloudflare Pages 与 GitHub Pages 只发布静态前端，不读取或返回任何节点内容：
 
 | 接口 | 实现与职责 |
 | :--- | :--- |
-| `/merge?token=…` | [merge.js](../scripts/endpoints/merge.js)：读取公开模板，将私有 `providers.yaml` 注入自动订阅标记区 |
-| `/sub?token=…` | [sub.js](../scripts/endpoints/sub.js)：读取私有 `nodes.yaml`，原样返回节点订阅 YAML |
-| `/api/endpoints` | 由后端直接吐出上述链接与订阅链接模板，不含任何凭据 |
+| `/api/inspect` | 后端拉取用户输入的机场订阅，只返回脱敏节点与流量清单 |
+| `/api/preview` | 按网页选择实时生成完整 YAML，供预览 / 下载 |
+| `/api/subscriptions` | 加密保存选择，返回自带随机密钥的订阅链接 |
+| `/subscription/<id>/<key>.yaml` | 客户端拉取时重新解析机场、按最新模板与所选规则模块实时生成配置 |
+| `/api/endpoints` | 由后端直接吐出上述链接模板，不含任何凭据 |
 
-环境变量写在 `config-builder/server/.env`：`TOKEN` 用于接口鉴权，`GH_TOKEN` 用于读取私有仓库，`PUBLIC_CONFIG_URL` 指定合并接口使用的模板地址，`PUBLIC_BASE_URL` 决定生成链接的对外域名。详见 [部署指南](../config-builder/docs/DEPLOYMENT.md)。
+环境变量写在 `config-builder/server/.env`：`PUBLIC_BASE_URL` 决定生成链接的对外域名，`ALLOWED_ORIGINS` 限定可调用的前端，`TEMPLATE_URL=bundled` 表示使用仓库示例模板 `resources/template/ratatoskr-template.yaml` 的同源快照。没有共享 TOKEN，也不读取私有仓库——访问能力完全由订阅链接自身的随机 ID 与密钥承载。详见 [部署指南](../config-builder/docs/DEPLOYMENT.md)。
 
-两个静态站上的 `/merge` 与 `/sub` 只是纯跳转页（CF 侧由 `functions/` 做一次 302，GitHub Pages 侧由 `merge/index.html`、`sub/index.html` 转发），把 `?token=` 原样交给后端。旧链接 `https://yggdrasil-afx.pages.dev/merge?token=…` 可继续使用；GitHub 侧对应 `https://yakasuka.github.io/yggdrasil/merge/?token=…`，也可用仓库的 [call-service.yml](../.github/workflows/call-service.yml) 从 Actions 调用。后端地址统一写在构建变量 `SERVICE_BASE_URL` 或仓库根 `service.json` 中。
+后端地址统一写在构建变量 `SERVICE_BASE_URL` 或仓库根 `service.json` 中。[call-service.yml](../.github/workflows/call-service.yml) 从 Actions 做只读冒烟测试，只输出状态码与链接模板。旧的 `/merge`、`/sub` 私有仓库链路与静态跳转页已完全移除。
 
-配置工坊使用同一套自建 [配置服务](../config-builder/worker/README.md)，按网页选项生成配置；订阅链接由后端直接返回，不经过 CF 或 GitHub Pages。
+配置工坊使用同一套自建 [配置服务](../config-builder/worker/README.md)，按网页选项（含「规则模块」按钮块）生成配置；订阅链接由后端直接返回，不经过 CF 或 GitHub Pages。
 
 </details>
 

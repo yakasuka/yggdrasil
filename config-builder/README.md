@@ -17,13 +17,13 @@
   ├─ /api/subscriptions         创建订阅，直接返回后端链接
   ├─ /api/latency               可选 TCP 检测
   ├─ /api/endpoints             后端吐出所有公开链接
-  ├─ /subscription/<id>/<token>.yaml   实时生成配置
-  ├─ /merge?token=              合并私有 providers，输出配置
-  ├─ /sub?token=                输出私有 nodes 订阅
+  ├─ /subscription/<id>/<key>.yaml     实时生成配置
   └─ server/data/               加密记录（替代 Cloudflare KV）
 ```
 
-Cloudflare Pages 与 GitHub Pages **只发布静态资源**：`index.html`、`assets/app.js`、`assets/app.css`、图标、`merge/` `sub/` 跳转页和 `service.json`。构建产物中不再包含 `_worker.js`、`_routes.json`、KV 绑定或任何读取节点的 Functions 逻辑；CF 不会经手节点内容，也就不会被误判。
+服务是公开 API：用户把自己机场 / 自建节点的订阅地址交给后端，在页面选择地区、策略、APP 与规则模块，创建订阅后得到一条自带随机密钥的链接 `/subscription/<id>/<key>.yaml`，可直接放入任意 Mihomo / Clash Meta 客户端。每次拉取都会重新解析机场、按最新模板与所选规则模块实时生成配置。没有共享 TOKEN，也不需要私有 GitHub 仓库。
+
+Cloudflare Pages 与 GitHub Pages **只发布静态资源**：`index.html`、`assets/app.js`、`assets/app.css`、图标和 `service.json`。构建产物中不包含 `_worker.js`、`_routes.json`、KV 绑定或任何读取节点的 Functions 逻辑；CF 不会经手节点内容，也就不会被误判。旧的 `/merge`、`/sub` 私有仓库链路已完全移除。
 
 两套前端共用同一份 `assets/app.js`。后端地址按顺序取自：
 
@@ -65,19 +65,19 @@ npm ci
 npm test
 
 # 后端
-cp server/.env.example server/.env     # 填 PUBLIC_BASE_URL / ALLOWED_ORIGINS / TOKEN / GH_TOKEN
+cp server/.env.example server/.env     # 填 PUBLIC_BASE_URL / ALLOWED_ORIGINS
 npm run server                         # http://127.0.0.1:8788
 
 # 前端（两个静态站同一份产物）
 SERVICE_BASE_URL=https://api.example.com npm run build
 ```
 
-`worker/gateway/dist/` 是 Cloudflare Pages 的构建输出目录；GitHub Pages 发布仓库根目录，由 [sync-static.yml](../.github/workflows/sync-static.yml) 把同一批产物提交到 `config-builder/`、`merge/`、`sub/` 和 `service.json`。
+`worker/gateway/dist/` 是 Cloudflare Pages 的构建输出目录；GitHub Pages 发布仓库根目录，由 [sync-static.yml](../.github/workflows/sync-static.yml) 把同一批产物提交到 `config-builder/` 和 `service.json`。
 
 ## 订阅、存储与链接
 
 浏览器只把机场链接提交给后端 `/api/inspect`，后端拉取、解码后仅返回脱敏清单；预览、下载与持久订阅由后端生成。创建订阅时后端直接返回 `https://<后端域名>/subscription/<id>/<token>.yaml`，链接不经过 CF 或 GitHub Pages。
 
-KV v3 的 AES-GCM 加密记录改存 `server/data/`（每记录一个文件，按有效期清理），Token 仍为随机 128 位 ID 与独立 256 位密钥，密钥不落盘。`/merge` 与 `/sub` 仍从私有仓库读取 `providers.yaml` / `nodes.yaml`，但只在自建服务上执行；`TOKEN` 用于鉴权，`GH_TOKEN` 不会出现在任何静态文件中。后端 `/api/endpoints` 只返回链接模板，不返回任何凭据。
+KV v3 的 AES-GCM 加密记录改存 `server/data/`（每记录一个文件，按有效期清理）。每条订阅链接自带随机 128 位 ID 与独立 256 位密钥，密钥不落盘——没有共享 TOKEN、不读私有仓库。后端 `/api/endpoints` 只返回链接模板，不返回任何凭据。
 
 完整订阅链接与生成的 YAML 都包含敏感访问能力，分享问题时应移除凭据。平台界面与额度可能变化，部署与验收细节见 [部署指南](docs/DEPLOYMENT.md)。

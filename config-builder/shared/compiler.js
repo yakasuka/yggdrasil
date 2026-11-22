@@ -35,6 +35,59 @@ export const STRATEGIES = [
     strategy: "round-robin",
   },
 ];
+// Rule modules are the template-authored rule groups (private / china / gfw /
+// game / community rule-sets ...). They are presented as toggle blocks in the
+// configurator. IDs come from the catalog so a remote template can add or drop
+// a module without any browser change; this table only supplies display text.
+export const RULE_MODULES = [
+  {
+    id: "private",
+    label: "私有网络直连",
+    description: "内网地址不经过代理，避免本地流量外泄。",
+    symbol: "🏠",
+  },
+  {
+    id: "china",
+    label: "中国大陆直连",
+    description: "国内域名与 IP 直连，含 Google 中国服务。",
+    symbol: "🇨🇳",
+  },
+  {
+    id: "gfw",
+    label: "受限制域名",
+    description: "GFW 名单内的域名走代理出口。",
+    symbol: "🧱",
+  },
+  {
+    id: "game-direct",
+    label: "国服游戏直连",
+    description: "国服游戏与下载流量直连，降低延迟。",
+    symbol: "🎮",
+  },
+  {
+    id: "direct-extra",
+    label: "增强直连规则集",
+    description: "社区维护的直连域名与 IP 规则集。",
+    symbol: "↘️",
+  },
+  {
+    id: "proxy-extra",
+    label: "增强代理规则集",
+    description: "社区维护的代理域名与 IP 规则集。",
+    symbol: "🌍",
+  },
+  {
+    id: "ports",
+    label: "特殊端口直连",
+    description: "按端口匹配的直连规则集。",
+    symbol: "🔌",
+  },
+];
+// Actual module IDs present in a given model. Derived from the catalog, never
+// hardcoded, so a new template module shows up automatically.
+export const ruleModules = (model = catalog) => [
+  ...new Set(model.orderedRules.filter((r) => r.module).map((r) => r.module)),
+];
 export class ConfigError extends Error {
   constructor(message, field = "") {
     super(message);
@@ -58,6 +111,7 @@ export function defaults(model = catalog) {
     appsMode: "all",
     apps: model.apps.map((a) => a.id),
     appPolicy: {},
+    modules: ruleModules(model),
     port: 7890,
     allowLan: false,
     lifetime: "30d",
@@ -171,6 +225,13 @@ export function normalize(input, model = catalog, { migrate = false } = {}) {
       return [id, value];
     }),
   );
+  // Older saved tokens have no `modules` field. Treat an absent value as
+  // "every module" so existing subscription links keep working unchanged.
+  const knownModules = ruleModules(model);
+  p.modules =
+    input.modules === undefined
+      ? knownModules
+      : selection(input.modules, knownModules, "modules");
   p.port = Number(input.port);
   if (!Number.isInteger(p.port) || p.port < 1024 || p.port > 65535)
     fail("代理端口应为 1024–65535。", "port");
@@ -305,7 +366,9 @@ export async function compile(input, model = catalog, options = {}) {
     });
   }
   const selected = model.orderedRules.filter(
-    (r) => !r.app || p.apps.includes(r.app),
+    (r) =>
+      (!r.app || p.apps.includes(r.app)) &&
+      (!r.module || p.modules.includes(r.module)),
   );
   const rules = unique(
     [

@@ -65,7 +65,7 @@ Network takeover features such as DNS, TUN, and sniffing are configured per clie
 
 ## Development and deployment
 
-The static front end lives in `config-builder/` and is published identically on Cloudflare Pages and GitHub Pages. Every API, the encrypted store, subscription links and the `/merge` / `/sub` responses are served by the self-hosted Node service in `config-builder/server/`; their shared implementations remain in `scripts/endpoints/`. No Cloudflare Worker, Function business logic or KV namespace is used. See the [implementation map](../config-builder/docs/IMPLEMENTATION.md) and the [deployment guide](../config-builder/docs/DEPLOYMENT.md).
+The static front end lives in `config-builder/` and is published identically on Cloudflare Pages and GitHub Pages. The self-hosted Node service in `config-builder/server/` is a public API: users submit their own subscription URLs, choose regions, strategies, apps and rule modules in the wizard, and receive a subscription link carrying its own random ID and key. Each pull re-resolves the airports and regenerates the config from the current template and selected modules. No shared token and no private repository are involved. No Cloudflare Worker, Function business logic or KV namespace is used. See the [implementation map](../config-builder/docs/IMPLEMENTATION.md) and the [deployment guide](../config-builder/docs/DEPLOYMENT.md).
 
 ```sh
 npm --prefix config-builder ci

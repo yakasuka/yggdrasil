@@ -1,7 +1,5 @@
 import { SERVICE_ROUTES } from "../shared/service-routes.js";
 import { createWorker } from "../worker/application.js";
-import { onRequestGet as mergeRequest } from "../../scripts/endpoints/merge.js";
-import { onRequestGet as subRequest } from "../../scripts/endpoints/sub.js";
 import { loadConfig, serviceEnv } from "./config.js";
 import { fileStorage } from "./storage.js";
 import { fetcher, ipFetcher, probe, resolver } from "./node-platform.js";
@@ -72,25 +70,6 @@ function corsHeaders(request, config) {
   return headers;
 }
 
-// /merge and /sub return private node data. Proxy clients consume them, not
-// browser JavaScript, so they must not be readable cross-origin and must not
-// leak through a referrer. The token lives in the URL, so no CORS header and
-// a strict referrer policy are the safest defaults for these two routes.
-function privateBody(response) {
-  const headers = new Headers(response.headers);
-  for (const name of [
-    "Access-Control-Allow-Origin",
-    "Access-Control-Allow-Methods",
-    "Access-Control-Allow-Headers",
-    "Access-Control-Max-Age",
-  ])
-    headers.delete(name);
-  headers.set("Cache-Control", "no-store, private");
-  headers.set("Referrer-Policy", "no-referrer");
-  headers.set("X-Content-Type-Options", "nosniff");
-  return new Response(response.body, { status: response.status, headers });
-}
-
 function withCors(request, response, config) {
   if (!response.headers.has("Access-Control-Allow-Origin"))
     return new Response(response.body, {
@@ -138,8 +117,6 @@ export function createService({
       create: base + SERVICE_ROUTES.create,
       latency: base + SERVICE_ROUTES.probe,
       subscription: base + SERVICE_ROUTES.subscription,
-      merge: base + "/merge?token=",
-      sub: base + "/sub?token=",
       frontends: config.allowedOrigins,
     };
   }
@@ -167,22 +144,10 @@ export function createService({
       });
 
     try {
-      // The backend is the only place that emits real links. No credential is
-      // ever included: callers append their own token to merge / sub.
+      // The backend is the only place that emits real links. The only
+      // credential is the random id/key carried in each subscription URL itself.
       if (path === "/api/endpoints" && ["GET", "HEAD"].includes(method))
-        return withCors(
-          request,
-          json({ ...links(request), tokenHint: "在 merge / sub 链接后追加你的 TOKEN" }),
-          config,
-        );
-
-      if (
-        (path === "/merge" || path === "/merge/" || path === "/sub" || path === "/sub/") &&
-        ["GET", "HEAD"].includes(method)
-      ) {
-        const endpoint = path.startsWith("/merge") ? mergeRequest : subRequest;
-        return privateBody(await endpoint({ request, env }));
-      }
+        return withCors(request, json(links(request)), config);
 
       let target = null;
       let create = false;

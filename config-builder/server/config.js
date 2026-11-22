@@ -44,27 +44,18 @@ export function loadConfig(source = process.env) {
     dataDir: text(source.DATA_DIR) ? resolve(text(source.DATA_DIR)) : defaultDataDir,
     templateURL: text(source.TEMPLATE_URL) || "bundled",
     tcpProbeEnabled: text(source.TCP_PROBE_ENABLED) === "true",
-    token: text(source.TOKEN),
-    ghToken: text(source.GH_TOKEN),
-    publicConfigURL:
-      text(source.PUBLIC_CONFIG_URL) ||
-      "https://raw.githubusercontent.com/yakasuka/yggdrasil/main/resources/template/ratatoskr-template.yaml",
-    privateRepo: text(source.PRIVATE_REPO) ||
-      "https://api.github.com/repos/yakasuka/yggdrasil-private/contents",
   };
 }
 
 // The worker modules expect a Cloudflare-style env object. Everything they
-// read is mapped to local configuration and the on-disk store here.
+// read is mapped to local configuration and the on-disk store here. The public
+// service needs no shared secret: access is granted by the random id/key in
+// each subscription URL.
 export function serviceEnv(config, storage) {
   return {
     SUBSCRIPTIONS: storage,
     ALLOWED_ORIGINS: config.allowedOrigins.join(","),
     TEMPLATE_URL: config.templateURL,
     TCP_PROBE_ENABLED: config.tcpProbeEnabled ? "true" : "false",
-    TOKEN: config.token,
-    GH_TOKEN: config.ghToken,
-    PUBLIC_CONFIG_URL: config.publicConfigURL,
-    PRIVATE_REPO: config.privateRepo,
   };
 }

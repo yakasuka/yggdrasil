@@ -31,7 +31,7 @@ export function appsPanel(ctx) {
       )
       .join("")}</div>` +
     notice(
-      "APP 列表与地区均来自 Ratatoskr 模板。分流规则和最终出口统一维护，页面不提供规则自定义。",
+      "APP 列表与地区均来自 Ratatoskr 模板。APP 分流规则与最终出口统一维护；规则集模块可在下一步「规则模块」中勾选。",
     )
   );
 }
