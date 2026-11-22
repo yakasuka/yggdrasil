@@ -490,7 +490,7 @@ async function updateSummary() {
     $("#rule-count").textContent = output.summary.rules;
     $("#file-name").textContent = ctx.profile.title
       ? filename(ctx.profile.title)
-      : "未命名-ratatoskr.yaml";
+      : "ratatoskr · 未命名.yaml";
     $("#file-size").textContent = `节点在生成时写入 · ${output.summary.groups} 个策略组`;
     if (card) card.hidden = false;
   } catch (e) {

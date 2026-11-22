@@ -30,8 +30,12 @@ const ADMIN_PATH = "/api/admin/configs";
 const DASHBOARD_PATH = CONFIG_PATH + "/dashboard";
 
 function aliasFromFilename(filename) {
+  // New format: "ratatoskr · <name>.yaml"; legacy: "<name>-ratatoskr.yaml".
+  // Strip either wrapper to recover the configuration name the user typed.
   const raw = String(filename || "")
+    .replace(/^ratatoskr\s*·\s*/i, "")
     .replace(/-ratatoskr\.yaml$/i, "")
+    .replace(/\.yaml$/i, "")
     .trim()
     .replace(/\s+/g, "-")
     .toLowerCase();
@@ -483,10 +487,17 @@ export function createService({
       }
 
       // Friendly links are meant to be opened in a browser: show the YAML as
-      // plain text instead of forcing a download.
+      // plain text instead of forcing a download. Keep the backend's filename
+      // (ratatoskr · <name>.yaml) but switch attachment -> inline, so saving
+      // the page uses that name instead of the URL path (config-builder.txt).
       if (friendlyYaml && response.ok) {
         const headers = new Headers(response.headers);
-        headers.delete("Content-Disposition");
+        const disposition = headers.get("Content-Disposition");
+        if (disposition)
+          headers.set(
+            "Content-Disposition",
+            disposition.replace(/^attachment\b/i, "inline"),
+          );
         headers.delete("Content-Length");
         headers.set("Content-Type", "text/plain; charset=utf-8");
         headers.set("X-Content-Type-Options", "nosniff");

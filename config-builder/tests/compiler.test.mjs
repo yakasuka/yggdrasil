@@ -211,8 +211,8 @@ test("hidden rule mutations, invalid app regions, lifetimes and duplicate source
     change(p);
     assert.throws(() => normalize(p));
   }
-  assert.equal(filename("Eaibee"), "Eaibee-ratatoskr.yaml");
-  assert.equal(filename("../名字/"), "名字-ratatoskr.yaml");
+  assert.equal(filename("Eaibee"), "ratatoskr · Eaibee.yaml");
+  assert.equal(filename("../名字/"), "ratatoskr · 名字.yaml");
 });
 test("new template APP and country require no browser lists or backend code changes", async () => {
   const source = parse(
@@ -299,9 +299,10 @@ test("region classification and emitted filters agree for ambiguous and newly ad
 });
 
 test("download response preserves ASCII names and correctly encodes Unicode and apostrophes", () => {
-  assert.ok(
-    contentDisposition("Eaibee").includes('filename="Eaibee-ratatoskr.yaml"'),
-  );
+  const cd = contentDisposition("Eaibee");
+  // ASCII fallback replaces the middle dot; UTF-8 form encodes it precisely.
+  assert.ok(cd.includes('filename="ratatoskr _ Eaibee.yaml"'));
+  assert.ok(cd.includes("filename*=UTF-8''ratatoskr%20%C2%B7%20Eaibee.yaml"));
   const header = contentDisposition("小明\'s");
   assert.ok(header.includes("%27"));
   assert.ok(header.includes("%E5"));

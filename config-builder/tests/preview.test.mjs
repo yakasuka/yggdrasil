@@ -56,7 +56,7 @@ test("final step never shows a detached YAML file card", async () => {
   );
   assert.doesNotMatch(review, /Eaibee/);
   assert.match(review, /id="file-card" hidden/);
-  assert.match(review, /未命名-ratatoskr\.yaml/);
+  assert.match(review, /ratatoskr · 未命名\.yaml/);
   const app = await readFile(new URL("../src/app.js", import.meta.url), "utf8");
   assert.match(app, /if \(ctx\.preview \|\| ctx\.service !== "ready"\)/);
   assert.match(app, /\$\("#download"\)\.hidden = !final \|\| !ready;/);

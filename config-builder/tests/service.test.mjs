@@ -45,7 +45,7 @@ test("all four lifetimes create unique encrypted profiles and permanent tokens o
     );
     assert.ok(
       decodeURIComponent(read.headers.get("Content-Disposition")).includes(
-        "Eaibee-ratatoskr.yaml",
+        "ratatoskr · Eaibee.yaml",
       ),
     );
     assert.ok((await read.text()).includes("# Ratatoskr · Eaibee"));

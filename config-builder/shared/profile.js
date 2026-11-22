@@ -11,7 +11,7 @@ export function filename(title) {
       .replace(/[<>:"/\\|?*\x00-\x1f]/g, "-")
       .replace(/^[.\s-]+|[.\s-]+$/g, "")
       .slice(0, 60) || "用户";
-  return safe + "-ratatoskr.yaml";
+  return `ratatoskr · ${safe}.yaml`;
 }
 export function lifetime(id) {
   const value = LIFETIMES.find((x) => x.id === id);

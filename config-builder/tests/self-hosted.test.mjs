@@ -181,7 +181,13 @@ test("subscription links point at the backend and serve YAML without any static 
   const read = await s.fetch(new Request(data.url));
   assert.equal(read.status, 200);
   assert.equal(read.headers.get("Content-Type"), "text/plain; charset=utf-8");
-  assert.equal(read.headers.get("Content-Disposition"), null);
+  // Friendly links still display inline, but carry the real filename so a
+  // browser "Save as" uses "ratatoskr · <name>.yaml" instead of config-builder.txt.
+  const disposition = read.headers.get("Content-Disposition");
+  assert.ok(disposition.startsWith("inline;"));
+  assert.ok(
+    decodeURIComponent(disposition).includes("ratatoskr · Eaibee.yaml"),
+  );
   const yaml = await read.text();
   assert.ok(yaml.includes("proxies:"));
   assert.ok(read.headers.get("Subscription-Userinfo"));
