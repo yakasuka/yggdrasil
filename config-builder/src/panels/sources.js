@@ -10,7 +10,6 @@ export function sourcesPanel(ctx) {
       "一切，从你的订阅开始。",
       "填入机场名称与订阅链接，支持 YAML、Base64 和常见节点链接格式。解析后，按实际节点组织地区与分流。",
     ) +
-    `<div class="share-box share-import"><div class="share-box-head"><span class="share-mark" aria-hidden="true">↧</span><div><strong>导入分享配置</strong><small>粘贴分享码，恢复地区、策略与规则选择</small></div></div><div class="share-box-row"><input id="share-code-input" type="text" placeholder="36 位分享码，或完整分享链接" autocomplete="off" spellcheck="false" aria-label="分享码或分享链接"><button class="button secondary" id="import-share" type="button">导入</button></div></div>` +
     '<div id="provider-list">' +
     ctx.profile.providers
       .map((p, i) => providerCard(p, i, ctx.profile.providers.length))
@@ -18,7 +17,7 @@ export function sourcesPanel(ctx) {
     "</div>" +
     `<button class="button add-provider" id="add-provider"${ctx.profile.providers.length >= 10 ? " disabled" : ""}>＋ 添加另一个机场 <span class="muted">${ctx.profile.providers.length} / 10</span></button>` +
     notice(
-      "点击下一步后解析节点与流量信息。机场链接仅用于处理你的配置，不会写入浏览器本地存储。",
+      "点击下一步后解析节点与流量信息；也可以选择「先配置其他步骤」，等节点就绪后再回来解析。机场链接仅用于处理你的配置，不会写入浏览器本地存储。",
     )
   );
 }

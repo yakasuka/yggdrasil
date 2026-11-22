@@ -416,6 +416,70 @@ button:active:not(:disabled),
   letter-spacing: 0.1em;
   color: var(--muted);
 }
+.panel-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+.icon-text-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 10px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--soft);
+  color: var(--ink);
+  font-size: 0.6875rem;
+  font-weight: 550;
+  line-height: 1;
+  cursor: pointer;
+}
+.icon-text-button:hover:not(:disabled) {
+  border-color: var(--selected-line);
+  background: var(--tint);
+  color: var(--accent);
+}
+.icon-text-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.icon-text-button span {
+  font-size: 0.875rem;
+  color: var(--accent);
+}
+.preview-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 20px;
+  padding: 12px 14px;
+  border: 1px solid var(--selected-line);
+  border-radius: 12px;
+  background: var(--tint);
+}
+.preview-banner[hidden] {
+  display: none;
+}
+.preview-banner > span {
+  font-size: 1.125rem;
+  color: var(--accent);
+}
+.preview-banner strong {
+  display: block;
+  font-size: 0.75rem;
+}
+.preview-banner small {
+  display: block;
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 0.6875rem;
+}
+.preview-banner .text-button {
+  margin-left: auto;
+  flex: none;
+}
 .panel-title {
   margin: 0 0 12px;
   font-size: 1.875rem;
@@ -1220,6 +1284,29 @@ dialog::backdrop {
   font-size: 1.5rem;
   font-weight: 600;
   letter-spacing: -0.03em;
+}
+.share-dialog {
+  max-width: 520px;
+}
+.share-pane {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+.share-pane h3 {
+  margin: 0 0 12px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+.share-pane .inline-field {
+  margin-bottom: 12px;
+}
+.share-pane .button {
+  width: 100%;
+}
+.share-pane .field input {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.75rem;
 }
 pre {
   max-height: 54svh;

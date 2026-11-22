@@ -40,8 +40,8 @@
     </script>
     <link rel="icon" href="../assets/favicon.png" type="image/png" />
     <link rel="preload" as="image" href="../assets/favicon.png" />
-    <link rel="stylesheet" href="./assets/app.css?v=a6d0df4875ce" />
-    <script type="module" src="./assets/app.js?v=e38cf896a123"></script>
+    <link rel="stylesheet" href="./assets/app.css?v=61f7265510a6" />
+    <script type="module" src="./assets/app.js?v=3aa929962430"></script>
   </head>
   <body>
     <div
@@ -136,6 +136,24 @@
         <div class="panel-top">
           <span id="step-caption" class="eyebrow"></span
           ><span class="chip">RATATOSKR</span>
+          <div class="panel-actions">
+            <button
+              type="button"
+              class="icon-text-button"
+              id="open-import"
+              title="导入分享码"
+            >
+              <span aria-hidden="true">↧</span> 导入配置
+            </button>
+            <button
+              type="button"
+              class="icon-text-button"
+              id="open-share"
+              title="分享当前配置"
+            >
+              <span aria-hidden="true">↥</span> 分享
+            </button>
+          </div>
         </div>
         <div
           class="service-status"
@@ -157,12 +175,29 @@
             ↻
           </button>
         </div>
+        <div id="preview-banner" class="preview-banner" hidden>
+          <span aria-hidden="true">✳</span>
+          <div>
+            <strong>预览模式 · 尚未解析节点</strong>
+            <small>可提前配置地区、策略与规则；填写订阅解析节点后才能生成配置。</small>
+          </div>
+          <button type="button" class="text-button" id="leave-preview">
+            填写订阅 →
+          </button>
+        </div>
         <div id="panel"></div>
         <div id="error" class="error" role="alert" hidden></div>
         <footer class="wizard-footer">
           <button id="back" class="button secondary" type="button">
             上一步</button
           ><span id="progress-note"></span
+          ><button
+            id="skip-sources"
+            class="text-button"
+            type="button"
+            hidden
+          >
+            先配置其他步骤 →</button
           ><button id="download" class="button secondary" type="button" hidden>
             下载 YAML ↓</button
           ><button id="next" class="button primary" type="button">
@@ -192,6 +227,44 @@
       </div>
       <p class="muted">预览含机场订阅地址，请妥善保管。</p>
       <pre id="yaml-preview" tabindex="0"></pre>
+    </dialog>
+    <dialog id="share-dialog" class="share-dialog">
+      <div class="dialog-header">
+        <div>
+          <span class="eyebrow">SHARE CONFIGURATION</span>
+          <h2>分享与导入</h2>
+        </div>
+        <button id="close-share" class="icon-button" aria-label="关闭分享窗口">
+          ×
+        </button>
+      </div>
+      <p class="muted">分享码可在任意步骤生成或导入；生成与读取需要通过订阅服务。</p>
+      <p id="share-error" class="error" role="alert" hidden></p>
+      <section class="share-pane">
+        <h3>导入配置</h3>
+        <label class="field"
+          >分享码或分享链接<input
+            id="share-code-input"
+            type="text"
+            placeholder="36 位分享码，或完整分享链接"
+            autocomplete="off"
+            spellcheck="false"
+        /></label>
+        <button class="button secondary" id="import-share" type="button">
+          导入配置
+        </button>
+      </section>
+      <section class="share-pane">
+        <h3>分享当前配置</h3>
+        <label class="inline-field"
+          ><span>同时包含机场订阅地址（谨慎）</span
+          ><input id="share-providers" type="checkbox"
+        /></label>
+        <button class="button secondary" id="create-share" type="button">
+          生成分享码
+        </button>
+        <div id="share-result"></div>
+      </section>
     </dialog>
     <div id="toast" role="status" hidden></div>
     <noscript>请启用 JavaScript，以使用配置向导。</noscript>

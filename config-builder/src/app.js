@@ -36,6 +36,7 @@ import { appsPanel } from "./panels/apps.js";
 import { rulesPanel } from "./panels/rules.js";
 import { reviewPanel, resultPanel, shareResult } from "./panels/review.js";
 import { applyShare, parseShareCode } from "../shared/share.js";
+import { previewInspection, previewRegions } from "../shared/preview.js";
 import { createShareCode, fetchShareCode } from "./share.js";
 const $ = (s) => document.querySelector(s);
 const steps = [
@@ -63,9 +64,9 @@ const ctx = {
   share: { code: "", includeProviders: false },
   importSelection: null,
   linkPwd: "",
+  preview: false,
 };
 let step = 0,
-  furthest = 0,
   busy = false,
   revision = 0,
   result = null,
@@ -103,9 +104,37 @@ function invalidate() {
   ctx.inspection = null;
   ctx.phase = "idle";
   ctx.probeDone = 0;
-  furthest = 0;
   changed();
   renderNav();
+}
+function renderPreview() {
+  const banner = $("#preview-banner");
+  if (!banner) return;
+  banner.hidden = !ctx.preview;
+}
+function enterPreview({ stay = false } = {}) {
+  ctx.preview = true;
+  ctx.inspection = previewInspection(catalog);
+  ctx.phase = "idle";
+  probeController?.abort();
+  ctx.probeDone = 0;
+  const chosen = ctx.profile.countries.filter((id) =>
+    catalog.regions.some((r) => r.id === id),
+  );
+  ctx.profile.countries = chosen.length
+    ? chosen
+    : previewRegions(catalog).filter((id) => id !== "OTHER");
+  clearError();
+  if (!stay) navigate(1);
+  else render();
+}
+function leavePreview() {
+  if (!ctx.preview) return;
+  ctx.preview = false;
+  ctx.inspection = null;
+  ctx.phase = "idle";
+  changed();
+  navigate(0);
 }
 function syncProviderCards() {
   const slots = $("#provider-list").querySelectorAll(
@@ -134,8 +163,9 @@ function syncProviderCards() {
   $("#add-provider").disabled = slots.length >= 10;
 }
 function renderNav() {
-  const phase =
-    ctx.phase === "loading"
+  const phase = ctx.preview
+    ? "预览模式 · 尚未解析节点"
+    : ctx.phase === "loading"
       ? "正在解析…"
       : ctx.phase === "error"
         ? "解析未完成"
@@ -157,7 +187,7 @@ function renderNav() {
   const parsing = step === 0 && ctx.phase === "loading";
   for (const button of $("#steps").querySelectorAll("[data-step]")) {
     const i = Number(button.dataset.step);
-    button.disabled = i > furthest || busy;
+    button.disabled = busy;
     button.classList.toggle("done", i < step);
     if (i === step && !parsing) button.setAttribute("aria-current", "step");
     else button.removeAttribute("aria-current");
@@ -174,11 +204,12 @@ function renderNav() {
 }
 function footer() {
   const final = step === FINAL_STEP;
-  const ready = ctx.service === "ready";
+  const ready = ctx.service === "ready" && !ctx.preview;
   $("#back").disabled = busy || step === 0;
   $("#download").hidden = !final;
   $("#download").disabled = busy || !ready;
-  $("#next").disabled = busy || !ready;
+  $("#next").disabled = busy || ((step === 0 || final) && !ready);
+  $("#skip-sources").hidden = busy || step !== 0 || ctx.preview;
   $("#next").innerHTML = busy
     ? ctx.phase === "loading"
       ? "正在解析…"
@@ -188,9 +219,11 @@ function footer() {
       : step === 0
         ? "解析并继续 →"
         : "下一步 →";
-  $("#progress-note").textContent = final
-    ? "配置按当前选择生成"
-    : "只保留你需要的枝叶。";
+  $("#progress-note").textContent = ctx.preview
+    ? "预览模式：填写订阅后可生成"
+    : final
+      ? "配置按当前选择生成"
+      : "只保留你需要的枝叶。";
   document.querySelector(".wizard-footer").dataset.final = String(final);
   renderService();
   if ($("#add-provider"))
@@ -204,6 +237,7 @@ function showResult() {
   renderEmoji($("#result-area"));
 }
 function render() {
+  renderPreview();
   renderNav();
   $("#step-caption").textContent =
     `STEP ${String(step + 1).padStart(2, "0")} / ${String(steps.length).padStart(2, "0")}`;
@@ -259,7 +293,6 @@ function validateStep() {
 }
 function navigate(next) {
   step = next;
-  furthest = Math.max(furthest, next);
   render();
   enterPanel($("#panel"));
   $("#workspace").focus({ preventScroll: true });
@@ -318,6 +351,7 @@ async function resolveSources() {
     return;
   }
   busy = true;
+  const wasPreview = ctx.preview;
   ctx.phase = "loading";
   clearError();
   renderNav();
@@ -348,6 +382,7 @@ async function resolveSources() {
       throw Error("订阅中没有识别到可用节点。");
     ctx.inspection = inspection;
     ctx.phase = "ready";
+    ctx.preview = false;
     if (ctx.importSelection) {
       // Shared choices win, but only for regions that actually exist in the
       // importer's subscription.
@@ -358,6 +393,18 @@ async function resolveSources() {
         ctx.importSelection.other &&
         inspection.regions.some((r) => r.id === "OTHER");
       ctx.importSelection = null;
+    } else if (wasPreview) {
+      // Keep choices made before the subscription was filled in, dropping
+      // only regions the real subscription does not contain.
+      const available = inspection.regions.map((r) => r.id);
+      ctx.profile.countries = ctx.profile.countries.filter((id) =>
+        available.includes(id),
+      );
+      ctx.profile.other = ctx.profile.other && available.includes("OTHER");
+      if (!ctx.profile.countries.length && !ctx.profile.other)
+        ctx.profile.countries = inspection.regions
+          .filter((r) => r.id !== "OTHER")
+          .map((r) => r.id);
     } else {
       ctx.profile.countries = inspection.regions
         .filter((r) => r.id !== "OTHER")
@@ -531,14 +578,37 @@ function toast(text) {
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => ($("#toast").hidden = true), 2500);
 }
+function shareError(text) {
+  const box = $("#share-error");
+  if (box) {
+    box.textContent = text;
+    box.hidden = !text;
+  }
+  if (text) error(text);
+}
+function openShareDialog(pane = "import") {
+  const dialog = $("#share-dialog");
+  if (!dialog) return;
+  shareError("");
+  const checkbox = $("#share-providers");
+  if (checkbox) checkbox.checked = ctx.share.includeProviders;
+  const box = $("#share-result");
+  if (box) box.innerHTML = shareResult(ctx.share);
+  const target = dialog.querySelector(
+    pane === "export" ? "#create-share" : "#share-code-input",
+  );
+  dialog.showModal();
+  target?.focus({ preventScroll: true });
+}
 async function createShare() {
   if (busy || ctx.service !== "ready") {
-    error("订阅服务未连接，请稍后重试。");
+    shareError("订阅服务未连接，请稍后重试。");
     return;
   }
   const button = $("#create-share");
   if (button) button.disabled = true;
   clearError();
+  shareError("");
   try {
     const data = await createShareCode(ctx.profile, ctx.share.includeProviders);
     ctx.share = { code: data.code, includeProviders: data.includeProviders };
@@ -546,24 +616,25 @@ async function createShare() {
     if (box) box.innerHTML = shareResult(ctx.share);
     toast("分享码已生成");
   } catch (e) {
-    error(e.message || "分享码生成失败。");
+    shareError(e.message || "分享码生成失败。");
   } finally {
     if (button) button.disabled = false;
   }
 }
 async function importShare() {
   if (busy || ctx.service !== "ready") {
-    error("订阅服务未连接，请稍后重试。");
+    shareError("订阅服务未连接，请稍后重试。");
     return;
   }
   const code = parseShareCode($("#share-code-input")?.value);
   if (!code) {
-    error("分享码格式不正确，请粘贴 36 位分享码或完整分享链接。");
+    shareError("分享码格式不正确，请粘贴 36 位分享码或完整分享链接。");
     return;
   }
   const button = $("#import-share");
   if (button) button.disabled = true;
   clearError();
+  shareError("");
   try {
     const data = await fetchShareCode(code);
     ctx.profile = applyShare(ctx.profile, data.profile, catalog);
@@ -579,15 +650,17 @@ async function importShare() {
       (p) => p.name.trim() && p.url.trim(),
     );
     invalidate();
+    if (!ready && !ctx.preview) enterPreview({ stay: true });
     navigate(0);
+    $("#share-dialog")?.close();
     toast(
       data.includeProviders
         ? "配置已导入，含机场订阅地址"
-        : "配置已导入，请确认机场订阅",
+        : "配置已导入，可先配置其他步骤；填写订阅后即可解析节点",
     );
     if (ready) void resolveSources();
   } catch (e) {
-    error(e.message || "分享码读取失败。");
+    shareError(e.message || "分享码读取失败。");
   } finally {
     if (button) button.disabled = false;
   }
@@ -597,7 +670,8 @@ document.addEventListener("input", (e) => {
   if (el.dataset.provider !== undefined) {
     ctx.profile.providers[Number(el.dataset.provider)][el.dataset.key] =
       el.value;
-    invalidate();
+    if (ctx.preview) changed();
+    else invalidate();
   }
   if (el.id === "profile-title") {
     ctx.profile.title = el.value;
@@ -670,6 +744,26 @@ document.addEventListener("click", async (e) => {
     await checkService();
     return;
   }
+  if (el.id === "open-import") {
+    openShareDialog("import");
+    return;
+  }
+  if (el.id === "open-share") {
+    openShareDialog("export");
+    return;
+  }
+  if (el.id === "close-share") {
+    $("#share-dialog")?.close();
+    return;
+  }
+  if (el.id === "skip-sources") {
+    enterPreview();
+    return;
+  }
+  if (el.id === "leave-preview") {
+    leavePreview();
+    return;
+  }
   if (el.id === "import-share") {
     await importShare();
     return;
@@ -701,7 +795,8 @@ document.addEventListener("click", async (e) => {
   if (el.id === "add-provider") {
     if (busy || ctx.profile.providers.length >= 10) return;
     ctx.profile.providers.push({ name: "", url: "" });
-    invalidate();
+    if (ctx.preview) changed();
+    else invalidate();
     const i = ctx.profile.providers.length - 1;
     $("#provider-list").insertAdjacentHTML(
       "beforeend",
@@ -717,12 +812,13 @@ document.addEventListener("click", async (e) => {
     const index = Number(el.dataset.remove),
       slot = el.closest(".provider-slot");
     ctx.profile.providers.splice(index, 1);
+    if (ctx.preview) changed();
     slot.classList.add("is-removing");
     slot.setAttribute("aria-hidden", "true");
     slot
       .querySelectorAll("input,button")
       .forEach((input) => (input.disabled = true));
-    invalidate();
+    if (!ctx.preview) invalidate();
     syncProviderCards();
     revealCard(slot, true);
     $("#add-provider").focus({ preventScroll: true });

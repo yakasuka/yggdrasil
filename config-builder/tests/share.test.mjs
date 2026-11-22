@@ -13,7 +13,6 @@ import {
 } from "../shared/share.js";
 import { createService } from "../server/create-server.js";
 import { sourcesPanel } from "../src/panels/sources.js";
-import { reviewPanel } from "../src/panels/review.js";
 import { profile as fixture } from "./helpers.mjs";
 
 const ORIGIN = "https://service.example";
@@ -53,25 +52,20 @@ const get = (code, origin = FRONTEND) =>
     headers: { Origin: origin },
   });
 
-test("the wizard renders import and export controls", () => {
-  const ctx = {
-    profile: fixture(),
-    inspection: null,
-    service: "ready",
-    share: { code: "", includeProviders: false },
-  };
-  const sources = sourcesPanel(ctx);
-  assert.match(sources, /id="share-code-input"/);
-  assert.match(sources, /id="import-share"/);
-  const review = reviewPanel(ctx);
-  assert.match(review, /id="create-share"/);
-  assert.match(review, /id="share-providers"/);
-  const withCode = reviewPanel({
-    ...ctx,
-    share: { code: "a".repeat(36), includeProviders: false },
-  });
-  assert.match(withCode, /id="copy-share"/);
-  assert.match(withCode, /不含机场地址/);
+test("share controls live in a dialog available from every step", async () => {
+  const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
+  assert.match(html, /id="open-import"/);
+  assert.match(html, /id="open-share"/);
+  assert.match(html, /id="share-dialog"/);
+  assert.match(html, /id="share-code-input"/);
+  assert.match(html, /id="import-share"/);
+  assert.match(html, /id="create-share"/);
+  assert.match(html, /id="share-providers"/);
+  assert.match(html, /id="share-result"/);
+  assert.match(html, /id="share-error"/);
+  // The old per-step boxes are gone, so no duplicate IDs are rendered.
+  const ctx = { profile: fixture(), inspection: null, service: "ready" };
+  assert.doesNotMatch(sourcesPanel(ctx), /share-code-input|import-share/);
 });
 
 test("share codes are 36 random hex characters and parse from pasted links", () => {
