@@ -85,11 +85,9 @@ Yggdrasil 是一套面向 **Mihomo / Clash / OpenClash / Clash Verge** 的配置
 
 ### 赞助支持
 
-如果 Yggdrasil 帮到了你，可以用一杯咖啡支持后续维护。项目提供 **微信 / 支付宝 / PayPal** 三种打赏方式：
+如果 Yggdrasil 帮到了你，可以用一杯咖啡支持后续维护。点击下方链接，选择 **微信 / 支付宝 / PayPal** 任意方式打赏：
 
-<pre><code><a href="https://yakasuka.github.io/yggdrasil/sponsor/">https://yakasuka.github.io/yggdrasil/sponsor/</a>  →  打开打赏页面（微信 / 支付宝 / PayPal）</code></pre>
-
-<sub>或访问项目主页的 <a href="https://yakasuka.github.io/yggdrasil/sponsor/">赞助页面</a>，扫码即可支持。</sub>
+<pre><code><a href="https://yakasuka.github.io/yggdrasil/sponsor/">https://yakasuka.github.io/yggdrasil/sponsor/</a>  →  打开打赏页面</code></pre>
 
 ### 贡献者
 
