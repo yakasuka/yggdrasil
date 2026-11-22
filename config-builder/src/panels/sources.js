@@ -10,6 +10,7 @@ export function sourcesPanel(ctx) {
       "一切，从你的订阅开始。",
       "填入机场名称与订阅链接，支持 YAML、Base64 和常见节点链接格式。解析后，按实际节点组织地区与分流。",
     ) +
+    `<div class="share-box share-import"><div class="share-box-head"><span class="share-mark" aria-hidden="true">↧</span><div><strong>导入分享配置</strong><small>粘贴分享码，恢复地区、策略与规则选择</small></div></div><div class="share-box-row"><input id="share-code-input" type="text" placeholder="36 位分享码，或完整分享链接" autocomplete="off" spellcheck="false" aria-label="分享码或分享链接"><button class="button secondary" id="import-share" type="button">导入</button></div></div>` +
     '<div id="provider-list">' +
     ctx.profile.providers
       .map((p, i) => providerCard(p, i, ctx.profile.providers.length))

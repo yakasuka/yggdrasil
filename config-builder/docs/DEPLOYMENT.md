@@ -13,12 +13,13 @@
    │
    └─ 数据：自建 Node 服务（唯一的节点数据来源，公开 API）
             /api/status /api/inspect /api/preview /api/subscriptions
-            /api/latency /api/endpoints
-            /subscription/<id>/<key>.yaml   拉取时实时生成配置
+            /api/latency /api/endpoints /api/presets
+            /config-builder?token=<名称>   友好订阅链接，内联返回 YAML
+            /subscription/<id>/<key>.yaml   旧版订阅链接（继续兼容）
             server/data/  加密记录
 ```
 
-服务是**公开 API**：用户在页面填入自己的机场 / 自建节点订阅地址，选择地区、策略、APP 与规则模块，创建订阅后得到一条自带随机密钥的链接 `/subscription/<id>/<key>.yaml`，可直接放进任意 Mihomo / Clash Meta 客户端。每次拉取都会重新解析机场、按最新模板与所选规则模块实时生成配置。
+服务是**公开 API**：用户在页面填入自己的机场 / 自建节点订阅地址，选择地区、策略、APP 与规则模块，创建订阅后得到一条以配置名称为凭据的链接 `/config-builder?token=guagua`，可直接放进任意 Mihomo / Clash Meta 客户端；浏览器打开时以 `text/plain` 内联显示 YAML，不触发下载。每次拉取都会重新解析机场、按最新模板与所选规则模块实时生成配置。旧的 `/subscription/<id>/<key>.yaml` 链接继续有效。
 
 没有共享 TOKEN、不读私有 GitHub 仓库。默认的规则与模板来自仓库示例 `resources/template/ratatoskr-template.yaml` 的同源快照 `shared/catalog.json`。
 
@@ -41,7 +42,8 @@ cp server/.env.example server/.env
 | 变量 | 作用 | 建议 |
 | --- | --- | --- |
 | `HOST` / `PORT` | 监听地址 | `127.0.0.1` / `8788`，由 Nginx 反代 |
-| `DATA_DIR` | 加密记录目录 | `./server/data`，已加入 `.gitignore`，务必持久化备份 |
+| `DATA_DIR` | 加密记录目录 | `./server/data`，已加入 `.gitignore`，务必持久化备份；分享码与其中的 `.preset-key` 也在这里 |
+| `PRESET_TTL` | 分享码有效期（秒） | 默认 `0` 表示永久有效；设置后过期自动清理 |
 | `PUBLIC_BASE_URL` | **生成订阅链接的对外源地址** | 填 `https://api.example.com`，否则链接会用内网 Host |
 | `TRUST_PROXY` | 是否信任 `X-Forwarded-*` | 前面有反代时设为 `true` |
 | `ALLOWED_ORIGINS` | 允许调用 API 的前端源，逗号分隔 | `https://yggdrasil-afx.pages.dev,https://yakasuka.github.io` |
@@ -50,7 +52,7 @@ cp server/.env.example server/.env
 
 `ALLOWED_ORIGINS` 留空时允许任意来源（服务日志会提示 `cors: open`）；上线前务必填成自己的两个静态站域名。`GET /api/status` 返回 `cors: restricted | open`，可用于核对。
 
-**没有需要保密的共享凭据**。唯一的访问能力是每条订阅链接自带的随机 128 位 ID 与独立 256 位密钥（路径 `/subscription/<id>/<key>.yaml`），创建订阅时生成，密钥不落盘。持有链接即可读取配置，因此把每条订阅链接本身当作口令保管即可。`service.json`、静态文件与 workflow 里都只有公开 URL。
+**没有需要保密的共享凭据**。新订阅的对外凭据是用户在「配置名称」里填写的 token（3–60 位字母、数字、`_` 或 `-`，空格转 `-`，不区分大小写，重名返回 409）；服务端把它映射到内部随机 128 位 ID 与独立 256 位密钥，密钥不落盘。名称可猜，因此把整条链接当作口令保管；旧版 `/subscription/<id>/<key>.yaml` 链接仍按随机凭据工作。`service.json`、静态文件与 workflow 里都只有公开 URL。
 
 若从旧的 Cloudflare Worker / Pages Functions 架构迁移：删除 CF 项目里的 `TOKEN`、`GH_TOKEN`、`SERVICE_TOKEN` 变量，下线旧 Worker 与 Pages Functions（`worker/wrangler.jsonc` 含 KV 绑定，已弃用，不要执行 `worker:deploy`），只保留静态站点；两个静态站的 `service.json` / `SERVICE_BASE_URL` 都指向同一个后端域名。
 
@@ -137,6 +139,8 @@ cd .. && git add config-builder/index.html config-builder/assets/app.js config-b
   "service": "https://api.example.com",
   "create": "https://api.example.com/api/subscriptions",
   "subscription": "https://api.example.com/subscription/",
+  "config": "https://api.example.com/config-builder",
+  "preset": "https://api.example.com/api/presets",
   "frontends": ["https://yggdrasil-afx.pages.dev", "https://yakasuka.github.io"]
 }
 ```
@@ -146,10 +150,16 @@ cd .. && git add config-builder/index.html config-builder/assets/app.js config-b
 1. 页面加载时 `/api/status` 探测后端；未就绪则向导停止并提示重试。
 2. 用户填入机场订阅地址 → `/api/inspect` 由后端解析、只返回脱敏节点清单；可选 `/api/latency` 做服务端 TCP 建连耗时。
 3. 用户选择地区、策略、APP 与规则模块 → `/api/preview` 生成完整 YAML 供预览 / 下载。
-4. 「生成订阅链接」→ `POST /api/subscriptions`，后端把选择与节点快照 AES-GCM 加密写入 `server/data/`，返回 `https://api.example.com/subscription/<id>/<key>.yaml`。
-5. 把这条链接放进 Mihomo / Clash Meta 客户端。每次更新订阅时，后端重新解析机场、刷新节点与流量，按最新模板与用户所选规则模块实时生成配置。
+4. 「生成订阅链接」→ `POST /api/subscriptions`，后端把选择与节点快照 AES-GCM 加密写入 `server/data/`，并把配置名称映射到内部随机凭据，返回 `https://api.example.com/config-builder?token=guagua`（流量接口为 `/config-builder/status?token=guagua`）。
+5. 把这条链接放进 Mihomo / Clash Meta 客户端，或直接在浏览器打开查看 YAML。每次更新订阅时，后端重新解析机场、刷新节点与流量，按最新模板与用户所选规则模块实时生成配置。
 
-链接本身即凭据：随机 128 位 ID + 独立 256 位密钥，不依赖共享 TOKEN。`GET /subscription/<id>/<key>/status` 可刷新流量报告。分享问题时务必移除完整链接。
+链接本身即凭据：对外是用户选择的配置名称（可猜，请私密传递或直接打开时留意），对内是随机 128 位 ID + 独立 256 位密钥，不依赖共享 TOKEN。`GET /config-builder/status?token=<名称>` 可刷新流量报告；旧 `GET /subscription/<id>/<key>/status` 继续有效。分享问题时务必移除完整链接。
+
+### 分享码
+
+分享码是另一条独立链路：`POST /api/presets` 接收 `{ profile, includeProviders }`，返回 `{ code, url, includeProviders }`；`GET /api/presets/<code>` 取回选择。码为 18 字节随机数转成的 36 位十六进制（144 位熵），本身即访问凭据。服务端只保存字段白名单内的内容，默认剥离机场订阅地址；勾选包含时用服务器本地生成的 AES-256-GCM 密钥加密，密钥文件 `server/data/.preset-key` 权限 `0600`，请勿删除，否则旧分享码无法读取。分享码默认永久有效，可用 `PRESET_TTL` 设置秒数。请求体上限 64 KB，未知地区 / APP / 模块 ID 在导入时按当前 catalog 过滤。
+
+分享码只携带选择，不携带节点或订阅 YAML，也不会替换订阅链接。含机场地址的分享码等于把节点访问能力交出去，应通过私下渠道传递。
 
 GitHub 侧的 [call-service.yml](../../.github/workflows/call-service.yml) 仅做只读冒烟测试：读取 `/api/status` 与 `/api/endpoints`，只输出状态码与链接模板，不保存任何节点内容到仓库或日志。
 
@@ -166,10 +176,11 @@ curl https://api.example.com/api/endpoints
 2. 填入测试订阅，由后端 `/api/inspect` 解析节点与地区。
 3. 在「规则模块」步骤切换几个按钮块，预览配置，核对对应规则确实出现 / 消失。
 4. 预览并下载 `Example-ratatoskr.yaml`，核对节点、地区去留与 `[P1]` / `[P2]` 标识。
-5. 创建订阅，确认 `/api/subscriptions` 返回 201，链接以 `https://api.example.com/subscription/` 开头；用该链接读取 YAML 应返回 200，且带 `Subscription-Userinfo`。
-6. 访问静态站的 `/config-builder/wrangler.jsonc`、`/config-builder/src/app.js`、`/_worker.js`，应返回 404；确认 CF 构建输出目录里没有 `_worker.js`。
-7. 旧的 `/merge`、`/sub` 应返回 404，静态站不应再有对应跳转页。
-8. 用支持相应 Geo 数据的 Mihomo 检查配置：
+5. 创建订阅，确认 `/api/subscriptions` 返回 201，链接形如 `https://api.example.com/config-builder?token=<配置名称>`；浏览器打开应显示 YAML 文本（响应头 `Content-Type: text/plain`、无 `Content-Disposition`），且带 `Subscription-Userinfo`。重复创建同名配置应返回 409。
+6. 在确认页生成分享码并在另一浏览器打开静态站，于「订阅来源」页粘贴导入，核对地区 / 策略 / 规则模块一致且机场地址未被带入（除非已勾选包含）；服务日志不应出现分享码内容。
+7. 访问静态站的 `/config-builder/wrangler.jsonc`、`/config-builder/src/app.js`、`/_worker.js`，应返回 404；确认 CF 构建输出目录里没有 `_worker.js`。
+8. 旧的 `/merge`、`/sub` 应返回 404，静态站不应再有对应跳转页。
+9. 用支持相应 Geo 数据的 Mihomo 检查配置：
 
 ```sh
 mihomo -t -d /path/to/mihomo-data -f /path/to/Example-ratatoskr.yaml

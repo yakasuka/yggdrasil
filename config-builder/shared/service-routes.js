@@ -5,5 +5,7 @@ export const SERVICE_ROUTES = Object.freeze({
   probe: "/api/latency",
   create: "/api/subscriptions",
   preview: "/api/preview",
+  preset: "/api/presets",
+  config: "/config-builder",
   subscription: "/subscription/",
 });

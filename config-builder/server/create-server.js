@@ -1,13 +1,41 @@
 import { SERVICE_ROUTES } from "../shared/service-routes.js";
+import { SHARE_CODE_RE, shareIncludesProviders } from "../shared/share.js";
 import { createWorker } from "../worker/application.js";
 import { loadConfig, serviceEnv } from "./config.js";
 import { fileStorage } from "./storage.js";
+import { createPresetStore } from "./presets.js";
 import { fetcher, ipFetcher, probe, resolver } from "./node-platform.js";
 
 const SUBSCRIPTION_PATH =
   /^\/subscription\/([A-Za-z0-9_-]{22})\/([A-Za-z0-9_-]{43})(\.yaml|\/status)$/;
 const INTERNAL_SUBSCRIPTION =
   /^\/s\/([A-Za-z0-9_-]{22})\/([A-Za-z0-9_-]{43})\.yaml$/;
+const PRESET_READ = /^\/api\/presets\/([0-9a-f]{36})$/i;
+const MAX_PRESET_BODY = 64 * 1024;
+// Friendly subscription links use the configuration name as their token.
+// The random id/key stay internal, so existing /subscription/ links keep
+// working while new links are short and browser-readable.
+const CONFIG_PATH = SERVICE_ROUTES.config;
+const ALIAS_RE = /^[\p{L}\p{N}_-]{3,60}$/u;
+const INTERNAL_PARTS = /^([A-Za-z0-9_-]{22})\/([A-Za-z0-9_-]{43})$/;
+const ID_RE = /^[A-Za-z0-9_-]{22}$/;
+const KEY_RE = /^[A-Za-z0-9_-]{43}$/;
+const aliasKey = (alias) => "alias:" + alias;
+
+function aliasFromFilename(filename) {
+  const raw = String(filename || "")
+    .replace(/-ratatoskr\.yaml$/i, "")
+    .trim()
+    .replace(/\s+/g, "-")
+    .toLowerCase();
+  return ALIAS_RE.test(raw) ? raw : null;
+}
+
+function aliasFromQuery(url) {
+  const token = url.searchParams.get("token");
+  if (url.searchParams.size !== 1 || !ALIAS_RE.test(token || "")) return null;
+  return token.toLowerCase();
+}
 
 const json = (data, status = 200, headers = {}) =>
   Response.json(data, {
@@ -106,6 +134,7 @@ export function createService({
 } = {}) {
   const application = createWorker({ ...platform });
   const env = serviceEnv(config, storage);
+  const presets = createPresetStore(storage, { ttl: config.presetTtl });
 
   function links(request) {
     const base = publicBase(request, config);
@@ -116,6 +145,8 @@ export function createService({
       preview: base + SERVICE_ROUTES.preview,
       create: base + SERVICE_ROUTES.create,
       latency: base + SERVICE_ROUTES.probe,
+      preset: base + SERVICE_ROUTES.preset,
+      config: base + CONFIG_PATH,
       subscription: base + SERVICE_ROUTES.subscription,
       frontends: config.allowedOrigins,
     };
@@ -149,8 +180,76 @@ export function createService({
       if (path === "/api/endpoints" && ["GET", "HEAD"].includes(method))
         return withCors(request, json(links(request)), config);
 
+      // Share codes need no shared secret: the 144-bit random code is the
+      // bearer token. Airport URLs are only stored on explicit opt-in.
+      if (path === SERVICE_ROUTES.preset && method === "POST") {
+        const raw = await request.text();
+        if (raw.length > MAX_PRESET_BODY)
+          return withCors(request, json({ error: "配置内容过大。" }, 413), config);
+        let payload;
+        try {
+          payload = JSON.parse(raw);
+        } catch {
+          return withCors(request, json({ error: "请求内容无效。" }, 400), config);
+        }
+        const includeProviders = payload?.includeProviders === true;
+        let code;
+        try {
+          code = await presets.create(payload?.profile, includeProviders);
+        } catch {
+          return withCors(request, json({ error: "配置内容无效。" }, 400), config);
+        }
+        return withCors(
+          request,
+          json({
+            code,
+            url: base + SERVICE_ROUTES.preset + "/" + code,
+            includeProviders,
+          }),
+          config,
+        );
+      }
+      const presetRead = path.match(PRESET_READ);
+      if (presetRead && ["GET", "HEAD"].includes(method)) {
+        const shared = await presets.read(presetRead[1]);
+        if (!shared)
+          return withCors(
+            request,
+            json({ error: "分享码不存在或已失效。" }, 404),
+            config,
+          );
+        return withCors(
+          request,
+          json({
+            profile: shared,
+            includeProviders: shareIncludesProviders(shared),
+          }),
+          config,
+        );
+      }
+
       let target = null;
       let create = false;
+      const friendlyYaml =
+        path === CONFIG_PATH && ["GET", "HEAD"].includes(method);
+      const friendlyStatus =
+        path === CONFIG_PATH + "/status" && ["GET", "HEAD"].includes(method);
+      if (friendlyYaml || friendlyStatus) {
+        const alias = aliasFromQuery(url);
+        if (!alias)
+          return withCors(request, json({ error: "订阅标识无效。" }, 400), config);
+        const mapping = await storage.get(aliasKey(alias), "json");
+        if (!mapping || !ID_RE.test(mapping.id) || !KEY_RE.test(mapping.key))
+          return withCors(
+            request,
+            json({ error: "订阅链接不存在或已失效。" }, 404),
+            config,
+          );
+        target = new URL(
+          `/s/${mapping.id}/${mapping.key}${friendlyStatus ? "/status" : ".yaml"}`,
+          url,
+        );
+      }
       for (const [publicPath, methods, internalPath] of REWRITES) {
         if (path === publicPath && methods.includes(method)) {
           target = new URL(internalPath, url);
@@ -179,16 +278,60 @@ export function createService({
           !INTERNAL_SUBSCRIPTION.test(internal.pathname)
         )
           return withCors(request, json({ error: "服务返回的订阅地址无效。" }, 502), config);
-        // Rewrite the /s/ link into a public /subscription/ link served by
-        // this backend only. Cloudflare / GitHub Pages never see node data.
-        const suffix = internal.pathname.slice("/s/".length);
-        data.url = base + SERVICE_ROUTES.subscription + suffix;
-        data.usageUrl = data.url.replace(/\.yaml$/, "/status");
+        // The friendly link uses the configuration name the user typed. The
+        // random id/key stay server-side, and old /subscription/ links remain
+        // valid for tokens issued before this change.
+        const parts = internal.pathname
+          .slice("/s/".length)
+          .replace(/\.yaml$/, "")
+          .match(INTERNAL_PARTS);
+        if (!parts)
+          return withCors(request, json({ error: "服务返回的订阅地址无效。" }, 502), config);
+        const alias = aliasFromFilename(data.filename);
+        if (!alias)
+          return withCors(
+            request,
+            json(
+              { error: "配置名称需为 3–60 位字母、数字、下划线或短横线，请修改后重试。" },
+              400,
+            ),
+            config,
+          );
+        if (await storage.get(aliasKey(alias), "json"))
+          return withCors(
+            request,
+            json({ error: "该配置名称已被使用，请改名后重试。" }, 409),
+            config,
+          );
+        await storage.put(
+          aliasKey(alias),
+          JSON.stringify({ id: parts[1], key: parts[2] }),
+        );
+        data.token = alias;
+        data.url = base + CONFIG_PATH + "?token=" + encodeURIComponent(alias);
+        data.usageUrl =
+          base + CONFIG_PATH + "/status?token=" + encodeURIComponent(alias);
         const headers = new Headers(response.headers);
         headers.delete("Content-Length");
         return withCors(
           request,
           Response.json(data, { status: response.status, headers }),
+          config,
+        );
+      }
+
+      // Friendly links are meant to be opened in a browser: show the YAML as
+      // plain text instead of forcing a download.
+      if (friendlyYaml && response.ok) {
+        const headers = new Headers(response.headers);
+        headers.delete("Content-Disposition");
+        headers.delete("Content-Length");
+        headers.set("Content-Type", "text/plain; charset=utf-8");
+        headers.set("X-Content-Type-Options", "nosniff");
+        headers.set("Cache-Control", "no-store, private");
+        return withCors(
+          request,
+          new Response(response.body, { status: response.status, headers }),
           config,
         );
       }

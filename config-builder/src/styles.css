@@ -924,34 +924,64 @@ details > div {
 .provider-card details > div {
   padding-bottom: 0;
 }
-.service-settings {
-  margin: 0 0 28px;
-  background: transparent;
-}
-.service-settings summary {
-  display: flex;
+/* One-line service health: a lamp, a short label and a retry button. Details
+   stay in the tooltip so the wizard header never grows into a status panel. */
+.service-status {
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-}
-.service-settings summary > span:last-child::after {
-  content: " +";
-}
-.service-settings[open] summary > span:last-child::after {
-  content: " −";
-}
-.service-settings[data-state="ready"] #service-label {
-  color: var(--accent);
-}
-.service-settings p {
+  gap: 8px;
+  margin: 0 0 22px;
+  padding: 5px 9px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--soft);
   font-size: 0.6875rem;
-  overflow-wrap: anywhere;
+  color: var(--muted);
 }
-.service-actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 16px;
+.status-dot {
+  width: 7px;
+  height: 7px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--muted);
+}
+.service-status[data-state="ready"] .status-dot {
+  background: #34c759;
+  box-shadow: 0 0 0 3px #34c75926;
+}
+.service-status[data-state="offline"] .status-dot {
+  background: #ff453a;
+  box-shadow: 0 0 0 3px #ff453a26;
+}
+.service-status[data-state="mismatch"] .status-dot {
+  background: var(--warning);
+  box-shadow: 0 0 0 3px var(--warning-bg);
+}
+.service-status[data-state="ready"] #service-label {
+  color: var(--ink);
+}
+.status-retry {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  margin-left: 2px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.875rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.status-retry:hover:not(:disabled) {
+  background: var(--line);
+  color: var(--ink);
+}
+.status-retry:disabled {
+  opacity: 0.4;
+  cursor: default;
 }
 .node-table-wrap {
   max-height: 370px;
@@ -1131,6 +1161,17 @@ details > div {
 .result .button {
   width: 100%;
   margin-top: 16px;
+}
+.result-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 16px;
+}
+.result-actions .button {
+  width: auto;
+  margin-top: 0;
 }
 .result small {
   display: block;
@@ -1639,4 +1680,77 @@ noscript {
   .caustic-copy a:active {
     transform: none;
   }
+}
+/* Share codes: quick import / export of configuration choices. */
+.share-box {
+  margin: 18px 0;
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--soft);
+}
+.share-box-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.share-mark {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  flex: none;
+  border-radius: 9px;
+  background: var(--tint);
+  color: var(--accent);
+  font-size: 1rem;
+}
+.share-box-head strong {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+.share-box-head small {
+  display: block;
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 0.6875rem;
+}
+.share-box-row {
+  display: flex;
+  gap: 8px;
+}
+.share-box-row input,
+.share-result .field input {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.75rem;
+}
+.share-box-row input {
+  flex: 1;
+  min-width: 0;
+}
+.share-box-row .button {
+  flex: none;
+}
+.share-export .inline-field {
+  margin: 0 0 12px;
+}
+.share-export > .button {
+  width: 100%;
+}
+.share-result {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+.share-result .field input {
+  letter-spacing: 0.04em;
+}
+.share-result small {
+  display: block;
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 0.6875rem;
+  overflow-wrap: anywhere;
 }

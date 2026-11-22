@@ -48,11 +48,11 @@ Yggdrasil 面向一站式的使用体验：使用者通过 config-builder 模块
 2. **地区节点。** 只展示订阅中确实拥有的地区，选择需要保留的节点范围。
 3. **节点策略。** 四种自动策略按需保留，默认出口为手动选择。
 4. **APP 分流。** 默认全部启用并跟随代理，也可指定已保留的地区、Direct 或 Reject。规则和最终出口由模板统一维护。
-5. **最终确认。** 预览配置，下载 `名字-ratatoskr.yaml`，或生成持久订阅链接。
+5. **最终确认。** 预览配置，下载 `名字-ratatoskr.yaml`，或生成持久订阅链接；也可生成一串 36 位分享码，别人在第一步粘贴即可导入同样的地区、策略与规则选择。分享码默认不含机场地址，可按需勾选包含。
 
 **[shared/catalog.json](../config-builder/shared/catalog.json)** 是 APP、地区与规则的静态目录数据。新增 APP 或地区时直接编辑该文件，构建后页面目录和后端模板随之更新；重新部署 Pages 后，同一 Token 可取得新的配置。完整的数据流与每项功能的位置见 **[实现路径](../config-builder/docs/IMPLEMENTATION.md)**。
 
-个人订阅使用独立随机 Token，持续时间可选 **3 小时 / 7 天 / 30 天 / 永久**。配置标题下的 catalog 指纹只标识模板版本，不用作访问凭据。节点来源保留 `[P1]`、`[P2]` 标识。
+持久订阅链接形如 `https://<后端域名>/config-builder?token=<配置名称>`，不带 `.yaml` 后缀，浏览器打开即可查看 YAML；配置名称就是访问凭据，请用不易猜到的名称并私密传递。持续时间可选 **3 小时 / 7 天 / 30 天 / 永久**。配置标题下的 catalog 指纹只标识模板版本，不用作访问凭据。节点来源保留 `[P1]`、`[P2]` 标识。
 
 配置工坊与订阅服务同源部署在 Cloudflare Pages：页面把机场链接提交给同源接口，由服务端拉取与解码，直接连接 KV 保存加密配置与 YAML 快照。生成配置包含所选地区的完整节点，支持文件下载与持久订阅链接。GitHub 负责代码托管与 Actions 构建，Cloudflare Pages 负责静态资源、Functions 接口与 KV，两者免费额度即可运行，无需自建或租用服务器；公开入口为 `https://<项目名>.pages.dev/config-builder/`。仓库提供通用部署模板，使用自己的项目名称与 KV 绑定接入，见 **[部署指南与故障复盘](../config-builder/docs/DEPLOYMENT.md)**。
 
@@ -180,7 +180,9 @@ Ratatoskr 将庞大的分类数据交给 Geo 数据库，将清晰的分流意�
 | `/api/inspect` | 后端拉取用户输入的机场订阅，只返回脱敏节点与流量清单 |
 | `/api/preview` | 按网页选择实时生成完整 YAML，供预览 / 下载 |
 | `/api/subscriptions` | 加密保存选择，返回自带随机密钥的订阅链接 |
-| `/subscription/<id>/<key>.yaml` | 客户端拉取时重新解析机场、按最新模板与所选规则模块实时生成配置 |
+| `/config-builder?token=<名称>` | 按配置名称返回订阅，内联 YAML，浏览器可直接查看；名称映射到内部随机凭据 |
+| `/subscription/<id>/<key>.yaml` | 旧版随机链接，继续兼容；客户端拉取时实时生成配置 |
+| `/api/presets`、`/api/presets/<code>` | 生成与读取分享码（36 位十六进制），默认不含机场地址，可选加密包含 |
 | `/api/endpoints` | 由后端直接吐出上述链接模板，不含任何凭据 |
 
 环境变量写在 `config-builder/server/.env`：`PUBLIC_BASE_URL` 决定生成链接的对外域名，`ALLOWED_ORIGINS` 限定可调用的前端，`TEMPLATE_URL=bundled` 表示使用仓库示例模板 `resources/template/ratatoskr-template.yaml` 的同源快照。没有共享 TOKEN，也不读取私有仓库——访问能力完全由订阅链接自身的随机 ID 与密钥承载。详见 [部署指南](../config-builder/docs/DEPLOYMENT.md)。

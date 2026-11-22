@@ -42,6 +42,7 @@ export function loadConfig(source = process.env) {
       : "",
     allowedOrigins,
     dataDir: text(source.DATA_DIR) ? resolve(text(source.DATA_DIR)) : defaultDataDir,
+    presetTtl: Number(text(source.PRESET_TTL) || 0) || 0,
     templateURL: text(source.TEMPLATE_URL) || "bundled",
     tcpProbeEnabled: text(source.TCP_PROBE_ENABLED) === "true",
   };

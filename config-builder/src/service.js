@@ -96,18 +96,39 @@ export async function probeService(origin, version, fetcher = fetch) {
   };
 }
 
-export function subscriptionURL(value, origin) {
-  const url = new URL(value);
+const CONFIG_TOKEN_RE = /^[\p{L}\p{N}_-]{3,60}$/u;
+
+function configToken(url, status) {
+  const expected = SERVICE_ROUTES.config + (status ? "/status" : "");
   if (
-    url.origin !== origin ||
+    url.pathname !== expected ||
+    url.hash ||
     url.username ||
     url.password ||
-    url.search ||
-    url.hash ||
-    !/^\/subscription\/[A-Za-z0-9_-]{22}\/[A-Za-z0-9_-]{43}\.yaml$/.test(
-      url.pathname,
-    )
+    [...url.searchParams.keys()].length !== 1
   )
+    return null;
+  const token = url.searchParams.get("token");
+  return CONFIG_TOKEN_RE.test(token || "") ? token : null;
+}
+
+export function subscriptionURL(value, origin) {
+  const url = new URL(value);
+  if (url.origin !== origin || url.username || url.password || url.hash)
     throw Error("服务返回的订阅地址无效。");
+  // New links carry the user's configuration name; legacy links still work.
+  if (configToken(url, false)) return url.href;
+  if (url.search || !/^\/subscription\/[A-Za-z0-9_-]{22}\/[A-Za-z0-9_-]{43}\.yaml$/.test(url.pathname))
+    throw Error("服务返回的订阅地址无效。");
+  return url.href;
+}
+
+export function usageURL(value, origin) {
+  const url = new URL(value);
+  if (url.origin !== origin || url.username || url.password || url.hash)
+    throw Error("服务返回的流量地址无效。");
+  if (configToken(url, true)) return url.href;
+  if (url.search || !/^\/subscription\/[A-Za-z0-9_-]{22}\/[A-Za-z0-9_-]{43}\/status$/.test(url.pathname))
+    throw Error("服务返回的流量地址无效。");
   return url.href;
 }

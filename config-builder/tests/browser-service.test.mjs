@@ -1,7 +1,12 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { probeService, serviceOrigin } from "../src/service.js";
+import {
+  probeService,
+  serviceOrigin,
+  subscriptionURL,
+  usageURL,
+} from "../src/service.js";
 import gateway from "../worker/gateway/index.js";
 import { environment } from "./helpers.mjs";
 
@@ -111,7 +116,9 @@ test("the browser entry is a static client that only calls the self-hosted servi
   ])
     assert.ok(!html.includes(removed), `local-mode markup remains: ${removed}`);
   assert.ok(html.includes('id="retry-service"'));
-  assert.ok(html.includes('id="service-host"'));
+  assert.ok(html.includes('class="status-dot"'));
+  for (const removed of ["service-host", "service-links", "service-description"])
+    assert.ok(!html.includes(removed), `status panel detail remains: ${removed}`);
   assert.ok(html.includes('name="yggdrasil:service"'));
 });
 
@@ -142,4 +149,20 @@ test("the Pages deployment serves its own origin and rejects unapproved cross-or
     env,
   );
   assert.equal(denied.status, 403);
+});
+
+test("the browser accepts friendly config links and legacy subscription links", () => {
+  const origin = "https://service.example";
+  const friendly = origin + "/config-builder?token=guagua";
+  assert.equal(subscriptionURL(friendly, origin), friendly);
+  assert.equal(
+    usageURL(origin + "/config-builder/status?token=guagua", origin),
+    origin + "/config-builder/status?token=guagua",
+  );
+  assert.throws(() => subscriptionURL(origin + "/config-builder?token=a", origin));
+  assert.throws(() => subscriptionURL(origin + "/config-builder?token=guagua&x=1", origin));
+  const legacy =
+    origin + "/subscription/" + "a".repeat(22) + "/" + "b".repeat(43) + ".yaml";
+  assert.equal(subscriptionURL(legacy, origin), legacy);
+  assert.throws(() => subscriptionURL(origin + "/config-builder?token=guagua", "https://other.example"));
 });

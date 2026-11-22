@@ -35,6 +35,9 @@
 | AES-GCM 与独立随机密钥 | `worker/crypto.js` |
 | Node HTTP 入口、请求/响应转换 | `server/index.js` |
 | 公开路由、CORS、链接改写、endpoints | `server/create-server.js` |
+| 分享码生成 / 解析 / 合并、字段白名单 | `shared/share.js`、`src/share.js` |
+| 分享码加密存储与本地密钥 | `server/presets.js`、`server/data/.preset-key` |
+| 分享码导入 / 生成入口 | `src/panels/sources.js`、`src/panels/review.js`、`src/app.js` |
 | 配置、文件型 KV、Node DNS/TCP 适配 | `server/config.js`、`server/storage.js`、`server/node-platform.js` |
 | 纯静态产物（无 `_worker.js`）、service.json | `scripts/build-gateway.mjs` |
 | CF Pages 纯静态项目配置（无 KV） | `wrangler.jsonc` |
@@ -53,11 +56,19 @@
 | `POST /api/inspect` | 替浏览器拉取机场，只返回脱敏清单 |
 | `POST /api/latency` | 可选的服务器到节点 TCP 建连耗时 |
 | `POST /api/preview` | 生成完整 YAML，供预览和下载；不落盘 |
-| `POST /api/subscriptions` | 加密保存选择，返回后端 `/subscription/…` 链接 |
-| `GET /subscription/<id>/<key>.yaml` | 凭 URL 中的随机密钥读取，刷新机场节点、流量，按所选规则模块生成配置 |
-| `GET /subscription/<id>/<key>/status` | 向链接持有者刷新流量报告 |
+| `POST /api/subscriptions` | 加密保存选择，返回 `/config-builder?token=<配置名称>`；名称映射到内部随机凭据，重名返回 409 |
+| `POST /api/presets` | 生成 36 位十六进制分享码，保存字段白名单内的配置选择 |
+| `GET /api/presets/<code>` | 凭分享码取回选择；默认不含机场订阅地址 |
+| `GET /config-builder?token=<名称>` | 按配置名称取回订阅，内联返回 YAML（无 `Content-Disposition`），浏览器可直接查看 |
+| `GET /config-builder/status?token=<名称>` | 向链接持有者刷新流量报告 |
+| `GET /subscription/<id>/<key>.yaml` | 旧版链接：凭 URL 中的随机密钥读取，继续兼容 |
+| `GET /subscription/<id>/<key>/status` | 旧版流量接口，继续兼容 |
 
 公开路径集中在 `shared/service-routes.js`；`server/create-server.js` 把它们映射到 `worker/application.js` 的内部路径。内部路由文件和模板不作为静态资源提供。
+
+订阅链接在创建响应里改写：`server/create-server.js` 从 `filename` 还原用户填写的配置名称，做规范化（去空格、转 `-`、小写）与 3–60 位校验，检查 `alias:` 记录是否重名，再把名称映射到 worker 返回的随机 id/key 存入文件型 KV。浏览器打开 `/config-builder?token=<名称>` 时按映射转发到内部 `/s/…`，并把 YAML 响应的 `Content-Type` 改为 `text/plain`、去掉 `Content-Disposition`，以便直接浏览；客户端拉取仍收到 `Subscription-Userinfo` 与实时生成的配置。旧 `/subscription/…` 路由保留，历史链接不受影响。前端 `src/service.js` 的 `subscriptionURL()` / `usageURL()` 同时校验新旧两种链接。
+
+分享码在确认页生成：前端把当前选择交给 `POST /api/presets`，后端用 `shared/share.js` 的字段白名单剔除机场地址（除非用户勾选包含），用 `server/presets.js` 以 18 字节随机数生成 36 位十六进制码，经 AES-GCM 封存到文件型 KV。导入时从「订阅来源」页粘贴码或完整链接，`applyShare()` 按当前 catalog 过滤未知 ID、保留导入者已有的机场地址；解析节点后恢复分享码里的地区选择（只保留当前订阅确实存在的地区）。分享码与订阅链接互不影响，前者分享选择，后者交付节点配置。
 
 ## 扩展模板
 

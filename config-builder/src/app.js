@@ -14,6 +14,7 @@ import { filename } from "../shared/profile.js";
 import {
   SERVICE_ROUTES,
   subscriptionURL,
+  usageURL,
   probeService,
 } from "./service.js";
 import { serviceBase, discoverService, apiFetch } from "./config.js";
@@ -28,7 +29,9 @@ import { regionsPanel } from "./panels/regions.js";
 import { strategiesPanel } from "./panels/strategies.js";
 import { appsPanel } from "./panels/apps.js";
 import { rulesPanel } from "./panels/rules.js";
-import { reviewPanel, resultPanel } from "./panels/review.js";
+import { reviewPanel, resultPanel, shareResult } from "./panels/review.js";
+import { applyShare, parseShareCode } from "../shared/share.js";
+import { createShareCode, fetchShareCode } from "./share.js";
 const $ = (s) => document.querySelector(s);
 const steps = [
   "订阅来源",
@@ -52,6 +55,8 @@ const ctx = {
   search: "",
   phase: "idle",
   probeDone: 0,
+  share: { code: "", includeProviders: false },
+  importSelection: null,
 };
 let step = 0,
   furthest = 0,
@@ -260,39 +265,19 @@ function navigate(next) {
   });
 }
 function renderService() {
+  const status = $("#service-settings");
   $("#service-label").textContent = {
-    checking: "正在检查订阅服务",
-    ready: "订阅服务已连接",
-    offline: "订阅服务未连接",
-    mismatch: "订阅服务版本不一致",
+    checking: "连接中",
+    ready: "服务正常",
+    offline: "服务未连接",
+    mismatch: "版本不一致",
   }[ctx.service];
-  $("#service-description").textContent = ctx.serviceMessage;
-  const host = $("#service-host");
-  if (host) host.textContent = new URL(serviceBase()).host;
-  $("#service-settings").dataset.state = ctx.service;
+  status.dataset.state = ctx.service;
+  // The full explanation is available on hover / to screen readers, but the
+  // backend address and endpoint list are deliberately not shown in the page.
+  status.title = ctx.serviceMessage;
+  status.setAttribute("aria-label", `订阅服务：${ctx.serviceMessage}`);
   $("#retry-service").disabled = busy || ctx.service === "checking";
-}
-// The backend is the single source of public links. Static hosts only show
-// them; credentials are appended by the owner, never stored in the page.
-async function loadEndpoints() {
-  const box = $("#service-links");
-  if (!box) return;
-  try {
-    const response = await apiFetch("/api/endpoints");
-    if (!response.ok) return;
-    const links = await response.json();
-    box.innerHTML =
-      '<p class="muted">服务提供的调用地址（请自行在 merge / sub 后追加 TOKEN）：</p>' +
-      ["merge", "sub", "subscription"]
-        .filter((key) => typeof links[key] === "string")
-        .map(
-          (key) =>
-            `<label class="field">${esc(key)}<input type="text" readonly value="${esc(links[key])}"></label>`,
-        )
-        .join("");
-  } catch {
-    box.replaceChildren();
-  }
 }
 function checkService() {
   const ticket = ++serviceRevision;
@@ -310,7 +295,6 @@ function checkService() {
       };
     }
     if (ticket !== serviceRevision) return status;
-    if (status.state === "ready") void loadEndpoints();
     ctx.service = status.state;
     ctx.serviceMessage = status.message;
     if (!busy && step === FINAL_STEP) render();
@@ -358,10 +342,22 @@ async function resolveSources() {
       throw Error("订阅中没有识别到可用节点。");
     ctx.inspection = inspection;
     ctx.phase = "ready";
-    ctx.profile.countries = inspection.regions
-      .filter((r) => r.id !== "OTHER")
-      .map((r) => r.id);
-    ctx.profile.other = inspection.regions.some((r) => r.id === "OTHER");
+    if (ctx.importSelection) {
+      // Shared choices win, but only for regions that actually exist in the
+      // importer's subscription.
+      ctx.profile.countries = ctx.importSelection.countries.filter((id) =>
+        inspection.regions.some((r) => r.id === id),
+      );
+      ctx.profile.other =
+        ctx.importSelection.other &&
+        inspection.regions.some((r) => r.id === "OTHER");
+      ctx.importSelection = null;
+    } else {
+      ctx.profile.countries = inspection.regions
+        .filter((r) => r.id !== "OTHER")
+        .map((r) => r.id);
+      ctx.profile.other = inspection.regions.some((r) => r.id === "OTHER");
+    }
     resetPolicies();
     busy = false;
     navigate(1);
@@ -465,8 +461,11 @@ async function generate() {
     const data = await response.json();
     if (!response.ok) throw Error(data.error || "订阅暂时无法生成。");
     if (rev !== revision) return;
-    result = { ...data, url: subscriptionURL(data.url, serviceBase()) };
-    result.usageUrl = result.url.replace(/\.yaml$/, "/status");
+    result = {
+      ...data,
+      url: subscriptionURL(data.url, serviceBase()),
+      usageUrl: usageURL(data.usageUrl, serviceBase()),
+    };
     celebrate($("#next"));
     showResult();
     $("#result-area").scrollIntoView({
@@ -521,6 +520,66 @@ function toast(text) {
   $("#toast").hidden = false;
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => ($("#toast").hidden = true), 2500);
+}
+async function createShare() {
+  if (busy || ctx.service !== "ready") {
+    error("订阅服务未连接，请稍后重试。");
+    return;
+  }
+  const button = $("#create-share");
+  if (button) button.disabled = true;
+  clearError();
+  try {
+    const data = await createShareCode(ctx.profile, ctx.share.includeProviders);
+    ctx.share = { code: data.code, includeProviders: data.includeProviders };
+    const box = $("#share-result");
+    if (box) box.innerHTML = shareResult(ctx.share);
+    toast("分享码已生成");
+  } catch (e) {
+    error(e.message || "分享码生成失败。");
+  } finally {
+    if (button) button.disabled = false;
+  }
+}
+async function importShare() {
+  if (busy || ctx.service !== "ready") {
+    error("订阅服务未连接，请稍后重试。");
+    return;
+  }
+  const code = parseShareCode($("#share-code-input")?.value);
+  if (!code) {
+    error("分享码格式不正确，请粘贴 36 位分享码或完整分享链接。");
+    return;
+  }
+  const button = $("#import-share");
+  if (button) button.disabled = true;
+  clearError();
+  try {
+    const data = await fetchShareCode(code);
+    ctx.profile = applyShare(ctx.profile, data.profile, catalog);
+    // Parsing resets the region selection to "all"; remember what the shared
+    // code chose so it can be restored once the current nodes are inspected.
+    ctx.importSelection = {
+      countries: [...ctx.profile.countries],
+      other: ctx.profile.other,
+    };
+    ctx.share = { code: "", includeProviders: false };
+    const ready = ctx.profile.providers.some(
+      (p) => p.name.trim() && p.url.trim(),
+    );
+    invalidate();
+    navigate(0);
+    toast(
+      data.includeProviders
+        ? "配置已导入，含机场订阅地址"
+        : "配置已导入，请确认机场订阅",
+    );
+    if (ready) void resolveSources();
+  } catch (e) {
+    error(e.message || "分享码读取失败。");
+  } finally {
+    if (button) button.disabled = false;
+  }
 }
 document.addEventListener("input", (e) => {
   const el = e.target;
@@ -582,6 +641,10 @@ document.addEventListener("change", (e) => {
       el.type === "checkbox" ? el.checked : el.value;
     changed();
   }
+  if (el.id === "share-providers") {
+    ctx.share.includeProviders = el.checked;
+    changed();
+  }
 });
 document.addEventListener("click", async (e) => {
   const el = e.target.closest("button");
@@ -590,6 +653,24 @@ document.addEventListener("click", async (e) => {
     changed();
     probeController?.abort();
     await checkService();
+    return;
+  }
+  if (el.id === "import-share") {
+    await importShare();
+    return;
+  }
+  if (el.id === "create-share") {
+    await createShare();
+    return;
+  }
+  if (el.id === "copy-share") {
+    try {
+      await navigator.clipboard.writeText(ctx.share.code);
+      toast("分享码已复制");
+    } catch {
+      $("#share-code")?.select();
+      toast("请选择并复制分享码");
+    }
     return;
   }
   if (el.id === "next") {

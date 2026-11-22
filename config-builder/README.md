@@ -17,11 +17,17 @@
   ├─ /api/subscriptions         创建订阅，直接返回后端链接
   ├─ /api/latency               可选 TCP 检测
   ├─ /api/endpoints             后端吐出所有公开链接
-  ├─ /subscription/<id>/<key>.yaml     实时生成配置
+  ├─ /api/presets               分享码：保存 / 读取配置选择
+  ├─ /config-builder?token=<名称>      友好订阅链接，浏览器可直接查看
+  ├─ /subscription/<id>/<key>.yaml     旧版订阅链接（继续兼容）
   └─ server/data/               加密记录（替代 Cloudflare KV）
 ```
 
-服务是公开 API：用户把自己机场 / 自建节点的订阅地址交给后端，在页面选择地区、策略、APP 与规则模块，创建订阅后得到一条自带随机密钥的链接 `/subscription/<id>/<key>.yaml`，可直接放入任意 Mihomo / Clash Meta 客户端。每次拉取都会重新解析机场、按最新模板与所选规则模块实时生成配置。没有共享 TOKEN，也不需要私有 GitHub 仓库。
+服务是公开 API：用户把自己机场 / 自建节点的订阅地址交给后端，在页面选择地区、策略、APP 与规则模块，创建订阅后得到一条以配置名称为凭据的链接 `/config-builder?token=guagua`，可直接放入任意 Mihomo / Clash Meta 客户端，也可粘贴到浏览器直接查看 YAML（不强制下载）。每次拉取都会重新解析机场、按最新模板与所选规则模块实时生成配置。没有共享 TOKEN，也不需要私有 GitHub 仓库。
+
+链接里的 `token` 来自用户填写的「配置名称」（3–60 位字母、数字、`_` 或 `-`，空格转 `-`，不区分大小写），重名会返回 409 要求改名；旧的 `/subscription/<id>/<key>.yaml` 链接继续有效。名称是可猜的，知道链接的人就能读取配置——请用不易猜到的名称，或只通过私密渠道传递。
+
+**分享配置：** 最终确认页可生成一串 36 位十六进制分享码（例如 `fffa18b5ff005bba7a19928f3e8626974ebe`），别人在「订阅来源」页粘贴该码即可导入地区、策略、APP、规则模块与客户端选项。分享码默认**不含机场订阅地址**；只有勾选「同时包含机场订阅地址」才会保存，导入后可直接解析。持有分享码即可读取其中内容，含机场地址时请勿公开传播。分享码与订阅链接是两套独立凭据：前者分享选择，后者读取节点配置。
 
 Cloudflare Pages 与 GitHub Pages **只发布静态资源**：`index.html`、`assets/app.js`、`assets/app.css`、图标和 `service.json`。构建产物中不包含 `_worker.js`、`_routes.json`、KV 绑定或任何读取节点的 Functions 逻辑；CF 不会经手节点内容，也就不会被误判。旧的 `/merge`、`/sub` 私有仓库链路已完全移除。
 
@@ -76,8 +82,8 @@ SERVICE_BASE_URL=https://api.example.com npm run build
 
 ## 订阅、存储与链接
 
-浏览器只把机场链接提交给后端 `/api/inspect`，后端拉取、解码后仅返回脱敏清单；预览、下载与持久订阅由后端生成。创建订阅时后端直接返回 `https://<后端域名>/subscription/<id>/<token>.yaml`，链接不经过 CF 或 GitHub Pages。
+浏览器只把机场链接提交给后端 `/api/inspect`，后端拉取、解码后仅返回脱敏清单；预览、下载与持久订阅由后端生成。创建订阅时后端直接返回 `https://<后端域名>/config-builder?token=<配置名称>`，链接不经过 CF 或 GitHub Pages，并以 `text/plain` 内联返回 YAML。
 
-KV v3 的 AES-GCM 加密记录改存 `server/data/`（每记录一个文件，按有效期清理）。每条订阅链接自带随机 128 位 ID 与独立 256 位密钥，密钥不落盘——没有共享 TOKEN、不读私有仓库。后端 `/api/endpoints` 只返回链接模板，不返回任何凭据。
+KV v3 的 AES-GCM 加密记录改存 `server/data/`（每记录一个文件，按有效期清理）。服务端为每条订阅保留随机 128 位 ID 与独立 256 位密钥，并把配置名称映射到这对凭据；名称本身成为对外访问凭据，密钥不落盘——没有共享 TOKEN、不读私有仓库。后端 `/api/endpoints` 只返回链接模板，不返回任何凭据。
 
 完整订阅链接与生成的 YAML 都包含敏感访问能力，分享问题时应移除凭据。平台界面与额度可能变化，部署与验收细节见 [部署指南](docs/DEPLOYMENT.md)。

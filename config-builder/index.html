@@ -33,8 +33,8 @@
     </script>
     <link rel="icon" href="../assets/favicon.png" type="image/png" />
     <link rel="preload" as="image" href="../assets/favicon.png" />
-    <link rel="stylesheet" href="./assets/app.css?v=1d2343625139" />
-    <script type="module" src="./assets/app.js?v=eb38e311b4ec"></script>
+    <link rel="stylesheet" href="./assets/app.css?v=d32f99f11a56" />
+    <script type="module" src="./assets/app.js?v=2f06b8cefd79"></script>
   </head>
   <body>
     <div
@@ -130,26 +130,26 @@
           <span id="step-caption" class="eyebrow"></span
           ><span class="chip">RATATOSKR</span>
         </div>
-        <details class="service-settings" id="service-settings">
-          <summary>
-            <span id="service-label">正在检查订阅服务</span
-            ><span class="muted">服务状态</span>
-          </summary>
-          <div>
-            <p id="service-description" class="muted" role="status"></p>
-            <p class="muted">
-              本页只提供界面。订阅解析、配置生成与订阅链接均由自建服务处理，
-              Cloudflare Pages 和 GitHub Pages 不接触节点内容。
-            </p>
-            <p class="muted">当前服务：<code id="service-host"></code></p>
-            <div id="service-links"></div>
-            <div class="service-actions">
-              <button type="button" class="text-button" id="retry-service">
-                重试连接
-              </button>
-            </div>
-          </div>
-        </details>
+        <div
+          class="service-status"
+          id="service-settings"
+          data-state="checking"
+          role="status"
+          aria-label="正在检查订阅服务"
+          title="正在检查订阅服务"
+        >
+          <span class="status-dot" aria-hidden="true"></span>
+          <span id="service-label">连接中</span>
+          <button
+            type="button"
+            class="status-retry"
+            id="retry-service"
+            aria-label="重试连接订阅服务"
+            title="重试连接"
+          >
+            ↻
+          </button>
+        </div>
         <div id="panel"></div>
         <div id="error" class="error" role="alert" hidden></div>
         <footer class="wizard-footer">

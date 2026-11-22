@@ -9,6 +9,7 @@ import { probeService } from "../src/service.js";
 import { serviceBase, discoverService, apiFetch } from "../src/config.js";
 import { fileStorage } from "../server/storage.js";
 import { createService } from "../server/create-server.js";
+import { createWorker } from "../worker/application.js";
 import { profile, text } from "./helpers.mjs";
 
 const ORIGIN = "https://service.example";
@@ -170,10 +171,12 @@ test("subscription links point at the backend and serve YAML without any static 
   const created = await s.fetch(post("/api/subscriptions", profile()));
   assert.equal(created.status, 201);
   const data = await created.json();
-  assert.ok(data.url.startsWith(ORIGIN + "/subscription/"));
-  assert.ok(data.usageUrl.endsWith("/status"));
+  assert.equal(data.url, ORIGIN + "/config-builder?token=eaibee");
+  assert.equal(data.usageUrl, ORIGIN + "/config-builder/status?token=eaibee");
   const read = await s.fetch(new Request(data.url));
   assert.equal(read.status, 200);
+  assert.equal(read.headers.get("Content-Type"), "text/plain; charset=utf-8");
+  assert.equal(read.headers.get("Content-Disposition"), null);
   const yaml = await read.text();
   assert.ok(yaml.includes("proxies:"));
   assert.ok(read.headers.get("Subscription-Userinfo"));
@@ -182,6 +185,37 @@ test("subscription links point at the backend and serve YAML without any static 
   );
   assert.equal(usage.status, 200);
   assert.equal((await usage.json()).usage.remaining, 70);
+});
+
+test("configuration names must be valid and unique", async () => {
+  const s = await service();
+  const first = await s.fetch(post("/api/subscriptions", profile()));
+  assert.equal(first.status, 201);
+  const duplicate = await s.fetch(post("/api/subscriptions", profile()));
+  assert.equal(duplicate.status, 409);
+  assert.match((await duplicate.json()).error, /已被使用/);
+  const invalid = await s.fetch(
+    post("/api/subscriptions", { ...profile(), title: "a&b" }),
+  );
+  assert.equal(invalid.status, 400);
+  const missing = await s.fetch(new Request(ORIGIN + "/config-builder"));
+  assert.equal(missing.status, 400);
+  const unknown = await s.fetch(
+    new Request(ORIGIN + "/config-builder?token=unknown-name"),
+  );
+  assert.equal(unknown.status, 404);
+});
+
+test("legacy random subscription links keep working", async () => {
+  const s = await service();
+  const worker = createWorker(platform);
+  const created = await worker.fetch(post("/api/profiles", profile()), s.env);
+  assert.equal(created.status, 201);
+  const internal = new URL((await created.json()).url);
+  const legacy = internal.pathname.replace(/^\/s\//, "/subscription/");
+  const read = await s.fetch(new Request(ORIGIN + legacy));
+  assert.equal(read.status, 200);
+  assert.ok((await read.text()).includes("proxies:"));
 });
 
 test("legacy merge / sub routes and static relays no longer exist", async () => {
