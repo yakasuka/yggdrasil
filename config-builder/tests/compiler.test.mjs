@@ -63,28 +63,27 @@ test("rule modules are the template module IDs and every one has display text", 
     assert.ok(m.label && m.description && m.symbol);
 });
 
-test("turning a rule module off removes only its rules and keeps references valid", async () => {
+test("turning a rule module off narrows the preview but keeps every template rule in the YAML", async () => {
   const base = await compile(profile());
   for (const id of ruleModules(catalog)) {
     const p = profile();
     p.modules = ruleModules(catalog).filter((m) => m !== id);
     const { config, yaml } = await compile(p);
     assertReferences(config);
-    // The YAML is rendered from the author's template, so it carries extra
-    // keys (socks-port, anchors, comments). Validate that the rendered rules
-    // match the compiled decision and references stay resolvable.
-    const rendered = parse(yaml, { merge: true, maxAliasCount: 100 });
-    // Same rule set as the compiled decision; order follows the template
-    // (the author's section layout), which is intentional.
-    assert.deepEqual([...rendered.rules].sort(), [...config.rules].sort());
-    assertValidTemplateRefs(rendered);
-    assert.ok(yaml.includes("GEOSITE,"));
+    // The structured config drives the preview and reflects the user's
+    // selection, so the module's rules are absent there.
     const removed = catalog.orderedRules.filter((r) => r.module === id).map((r) => r.rule);
     assert.ok(
       removed.every((rule) => !config.rules.includes(rule)),
-      `rules from ${id} must be absent`,
+      `rules from ${id} must be absent from the preview config`,
     );
-    // Everything outside the disabled module is still present.
+    // The downloaded YAML, however, is the author's complete option list:
+    // deselecting a module must NOT delete its rules from the file.
+    const rendered = parse(yaml, { merge: true, maxAliasCount: 100 });
+    assert.deepEqual([...rendered.rules].sort(), [...base.config.rules].sort());
+    assertValidTemplateRefs(rendered);
+    assert.ok(yaml.includes("GEOSITE,"));
+    // Everything outside the disabled module is still present in the preview.
     for (const rule of base.config.rules) {
       if (removed.includes(rule)) continue;
       assert.ok(config.rules.includes(rule), `rule ${rule} should survive`);

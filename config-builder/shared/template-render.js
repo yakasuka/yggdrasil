@@ -4,15 +4,23 @@
 // Why: the template carries hand-written section banners, inline comments,
 // flow-style one-liners and YAML anchors (*FilterAll, &RP-domain). Rebuilding
 // the object throws all of that away and produces a noisy, unreadable file.
-// Here we keep every original line verbatim and only:
+//
+// The template is the complete set of OPTIONS the author shipped. Every group,
+// every region entry in every proxies[] list, every rule and every rule-provider
+// is written out VERBATIM regardless of what the user selected. Selections are
+// not filters — they only decide the DEFAULT exit (the first proxy) of the
+// switch/APP groups. An unselected region is still written as an option: the
+// user can pick it in the client, and it becomes useful as soon as their airport
+// subscription actually carries nodes for it. Previously this renderer dropped
+// unselected groups and pruned their references from 40+ proxies[] lists, which
+// silently deleted content (Hermes / 节点选择 / all APP groups / China / Final
+// lost Hong Kong, Taiwan, Singapore and Others).
+//
+// The only edits applied in place are:
 //   1. inject proxy-providers into the AUTO-PROVIDERS marker block
 //   2. patch port / allow-lan / title in place
-//   3. drop proxy-group / rule / rule-provider lines the user deselected
-//   4. rewrite the proxies[] lists of surviving groups so they no longer
-//      reference groups we just dropped (keeping flow style + comments)
-//
-// The decisions come from compile()'s already-validated `config`, so the
-// rendered YAML is guaranteed to have the same semantics as that config.
+//   3. move the user's chosen default exit to the FRONT of a group's proxies[]
+//      (keeping every other option, flow style and trailing comment intact)
 import { parse } from "yaml";
 
 const isBlank = (line) => !line.trim();
@@ -37,65 +45,17 @@ export function renderFromTemplate(template, config, p, model) {
   const source = template.replace(/\r\n/g, "\n");
   const lines = source.split("\n");
 
-  // Names that exist in the compiled config. Anything absent was deselected.
-  const liveGroups = new Set(config["proxy-groups"].map((x) => x.name));
-  const liveRules = new Set(config.rules);
-  const liveRuleProviders = new Set(Object.keys(config["rule-providers"] || {}));
-
-  // Full template names of the groups we may drop. compile() uses short names
-  // for regions (icons); the template uses full names, so map id -> groupName.
-  const regionByName = new Map(model.regions.map((r) => [r.groupName, r.id]));
-  const strategyNames = new Set(model.strategies.map((s) => s.name));
-  const appNames = new Set(model.apps.map((a) => a.name));
-
-  // A template group line is kept if its group name is present in the compiled
-  // config. Regions need the full-name -> short-name translation.
-  const templateNameToConfig = (name) => {
-    if (regionByName.has(name)) {
-      const id = regionByName.get(name);
-      return model.regions.find((r) => r.id === id)?.name || null;
-    }
-    // The OTHER group is `🌌` in config but `🌌 Others` in the template.
-    if (name === g.otherGroupName) return g.other;
-    return name;
-  };
-  // Reverse: config short name (icon) -> template full group name.
+  // Config uses short icon names for regions; the template uses full names.
   const configNameToTemplate = (name) => {
     const r = model.regions.find((x) => x.name === name);
     if (r) return r.groupName;
     if (name === g.other) return g.otherGroupName;
     return name;
   };
-  const groupKept = (name) => {
-    const mapped = templateNameToConfig(name);
-    return liveGroups.has(name) || liveGroups.has(mapped);
-  };
+  const appNames = new Set(model.apps.map((a) => a.name));
 
-  // Which proxies-list references must be rewritten. When a region/strategy
-  // group is dropped, exit lists (Hermes / 节点选择 / APP groups) must drop it.
-  const dropNames = new Set();
-  for (const r of model.regions) {
-    if (!liveGroups.has(r.name)) {
-      dropNames.add(r.groupName);
-      dropNames.add(r.name);
-    }
-  }
-  if (!liveGroups.has(g.other)) {
-    dropNames.add(g.otherGroupName);
-    dropNames.add(g.other);
-  }
-  for (const s of model.strategies)
-    if (!liveGroups.has(s.name)) dropNames.add(s.name);
-  // APP groups removed by the user should also be pruned from exit lists.
-  for (const a of model.apps)
-    if (!liveGroups.has(a.name)) dropNames.add(a.name);
-  // Ports group may be absent when no rule references it.
-  if (!liveGroups.has(g.ports)) dropNames.add(g.ports);
-
-  // Find the compiled version of each group by (possibly translated) name.
-  const compiled = new Map(
-    config["proxy-groups"].map((x) => [x.name, x]),
-  );
+  // Find the compiled version of each group by name (for default-exit sync).
+  const compiled = new Map(config["proxy-groups"].map((x) => [x.name, x]));
 
   const out = [];
   let section = "head"; // head | providers | groups | rules | ruleproviders
@@ -160,27 +120,23 @@ export function renderFromTemplate(template, config, p, model) {
     // The commented-out manual proxy-providers example and manual proxies
     // block are author documentation: keep them verbatim.
 
-    // --- proxy-group entries ------------------------------------------------
+    // --- proxy-group entries -----------------------------------------------
+    // Keep EVERY group line verbatim. The user's choices only move a default
+    // exit to the front; no group or proxies[] item is ever removed.
     if (section === "groups") {
       const m = line.match(/^(\s*-\s*\{)(.*?)(\}\s*(?:#.*)?)$/);
       if (m) {
         const name = flowField(m[2], "name");
         if (name) {
-          if (!groupKept(name)) {
-            // drop this whole line (its leading comment stays as documentation)
-            continue;
-          }
-          const cf = compiled.get(name) || compiled.get(templateNameToConfig(name));
+          const cf = compiled.get(name);
           let body = m[2];
-          // Rewrite proxies[] so removed groups are not referenced.
-          body = rewriteProxies(body, dropNames, cf);
           // Sync APP default route (first proxy) with the user's policy.
           if (appNames.has(name) && cf?.proxies?.length) {
             body = setFirstProxy(body, configNameToTemplate(cf.proxies[0]));
           }
-          // Sync gateway/final first choice with default strategy.
+          // Sync Hermes / gateway / final first choice with default strategy.
           if (
-            (name === g.gateway || name === g.final) &&
+            (name === g.hermes || name === g.gateway || name === g.final) &&
             cf?.proxies?.length
           ) {
             body = setFirstProxy(body, configNameToTemplate(cf.proxies[0]));
@@ -192,25 +148,9 @@ export function renderFromTemplate(template, config, p, model) {
       // Keep comments, blank lines, filter anchor definitions etc. verbatim.
     }
 
-    // --- rules -------------------------------------------------------------
-    if (section === "rules") {
-      const m = line.match(/^(\s*-\s*)([A-Z][A-Z-]*,[^#]*?)(\s*(?:#.*)?)$/);
-      if (m) {
-        const rule = m[2].trim();
-        if (!liveRules.has(rule)) continue;
-      }
-    }
-
-    // --- rule-providers ----------------------------------------------------
-    if (section === "ruleproviders") {
-      const m = line.match(/^(\s*)([^\s:#][^:]*):(\s*\{.*)$/);
-      if (m) {
-        const name = m[2].trim();
-        if (/\p{Extended_Pictographic}/u.test(name)) {
-          if (!liveRuleProviders.has(name)) continue;
-        }
-      }
-    }
+    // --- rules / rule-providers --------------------------------------------
+    // Written verbatim. The template's rule set is a complete option list;
+    // deselecting a module must not delete its RULE-SET rule or provider.
 
     out.push(line);
   }
@@ -235,21 +175,15 @@ function flowField(body, key) {
   return m ? m[1].trim().replace(/^["']|["']$/g, "") : null;
 }
 
-function rewriteProxies(body, dropNames, cf) {
-  const m = body.match(/proxies:\s*\[([^\]]*)\]/);
-  if (!m) return body;
-  let items = splitFlow(m[1]);
-  items = items.filter((x) => !dropNames.has(x));
-  // A group should never be empty; compiled config always keeps DIRECT/REJECT.
-  if (!items.length && cf?.proxies?.length) items = cf.proxies.slice();
-  return body.replace(m[0], `proxies: [${items.join(", ")}]`);
-}
-
+// Move `first` to the FRONT of proxies[] without removing any other option.
 function setFirstProxy(body, first) {
+  if (!first) return body;
   const m = body.match(/proxies:\s*\[([^\]]*)\]/);
   if (!m) return body;
-  const items = splitFlow(m[1]).filter((x) => x !== first);
-  return body.replace(m[0], `proxies: [${first}, ${items.join(", ")}]`);
+  const items = splitFlow(m[1]);
+  if (!items.includes(first)) return body;
+  const reordered = [first, ...items.filter((x) => x !== first)];
+  return body.replace(m[0], `proxies: [${reordered.join(", ")}]`);
 }
 
 // Build the proxy-providers block using the airports' ORIGINAL subscription

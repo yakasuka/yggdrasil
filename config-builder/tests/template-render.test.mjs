@@ -93,18 +93,38 @@ test("render honours port, allow-lan and APP policy in place", async () => {
   assertValidRefs(doc);
 });
 
-test("render prunes deselected regions/strategies/modules and keeps references valid", async () => {
+test("render keeps EVERY template group/region/rule regardless of selection", async () => {
+  // Selections only decide default exits; they must never delete options from
+  // the generated YAML (Hermes / 节点选择 / APP groups must keep all regions).
   const cases = [
     ["one region", { countries: ["JP"], other: false }],
     ["one strategy", { strategies: ["auto"] }],
     ["no modules", { modules: [] }],
     ["few apps", { appsMode: "custom", apps: ["openai"], appPolicy: { openai: "proxy" } }],
   ];
+  const expectedGroups = parse(template, { merge: true, maxAliasCount: 100 })["proxy-groups"];
+  const expectedRules = parse(template, { merge: true, maxAliasCount: 100 }).rules;
   for (const [label, patch] of cases) {
     const { yaml } = await compile({ ...profile(), ...patch });
     const doc = parse(yaml, { merge: true, maxAliasCount: 100 });
     assertValidRefs(doc);
-    // Template shape is retained even after pruning.
+    // The complete author template is written out verbatim.
+    assert.deepEqual(
+      new Set(doc["proxy-groups"].map((g) => g.name)),
+      new Set(expectedGroups.map((g) => g.name)),
+      `${label}: every template group must survive`,
+    );
+    assert.deepEqual([...doc.rules].sort(), [...expectedRules].sort(), `${label}: every template rule must survive`);
+    for (const name of ["✨ Hermes", "🎚️ 节点选择", "🏯 China", "🏁 Final", "🌆 Hong Kong", "🧋 Taiwan", "🏙️ Singapore", "🌌 Others"]) {
+      const group = doc["proxy-groups"].find((g) => g.name === name);
+      assert.ok(group, `${label}: missing group ${name}`);
+      // Switch / APP / China / Final groups list every region as an explicit
+      // option; region groups themselves use include-all+filter and have no
+      // proxies[] list, so only assert where the template defines one.
+      if (["✨ Hermes", "🎚️ 节点选择", "🏯 China", "🏁 Final"].includes(name))
+        for (const region of ["🌆 Hong Kong", "🧋 Taiwan", "⛩️ Japan", "🎤 South Korea", "🏙️ Singapore", "🗽 United States", "🌌 Others"])
+          assert.ok(group.proxies.includes(region), `${label}: ${name} must keep ${region} as an option`);
+    }
     assert.ok(yaml.includes("6. 分流规则 Rules"), label);
     assert.ok(yaml.includes("proxy-providers:"), label);
   }

@@ -15,6 +15,56 @@ test("defaults follow the example template with every switch enabled", () => {
   );
 });
 
+test("partial selection still writes every template group, region option and anchor reference", async () => {
+  // Regression: the old renderer dropped unselected region groups entirely and
+  // pruned them from 40+ proxies[] lists, so Hermes / 节点选择 / all APP groups
+  // lost Hong Kong, Taiwan, Singapore and Others. Options must never be deleted.
+  const p = {
+    ...defaults(catalog),
+    title: "示例",
+    providers: [{ name: "test", url: "https://example.com/sub" }],
+    countries: ["JP", "KR", "US"],
+    other: false,
+    appsMode: "custom",
+    apps: ["openai"],
+    strategies: ["auto"],
+  };
+  const out = await compile(p, catalog);
+
+  // Every template group is written to the YAML, even unselected regions.
+  const { parse } = await import("yaml");
+  const doc = parse(out.yaml, { merge: true, maxAliasCount: 100 });
+  const names = doc["proxy-groups"].map((g) => g.name);
+  for (const name of [
+    "🌆 Hong Kong",
+    "🧋 Taiwan",
+    "🏙️ Singapore",
+    "🌌 Others",
+    "✨ Hermes",
+    "🎚️ 节点选择",
+    "🏯 China",
+    "🏁 Final",
+  ])
+    assert.ok(names.includes(name), `generated YAML missing group ${name}`);
+
+  // Every proxies[] list in the rendered YAML keeps all template regions.
+  const allRegions = [
+    "🌆 Hong Kong",
+    "🧋 Taiwan",
+    "⛩️ Japan",
+    "🎤 South Korea",
+    "🏙️ Singapore",
+    "🗽 United States",
+    "🌌 Others",
+  ];
+  const hermes = doc["proxy-groups"].find((g) => g.name === "✨ Hermes");
+  for (const region of allRegions)
+    assert.ok(hermes.proxies.includes(region), `Hermes missing option ${region}`);
+  // The unselected-region filter anchors are still referenced in the YAML.
+  for (const anchor of ["*FilterHK", "*FilterTW", "*FilterSG", "*FilterOthers"])
+    assert.ok(out.yaml.includes(anchor), `missing anchor reference ${anchor}`);
+});
+
 test("full config keeps template-authored switch groups and rule providers", async () => {
   const profile = {
     ...defaults(catalog),
