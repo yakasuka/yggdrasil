@@ -258,6 +258,10 @@ export function createService({
           configs.push({
             token: pwdParts[0],
             hasPwd: pwdParts.length > 1,
+            // Plaintext password is kept on the owner's server purely so the
+            // admin dashboard can display the real subscription link for
+            // debugging. It is never returned by any public endpoint.
+            pwd: typeof mapping.pwd === "string" ? mapping.pwd : "",
             id: mapping.id,
             createdAt: profile?.createdAt || null,
             expiresAt: profile?.expiresAt || null,
@@ -455,9 +459,13 @@ export function createService({
             ),
             config,
           );
+        // Keep the plaintext password alongside the mapping. The owner needs
+        // it to reconstruct/debug the real link in the dashboard; it never
+        // leaves the Basic-auth-protected admin API. The storage key itself is
+        // still derived from a SHA-256 digest, so collisions stay isolated.
         await storage.put(
           storageKey,
-          JSON.stringify({ id: parts[1], key: parts[2] }),
+          JSON.stringify({ id: parts[1], key: parts[2], pwd }),
         );
         data.token = alias;
         data.hasPwd = !!pwd;

@@ -104,12 +104,13 @@ test("dashboard is disabled together with the admin API when no users configured
 
 test("dashboard link base uses PUBLIC_LINK_BASE when configured", async () => {
   const s = await service({
-    publicLinkBase: FRONTEND + "/yggdrasil/config-builder",
+    publicLinkBase: FRONTEND + "/config-builder",
   });
   const res = await s.fetch(new Request(ORIGIN + "/api/endpoints"));
   assert.equal(res.status, 200);
   const html = await (await dash(s)).text();
-  assert.ok(html.includes("yggdrasil-afx.pages.dev/yggdrasil/config-builder"));
+  assert.ok(html.includes("yggdrasil-afx.pages.dev/config-builder"));
+  assert.ok(!html.includes("yggdrasil-afx.pages.dev/yggdrasil/config-builder"));
 });
 
 test("a password-protected config can be deleted by its id", async () => {
@@ -142,6 +143,25 @@ test("a password-protected config can be deleted by its id", async () => {
   assert.equal((await deleteById(s, plain.id, "")).status, 401);
   assert.equal((await deleteById(s, plain.id)).status, 200);
   assert.equal((await (await adminGet(s)).json()).configs.length, 0);
+});
+
+test("admin API returns the real plaintext password for debugging", async () => {
+  const s = await service();
+  assert.equal((await s.fetch(create("alpha"))).status, 201);
+  assert.equal((await s.fetch(create("", "PublicOne"))).status, 201);
+
+  const { configs } = await (await adminGet(s)).json();
+  const locked = configs.find((c) => c.hasPwd);
+  const plain = configs.find((c) => !c.hasPwd);
+  assert.equal(locked.pwd, "alpha", "plaintext password must be exposed to the owner");
+  assert.equal(plain.pwd, "", "passwordless configs expose an empty string");
+});
+
+test("dashboard builds links from the real password, not a placeholder", () => {
+  const html = dashboardHTML({ linkBase: FRONTEND + "/config-builder" });
+  // The old placeholder encoded to %3C%E5%9C%A8... and must be gone.
+  assert.ok(!html.includes("在生成时设置的口令"));
+  assert.ok(html.includes("encodeURIComponent(row.pwd || \"\")"));
 });
 
 test("legacy name+password deletion still works alongside id deletion", async () => {

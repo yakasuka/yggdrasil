@@ -53,9 +53,9 @@ cp server/.env.example server/.env
 
 `ALLOWED_ORIGINS` 留空时允许任意来源（服务日志会提示 `cors: open`）；上线前务必填成自己的两个静态站域名。`GET /api/status` 返回 `cors: restricted | open`，可用于核对。
 
-**没有需要保密的共享凭据**。新订阅的对外凭据是用户在「配置名称」里填写的 token（3–60 位字母、数字、`_` 或 `-`，空格转 `-`，不区分大小写），外加确认页可选的 1–64 位访问口令；口令参与存储键派生（SHA-256 摘要，明文不落盘），同名配置配不同口令即可共存，同名同口令返回 409。服务端把「名称 + 口令」映射到内部随机 128 位 ID 与独立 256 位密钥，密钥不落盘。口令会原样出现在链接里，不是私密密码，把整条链接当作凭据保管；不带口令的历史链接继续有效。旧的 `/subscription/<id>/<key>.yaml` 路由已移除。`service.json`、静态文件与 workflow 里都只有公开 URL。
+**没有需要保密的共享凭据**。新订阅的对外凭据是用户在「配置名称」里填写的 token（3–60 位字母、数字、`_` 或 `-`，空格转 `-`，不区分大小写），外加确认页可选的 1–64 位访问口令；口令以 SHA-256 摘要参与存储键派生，同时明文另存进映射记录，仅供管理员后台调试展示真实订阅链接使用（公开接口不返回它），同名配置配不同口令即可共存，同名同口令返回 409。服务端把「名称 + 口令」映射到内部随机 128 位 ID 与独立 256 位密钥，密钥不落盘。口令会原样出现在链接里，不是私密密码，把整条链接当作凭据保管；不带口令的历史链接继续有效。旧的 `/subscription/<id>/<key>.yaml` 路由已移除。`service.json`、静态文件与 workflow 里都只有公开 URL。
 
-**管理后台：** 设置 `ADMIN_USERS` 后，浏览器打开 `https://<后端域名>/config-builder/dashboard` 并用同一组 Basic 账号密码登录，即可列出全部配置（名称、是否带口令、创建/过期时间、可复制的订阅链接）并删除任意配置——带口令的配置也能删（按内部 id 定位，无需明文口令）。它复用 `GET/DELETE /api/admin/configs`，不配置 `ADMIN_USERS` 时后台与接口都返回 401，且不在前端或 `/api/endpoints` 中暴露。Nginx 需把 `/config-builder/dashboard` 一起反代到后端（常规路径反代已覆盖）。
+**管理后台：** 设置 `ADMIN_USERS` 后，推荐打开 `https://yggdrasil-afx.pages.dev/config-builder/dashboard`——CF Pages 边缘函数就地代理到后端，地址栏不跳后端；浏览器 Basic 弹框的凭据与 401 质询原样透传，页面内的 `GET/DELETE /api/admin/configs` 也由 `functions/api/admin/configs.js` 在同源代理。也可直连 `https://<后端域名>/config-builder/dashboard`（Nginx 常规路径反代已覆盖该路径）。用同一组 Basic 账号密码登录，即可列出全部配置（名称、真实口令、创建/过期时间、可复制的**真实**订阅链接）并删除任意配置——带口令的配置也能删（按内部 id 定位，无需明文口令）。列表里展示的口令与链接来自服务端明文映射记录，仅供管理员调试，公开接口不返回；不配置 `ADMIN_USERS` 时后台与接口都返回 401，且不在前端或 `/api/endpoints` 中暴露。
 
 若从旧的私有仓库链路迁移：删除 CF 项目里的 `TOKEN`、`GH_TOKEN`、`SERVICE_TOKEN` 变量，下线旧的独立 Worker（`worker/wrangler.jsonc` 含 KV 绑定，已弃用，不要执行 `worker:deploy`），也不要保留任何读取节点正文的旧 Pages Functions。当前唯一需要的是仓库根 `functions/` 下的两个透明代理函数；CF Git 集成部署会自动识别它们，无需手动配置 KV 或环境变量。两个静态站的 `service.json` / `SERVICE_BASE_URL` 都指向同一个后端域名。
 

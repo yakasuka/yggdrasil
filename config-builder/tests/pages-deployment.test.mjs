@@ -153,10 +153,17 @@ test("Pages Function routes and proxy source are published at the repo root", ()
   const repo = new URL("../../", import.meta.url);
   const routes = JSON.parse(readFileSync(new URL("_routes.json", repo), "utf8"));
   assert.equal(routes.version, 1);
-  assert.deepEqual(routes.include, ["/config-builder", "/config-builder/status"]);
+  assert.deepEqual(routes.include, [
+    "/config-builder",
+    "/config-builder/status",
+    "/config-builder/dashboard",
+    "/api/admin/configs",
+  ]);
   for (const file of [
     "functions/config-builder.js",
     "functions/config-builder/status.js",
+    "functions/config-builder/dashboard.js",
+    "functions/api/admin/configs.js",
     "config-builder/shared/pages-proxy.js",
   ]) {
     assert.ok(existsSync(new URL(file, repo)), `${file} must exist`);

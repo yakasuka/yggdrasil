@@ -70,7 +70,7 @@ var status = document.getElementById("status");
 function el(tag, text){var n=document.createElement(tag);if(text!=null)n.textContent=text;return n}
 function linkFor(row){
   var parts = CFG.linkBase + "?token=" + encodeURIComponent(row.token);
-  if(row.hasPwd) parts += "&pwd=" + encodeURIComponent("<在生成时设置的口令>");
+  if(row.hasPwd) parts += "&pwd=" + encodeURIComponent(row.pwd || "");
   return parts;
 }
 function render(rows){

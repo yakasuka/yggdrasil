@@ -7,6 +7,7 @@ import {
   isSubscription,
   upstreamURL,
   proxySubscription,
+  proxyAdmin,
 } from "../shared/pages-proxy.js";
 
 const req = (href, headers = {}, method = "GET") =>
@@ -108,4 +109,67 @@ test("no extra path layer: upstream is /config-builder, not /yggdrasil/...", asy
   );
   assert.equal(called, "/config-builder");
   assert.ok(!called.includes("yggdrasil/"));
+});
+
+test("admin proxy relays Basic credentials and the 401 challenge", async () => {
+  const BASIC = "Basic " + Buffer.from("admin:yakasuka").toString("base64");
+  const seen = [];
+  const fetcher = async (url, init) => {
+    seen.push({ path: url.pathname, auth: init.headers.get("authorization") });
+    if (!init.headers.get("authorization"))
+      return new Response("no", {
+        status: 401,
+        headers: { "WWW-Authenticate": 'Basic realm="yggdrasil-admin"' },
+      });
+    return new Response('{"configs":[]}', {
+      status: 200,
+      headers: { "content-type": "application/json" },
+    });
+  };
+
+  const challenge = await proxyAdmin(
+    req("https://pages.dev/config-builder/dashboard"),
+    DEFAULT_SERVICE,
+    fetcher,
+  );
+  assert.equal(challenge.status, 401);
+  assert.match(challenge.headers.get("www-authenticate") || "", /Basic/);
+
+  const ok = await proxyAdmin(
+    req("https://pages.dev/config-builder/dashboard", { authorization: BASIC }),
+    DEFAULT_SERVICE,
+    fetcher,
+  );
+  assert.equal(ok.status, 200);
+  assert.equal(seen[0].path, "/config-builder/dashboard");
+  assert.equal(seen[1].auth, BASIC);
+});
+
+test("admin proxy forwards the admin API path and DELETE body", async () => {
+  let seen;
+  const fetcher = async (url, init) => {
+    const raw = init.body ? await new Response(init.body).text() : "";
+    seen = { href: url.href, method: init.method, body: raw };
+    return new Response('{"removed":true}', {
+      status: 200,
+      headers: { "content-type": "application/json" },
+    });
+  };
+  const body = JSON.stringify({ id: "AAAAAAAAAAAAAAAAAAAAAA" });
+  const response = await proxyAdmin(
+    new Request("https://pages.dev/api/admin/configs", {
+      method: "DELETE",
+      headers: {
+        authorization: "Basic abc",
+        "content-type": "application/json",
+      },
+      body,
+    }),
+    DEFAULT_SERVICE,
+    fetcher,
+  );
+  assert.equal(response.status, 200);
+  assert.equal(seen.href, "https://yggdrasil.xyang.cyou/api/admin/configs");
+  assert.equal(seen.method, "DELETE");
+  assert.equal(seen.body, body);
 });

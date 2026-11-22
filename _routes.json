@@ -2,7 +2,9 @@
   "version": 1,
   "include": [
     "/config-builder",
-    "/config-builder/status"
+    "/config-builder/status",
+    "/config-builder/dashboard",
+    "/api/admin/configs"
   ],
   "exclude": []
 }

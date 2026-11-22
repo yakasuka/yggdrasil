@@ -42,6 +42,61 @@ const FORWARD_RESPONSE_HEADERS = [
   "access-control-max-age",
 ];
 
+// Admin endpoints (the dashboard shell + its JSON API) need a few headers the
+// subscription proxy deliberately drops: Basic credentials in both directions
+// (Authorization request / WWW-Authenticate challenge) and the Content-Type
+// body for DELETE. Everything runs in the browser's Basic session against the
+// Pages origin; the edge relays it to the self-hosted backend unchanged.
+const ADMIN_REQUEST_HEADERS = [
+  "accept",
+  "authorization",
+  "content-type",
+  "user-agent",
+];
+const ADMIN_RESPONSE_HEADERS = [
+  "content-type",
+  "www-authenticate",
+  "cache-control",
+  "content-security-policy",
+  "x-content-type-options",
+  "x-frame-options",
+];
+
+export async function proxyAdmin(
+  request,
+  service = DEFAULT_SERVICE,
+  fetcher = fetch,
+) {
+  const url = new URL(request.url);
+  const target = new URL(url.pathname + url.search, service);
+
+  const headers = new Headers();
+  for (const name of ADMIN_REQUEST_HEADERS) {
+    const value = request.headers.get(name);
+    if (value) headers.set(name, value);
+  }
+
+  const init = { method: request.method, headers, redirect: "manual" };
+  if (!["GET", "HEAD"].includes(request.method) && request.body) {
+    init.body = request.body;
+    init.duplex = "half";
+  }
+
+  const upstream = await fetcher(target, init);
+  const output = new Headers();
+  for (const name of ADMIN_RESPONSE_HEADERS) {
+    const value = upstream.headers.get(name);
+    if (value) output.set(name, value);
+  }
+  if (!output.has("cache-control")) output.set("cache-control", "no-store");
+
+  return new Response(upstream.body, {
+    status: upstream.status,
+    statusText: upstream.statusText,
+    headers: output,
+  });
+}
+
 export async function proxySubscription(
   request,
   service = DEFAULT_SERVICE,
