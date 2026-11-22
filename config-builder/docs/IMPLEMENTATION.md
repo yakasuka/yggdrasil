@@ -66,6 +66,14 @@
 | `GET /config-builder?token=<名称>[&pwd=<口令>]` | 按配置名称与口令取回订阅，内联返回 YAML（无 `Content-Disposition`），浏览器可直接查看 |
 | `GET /config-builder/status?token=<名称>[&pwd=<口令>]` | 向链接持有者刷新流量报告 |
 
+管理员专用（需 `ADMIN_USERS`，HTTP Basic，不出现在 `/api/endpoints`）：
+
+| 路径 | 行为 |
+| --- | --- |
+| `GET /config-builder/dashboard` | Web 管理界面，返回自包含 HTML，运行时从同源管理 API 读取并删除配置 |
+| `GET /api/admin/configs` | 列出全部配置（名称、是否带口令、创建/过期时间、内部 id） |
+| `DELETE /api/admin/configs` | body `{id}` 按内部 id 删除（兼容旧 `{token,pwd}`），带口令配置无需明文口令即可删除 |
+
 旧的 `/subscription/<id>/<key>.yaml` 与 `/subscription/<id>/<key>/status` 路由已彻底移除，不是公开路径。
 
 公开路径集中在 `shared/service-routes.js`；`server/create-server.js` 把它们映射到 `worker/application.js` 的内部路径。内部路由文件和模板不作为静态资源提供。
@@ -73,6 +81,8 @@
 订阅链接在创建响应里改写：`server/create-server.js` 从 `filename` 还原用户填写的配置名称，做规范化（去空格、转 `-`、小写）与 3–60 位校验，并读取创建请求里的 `X-Config-Pwd`（可选，1–64 位非空白字符）。`shared/config-link.js` 用名称与口令生成 URL 查询串，并以「名称 + 口令」的 SHA-256 摘要作为 `alias:` 存储键（无口令时保留旧键以兼容历史链接）：同名不同口令互不冲突，同名同口令返回 409。映射指向 worker 返回的随机 id/key 并存入文件型 KV，口令明文不落盘。浏览器打开 `/config-builder?token=<名称>[&pwd=<口令>]` 时按同一摘要定位映射并转发到内部 `/s/…`，并把 YAML 响应的 `Content-Type` 改为 `text/plain`、去掉 `Content-Disposition`，以便直接浏览；客户端拉取仍收到 `Subscription-Userinfo` 与实时生成的配置。前端 `src/service.js` 的 `subscriptionURL()` / `usageURL()` 只校验新的 `/config-builder` 链接（含可选 `pwd`）。
 
 分享码在确认页生成：前端把当前选择交给 `POST /api/presets`，后端用 `shared/share.js` 的字段白名单剔除机场地址（除非用户勾选包含），用 `server/presets.js` 以 18 字节随机数生成 36 位十六进制码，经 AES-GCM 封存到文件型 KV。导入时从「订阅来源」页粘贴码或完整链接，`applyShare()` 按当前 catalog 过滤未知 ID、保留导入者已有的机场地址；解析节点后恢复分享码里的地区选择（只保留当前订阅确实存在的地区）。分享码与订阅链接互不影响，前者分享选择，后者交付节点配置。
+
+管理后台在 `server/dashboard.js` 里作为自包含 HTML 生成（内联样式与脚本，无外部依赖），由 `server/create-server.js` 在 `GET /config-builder/dashboard` 用管理端 Basic 凭据保护并返回，响应带 `Content-Security-Policy` 与 `X-Frame-Options`。启动时把 `linkBase`（`PUBLIC_LINK_BASE` 或后端自身地址）与 API 路径以 JSON 注入，注入前把 `<`、`>` 编码为 JSON unicode 转义以防闭合脚本标签；列表数据由页面运行时从同源管理 API 拉取并用 `textContent` 渲染，避免配置名注入。`DELETE /api/admin/configs` 优先按内部 id 在 `storage.list()` 里定位 alias 记录（带口令配置的明文口令不落盘，无法用旧 `{token,pwd}` 方式重新派生），再删 alias 与 `profile:<id>`；旧方式保留兼容。
 
 ## 扩展模板
 

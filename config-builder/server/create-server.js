@@ -9,6 +9,7 @@ import {
   parseConfigQuery,
 } from "../shared/config-link.js";
 import { createWorker } from "../worker/application.js";
+import { dashboardHTML } from "./dashboard.js";
 import { loadConfig, serviceEnv } from "./config.js";
 import { fileStorage } from "./storage.js";
 import { createPresetStore } from "./presets.js";
@@ -26,6 +27,7 @@ const INTERNAL_PARTS = /^([A-Za-z0-9_-]{22})\/([A-Za-z0-9_-]{43})$/;
 const ID_RE = /^[A-Za-z0-9_-]{22}$/;
 const KEY_RE = /^[A-Za-z0-9_-]{43}$/;
 const ADMIN_PATH = "/api/admin/configs";
+const DASHBOARD_PATH = CONFIG_PATH + "/dashboard";
 
 function aliasFromFilename(filename) {
   const raw = String(filename || "")
@@ -208,6 +210,32 @@ export function createService({
       });
 
     try {
+      // Owner-only web dashboard. Same Basic credential as the management API;
+      // it is a static shell that fetches data from the admin API itself.
+      if (path === DASHBOARD_PATH && ["GET", "HEAD"].includes(method)) {
+        if (!adminAuthorized(request, config))
+          return withCors(request, unauthorized(), config);
+        const html = dashboardHTML({
+          linkBase: config.publicLinkBase || base + CONFIG_PATH,
+          adminPath: ADMIN_PATH,
+        });
+        return withCors(
+          request,
+          new Response(method === "HEAD" ? null : html, {
+            status: 200,
+            headers: {
+              "Content-Type": "text/html; charset=utf-8",
+              "Cache-Control": "no-store, private",
+              "X-Content-Type-Options": "nosniff",
+              "X-Frame-Options": "DENY",
+              "Content-Security-Policy":
+                "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'self'",
+            },
+          }),
+          config,
+        );
+      }
+
       // Owner-only management API. Not linked from any frontend or endpoint
       // discovery response; requires HTTP Basic credentials from ADMIN_USERS.
       if (path === ADMIN_PATH && !adminAuthorized(request, config))
@@ -248,13 +276,37 @@ export function createService({
         } catch {
           return withCors(request, json({ error: "请求内容无效。" }, 400), config);
         }
-        const token = String(payload?.token || "").toLowerCase();
-        const pwd = String(payload?.pwd || "");
-        if (!CONFIG_NAME_RE.test(token) || (pwd && !(CONFIG_PWD_RE.test(pwd))))
-          return withCors(request, json({ error: "标识无效。" }, 400), config);
-        const key = await configAliasKey(token, pwd);
-        const mapping = await storage.get(key, "json");
-        if (!mapping || !ID_RE.test(mapping.id))
+        const id = String(payload?.id || "");
+        let key = "";
+        let mapping = null;
+        if (ID_RE.test(id)) {
+          // Preferred path: locate the alias record by its internal id. This
+          // works for password-protected configs too, whose plaintext password
+          // is deliberately never stored and cannot be re-derived here.
+          for (const record of await storage.list()) {
+            if (!record.key.startsWith("alias:")) continue;
+            let candidate;
+            try {
+              candidate = JSON.parse(record.value);
+            } catch {
+              continue;
+            }
+            if (candidate?.id === id && KEY_RE.test(candidate.key)) {
+              key = record.key;
+              mapping = candidate;
+              break;
+            }
+          }
+        } else {
+          // Legacy path kept for API compatibility: name + plaintext password.
+          const token = String(payload?.token || "").toLowerCase();
+          const pwd = String(payload?.pwd || "");
+          if (!CONFIG_NAME_RE.test(token) || (pwd && !(CONFIG_PWD_RE.test(pwd))))
+            return withCors(request, json({ error: "标识无效。" }, 400), config);
+          key = await configAliasKey(token, pwd);
+          mapping = await storage.get(key, "json");
+        }
+        if (!key || !mapping || !ID_RE.test(mapping.id))
           return withCors(request, json({ error: "配置不存在。" }, 404), config);
         await storage.delete(key);
         await storage.delete("profile:" + mapping.id);

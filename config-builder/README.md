@@ -19,6 +19,7 @@
   ├─ /api/endpoints             后端吐出所有公开链接
   ├─ /api/presets               分享码：保存 / 读取配置选择
   ├─ /api/admin/configs         管理员专用：列出 / 删除配置（Basic Auth）
+  ├─ /config-builder/dashboard  管理员专用：Web 管理界面（Basic Auth）
   ├─ /config-builder?token=<名称>[&pwd=<口令>]  唯一订阅链接，浏览器可直接查看
   └─ server/data/               加密记录（替代 Cloudflare KV）
 ```
@@ -29,7 +30,7 @@
 
 **订阅链接的公开域名：** 页面填的「配置名称/口令」决定 token，链接前缀由 `yggdrasil:public` meta（或构建期 `PUBLIC_LINK_BASE`）决定，默认 `https://yggdrasil-afx.pages.dev/yggdrasil/config-builder`。Cloudflare Pages 用 `_redirects` 把 `/yggdrasil/config-builder[?token=…]` 以 302（保留 query）转到自建服务，因此用户复制/分发的链接里不会出现后端地址；浏览器打开会跳到后端显示 YAML，客户端跟随 302 直接拉取。GitHub Pages 是纯静态、无法转发，但从它生成的链接同样指向 CF 域名，保证可用。没有公开域名配置时回退为后端直链。
 
-**配置管理（仅管理员）：** 服务端用 `ADMIN_USERS=用户名:密码[,...]` 开启 `GET /api/admin/configs`（列出名称、是否带口令、创建/过期时间）与 `DELETE /api/admin/configs`（body `{token,pwd}` 删除配置）。HTTP Basic 认证，定时安全比较；不配置则接口返回 401，前端和 `/api/endpoints` 都不会暴露它。不是普通用户功能。
+**配置管理（仅管理员）：** 服务端用 `ADMIN_USERS=用户名:密码[,...]` 开启浏览器管理后台 `https://<后端域名>/config-builder/dashboard`——打开后用同一组 Basic 账号密码登录，即可列出所有配置（名称、是否带口令、创建/过期时间、可复制的订阅链接）并删除任意配置，包括带口令的。它背后是 `GET /api/admin/configs` 与 `DELETE /api/admin/configs`（body `{id}`，兼容旧 `{token,pwd}`）。可选的 `PUBLIC_LINK_BASE` 设置后台里展示的订阅链接前缀（如 `https://yggdrasil-afx.pages.dev/yggdrasil/config-builder`），未设置则用后端自身地址。HTTP Basic 认证，定时安全比较；不配置 `ADMIN_USERS` 则后台和接口都返回 401，前端和 `/api/endpoints` 都不会暴露它们。不是普通用户功能。
 
 **分享配置：** 最终确认页可生成一串 36 位十六进制分享码（例如 `fffa18b5ff005bba7a19928f3e8626974ebe`），别人在「订阅来源」页粘贴该码即可导入地区、策略、APP、规则模块与客户端选项。分享码默认**不含机场订阅地址**；只有勾选「同时包含机场订阅地址」才会保存，导入后可直接解析。持有分享码即可读取其中内容，含机场地址时请勿公开传播。分享码与订阅链接是两套独立凭据：前者分享选择，后者读取节点配置。
 

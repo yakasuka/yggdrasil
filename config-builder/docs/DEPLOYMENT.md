@@ -46,12 +46,16 @@ cp server/.env.example server/.env
 | `PUBLIC_BASE_URL` | **生成订阅链接的对外源地址** | 填 `https://api.example.com`，否则链接会用内网 Host |
 | `TRUST_PROXY` | 是否信任 `X-Forwarded-*` | 前面有反代时设为 `true` |
 | `ALLOWED_ORIGINS` | 允许调用 API 的前端源，逗号分隔 | `https://yggdrasil-afx.pages.dev,https://yakasuka.github.io` |
+| `ADMIN_USERS` | 管理后台与 API 的 Basic 账号，逗号分隔 `用户:密码` | 例如 `admin:change-me`；留空则禁用管理端 |
+| `PUBLIC_LINK_BASE` | 管理后台里展示的订阅链接前缀（含挂载路径） | `https://yggdrasil-afx.pages.dev/yggdrasil/config-builder`；留空则用后端自身地址 |
 | `TEMPLATE_URL` | `bundled`（用 `shared/catalog.json`，仓库示例模板快照）或带 `x-configurator` 元数据的远程模板 | 默认 `bundled` |
 | `TCP_PROBE_ENABLED` | 可选 TCP 检测 | 默认 `false`，需要时设 `true` |
 
 `ALLOWED_ORIGINS` 留空时允许任意来源（服务日志会提示 `cors: open`）；上线前务必填成自己的两个静态站域名。`GET /api/status` 返回 `cors: restricted | open`，可用于核对。
 
 **没有需要保密的共享凭据**。新订阅的对外凭据是用户在「配置名称」里填写的 token（3–60 位字母、数字、`_` 或 `-`，空格转 `-`，不区分大小写），外加确认页可选的 1–64 位访问口令；口令参与存储键派生（SHA-256 摘要，明文不落盘），同名配置配不同口令即可共存，同名同口令返回 409。服务端把「名称 + 口令」映射到内部随机 128 位 ID 与独立 256 位密钥，密钥不落盘。口令会原样出现在链接里，不是私密密码，把整条链接当作凭据保管；不带口令的历史链接继续有效。旧的 `/subscription/<id>/<key>.yaml` 路由已移除。`service.json`、静态文件与 workflow 里都只有公开 URL。
+
+**管理后台：** 设置 `ADMIN_USERS` 后，浏览器打开 `https://<后端域名>/config-builder/dashboard` 并用同一组 Basic 账号密码登录，即可列出全部配置（名称、是否带口令、创建/过期时间、可复制的订阅链接）并删除任意配置——带口令的配置也能删（按内部 id 定位，无需明文口令）。它复用 `GET/DELETE /api/admin/configs`，不配置 `ADMIN_USERS` 时后台与接口都返回 401，且不在前端或 `/api/endpoints` 中暴露。Nginx 需把 `/config-builder/dashboard` 一起反代到后端（常规路径反代已覆盖）。
 
 若从旧的 Cloudflare Worker / Pages Functions 架构迁移：删除 CF 项目里的 `TOKEN`、`GH_TOKEN`、`SERVICE_TOKEN` 变量，下线旧 Worker 与 Pages Functions（`worker/wrangler.jsonc` 含 KV 绑定，已弃用，不要执行 `worker:deploy`），只保留静态站点；两个静态站的 `service.json` / `SERVICE_BASE_URL` 都指向同一个后端域名。
 

@@ -57,6 +57,10 @@ export function loadConfig(source = process.env) {
     publicBase: text(source.PUBLIC_BASE_URL)
       ? originOf(text(source.PUBLIC_BASE_URL), "PUBLIC_BASE_URL")
       : "",
+    // Optional full prefix (origin + mount path) for links shown in the owner
+    // dashboard, e.g. https://yggdrasil-afx.pages.dev/yggdrasil/config-builder.
+    // When unset, the dashboard links to this service itself.
+    publicLinkBase: text(source.PUBLIC_LINK_BASE).replace(/\/+$/, ""),
     allowedOrigins,
     adminUsers: adminUsers(text(source.ADMIN_USERS)),
     dataDir: text(source.DATA_DIR) ? resolve(text(source.DATA_DIR)) : defaultDataDir,
