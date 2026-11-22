@@ -1,5 +1,12 @@
 import { SERVICE_ROUTES } from "../shared/service-routes.js";
 import { SHARE_CODE_RE, shareIncludesProviders } from "../shared/share.js";
+import {
+  CONFIG_NAME_RE,
+  CONFIG_PWD_RE,
+  configAliasKey,
+  configQuery,
+  parseConfigQuery,
+} from "../shared/config-link.js";
 import { createWorker } from "../worker/application.js";
 import { loadConfig, serviceEnv } from "./config.js";
 import { fileStorage } from "./storage.js";
@@ -14,11 +21,9 @@ const MAX_PRESET_BODY = 64 * 1024;
 // id/key stay internal. The legacy /subscription/<id>/<key>.yaml alias has
 // been removed.
 const CONFIG_PATH = SERVICE_ROUTES.config;
-const ALIAS_RE = /^[\p{L}\p{N}_-]{3,60}$/u;
 const INTERNAL_PARTS = /^([A-Za-z0-9_-]{22})\/([A-Za-z0-9_-]{43})$/;
 const ID_RE = /^[A-Za-z0-9_-]{22}$/;
 const KEY_RE = /^[A-Za-z0-9_-]{43}$/;
-const aliasKey = (alias) => "alias:" + alias;
 
 function aliasFromFilename(filename) {
   const raw = String(filename || "")
@@ -26,13 +31,7 @@ function aliasFromFilename(filename) {
     .trim()
     .replace(/\s+/g, "-")
     .toLowerCase();
-  return ALIAS_RE.test(raw) ? raw : null;
-}
-
-function aliasFromQuery(url) {
-  const token = url.searchParams.get("token");
-  if (url.searchParams.size !== 1 || !ALIAS_RE.test(token || "")) return null;
-  return token.toLowerCase();
+  return CONFIG_NAME_RE.test(raw) ? raw : null;
 }
 
 const json = (data, status = 200, headers = {}) =>
@@ -89,7 +88,7 @@ function corsHeaders(request, config) {
   const headers = {
     Vary: "Origin",
     "Access-Control-Allow-Methods": "GET, HEAD, POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Headers": "Content-Type, X-Config-Pwd",
   };
   const origin = request.headers.get("Origin");
   headers["Access-Control-Allow-Origin"] = origin || "*";
@@ -232,10 +231,13 @@ export function createService({
       const friendlyStatus =
         path === CONFIG_PATH + "/status" && ["GET", "HEAD"].includes(method);
       if (friendlyYaml || friendlyStatus) {
-        const alias = aliasFromQuery(url);
-        if (!alias)
+        const link = parseConfigQuery(url.searchParams);
+        if (!link)
           return withCors(request, json({ error: "订阅标识无效。" }, 400), config);
-        const mapping = await storage.get(aliasKey(alias), "json");
+        const mapping = await storage.get(
+          await configAliasKey(link.name, link.pwd),
+          "json",
+        );
         if (!mapping || !ID_RE.test(mapping.id) || !KEY_RE.test(mapping.key))
           return withCors(
             request,
@@ -262,6 +264,13 @@ export function createService({
       );
 
       if (create && response.ok) {
+        const pwd = (request.headers.get("X-Config-Pwd") || "").trim();
+        if (pwd && !CONFIG_PWD_RE.test(pwd))
+          return withCors(
+            request,
+            json({ error: "访问口令需为 1–64 个非空白字符。" }, 400),
+            config,
+          );
         const data = await response.json();
         const internal = new URL(data.url);
         if (
@@ -290,20 +299,29 @@ export function createService({
             ),
             config,
           );
-        if (await storage.get(aliasKey(alias), "json"))
+        const storageKey = await configAliasKey(alias, pwd);
+        if (await storage.get(storageKey, "json"))
           return withCors(
             request,
-            json({ error: "该配置名称已被使用，请改名后重试。" }, 409),
+            json(
+              {
+                error: pwd
+                  ? "该配置名称与口令组合已被使用，请修改名称或口令后重试。"
+                  : "该配置名称已被使用，请改名后重试。",
+              },
+              409,
+            ),
             config,
           );
         await storage.put(
-          aliasKey(alias),
+          storageKey,
           JSON.stringify({ id: parts[1], key: parts[2] }),
         );
         data.token = alias;
-        data.url = base + CONFIG_PATH + "?token=" + encodeURIComponent(alias);
-        data.usageUrl =
-          base + CONFIG_PATH + "/status?token=" + encodeURIComponent(alias);
+        data.hasPwd = !!pwd;
+        const query = configQuery(alias, pwd);
+        data.url = base + CONFIG_PATH + "?" + query;
+        data.usageUrl = base + CONFIG_PATH + "/status?" + query;
         const headers = new Headers(response.headers);
         headers.delete("Content-Length");
         return withCors(

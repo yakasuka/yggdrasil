@@ -57,6 +57,7 @@ const ctx = {
   probeDone: 0,
   share: { code: "", includeProviders: false },
   importSelection: null,
+  linkPwd: "",
 };
 let step = 0,
   furthest = 0,
@@ -454,7 +455,10 @@ async function generate() {
   try {
     const response = await apiFetch(SERVICE_ROUTES.create, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "X-Config-Pwd": ctx.linkPwd,
+      },
       body: JSON.stringify(profile),
       signal: AbortSignal.timeout(90000),
     });
@@ -564,6 +568,7 @@ async function importShare() {
       other: ctx.profile.other,
     };
     ctx.share = { code: "", includeProviders: false };
+    ctx.linkPwd = "";
     const ready = ctx.profile.providers.some(
       (p) => p.name.trim() && p.url.trim(),
     );
@@ -590,6 +595,10 @@ document.addEventListener("input", (e) => {
   }
   if (el.id === "profile-title") {
     ctx.profile.title = el.value;
+    changed();
+  }
+  if (el.id === "config-pwd") {
+    ctx.linkPwd = el.value;
     changed();
   }
   if (el.id === "port") {

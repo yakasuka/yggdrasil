@@ -12,7 +12,7 @@
 
 配置由 `shared/template-render.js` 的 `renderFromTemplate()` **在 `ratatoskr-template.yaml` 原文上定点编辑**生成：先由 `compile()` 得到经校验的裁剪决策，渲染器据此逐行保留分区注释、flow 单行格式、`FilterRegions` 锚点与 `GEOSITE`/`GEOIP` 客户端规则，只注入 `proxy-providers`（机场原始订阅地址）、改端口与 APP 默认出口、删除未选中的组/规则行，并同步修正入口组 `proxies` 引用。节点不再内联，也不写 `geox-url`——客户端直接从机场远程拉取，节点更新即时生效。
 
-生成订阅时，`worker/application.js` 将用户选择经 AES-GCM 加密后交给 `server/storage.js` 写入 `server/data/`；`server/create-server.js` 把配置名称映射到内部随机 ID/密钥，对外只暴露 `/config-builder?token=<名称>`。后端是公开 API，没有共享 TOKEN、不读私有仓库；旧的 `/merge`、`/sub`、`/subscription/…` 链路及其静态跳转页均已移除。后端 `/api/endpoints` 吐出所有公开链接模板。
+生成订阅时，`worker/application.js` 将用户选择经 AES-GCM 加密后交给 `server/storage.js` 写入 `server/data/`；`server/create-server.js` 把配置名称与可选口令映射到内部随机 ID/密钥，对外只暴露 `/config-builder?token=<名称>[&pwd=<口令>]`。后端是公开 API，没有共享 TOKEN、不读私有仓库；旧的 `/merge`、`/sub`、`/subscription/…` 链路及其静态跳转页均已移除。后端 `/api/endpoints` 吐出所有公开链接模板。
 
 ## 功能对应位置
 
@@ -60,17 +60,17 @@
 | `POST /api/inspect` | 替浏览器拉取机场，只返回脱敏清单 |
 | `POST /api/latency` | 可选的服务器到节点 TCP 建连耗时 |
 | `POST /api/preview` | 生成完整 YAML，供预览和下载；不落盘 |
-| `POST /api/subscriptions` | 加密保存选择，返回 `/config-builder?token=<配置名称>`；名称映射到内部随机凭据，重名返回 409 |
+| `POST /api/subscriptions` | 加密保存选择，返回 `/config-builder?token=<配置名称>[&pwd=<口令>]`；名称+口令映射到内部随机凭据，同名同口令返回 409 |
 | `POST /api/presets` | 生成 36 位十六进制分享码，保存字段白名单内的配置选择 |
 | `GET /api/presets/<code>` | 凭分享码取回选择；默认不含机场订阅地址 |
-| `GET /config-builder?token=<名称>` | 按配置名称取回订阅，内联返回 YAML（无 `Content-Disposition`），浏览器可直接查看 |
-| `GET /config-builder/status?token=<名称>` | 向链接持有者刷新流量报告 |
+| `GET /config-builder?token=<名称>[&pwd=<口令>]` | 按配置名称与口令取回订阅，内联返回 YAML（无 `Content-Disposition`），浏览器可直接查看 |
+| `GET /config-builder/status?token=<名称>[&pwd=<口令>]` | 向链接持有者刷新流量报告 |
 
 旧的 `/subscription/<id>/<key>.yaml` 与 `/subscription/<id>/<key>/status` 路由已彻底移除，不是公开路径。
 
 公开路径集中在 `shared/service-routes.js`；`server/create-server.js` 把它们映射到 `worker/application.js` 的内部路径。内部路由文件和模板不作为静态资源提供。
 
-订阅链接在创建响应里改写：`server/create-server.js` 从 `filename` 还原用户填写的配置名称，做规范化（去空格、转 `-`、小写）与 3–60 位校验，检查 `alias:` 记录是否重名，再把名称映射到 worker 返回的随机 id/key 存入文件型 KV。浏览器打开 `/config-builder?token=<名称>` 时按映射转发到内部 `/s/…`，并把 YAML 响应的 `Content-Type` 改为 `text/plain`、去掉 `Content-Disposition`，以便直接浏览；客户端拉取仍收到 `Subscription-Userinfo` 与实时生成的配置。前端 `src/service.js` 的 `subscriptionURL()` / `usageURL()` 只校验新的 `/config-builder` 链接。
+订阅链接在创建响应里改写：`server/create-server.js` 从 `filename` 还原用户填写的配置名称，做规范化（去空格、转 `-`、小写）与 3–60 位校验，并读取创建请求里的 `X-Config-Pwd`（可选，1–64 位非空白字符）。`shared/config-link.js` 用名称与口令生成 URL 查询串，并以「名称 + 口令」的 SHA-256 摘要作为 `alias:` 存储键（无口令时保留旧键以兼容历史链接）：同名不同口令互不冲突，同名同口令返回 409。映射指向 worker 返回的随机 id/key 并存入文件型 KV，口令明文不落盘。浏览器打开 `/config-builder?token=<名称>[&pwd=<口令>]` 时按同一摘要定位映射并转发到内部 `/s/…`，并把 YAML 响应的 `Content-Type` 改为 `text/plain`、去掉 `Content-Disposition`，以便直接浏览；客户端拉取仍收到 `Subscription-Userinfo` 与实时生成的配置。前端 `src/service.js` 的 `subscriptionURL()` / `usageURL()` 只校验新的 `/config-builder` 链接（含可选 `pwd`）。
 
 分享码在确认页生成：前端把当前选择交给 `POST /api/presets`，后端用 `shared/share.js` 的字段白名单剔除机场地址（除非用户勾选包含），用 `server/presets.js` 以 18 字节随机数生成 36 位十六进制码，经 AES-GCM 封存到文件型 KV。导入时从「订阅来源」页粘贴码或完整链接，`applyShare()` 按当前 catalog 过滤未知 ID、保留导入者已有的机场地址；解析节点后恢复分享码里的地区选择（只保留当前订阅确实存在的地区）。分享码与订阅链接互不影响，前者分享选择，后者交付节点配置。
 

@@ -160,6 +160,8 @@ test("the browser accepts only friendly config links (legacy subscription links 
     origin + "/config-builder/status?token=guagua",
   );
   assert.throws(() => subscriptionURL(origin + "/config-builder?token=a", origin));
+  const withPassword = origin + "/config-builder?token=guagua&pwd=abc123";
+  assert.equal(subscriptionURL(withPassword, origin), withPassword);
   assert.throws(() => subscriptionURL(origin + "/config-builder?token=guagua&x=1", origin));
   // The legacy /subscription/<id>/<key>.yaml alias has been removed.
   const legacy =

@@ -14,11 +14,11 @@
    └─ 数据：自建 Node 服务（唯一的节点数据来源，公开 API）
             /api/status /api/inspect /api/preview /api/subscriptions
             /api/latency /api/endpoints /api/presets
-            /config-builder?token=<名称>   唯一订阅链接，内联返回 YAML
+            /config-builder?token=<名称>[&pwd=<口令>]  唯一订阅链接，内联返回 YAML
             server/data/  加密记录
 ```
 
-服务是**公开 API**：用户在页面填入自己的机场 / 自建节点订阅地址，选择地区、策略、APP 与规则模块，创建订阅后得到一条以配置名称为凭据的链接 `/config-builder?token=guagua`，可直接放进任意 Mihomo / Clash Meta 客户端；浏览器打开时以 `text/plain` 内联显示 YAML，不触发下载。配置由 `shared/template-render.js` **在模板 `ratatoskr-template.yaml` 原文上定点编辑**生成：完整保留分区注释、flow 单行格式、锚点与 `GEOSITE`/`GEOIP` 客户端规则，节点通过 `proxy-providers` 引用机场原始订阅地址由客户端直接远程拉取，不内联节点、不写 `geox-url`。旧的 `/subscription/<id>/<key>.yaml` 链接已彻底移除。
+服务是**公开 API**：用户在页面填入自己的机场 / 自建节点订阅地址，选择地区、策略、APP 与规则模块，创建订阅后得到一条以配置名称（可选加访问口令）为凭据的链接 `/config-builder?token=guagua`，可直接放进任意 Mihomo / Clash Meta 客户端；浏览器打开时以 `text/plain` 内联显示 YAML，不触发下载。配置由 `shared/template-render.js` **在模板 `ratatoskr-template.yaml` 原文上定点编辑**生成：完整保留分区注释、flow 单行格式、锚点与 `GEOSITE`/`GEOIP` 客户端规则，节点通过 `proxy-providers` 引用机场原始订阅地址由客户端直接远程拉取，不内联节点、不写 `geox-url`。旧的 `/subscription/<id>/<key>.yaml` 链接已彻底移除。
 
 没有共享 TOKEN、不读私有 GitHub 仓库。默认的规则与模板来自仓库示例 `resources/template/ratatoskr-template.yaml` 的同源快照 `shared/catalog.json`。
 
@@ -51,7 +51,7 @@ cp server/.env.example server/.env
 
 `ALLOWED_ORIGINS` 留空时允许任意来源（服务日志会提示 `cors: open`）；上线前务必填成自己的两个静态站域名。`GET /api/status` 返回 `cors: restricted | open`，可用于核对。
 
-**没有需要保密的共享凭据**。新订阅的对外凭据是用户在「配置名称」里填写的 token（3–60 位字母、数字、`_` 或 `-`，空格转 `-`，不区分大小写，重名返回 409）；服务端把它映射到内部随机 128 位 ID 与独立 256 位密钥，密钥不落盘。名称可猜，因此把整条链接当作口令保管；旧的 `/subscription/<id>/<key>.yaml` 路由已移除。`service.json`、静态文件与 workflow 里都只有公开 URL。
+**没有需要保密的共享凭据**。新订阅的对外凭据是用户在「配置名称」里填写的 token（3–60 位字母、数字、`_` 或 `-`，空格转 `-`，不区分大小写），外加确认页可选的 1–64 位访问口令；口令参与存储键派生（SHA-256 摘要，明文不落盘），同名配置配不同口令即可共存，同名同口令返回 409。服务端把「名称 + 口令」映射到内部随机 128 位 ID 与独立 256 位密钥，密钥不落盘。口令会原样出现在链接里，不是私密密码，把整条链接当作凭据保管；不带口令的历史链接继续有效。旧的 `/subscription/<id>/<key>.yaml` 路由已移除。`service.json`、静态文件与 workflow 里都只有公开 URL。
 
 若从旧的 Cloudflare Worker / Pages Functions 架构迁移：删除 CF 项目里的 `TOKEN`、`GH_TOKEN`、`SERVICE_TOKEN` 变量，下线旧 Worker 与 Pages Functions（`worker/wrangler.jsonc` 含 KV 绑定，已弃用，不要执行 `worker:deploy`），只保留静态站点；两个静态站的 `service.json` / `SERVICE_BASE_URL` 都指向同一个后端域名。
 
@@ -149,10 +149,10 @@ cd .. && git add config-builder/index.html config-builder/assets/app.js config-b
 1. 页面加载时 `/api/status` 探测后端；未就绪则向导停止并提示重试。
 2. 用户填入机场订阅地址 → `/api/inspect` 由后端解析、只返回脱敏节点清单；可选 `/api/latency` 做服务端 TCP 建连耗时。
 3. 用户选择地区、策略、APP 与规则模块 → `/api/preview` 生成完整 YAML 供预览 / 下载。
-4. 「生成订阅链接」→ `POST /api/subscriptions`，后端把选择与节点快照 AES-GCM 加密写入 `server/data/`，并把配置名称映射到内部随机凭据，返回 `https://api.example.com/config-builder?token=guagua`（流量接口为 `/config-builder/status?token=guagua`）。
+4. 「生成订阅链接」→ `POST /api/subscriptions`，后端把选择与节点快照 AES-GCM 加密写入 `server/data/`，并把配置名称（可选加访问口令）映射到内部随机凭据，返回 `https://api.example.com/config-builder?token=guagua`（填写口令时链接另带 `&pwd=<口令>`；流量接口为 `/config-builder/status?token=guagua[&pwd=<口令>]`）。
 5. 把这条链接放进 Mihomo / Clash Meta 客户端，或直接在浏览器打开查看 YAML。每次更新订阅时，后端重新解析机场、刷新节点与流量，按最新模板与用户所选规则模块实时生成配置。
 
-链接本身即凭据：对外是用户选择的配置名称（可猜，请私密传递或直接打开时留意），对内是随机 128 位 ID + 独立 256 位密钥，不依赖共享 TOKEN。`GET /config-builder/status?token=<名称>` 可刷新流量报告。分享问题时务必移除完整链接。
+链接本身即凭据：对外是用户选择的配置名称（可加可选访问口令，口令明文写在链接里，请私密传递），对内是随机 128 位 ID + 独立 256 位密钥，不依赖共享 TOKEN。`GET /config-builder/status?token=<名称>[&pwd=<口令>]` 可刷新流量报告。分享问题时务必移除完整链接。
 
 ### 分享码
 
@@ -175,7 +175,7 @@ curl https://api.example.com/api/endpoints
 2. 填入测试订阅，由后端 `/api/inspect` 解析节点与地区。
 3. 在「规则模块」步骤切换几个按钮块，预览配置，核对对应规则确实出现 / 消失。
 4. 预览并下载 `Example-ratatoskr.yaml`，核对节点、地区去留与 `[P1]` / `[P2]` 标识。
-5. 创建订阅，确认 `/api/subscriptions` 返回 201，链接形如 `https://api.example.com/config-builder?token=<配置名称>`；浏览器打开应显示 YAML 文本（响应头 `Content-Type: text/plain`、无 `Content-Disposition`），且带 `Subscription-Userinfo`。重复创建同名配置应返回 409。
+5. 创建订阅，确认 `/api/subscriptions` 返回 201，链接形如 `https://api.example.com/config-builder?token=<配置名称>[&pwd=<口令>]`；浏览器打开应显示 YAML 文本（响应头 `Content-Type: text/plain`、无 `Content-Disposition`），且带 `Subscription-Userinfo`。同名同口令重复创建应返回 409；同名不同口令应各自成功。
 6. 在确认页生成分享码并在另一浏览器打开静态站，于「订阅来源」页粘贴导入，核对地区 / 策略 / 规则模块一致且机场地址未被带入（除非已勾选包含）；服务日志不应出现分享码内容。
 7. 访问静态站的 `/config-builder/wrangler.jsonc`、`/config-builder/src/app.js`、`/_worker.js`，应返回 404；确认 CF 构建输出目录里没有 `_worker.js`。
 8. 旧的 `/merge`、`/sub` 应返回 404，静态站不应再有对应跳转页。

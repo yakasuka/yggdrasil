@@ -52,7 +52,7 @@ Yggdrasil 面向一站式的使用体验：使用者通过 config-builder 模块
 
 **[shared/catalog.json](../config-builder/shared/catalog.json)** 是 APP、地区与规则的静态目录数据。新增 APP 或地区时直接编辑该文件，构建后页面目录和后端模板随之更新；重新部署 Pages 后，同一 Token 可取得新的配置。完整的数据流与每项功能的位置见 **[实现路径](../config-builder/docs/IMPLEMENTATION.md)**。
 
-持久订阅链接形如 `https://<后端域名>/config-builder?token=<配置名称>`，不带 `.yaml` 后缀，浏览器打开即可查看 YAML；配置名称就是访问凭据，请用不易猜到的名称并私密传递。持续时间可选 **3 小时 / 7 天 / 30 天 / 永久**。配置标题下的 catalog 指纹只标识模板版本，不用作访问凭据。生成的配置不内联节点，机场订阅地址以 `proxy-providers` 形式远程调用，节点更新即时生效。
+持久订阅链接形如 `https://<后端域名>/config-builder?token=<配置名称>[&pwd=<访问口令>]`，不带 `.yaml` 后缀，浏览器打开即可查看 YAML；配置名称就是访问凭据，可另填 1–64 位访问口令来区分同名配置（同名同口令仍冲突）。口令以摘要参与存储键、明文出现在链接里，不是私密密码，请用不易猜到的组合并私密传递。持续时间可选 **3 小时 / 7 天 / 30 天 / 永久**。配置标题下的 catalog 指纹只标识模板版本，不用作访问凭据。生成的配置不内联节点，机场订阅地址以 `proxy-providers` 形式远程调用，节点更新即时生效。
 
 配置工坊与订阅服务同源部署在 Cloudflare Pages：页面把机场链接提交给同源接口，由服务端拉取与解码，直接连接 KV 保存加密配置与 YAML 快照。生成配置包含所选地区的完整节点，支持文件下载与持久订阅链接。GitHub 负责代码托管与 Actions 构建，Cloudflare Pages 负责静态资源、Functions 接口与 KV，两者免费额度即可运行，无需自建或租用服务器；公开入口为 `https://<项目名>.pages.dev/config-builder/`。仓库提供通用部署模板，使用自己的项目名称与 KV 绑定接入，见 **[部署指南与故障复盘](../config-builder/docs/DEPLOYMENT.md)**。
 
@@ -180,7 +180,7 @@ Ratatoskr 将庞大的分类数据交给 Geo 数据库，将清晰的分流意�
 | `/api/inspect` | 后端拉取用户输入的机场订阅，只返回脱敏节点与流量清单 |
 | `/api/preview` | 按网页选择实时生成完整 YAML，供预览 / 下载 |
 | `/api/subscriptions` | 加密保存选择，返回自带随机密钥的订阅链接 |
-| `/config-builder?token=<名称>` | 唯一订阅链接：按配置名称返回订阅，内联 YAML，浏览器可直接查看；名称映射到内部随机凭据 |
+| `/config-builder?token=<名称>[&pwd=<口令>]` | 唯一订阅链接：按配置名称与可选口令返回订阅，内联 YAML，浏览器可直接查看；名称+口令映射到内部随机凭据 |
 | `/api/presets`、`/api/presets/<code>` | 生成与读取分享码（36 位十六进制），默认不含机场地址，可选加密包含 |
 | `/api/endpoints` | 由后端直接吐出上述链接模板，不含任何凭据 |
 

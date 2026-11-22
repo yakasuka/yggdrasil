@@ -165,6 +165,10 @@ test("cross-origin frontends are allowed, unknown origins are rejected, prefligh
   );
   assert.equal(preflight.status, 204);
   assert.equal(preflight.headers.get("Access-Control-Allow-Origin"), FRONTEND);
+  assert.match(
+    preflight.headers.get("Access-Control-Allow-Headers"),
+    /X-Config-Pwd/,
+  );
 });
 
 test("subscription links point at the backend and serve YAML without any static host", async () => {

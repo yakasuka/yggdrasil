@@ -37,7 +37,7 @@ function reply(response, origin) {
   if (origin) headers.set("Access-Control-Allow-Origin", origin);
   headers.set("Vary", "Origin");
   headers.set("Access-Control-Allow-Methods", "GET, HEAD, POST, OPTIONS");
-  headers.set("Access-Control-Allow-Headers", "Content-Type");
+  headers.set("Access-Control-Allow-Headers", "Content-Type, X-Config-Pwd");
   return new Response(response.body, { status: response.status, headers });
 }
 export function createWorker(options = {}) {

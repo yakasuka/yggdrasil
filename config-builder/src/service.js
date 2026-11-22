@@ -1,4 +1,5 @@
 import { SERVICE_ROUTES } from "../shared/service-routes.js";
+import { parseConfigQuery } from "../shared/config-link.js";
 export { SERVICE_ROUTES };
 
 // The wizard is a static page; the subscription service lives on the owner's
@@ -96,8 +97,6 @@ export async function probeService(origin, version, fetcher = fetch) {
   };
 }
 
-const CONFIG_TOKEN_RE = /^[\p{L}\p{N}_-]{3,60}$/u;
-
 function configToken(url, status) {
   const expected = SERVICE_ROUTES.config + (status ? "/status" : "");
   if (
@@ -105,11 +104,10 @@ function configToken(url, status) {
     url.hash ||
     url.username ||
     url.password ||
-    [...url.searchParams.keys()].length !== 1
+    !parseConfigQuery(url.searchParams)
   )
     return null;
-  const token = url.searchParams.get("token");
-  return CONFIG_TOKEN_RE.test(token || "") ? token : null;
+  return url.searchParams.toString();
 }
 
 export function subscriptionURL(value, origin) {
