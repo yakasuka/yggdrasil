@@ -2,53 +2,63 @@
 
 ## 数据流
 
-`config-builder/shared/catalog.json` 是 APP、国家/地区与规则的静态目录数据，前端与 Pages 服务在构建时直接读取它，不提取个人订阅与节点凭据。新增 APP 或地区时直接编辑该文件并重新构建。`shared/template.js` 的 `catalogFromTemplate` 只在 `TEMPLATE_URL` 指向远程模板时于运行时解析目录，测试夹具位于 `tests/fixtures/template-with-metadata.yaml`，均不读取本地目录模板。
+`config-builder/shared/catalog.json` 是 APP、国家/地区与规则的静态目录数据，前端 bundle 与自建服务在构建时直接读取它，不提取个人订阅与节点凭据。新增 APP 或地区时直接编辑该文件并重新构建。`shared/template.js` 的 `catalogFromTemplate` 只在 `TEMPLATE_URL` 指向远程模板时于运行时解析目录，测试夹具位于 `tests/fixtures/template-with-metadata.yaml`。
 
-前端与订阅服务同源部署在 Cloudflare Pages。`src/app.js` 固定以 `location.origin` 为 API 地址：把机场链接提交给 `/api/inspect`，由 Pages 服务端通过 `worker/subscriptions.js` 拉取，`shared/subscription.js` 解码 Base64、YAML 或节点链接，`shared/nodes.js` 用模板 filter 分类并只返回脱敏清单。浏览器不直连机场、不缓存完整节点、不写入本地存储，因此不受 CORS 限制。
+前端是发布在 Cloudflare Pages 与 GitHub Pages 上的**静态文件**，两套站点共用同一份 `assets/app.js`。`src/config.js` 解析自建服务地址（HTML meta → 构建注入的 `SERVICE_BASE_URL` → 同源），`src/app.js` 通过 `apiFetch()` 跨源提交机场链接到 `/api/inspect`；`worker/subscriptions.js` 由 `server/` 直接运行，拉取订阅后由 `shared/subscription.js` 解码 Base64、YAML 或节点链接，`shared/nodes.js` 用模板 filter 分类并只返回脱敏清单。浏览器不直连机场、不缓存完整节点、不写入本地存储；服务端按 `ALLOWED_ORIGINS` 做 CORS 白名单。
 
-`src/service.js` 在页面加载时检查同源 `/api/status`，验证存储、模板版本与能力；服务未就绪时向导停止并提示重试，不提供本地 / 离线降级，也没有手动填写服务地址的入口。后续选择地区、策略和 APP 与订阅协议分离。
+`src/service.js` 在页面加载时检查自建服务的 `/api/status`，验证存储、模板版本与能力；服务未就绪时向导停止并提示重试，不提供本地 / 离线降级，也没有在向导里手动填写服务地址的入口（地址写在静态文件 / 构建变量里）。后续选择地区、策略和 APP 与订阅协议分离。
 
-最终下载通过 `/api/preview` 取得含完整节点的自包含 YAML。生成订阅时，Pages 将用户选择与 YAML 快照通过 AES-GCM 加密保存到 KV；客户端持有 ID 与独立随机 Token，访问稳定的 `/subscription/…` 地址。每次拉取更新节点和真实流量，再按当前模板编排。
+最终下载通过 `/api/preview` 取得含完整节点的自包含 YAML。生成订阅时，`worker/application.js` 将用户选择与 YAML 快照经 AES-GCM 加密后交给 `server/storage.js` 写入 `server/data/`；`server/create-server.js` 把内部 `/s/…` 链接改写成后端的 `/subscription/…` 并直接返回给浏览器。客户端持有 ID 与独立随机 Token，每次拉取更新节点和真实流量，再按当前模板编排。
+
+`/merge` 与 `/sub` 由 `scripts/endpoints/*.js` 实现，只在自建服务上运行；静态站的 `merge/index.html`、`sub/index.html` 与 `functions/*.js` 只做跳转。后端 `/api/endpoints` 吐出所有公开链接模板。
 
 ## 功能对应位置
 
-| 功能                                           | 维护入口                                           |
-| ---------------------------------------------- | -------------------------------------------------- |
-| 机场名称、链接及 P1/P2                         | `src/panels/sources.js`、`src/app.js`              |
-| 同源接口调用、健康检查、状态与重试             | `src/app.js`、`src/service.js`、`index.html`       |
-| Base64、YAML 和协议链接转换                    | `shared/subscription.js`                           |
-| 脱敏节点清单、地区匹配、流量汇总               | `shared/nodes.js`                                  |
-| 只展示拥有的地区、地区去留                     | `src/panels/regions.js`                            |
-| 四种策略、默认手动                             | `src/panels/strategies.js`、`shared/compiler.js`   |
-| APP 默认全选、跟随代理、地区/Direct/Reject     | `src/panels/apps.js`、`shared/compiler.js`         |
-| 固定规则、最终出口跟随代理                     | `shared/compiler.js` 的参数校验和组装              |
-| 最终确认、预览、下载及按钮位置                 | `src/panels/review.js`、`src/app.js`、`index.html` |
-| 用户名文件名、Token 有效期                     | `shared/profile.js`                                |
-| 完整节点 YAML 与地区过滤                       | `shared/compiler.js` 的 `inlineProxies` 选项       |
-| 服务端拉取、缓存、私网防护、可选 TCP 检测      | `worker/subscriptions.js`                          |
-| IP 地址机场、自定义端口、原生 TLS 和 HTTP 响应 | `worker/ip-fetch.js`                               |
-| 公网地址判定、统一 URL 校验                    | `worker/public-url.js`                             |
-| 创建、加密快照、旧记录兼容、实时更新           | `worker/application.js`                            |
-| AES-GCM 与独立随机密钥                         | `worker/crypto.js`                                 |
-| Pages 直连 KV、公开路径、静态文件隔离          | `worker/gateway/index.js`                          |
-| Pages 项目、KV 与统一输出目录                  | `wrangler.jsonc`                                   |
-| Pages 发布产物白名单                           | `scripts/build-gateway.mjs`                        |
-| 自动检查、模板目录与页面产物同步               | 根目录 `.github/workflows/check.yml`               |
-| 可选手动 Pages 发布                            | 根目录 `.github/workflows/deploy-cloudflare.yml`   |
+| 功能 | 维护入口 |
+| --- | --- |
+| 机场名称、链接及 P1/P2 | `src/panels/sources.js`、`src/app.js` |
+| 后端地址解析、跨源请求、健康检查与重试 | `src/config.js`、`src/app.js`、`src/service.js`、`index.html` |
+| Base64、YAML 和协议链接转换 | `shared/subscription.js` |
+| 脱敏节点清单、地区匹配、流量汇总 | `shared/nodes.js` |
+| 只展示拥有的地区、地区去留 | `src/panels/regions.js` |
+| 四种策略、默认手动 | `src/panels/strategies.js`、`shared/compiler.js` |
+| APP 默认全选、跟随代理、地区/Direct/Reject | `src/panels/apps.js`、`shared/compiler.js` |
+| 固定规则、最终出口跟随代理 | `shared/compiler.js` 的参数校验和组装 |
+| 最终确认、预览、下载及按钮位置 | `src/panels/review.js`、`src/app.js`、`index.html` |
+| 用户名文件名、Token 有效期 | `shared/profile.js` |
+| 完整节点 YAML 与地区过滤 | `shared/compiler.js` 的 `inlineProxies` 选项 |
+| 服务端拉取、缓存、私网防护、可选 TCP 检测 | `worker/subscriptions.js` |
+| IP 地址机场的旧 CF 套接字客户端（历史测试用） | `worker/ip-fetch.js` |
+| 公网地址判定、统一 URL 校验 | `worker/public-url.js` |
+| 创建、加密快照、旧记录兼容、实时更新 | `worker/application.js` |
+| AES-GCM 与独立随机密钥 | `worker/crypto.js` |
+| Node HTTP 入口、请求/响应转换 | `server/index.js` |
+| 公开路由、CORS、链接改写、merge/sub、endpoints | `server/create-server.js` |
+| 配置、文件型 KV、Node DNS/TCP 适配 | `server/config.js`、`server/storage.js`、`server/node-platform.js` |
+| 纯静态产物（无 `_worker.js`）、跳转页、service.json | `scripts/build-gateway.mjs` |
+| CF Pages 纯静态项目配置（无 KV） | `wrangler.jsonc` |
+| 自动检查 | 根目录 `.github/workflows/check.yml` |
+| GitHub Pages 产物同步 / GitHub 侧调用后端 | 根目录 `.github/workflows/sync-static.yml`、`call-service.yml` |
+| 可选手动 CF Pages 发布 | 根目录 `.github/workflows/deploy-cloudflare.yml` |
+
+`worker/gateway/index.js` 是弃用的旧 CF 网关，不参与构建或部署，仅为历史回归测试保留。
 
 ## 接口
 
-| 公开路径                                 | 行为                                        |
-| ---------------------------------------- | ------------------------------------------- |
-| `GET /api/status`                        | 读取 KV 并检查服务、模板与功能              |
-| `POST /api/inspect`                      | 必要时替浏览器拉取机场，只返回脱敏清单      |
-| `POST /api/latency`                      | 可选的服务器到节点 TCP 建连耗时             |
-| `POST /api/preview`                      | 生成完整 YAML，供预览和下载；不创建 KV 记录 |
-| `POST /api/subscriptions`                | 加密保存用户选择与 YAML 快照，返回订阅链接  |
-| `GET /subscription/<id>/<secret>.yaml`   | 验证 Token，刷新机场节点、流量，生成配置    |
-| `GET /subscription/<id>/<secret>/status` | 向链接持有者刷新流量报告                    |
+| 公开路径 | 行为 |
+| --- | --- |
+| `GET /api/status` | 检查存储、模板版本与能力，返回 `storage: self-hosted` 与后端地址 |
+| `GET /api/endpoints` | 后端吐出 merge / sub / subscription 等链接模板，不含凭据 |
+| `POST /api/inspect` | 替浏览器拉取机场，只返回脱敏清单 |
+| `POST /api/latency` | 可选的服务器到节点 TCP 建连耗时 |
+| `POST /api/preview` | 生成完整 YAML，供预览和下载；不落盘 |
+| `POST /api/subscriptions` | 加密保存选择，返回后端 `/subscription/…` 链接 |
+| `GET /subscription/<id>/<secret>.yaml` | 验证 Token，刷新机场节点、流量，生成配置 |
+| `GET /subscription/<id>/<secret>/status` | 向链接持有者刷新流量报告 |
+| `GET /merge?token=…` | 合并公开模板与私有 `providers.yaml` |
+| `GET /sub?token=…` | 返回私有 `nodes.yaml` |
 
-公开路径集中在 `shared/service-routes.js`。内部路由文件和模板不作为静态资源提供。生产入口只导出默认 HTTP 处理器；测试工厂从 `worker/application.js` 注入数据源，不暴露为额外平台类入口。
+公开路径集中在 `shared/service-routes.js`；`server/create-server.js` 把它们映射到 `worker/application.js` 的内部路径。内部路由文件和模板不作为静态资源提供。
 
 ## 扩展模板
 
@@ -66,16 +76,16 @@
 
 `src/motion.js` 集中维护非线性曲线、保留速度的步骤箭头弹簧、卡片增删和完成礼花；`src/motion.css` 管理对应视觉规则。步骤导航 DOM 持续复用，解析阶段指向中间行；新增机场只插入新卡片，保留已有输入和侧栏，再将焦点交给新机场。礼花仅在文件生成或订阅创建成功后触发，减少动态效果模式跳过装饰动效。
 
-`scripts/build.mjs` 为 JS / CSS 写入内容哈希，检查工作流同步对应 HTML，避免新旧资源缓存混用。主题与水面模块打包进浏览器入口，不再依赖公开源码路径。
+`scripts/build.mjs` 为 JS / CSS 写入内容哈希，并注入 `SERVICE_BASE_URL`，避免新旧资源缓存混用。主题与水面模块打包进浏览器入口，不再依赖公开源码路径。
 
 ## 验证与边界
 
-`npm run build && npm test` 覆盖编排引用、地区筛选、P1/P2、真实/缺失流量、四种有效期、加密快照、同链接更新、跨域来源、私有地址保护、公开文件隔离和协议解码。新增协议还需用 Mihomo 内核检查生成配置。
+`npm run build && npm test` 覆盖编排引用、地区筛选、P1/P2、真实/缺失流量、四种有效期、加密快照、同链接更新、跨源白名单、自建服务吐链接、文件存储过期、私有地址保护、静态产物隔离和协议解码。新增协议还需用 Mihomo 内核检查生成配置。
 
-订阅统一由同源服务拉取，浏览器不再受机场 CORS 策略影响。Base64 解码保留 UTF-8 字符，不是密码学解密。可选测速属于服务端 TCP 建连耗时，不能当作 ICMP ping 或完整代理隧道延迟。
+订阅统一由自建服务拉取，浏览器不受机场 CORS 策略影响。Base64 解码保留 UTF-8 字符，不是密码学解密。可选测速属于服务端 TCP 建连耗时，不能当作 ICMP ping 或完整代理隧道延迟。
 
-对于公网 IP 加自定义端口的机场，同源服务使用 `cloudflare:sockets` 拉取 HTTP / HTTPS 订阅，避免 Cloudflare `fetch()` 的 IP 目标限制；域名订阅继续使用 `fetch()`。HTTPS 保留原生 TLS 验证；只允许 GET / HEAD，重定向后重新检查目标，响应和解压结果均受大小限制。HTTP 分块、gzip / deflate、超时及关闭连接由独立模块处理，回归测试见 `tests/ip-subscriptions.test.mjs`。
+对于公网 IP 加自定义端口的机场，自建服务直接用 Node 的 `fetch()` 读取（Node 没有 Cloudflare `fetch()` 的 IP 目标限制），DNS 由 `node:dns` 解析、TCP 检测由 `node:net` 完成；域名订阅同样使用 `fetch()`。HTTPS 保留 TLS 验证；重定向后重新检查目标，响应和解压结果均受大小限制。旧 `worker/ip-fetch.js` 的 `cloudflare:sockets` 实现仅保留给历史回归测试。
 
 格式识别使用响应正文，不依赖 `Content-Type`。即使机场把 Base64 标成 `text/html`，也先解码并转换为 Mihomo 节点；不会把它作为 HTML 执行。所有机场都由服务端代取，未提供流量头的机场显示未知。
 
-机场凭据、完整订阅链接和 YAML 不进入日志。完整 Token 链接是访问凭据；KV 只保存密文。客户端 DNS、TUN 与系统代理仍由客户端管理。
+机场凭据、完整订阅链接和 YAML 不进入日志。完整 Token 链接是访问凭据；`server/data/` 只保存密文。客户端 DNS、TUN 与系统代理仍由客户端管理。

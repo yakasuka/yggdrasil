@@ -1,8 +1,9 @@
-const PRIVATE_REPO =
+const DEFAULT_PRIVATE_REPO =
   "https://api.github.com/repos/yakasuka/yggdrasil-private/contents";
 
 async function readPrivateFile(env, filename) {
-  const response = await fetch(`${PRIVATE_REPO}/${filename}`, {
+  const repo = env.PRIVATE_REPO || DEFAULT_PRIVATE_REPO;
+  const response = await fetch(`${repo}/${filename}`, {
     headers: {
       Authorization: `Bearer ${env.GH_TOKEN}`,
       Accept: "application/vnd.github+json",

@@ -1,6 +1,10 @@
 import { SERVICE_ROUTES } from "../shared/service-routes.js";
 export { SERVICE_ROUTES };
 
+// The wizard is a static page; the subscription service lives on the owner's
+// own server. Only a bare HTTPS origin (or a local development address) is
+// accepted, and legacy workers.dev addresses are refused so the browser can
+// never fall back to an old Cloudflare Worker that still handles node data.
 export function serviceOrigin(value) {
   if (!value) return null;
   if (typeof value !== "string") throw Error("请填写有效的 HTTPS 服务地址。");
@@ -27,9 +31,12 @@ export function serviceOrigin(value) {
   return url.origin;
 }
 
-// The wizard is served by the same origin as the subscription service. There
-// is no unconfigured / offline-only mode: a failed probe is a hard error.
-// Probe only the public health route. Airport credentials are never included.
+// Static frontends on Cloudflare Pages and GitHub Pages both probe the same
+// self-hosted service. There is no unconfigured / offline-only mode: a failed
+// probe is a hard error. Only the public health route is probed; airport
+// credentials are never included.
+const STORAGE_KINDS = new Set(["kv", "self-hosted", "file", "disk"]);
+
 export async function probeService(origin, version, fetcher = fetch) {
   const base = serviceOrigin(origin);
   if (!base)
@@ -72,7 +79,7 @@ export async function probeService(origin, version, fetcher = fetch) {
           ? "订阅服务尚未连接存储，请联系维护者。"
           : "订阅服务暂不可用，请重试或联系维护者。",
     };
-  if (health.storage !== "kv" || health.format !== "mihomo")
+  if (!STORAGE_KINDS.has(health.storage) || health.format !== "mihomo")
     return { state: "offline", message: "该地址未提供兼容的订阅服务。" };
   if (health.version !== version)
     return {
@@ -82,8 +89,10 @@ export async function probeService(origin, version, fetcher = fetch) {
   return {
     state: "ready",
     message:
-      "已连接。在线解析和持久订阅可用，机场链接仅在处理配置时发送给该服务。",
+      "已连接。在线解析与持久订阅可用；机场链接和生成的配置只经过该服务。",
     tcp: health.capabilities?.tcp === true,
+    service: health.service,
+    endpoints: health.endpoints,
   };
 }
 

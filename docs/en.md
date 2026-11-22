@@ -65,16 +65,17 @@ Network takeover features such as DNS, TUN, and sniffing are configured per clie
 
 ## Development and deployment
 
-The front end and shared template compiler are in `config-builder/`. Legacy `/merge` and `/sub` endpoints are in `scripts/endpoints/`. See the [implementation map](../config-builder/docs/IMPLEMENTATION.md) for code paths and the [deployment guide](../config-builder/docs/DEPLOYMENT.md) for Pages, Worker, and KV setup.
+The static front end lives in `config-builder/` and is published identically on Cloudflare Pages and GitHub Pages. Every API, the encrypted store, subscription links and the `/merge` / `/sub` responses are served by the self-hosted Node service in `config-builder/server/`; their shared implementations remain in `scripts/endpoints/`. No Cloudflare Worker, Function business logic or KV namespace is used. See the [implementation map](../config-builder/docs/IMPLEMENTATION.md) and the [deployment guide](../config-builder/docs/DEPLOYMENT.md).
 
 ```sh
 npm --prefix config-builder ci
-npm --prefix config-builder run build
+cp config-builder/server/.env.example config-builder/server/.env
+SERVICE_BASE_URL=https://api.example.com npm --prefix config-builder run build
 npm --prefix config-builder test
-npm --prefix config-builder run service:dev
+npm --prefix config-builder run server
 ```
 
-The local service is available at `http://localhost:8788/config-builder/`. To add an application or region to the builder, edit the static [catalog.json](../config-builder/shared/catalog.json), then rebuild and review the generated catalog.
+The backend listens on `http://127.0.0.1:8788`. Publish `config-builder/worker/gateway/dist/` on Cloudflare Pages, and the repository root (including `config-builder/`, `merge/`, `sub/` and `service.json`) on GitHub Pages. To add an application or region, edit the static [catalog.json](../config-builder/shared/catalog.json), then rebuild and review the generated catalog.
 
 ## Contributors
 

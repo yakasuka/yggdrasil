@@ -1,3 +1,7 @@
+// DEPRECATED: legacy standalone Cloudflare Worker (reads private nodes via KV).
+// Do not deploy this. The service now runs on your own Node server:
+//   config-builder/server/index.js  (npm run server)
+// Cloudflare / GitHub Pages publish static files only.
 {
   "$schema": "../node_modules/wrangler/config-schema.json",
   "name": "yggdrasil-subscriptions",

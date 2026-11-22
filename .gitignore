@@ -7,7 +7,11 @@ node_modules
 .dev.vars*
 .env
 .env.*
+!config-builder/server/.env.example
 **/worker/wrangler.local.*
+
+# Encrypted subscription records written by the self-hosted backend.
+config-builder/server/data/
 test-results/
 **/worker/gateway/dist/
 

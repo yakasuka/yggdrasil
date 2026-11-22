@@ -80,9 +80,16 @@ test("health checks distinguish static sites, missing storage and incompatible t
   assert.ok(!failed.message.includes("private request detail"));
 });
 
-test("the browser entry has no local-mode fallback or manual service setup", () => {
+test("the browser entry is a static client that only calls the self-hosted service", () => {
   const app = readFileSync(new URL("../src/app.js", import.meta.url), "utf8");
-  assert.ok(app.includes("location.origin"), "frontend must use the same origin");
+  const config = readFileSync(new URL("../src/config.js", import.meta.url), "utf8");
+  assert.ok(
+    app.includes("serviceBase()"),
+    "frontend must resolve the configured service origin",
+  );
+  assert.ok(app.includes("apiFetch("), "all API calls must be centralized");
+  assert.ok(config.includes("yggdrasil:service"));
+  assert.ok(config.includes('credentials: "omit"'));
   for (const removed of [
     "browserRecords",
     "sourceFailureMessage",
@@ -104,6 +111,8 @@ test("the browser entry has no local-mode fallback or manual service setup", () 
   ])
     assert.ok(!html.includes(removed), `local-mode markup remains: ${removed}`);
   assert.ok(html.includes('id="retry-service"'));
+  assert.ok(html.includes('id="service-host"'));
+  assert.ok(html.includes('name="yggdrasil:service"'));
 });
 
 test("the Pages deployment serves its own origin and rejects unapproved cross-origin calls", async () => {

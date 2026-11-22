@@ -14,7 +14,9 @@
     "worker:whoami": "wrangler whoami",
     "service:build": "node scripts/build-gateway.mjs",
     "service:dev": "npm run service:build && wrangler pages dev --port 8788",
-    "service:deploy": "npm run service:build && wrangler pages deploy"
+    "service:deploy": "npm run service:build && wrangler pages deploy",
+    "server": "node server/index.js",
+    "server:dev": "node --watch server/index.js"
   },
   "dependencies": {
     "buffer": "^6.0.3",

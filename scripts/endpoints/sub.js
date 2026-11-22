@@ -14,8 +14,10 @@ export async function onRequestGet({ request, env }) {
       headers: { "Content-Type": "text/plain; charset=utf-8" },
     });
 
-  const api =
-    "https://api.github.com/repos/yakasuka/yggdrasil-private/contents/nodes.yaml";
+  const repo =
+    env.PRIVATE_REPO ||
+    "https://api.github.com/repos/yakasuka/yggdrasil-private/contents";
+  const api = `${repo}/nodes.yaml`;
   try {
     const response = await fetch(api, {
       headers: {

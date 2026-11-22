@@ -1,65 +1,37 @@
+// Cloudflare Pages only forwards the link. Every node, token and private
+// repository read now happens on the self-hosted service configured in
+// SERVICE_BASE_URL. This function contains no subscription data at all.
 export async function onRequestGet({ request, env }) {
   const url = new URL(request.url);
-  if (!env.TOKEN || url.searchParams.get("token") !== env.TOKEN)
-    return new Response("Unauthorized", {
-      status: 401,
+  const configured = String(env.SERVICE_BASE_URL || "")
+    .trim()
+    .replace(/\/+$/, "");
+  const unavailable = (message) =>
+    new Response(message, {
+      status: 503,
       headers: {
         "Content-Type": "text/plain; charset=utf-8",
         "Cache-Control": "no-store",
+        "Referrer-Policy": "no-referrer",
       },
     });
-  if (!env.GH_TOKEN)
-    return new Response("Missing GH_TOKEN", {
-      status: 500,
-      headers: { "Content-Type": "text/plain; charset=utf-8" },
-    });
-
-  const api =
-    "https://api.github.com/repos/yakasuka/yggdrasil-private/contents/nodes.yaml";
-  try {
-    const response = await fetch(api, {
-      headers: {
-        Authorization: `Bearer ${env.GH_TOKEN}`,
-        Accept: "application/vnd.github+json",
-        "X-GitHub-Api-Version": "2022-11-28",
-        "User-Agent": "yggdrasil-providers",
-      },
-    });
-    if (!response.ok)
-      return new Response(
-        `Failed to read nodes.yaml: GitHub HTTP ${response.status}`,
-        {
-          status: 502,
-          headers: {
-            "Content-Type": "text/plain; charset=utf-8",
-            "Cache-Control": "no-store",
-          },
-        },
-      );
-    const data = await response.json();
-    if (!data.content || data.encoding !== "base64")
-      return new Response("Invalid GitHub file response", { status: 502 });
-    const binary = atob(data.content.replace(/\s/g, ""));
-    const yaml = new TextDecoder("utf-8").decode(
-      Uint8Array.from(binary, (character) => character.charCodeAt(0)),
+  if (!configured)
+    return unavailable(
+      "SERVICE_BASE_URL 未配置：请在 Cloudflare Pages 项目变量中填写自建服务地址。",
     );
-    return new Response(yaml, {
-      headers: {
-        "Content-Type": "text/plain; charset=utf-8",
-        "Content-Disposition": "inline",
-        "Cache-Control": "no-store",
-        "X-Content-Type-Options": "nosniff",
-        "Subscription-Userinfo":
-          "upload=0; download=0; total=10000000000000",
-      },
-    });
+  let target;
+  try {
+    target = new URL("/sub" + url.search, configured);
+    if (!["http:", "https:"].includes(target.protocol)) throw Error("invalid");
   } catch {
-    return new Response("Failed to read nodes.yaml", {
-      status: 502,
-      headers: {
-        "Content-Type": "text/plain; charset=utf-8",
-        "Cache-Control": "no-store",
-      },
-    });
+    return unavailable("SERVICE_BASE_URL 无效。");
   }
+  return new Response(null, {
+    status: 302,
+    headers: {
+      Location: target.href,
+      "Cache-Control": "no-store",
+      "Referrer-Policy": "no-referrer",
+    },
+  });
 }

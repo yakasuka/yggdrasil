@@ -1,3 +1,9 @@
+// DEPRECATED / NOT DEPLOYED.
+// This was the Cloudflare Pages _worker.js gateway. It is no longer bundled:
+// scripts/build-gateway.mjs emits static files only. Every API, the KV-like
+// store and the merge/sub endpoints now run on the owner's own server (see
+// ../../server/). The file is kept solely for historical regression tests;
+// never deploy it, or Cloudflare would again handle node data.
 import { SERVICE_ROUTES } from "../../shared/service-routes.js";
 import { createWorker } from "../application.js";
 import { onRequestGet as subscriptionRequest } from "../../../scripts/endpoints/sub.js";

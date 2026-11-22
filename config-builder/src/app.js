@@ -16,6 +16,7 @@ import {
   subscriptionURL,
   probeService,
 } from "./service.js";
+import { serviceBase, discoverService, apiFetch } from "./config.js";
 import { esc } from "./ui.js";
 import {
   sourcesPanel,
@@ -28,9 +29,11 @@ import { appsPanel } from "./panels/apps.js";
 import { reviewPanel, resultPanel } from "./panels/review.js";
 const $ = (s) => document.querySelector(s);
 const steps = ["订阅来源", "地区节点", "节点策略", "APP 分流", "最终确认"];
-// The page and the subscription service are always deployed together. All
-// parsing, preview, download and subscription creation happen in the service.
-const apiBase = location.origin;
+// The page is a static asset on Cloudflare Pages / GitHub Pages. All parsing,
+// preview, download and subscription creation happen on the self-hosted
+// service; the returned subscription link also points straight at that host.
+// The service origin is resolved per call, so service.json can be discovered
+// after the first paint.
 const ctx = {
   profile: defaults(),
   inspection: null,
@@ -248,8 +251,32 @@ function renderService() {
     mismatch: "订阅服务版本不一致",
   }[ctx.service];
   $("#service-description").textContent = ctx.serviceMessage;
+  const host = $("#service-host");
+  if (host) host.textContent = new URL(serviceBase()).host;
   $("#service-settings").dataset.state = ctx.service;
   $("#retry-service").disabled = busy || ctx.service === "checking";
+}
+// The backend is the single source of public links. Static hosts only show
+// them; credentials are appended by the owner, never stored in the page.
+async function loadEndpoints() {
+  const box = $("#service-links");
+  if (!box) return;
+  try {
+    const response = await apiFetch("/api/endpoints");
+    if (!response.ok) return;
+    const links = await response.json();
+    box.innerHTML =
+      '<p class="muted">服务提供的调用地址（请自行在 merge / sub 后追加 TOKEN）：</p>' +
+      ["merge", "sub", "subscription"]
+        .filter((key) => typeof links[key] === "string")
+        .map(
+          (key) =>
+            `<label class="field">${esc(key)}<input type="text" readonly value="${esc(links[key])}"></label>`,
+        )
+        .join("");
+  } catch {
+    box.replaceChildren();
+  }
 }
 function checkService() {
   const ticket = ++serviceRevision;
@@ -259,7 +286,7 @@ function checkService() {
   return (async () => {
     let status;
     try {
-      status = await probeService(apiBase, catalog.version);
+      status = await probeService(serviceBase(), catalog.version);
     } catch {
       status = {
         state: "offline",
@@ -267,6 +294,7 @@ function checkService() {
       };
     }
     if (ticket !== serviceRevision) return status;
+    if (status.state === "ready") void loadEndpoints();
     ctx.service = status.state;
     ctx.serviceMessage = status.message;
     if (!busy && step === 4) render();
@@ -291,7 +319,7 @@ async function resolveSources() {
   const rev = revision;
   inspectionController = new AbortController();
   try {
-    const response = await fetch(apiBase + SERVICE_ROUTES.inspect, {
+    const response = await apiFetch(SERVICE_ROUTES.inspect, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ providers }),
@@ -344,7 +372,7 @@ async function probeAll(providers, rev) {
   const ids = inspected.nodes.map((n) => n.id);
   for (let i = 0; i < ids.length && ctx.inspection === inspected; i += 10) {
     try {
-      const response = await fetch(apiBase + SERVICE_ROUTES.probe, {
+      const response = await apiFetch(SERVICE_ROUTES.probe, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ providers, nodeIds: ids.slice(i, i + 10) }),
@@ -412,7 +440,7 @@ async function generate() {
   const prior = locked.map((el) => el.disabled);
   locked.forEach((el) => (el.disabled = true));
   try {
-    const response = await fetch(apiBase + SERVICE_ROUTES.create, {
+    const response = await apiFetch(SERVICE_ROUTES.create, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(profile),
@@ -421,7 +449,7 @@ async function generate() {
     const data = await response.json();
     if (!response.ok) throw Error(data.error || "订阅暂时无法生成。");
     if (rev !== revision) return;
-    result = { ...data, url: subscriptionURL(data.url, apiBase) };
+    result = { ...data, url: subscriptionURL(data.url, serviceBase()) };
     result.usageUrl = result.url.replace(/\.yaml$/, "/status");
     celebrate($("#next"));
     $("#result-area").innerHTML = resultPanel(result);
@@ -461,7 +489,7 @@ async function configurationOutput() {
   if (ctx.service !== "ready")
     throw Error("订阅服务未连接，请稍后重试。");
   const profile = normalize(ctx.profile);
-  const response = await fetch(apiBase + SERVICE_ROUTES.preview, {
+  const response = await apiFetch(SERVICE_ROUTES.preview, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(profile),
@@ -626,8 +654,7 @@ document.addEventListener("click", async (e) => {
   if (el.id === "refresh-usage") {
     el.disabled = true;
     try {
-      const response = await fetch(result.usageUrl, {
-        cache: "no-store",
+      const response = await apiFetch(result.usageUrl, {
         signal: AbortSignal.timeout(30000),
       });
       if (!response.ok) throw Error();
@@ -641,4 +668,6 @@ document.addEventListener("click", async (e) => {
   }
 });
 render();
-checkService();
+// Resolve service.json (if the address was not baked into the bundle) before
+// probing, so the first health check already targets the right backend.
+void discoverService().then(() => checkService());

@@ -173,18 +173,19 @@ Ratatoskr 将庞大的分类数据交给 Geo 数据库，将清晰的分流意�
 <details>
 <summary><strong>维护者：订阅接口与部署约定</strong></summary>
 
-仓库提供适用于 Cloudflare Pages Functions 的接口：
+订阅接口只运行在自建 Node 服务上，Cloudflare Pages 与 GitHub Pages 只发布静态前端，不读取或返回任何节点内容：
 
 | 接口 | 实现与职责 |
 | :--- | :--- |
 | `/merge?token=…` | [merge.js](../scripts/endpoints/merge.js)：读取公开模板，将私有 `providers.yaml` 注入自动订阅标记区 |
 | `/sub?token=…` | [sub.js](../scripts/endpoints/sub.js)：读取私有 `nodes.yaml`，原样返回节点订阅 YAML |
+| `/api/endpoints` | 由后端直接吐出上述链接与订阅链接模板，不含任何凭据 |
 
-环境变量：`TOKEN` 用于接口鉴权，`GH_TOKEN` 用于读取私有仓库，`PUBLIC_CONFIG_URL` 指定合并接口使用的模板地址。
+环境变量写在 `config-builder/server/.env`：`TOKEN` 用于接口鉴权，`GH_TOKEN` 用于读取私有仓库，`PUBLIC_CONFIG_URL` 指定合并接口使用的模板地址，`PUBLIC_BASE_URL` 决定生成链接的对外域名。详见 [部署指南](../config-builder/docs/DEPLOYMENT.md)。
 
-以上为保留的旧接口，仍引用 `yakasuka/yggdrasil-private`；新的 Pages 构建不发布该目录，也不需要 GitHub 读取 Token。若另行启用旧接口，须同步配置仓库位置、凭据和模板地址，并保留成对的 `AUTO-PROVIDERS-START` / `AUTO-PROVIDERS-END` 标记。
+两个静态站上的 `/merge` 与 `/sub` 只是纯跳转页（CF 侧由 `functions/` 做一次 302，GitHub Pages 侧由 `merge/index.html`、`sub/index.html` 转发），把 `?token=` 原样交给后端。旧链接 `https://yggdrasil-afx.pages.dev/merge?token=…` 可继续使用；GitHub 侧对应 `https://yakasuka.github.io/yggdrasil/merge/?token=…`，也可用仓库的 [call-service.yml](../.github/workflows/call-service.yml) 从 Actions 调用。后端地址统一写在构建变量 `SERVICE_BASE_URL` 或仓库根 `service.json` 中。
 
-现有 `/merge` 获取公开配置并将私有 `providers.yaml` 注入自动订阅标记区；`/sub` 直接提供私有 `nodes.yaml`。新的配置工坊使用独立的 [配置服务与网关](../config-builder/worker/README.md)，按网页选项生成配置。
+配置工坊使用同一套自建 [配置服务](../config-builder/worker/README.md)，按网页选项生成配置；订阅链接由后端直接返回，不经过 CF 或 GitHub Pages。
 
 </details>
 

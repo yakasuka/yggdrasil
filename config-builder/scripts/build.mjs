@@ -3,6 +3,29 @@ import { fileURLToPath } from "node:url";
 import { readFile, writeFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 
+// Both static hosts share one bundle. The service address is injected here so
+// the very same assets/app.js works on Cloudflare Pages and GitHub Pages.
+function serviceBaseURL() {
+  const value = (process.env.SERVICE_BASE_URL || "").trim();
+  if (!value) return "";
+  let url;
+  try {
+    url = new URL(value);
+  } catch {
+    throw Error("SERVICE_BASE_URL 必须是完整的 http(s) 地址。");
+  }
+  if (
+    !["http:", "https:"].includes(url.protocol) ||
+    url.username ||
+    url.password ||
+    url.pathname !== "/" ||
+    url.search ||
+    url.hash
+  )
+    throw Error("SERVICE_BASE_URL 只能是不含路径与参数的源地址。");
+  return url.origin;
+}
+
 // Resolve paths from this script, so builds also work outside config-builder/.
 await build({
   absWorkingDir: fileURLToPath(new URL("../", import.meta.url)),
@@ -13,6 +36,7 @@ await build({
   target: "es2022",
   minify: true,
   legalComments: "none",
+  define: { __SERVICE_BASE_URL__: JSON.stringify(serviceBaseURL()) },
 });
 // HTML always points at its matching assets, including on cached repeat visits.
 const root = new URL("../", import.meta.url);

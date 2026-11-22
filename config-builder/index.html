@@ -9,6 +9,9 @@
     />
     <meta name="color-scheme" content="light dark" />
     <meta name="referrer" content="no-referrer" />
+    <!-- Static host only. Point this at the self-hosted service; leaving it
+         empty uses the SERVICE_BASE_URL injected at build time. -->
+    <meta name="yggdrasil:service" content="" />
     <title>config-builder · Yggdrasil</title>
     <script>
       (() => {
@@ -35,7 +38,7 @@
     <link rel="icon" href="../assets/favicon.png" type="image/png" />
     <link rel="preload" as="image" href="../assets/favicon.png" />
     <link rel="stylesheet" href="./assets/app.css?v=83f4c1793bd5" />
-    <script type="module" src="./assets/app.js?v=a5e747f97c18"></script>
+    <script type="module" src="./assets/app.js?v=fa3d6b5ed64a"></script>
   </head>
   <body>
     <div
@@ -139,8 +142,11 @@
           <div>
             <p id="service-description" class="muted" role="status"></p>
             <p class="muted">
-              页面与订阅服务同源部署，机场链接仅在处理配置时发送给该服务。
+              本页只提供界面。订阅解析、配置生成与订阅链接均由自建服务处理，
+              Cloudflare Pages 和 GitHub Pages 不接触节点内容。
             </p>
+            <p class="muted">当前服务：<code id="service-host"></code></p>
+            <div id="service-links"></div>
             <div class="service-actions">
               <button type="button" class="text-button" id="retry-service">
                 重试连接
