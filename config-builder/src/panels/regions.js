@@ -25,8 +25,8 @@ export function regionsPanel(ctx) {
     notice(
       ctx.preview
         ? "预览模式下不显示节点与连接耗时；填写订阅并解析后会出现实际节点。"
-        : "地区根据节点名称匹配；未识别到节点的地区仍可勾选并写入配置。延迟由服务器测得（url-test 自动选择组用同一测试地址），不代表经过代理隧道后的实际访问延迟。",
+        : "地区根据节点名称匹配；未识别到节点的地区仍可勾选并写入配置。耗时由服务器通过节点代理请求测试地址测得，与 url-test 自动选择组口径一致。",
     ) +
-    `<details><summary>查看节点与连接耗时（${nodes.length}）</summary><div class="node-table-wrap"><table class="node-table"><thead><tr><th>节点</th><th>地区</th><th>TCP 连接耗时</th></tr></thead><tbody>${nodes.map((n) => `<tr><td>[P${n.provider + 1}] ${esc(n.name)}</td><td>${esc(regions.find((r) => r.id === n.region)?.label || "其他地区")}</td><td data-latency="${n.id}">${n.latencyMs === null || n.latencyMs === undefined ? "未检测" : n.latencyMs + " ms"}</td></tr>`).join("")}</tbody></table></div></details>`
+    `<details><summary>查看节点与连接耗时（${nodes.length}）</summary><div class="node-table-wrap"><table class="node-table"><thead><tr><th>节点</th><th>地区</th><th>连接耗时（url-test）</th></tr></thead><tbody>${nodes.map((n) => `<tr><td>[P${n.provider + 1}] ${esc(n.name)}</td><td>${esc(regions.find((r) => r.id === n.region)?.label || "其他地区")}</td><td data-latency="${n.id}">${n.latencyMs === null || n.latencyMs === undefined ? "未检测" : n.latencyMs + " ms"}</td></tr>`).join("")}</tbody></table></div></details>`
   );
 }

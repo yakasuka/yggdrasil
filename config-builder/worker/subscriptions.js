@@ -58,6 +58,7 @@ export function subscriptionClient({
   fetcher = fetch,
   resolver,
   probe,
+  urlProbe,
   ipFetcher,
 } = {}) {
   const cache = new Map();
@@ -200,6 +201,23 @@ export function subscriptionClient({
   }
   async function probeNodes(providers, ids) {
     const records = await inspect(providers);
+    // When a real proxy engine is available (urlProbe), measure latency the
+    // same way the client's url-test group does: send a request through each
+    // node. This is the only accurate measurement for UDP-based protocols
+    // such as hysteria2, where a TCP connect can never succeed. Fall back to
+    // the legacy TCP-connect probe otherwise (e.g. Cloudflare Workers).
+    if (urlProbe) {
+      try {
+        return await urlProbe(records, ids);
+      } catch {
+        return ids.map((id) => ({
+          id,
+          latencyMs: null,
+          kind: "url-test",
+          error: "连接检测暂不可用。",
+        }));
+      }
+    }
     const nodes = records
       .flatMap((p) => p.nodes)
       .filter((n) => ids.includes(n.id));

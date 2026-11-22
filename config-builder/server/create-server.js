@@ -14,6 +14,7 @@ import { loadConfig, serviceEnv } from "./config.js";
 import { fileStorage } from "./storage.js";
 import { createPresetStore } from "./presets.js";
 import { fetcher, ipFetcher, probe, resolver } from "./node-platform.js";
+import { createUrlProbe } from "./url-probe.js";
 
 const INTERNAL_SUBSCRIPTION =
   /^\/s\/([A-Za-z0-9_-]{22})\/([A-Za-z0-9_-]{43})\.yaml$/;
@@ -172,7 +173,20 @@ export function createService({
   storage = fileStorage(config.dataDir),
   platform = { fetcher, ipFetcher, resolver, probe },
 } = {}) {
-  const application = createWorker({ ...platform });
+  // Real url-test probing is opt-in via MIHOMO_BIN. Auto-attach it to the
+  // default platform so the self-hosted service measures UDP nodes the same
+  // way the client does; an explicitly injected platform (tests) keeps its own
+  // probe behaviour.
+  let effectivePlatform = platform;
+  if (config.mihomoBin && !("urlProbe" in platform)) {
+    const urlProbe = createUrlProbe({
+      mihomoBin: config.mihomoBin,
+      testURL: config.urlTestURL,
+      timeoutMs: config.urlTestTimeout,
+    });
+    if (urlProbe) effectivePlatform = { ...platform, urlProbe };
+  }
+  const application = createWorker({ ...effectivePlatform });
   const env = serviceEnv(config, storage);
   const presets = createPresetStore(storage, { ttl: config.presetTtl });
 

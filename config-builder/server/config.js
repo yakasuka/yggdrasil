@@ -70,6 +70,13 @@ export function loadConfig(source = process.env) {
     // opt out. The parsed node list shows real connection latency instead of
     // "未检测" out of the box.
     tcpProbeEnabled: text(source.TCP_PROBE_ENABLED) !== "false",
+    // Optional local proxy core for real url-test latency (hysteria2 etc.).
+    // When set to an executable path, /api/latency measures latency by sending
+    // a request through each node, exactly like the client's url-test group.
+    // Leave empty to fall back to TCP connect (which cannot measure UDP nodes).
+    mihomoBin: text(source.MIHOMO_BIN),
+    urlTestURL: text(source.URL_TEST_URL) || "https://www.gstatic.com/generate_204",
+    urlTestTimeout: Number(text(source.URL_TEST_TIMEOUT) || 0) || 10000,
   };
 }
 
