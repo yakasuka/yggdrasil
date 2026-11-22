@@ -154,6 +154,7 @@ test("Pages Function routes and proxy source are published at the repo root", ()
   const routes = JSON.parse(readFileSync(new URL("_routes.json", repo), "utf8"));
   assert.equal(routes.version, 1);
   assert.deepEqual(routes.include, [
+    "/sub",
     "/config-builder",
     "/config-builder/status",
     "/config-builder/dashboard",
@@ -162,6 +163,7 @@ test("Pages Function routes and proxy source are published at the repo root", ()
     "/api/admin/configs",
   ]);
   for (const file of [
+    "functions/sub.js",
     "functions/config-builder.js",
     "functions/config-builder/status.js",
     "functions/config-builder/dashboard.js",

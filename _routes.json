@@ -1,6 +1,7 @@
 {
   "version": 1,
   "include": [
+    "/sub",
     "/config-builder",
     "/config-builder/status",
     "/config-builder/dashboard",
