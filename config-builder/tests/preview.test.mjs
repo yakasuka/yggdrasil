@@ -42,3 +42,22 @@ test("wizard exposes an early-configuration entry and unlocked steps", async () 
   assert.match(app, /if \(ctx\.preview\) changed\(\);/);
   assert.match(app, /const wasPreview = ctx\.preview;/);
 });
+
+test("theme follows the system while no manual choice is stored", async () => {
+  const source = await readFile(new URL("../src/theme.js", import.meta.url), "utf8");
+  assert.match(source, /prefers-color-scheme/);
+  assert.match(source, /if \(!saved\) apply\(\)/);
+});
+
+test("final step never shows a detached YAML file card", async () => {
+  const review = await readFile(
+    new URL("../src/panels/review.js", import.meta.url),
+    "utf8",
+  );
+  assert.doesNotMatch(review, /Eaibee/);
+  assert.match(review, /id="file-card" hidden/);
+  assert.match(review, /未命名-ratatoskr\.yaml/);
+  const app = await readFile(new URL("../src/app.js", import.meta.url), "utf8");
+  assert.match(app, /if \(ctx\.preview \|\| ctx\.service !== "ready"\)/);
+  assert.match(app, /\$\("#download"\)\.hidden = !final \|\| !ready;/);
+});

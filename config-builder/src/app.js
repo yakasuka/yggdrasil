@@ -206,7 +206,7 @@ function footer() {
   const final = step === FINAL_STEP;
   const ready = ctx.service === "ready" && !ctx.preview;
   $("#back").disabled = busy || step === 0;
-  $("#download").hidden = !final;
+  $("#download").hidden = !final || !ready;
   $("#download").disabled = busy || !ready;
   $("#next").disabled = busy || (final && !ready);
   $("#skip-sources").hidden = busy || step !== 0 || ctx.preview;
@@ -480,14 +480,25 @@ async function updateSummary() {
       catalog,
     );
     if (step !== FINAL_STEP || rev !== revision) return;
+    const card = $("#file-card");
+    // Preview mode has no nodes and cannot produce a file. Never show a
+    // detached YAML card with a dead "preview" action in that state.
+    if (ctx.preview || ctx.service !== "ready") {
+      if (card) card.hidden = true;
+      return;
+    }
     $("#rule-count").textContent = output.summary.rules;
     $("#file-name").textContent = ctx.profile.title
       ? filename(ctx.profile.title)
-      : "名字-ratatoskr.yaml";
+      : "未命名-ratatoskr.yaml";
     $("#file-size").textContent = `节点在生成时写入 · ${output.summary.groups} 个策略组`;
+    if (card) card.hidden = false;
   } catch (e) {
-    if (step === FINAL_STEP && rev === revision)
-      $("#file-size").textContent = "请检查配置选择";
+    if (step === FINAL_STEP && rev === revision) {
+      const card = $("#file-card");
+      if (card) card.hidden = true;
+      $("#rule-count").textContent = "—";
+    }
   }
 }
 async function generate() {

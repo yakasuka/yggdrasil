@@ -40,11 +40,11 @@
   --input: #fff;
   --ink: #1d1d1f;
   --muted: #6e6e73;
-  --line: #00000012;
-  --accent: #0066cc;
+  --line: #00000026;
+  --accent: #005bb5;
   --action: #0071e3;
-  --tint: #0071e308;
-  --selected-line: #0071e360;
+  --tint: #0071e314;
+  --selected-line: #0071e385;
   --glass: #ffffffe0;
   --glass-edge: #ffffffef;
   --warning: #805b19;
@@ -611,6 +611,12 @@ textarea {
 .button.secondary {
   background: var(--soft);
   border-color: var(--line);
+}
+:root[data-theme="light"] .button.secondary,
+:root[data-theme="light"] .icon-text-button {
+  background: #fff;
+  border-color: #005bb566;
+  box-shadow: 0 1px 2px #00000014;
 }
 .button.secondary:hover:not(:disabled),
 .icon-button:hover:not(:disabled) {
@@ -1180,6 +1186,9 @@ details > div {
   align-items: center;
   gap: 14px;
   margin: 26px 0;
+}
+.file-card[hidden] {
+  display: none;
 }
 .file-icon {
   width: 42px;
