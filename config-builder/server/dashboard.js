@@ -213,7 +213,13 @@ function copyButton(text,label){
   b.appendChild(copyIcon());b.appendChild(el("span","复制"));
   b.addEventListener("click",function(){
     var done=function(){notify("已复制订阅链接");var sp=b.getElementsByTagName("span")[0];if(sp){var old=sp.textContent;sp.textContent="已复制";setTimeout(function(){sp.textContent=old},1500)}};
-    var fail=function(){notify("复制失败，请手动选择链接",true)};
+    var fail=function(){
+      // Select the visible link so a plain Ctrl/Cmd+C still works when the
+      // Clipboard API is unavailable (e.g. non-secure or restricted contexts).
+      var cell=b.closest("td");var code=cell&&cell.getElementsByTagName("code")[0];
+      if(code&&window.getSelection){var r=document.createRange();r.selectNodeContents(code);var sel=window.getSelection();sel.removeAllRanges();sel.addRange(r)}
+      notify("已选中链接，请按 Ctrl/Cmd+C 复制",true);
+    };
     if(navigator.clipboard&&navigator.clipboard.writeText){
       navigator.clipboard.writeText(text).then(done).catch(function(){fallbackCopy(text,done,fail)});
     }else fallbackCopy(text,done,fail);
