@@ -58,6 +58,14 @@ export function disabledIds(kind, profile, model = catalog) {
   return allIds(kind, model).filter((id) => !on.has(id));
 }
 
+// The single source of truth for what the grid renders: the enabled ids in
+// the user's saved display order. A widget's presence on the grid IS its
+// enabled state — there is no second "checked" state to keep in sync.
+export function activeOrder(kind, profile, model = catalog) {
+  const on = new Set(enabledIds(kind, profile));
+  return displayOrder(kind, profile, model).filter((id) => on.has(id));
+}
+
 // Ids in the user's saved display order, with any missing/new ids appended.
 export function displayOrder(kind, profile, model = catalog) {
   const saved = (profile.order && profile.order[ORDER_KEY[kind]]) || [];
@@ -136,17 +144,29 @@ export function widgetLabel(kind, id, model = catalog) {
   }
 }
 
-// The little red minus badge shown on an editable card while jiggling.
+// The corner affordances on every card. In the unified widget model the red
+// minus is the "remove from grid" action (always available, not edit-gated);
+// fixed widgets get a neutral lock instead. The plus is rendered by the
+// library item builder, not here.
 export function removeBadge(kind, id, fixed = false) {
   if (fixed)
-    return `<span class="widget-badge widget-badge--fixed" aria-hidden="true">🔒</span>`;
+    return `<span class="widget-badge widget-badge--fixed" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.4"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span>`;
   return `<button type="button" class="widget-badge widget-badge--remove" data-widget-remove="${kind}" data-id="${esc(id)}" aria-label="移除 ${esc(id)}" tabindex="-1"><span aria-hidden="true">−</span></button>`;
+}
+
+// Build a library item's markup for one disabled widget. Shared by the panel
+// (initial render) and the editor (incremental add/remove without re-render).
+export function libraryItem(kind, id, model = catalog) {
+  const w = widgetLabel(kind, id, model);
+  return `<button type="button" class="widget-library-item" data-widget-add="${kind}" data-id="${esc(id)}">${w.icon ? `<img src="${esc(w.icon)}" alt="" decoding="async" onerror="this.hidden=true">` : `<span aria-hidden="true">${esc(w.text)}</span>`}<span>${esc(w.label)}</span><b aria-hidden="true">＋</b></button>`;
 }
 
 // Attributes every draggable card carries so the app can delegate drag and
 // edit gestures without re-binding listeners on each full re-render.
 export function widgetAttrs(kind, id, { fixed = false } = {}) {
-  return ` data-widget="${kind}" data-id="${esc(id)}"${fixed ? " data-widget-fixed" : ""}`;
+  // Dragging works without entering any edit mode in the unified widget model;
+  // fixed widgets keep their marker so the editor never drags or removes them.
+  return ` data-widget="${kind}" data-id="${esc(id)}"${fixed ? " data-widget-fixed" : " draggable=\"true\""}`;
 }
 
 // Sort all widgets of a kind into one of two canonical orders and persist it.

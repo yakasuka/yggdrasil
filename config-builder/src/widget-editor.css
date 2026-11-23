@@ -1,208 +1,296 @@
 /* ============================================================
-   Widget edit mode · Liquid Glass
-   A restrained, Apple-like glass surface + iOS home-screen jiggle.
-   All colour comes from the existing theme variables, so it stays
-   neutral and adapts to light/dark automatically.
+   Widget board · Liquid Glass
+   A real glass material: a translucent, blurred body that REFRACTS a
+   colourful layer behind it, a crisp specular rim, and a soft falloff.
+   The trick that was missing before: the page background is a flat colour,
+   so blur had nothing to bend. We give the picker area its own tinted
+   "under-glass" light field, then the cards bend it with backdrop-filter.
    ============================================================ */
 
-/* --- Liquid glass card skin ------------------------------------------- */
+/* --- Under-glass light field ---------------------------------------------
+   A soft, low-saturation colour wash behind the widgets. It is not decoration
+   on top — it sits UNDER the cards so backdrop-filter actually refracts it.
+   Kept desaturated to stay Apple-calm; the saturated glow lives only here. */
+:root {
+  --glass-wash-1: #7fb0ff;
+  --glass-wash-2: #b9a6ff;
+  --glass-wash-3: #7ce0d0;
+  --glass-wash-a: 0.16;
+  --glass-body: color-mix(in srgb, var(--surface) 58%, transparent);
+  --glass-body-2: color-mix(in srgb, var(--soft) 42%, transparent);
+  --glass-rim: color-mix(in srgb, #ffffff 42%, transparent);
+  --glass-shadow: 0 12px 34px -18px #0009;
+}
+:root[data-theme="light"] {
+  --glass-wash-a: 0.20;
+  --glass-body: color-mix(in srgb, #ffffff 62%, transparent);
+  --glass-body-2: color-mix(in srgb, #eef2f8 58%, transparent);
+  --glass-rim: #ffffff;
+  --glass-shadow: 0 14px 34px -18px #1d1d1f40;
+}
+
+/* The board: one shared light field for the grid + its library. Every widget
+   in this group refracts the same blobs, like glass over one image. */
+.widget-editor-root {
+  position: relative;
+  isolation: isolate;
+  border-radius: 24px;
+  padding: 4px 0 2px;
+}
+.widget-editor-root::before {
+  content: "";
+  position: absolute;
+  inset: -18px -16px -18px;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: 30px;
+  background:
+    radial-gradient(38% 60% at 12% 8%, color-mix(in srgb, var(--glass-wash-1) calc(var(--glass-wash-a) * 100%), transparent), transparent 70%),
+    radial-gradient(42% 66% at 92% 22%, color-mix(in srgb, var(--glass-wash-2) calc(var(--glass-wash-a) * 100%), transparent), transparent 72%),
+    radial-gradient(46% 58% at 62% 96%, color-mix(in srgb, var(--glass-wash-3) calc(var(--glass-wash-a) * 100%), transparent), transparent 74%);
+  filter: blur(6px);
+  opacity: 0.95;
+}
+
+/* --- Glass card skin ------------------------------------------------------
+   translucency + blur (refraction) + a specular top edge + a crisp rim.
+   Selection is NOT a blue fill — presence on the grid already means "on".
+   overflow stays visible so the corner affordance can sit off the edge. */
 .choice,
 .region-bar,
 .app-card {
   position: relative;
   isolation: isolate;
-  border-radius: 18px;
-  border: 1px solid var(--glass-edge);
-  background: linear-gradient(150deg, var(--glass), var(--surface));
-  backdrop-filter: blur(24px) saturate(160%);
-  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  border-radius: 17px;
+  border: 1px solid var(--glass-rim);
+  background: linear-gradient(155deg, var(--glass-body), var(--glass-body-2));
+  -webkit-backdrop-filter: blur(22px) saturate(190%) brightness(1.06);
+  backdrop-filter: blur(22px) saturate(190%) brightness(1.06);
   box-shadow:
-    inset 0 1px 0 #ffffff2e,
-    inset 0 -1px 0 #00000012,
-    0 6px 22px -14px #0007;
-  overflow: clip;
+    inset 0 1px 0 #ffffff66,
+    inset 0 -1px 0 #00000010,
+    0 1px 0 #ffffff1a,
+    var(--glass-shadow);
+  overflow: visible;
   transition:
     border-color 220ms var(--ease),
     box-shadow 220ms var(--ease),
     transform 220ms var(--ease);
 }
-/* Specular highlight that sweeps the top edge of the glass. */
+/* Specular highlight: a thin, bright top edge that fades down — the single
+   most "glass" cue. Rounded to match the card since overflow is visible. */
 .choice::before,
 .region-bar::before,
 .app-card::before {
   content: "";
   position: absolute;
   inset: 0 0 auto 0;
-  height: 45%;
-  background: linear-gradient(180deg, #ffffff1f, transparent);
+  height: 46%;
+  border-radius: 16px 16px 0 0;
+  background: linear-gradient(180deg, #ffffff42, #ffffff0a 45%, transparent);
   pointer-events: none;
   z-index: -1;
-}
-.choice:has(input:checked),
-.region-bar:has(input:checked),
-.app-card:has(input:checked) {
-  border-color: var(--selected-line);
-  box-shadow:
-    inset 0 1px 0 #ffffff3d,
-    inset 0 -1px 0 #00000012,
-    0 0 0 1px var(--selected-line),
-    0 10px 28px -16px var(--accent);
-}
-.choice:hover,
-.region-bar:hover,
-.app-card:hover {
-  transform: translateY(-1px);
-  box-shadow:
-    inset 0 1px 0 #ffffff3d,
-    0 12px 30px -16px #0009;
 }
 :root[data-theme="light"] .choice::before,
 :root[data-theme="light"] .region-bar::before,
 :root[data-theme="light"] .app-card::before {
-  background: linear-gradient(180deg, #ffffffb8, transparent);
+  background: linear-gradient(180deg, #ffffffcc, #ffffff30 50%, transparent);
+}
+/* A faint diagonal sheen sweeping the glass, like a light source at the top. */
+.choice::after,
+.region-bar::after,
+.app-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(118deg, transparent 32%, #ffffff12 48%, transparent 62%);
+  pointer-events: none;
+  z-index: -1;
 }
 
-/* --- Jiggle (iOS home-screen edit) ------------------------------------ */
-@keyframes widget-jiggle {
-  0% {
-    transform: rotate(-0.55deg) translate3d(-0.3px, 0, 0);
-  }
-  50% {
-    transform: rotate(0.55deg) translate3d(0.3px, -0.6px, 0);
-  }
-  100% {
-    transform: rotate(-0.55deg) translate3d(-0.3px, 0, 0);
-  }
-}
-/* `#panel` prefix raises specificity above motion.css's `animation: none`. */
-#panel [data-widget-grid].is-editing > [data-widget] {
-  animation: widget-jiggle 260ms ease-in-out infinite !important;
-  will-change: transform;
-}
-/* Stagger phase so cards don't jiggle in lockstep, like iOS. */
-#panel [data-widget-grid].is-editing > [data-widget]:nth-child(4n + 1) {
-  animation-delay: -65ms !important;
-}
-#panel [data-widget-grid].is-editing > [data-widget]:nth-child(4n + 2) {
-  animation-delay: -130ms !important;
-}
-#panel [data-widget-grid].is-editing > [data-widget]:nth-child(4n + 3) {
-  animation-delay: -195ms !important;
-}
-#panel [data-widget-grid].is-editing > [data-widget]:nth-child(4n) {
-  animation-delay: -25ms !important;
-}
-#panel [data-widget-grid].is-editing > [data-widget]:hover {
-  animation-play-state: paused !important;
+/* Hover lifts the glass slightly and brightens the rim. */
+.choice:hover,
+.region-bar:hover,
+.app-card:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--glass-rim) 70%, #ffffff);
+  box-shadow:
+    inset 0 1px 0 #ffffff88,
+    inset 0 -1px 0 #00000010,
+    0 2px 0 #ffffff26,
+    0 18px 38px -18px #000a;
 }
 
-/* The category headings are grid children but not widgets — keep them still. */
-[data-widget-grid].is-editing > .category-heading {
-  animation: none;
+/* APP cards: cards are now <div> (no checkbox), so the icon+name uses a main
+   wrapper with the same flex behaviour the old <label> had. */
+.app-card .app-card-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+  min-height: 26px;
+  font-size: 0.75rem;
 }
+.app-card .app-card-main > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.app-card select {
+  flex: 0 0 auto;
+  width: 96px;
+  min-height: 30px;
+  margin: 0;
+  padding: 5px 8px;
+  font-size: 0.8125rem;
+}
+.app-card .entry-hint {
+  flex-basis: 100%;
+  color: var(--muted);
+  font-size: 0.6875rem;
+  line-height: 1.4;
+}
+/* Selecting an exit or dragging must not trigger the corner badge. */
+.app-card select { position: relative; z-index: 2; }
 
-/* --- Remove / fixed badges -------------------------------------------- */
+/* --- Corner affordance ---------------------------------------------------- */
 .widget-badge {
   position: absolute;
   top: -7px;
   left: -7px;
-  z-index: 3;
+  z-index: 4;
   width: 24px;
   height: 24px;
-  display: none;
+  display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
-  border: 0;
+  border: 2px solid color-mix(in srgb, var(--surface) 70%, #fff);
   border-radius: 50%;
   font-size: 1rem;
   line-height: 1;
   color: #fff;
   background: #ff453a;
-  box-shadow: 0 2px 8px #ff453a66;
+  box-shadow: 0 3px 10px #ff453a66;
   cursor: pointer;
+  opacity: 0.9;
+  transform: scale(0.9);
+  transition: transform 180ms var(--ease), opacity 180ms var(--ease);
 }
-.widget-badge--fixed {
-  background: var(--soft);
-  color: var(--muted);
-  box-shadow: 0 2px 8px #0004;
-  font-size: 0.7rem;
+.widget-badge:hover {
+  opacity: 1;
+  transform: scale(1.12);
+}
+/* The whole point of edit mode: corner affordances only exist there. */
+#panel:not(.is-widget-editing) .widget-badge {
+  display: none !important;
 }
 [data-widget-grid].is-editing > [data-widget] > .widget-badge {
-  display: flex;
-  animation: badge-pop 220ms var(--ease) both;
+  opacity: 1;
+  transform: scale(1);
 }
-@keyframes badge-pop {
-  from {
-    transform: scale(0.3);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
+.widget-badge--fixed {
+  background: color-mix(in srgb, var(--soft) 80%, transparent);
+  color: var(--muted);
+  box-shadow: 0 2px 8px #0003;
+  cursor: default;
 }
-
-/* While editing, switched-off widgets leave the grid and live only in the + library. */
-#panel [data-widget-grid].is-editing > [data-widget].is-library-only {
-  display: none;
+.widget-badge--fixed svg {
+  width: 13px;
+  height: 13px;
+  display: block;
 }
 
-/* A widget added back from the library pops in, iOS-style. */
+/* --- Jiggle (edit mode only — the iOS "wobble" that signals editable) ----- */
+@keyframes widget-jiggle {
+  0% { transform: rotate(-0.55deg) translate3d(-0.3px, 0, 0); }
+  50% { transform: rotate(0.55deg) translate3d(0.3px, -0.6px, 0); }
+  100% { transform: rotate(-0.55deg) translate3d(-0.3px, 0, 0); }
+}
+#panel [data-widget-grid].is-editing > [data-widget] {
+  animation: widget-jiggle 260ms ease-in-out infinite !important;
+  will-change: transform;
+}
+#panel [data-widget-grid].is-editing > [data-widget]:nth-child(4n + 1) { animation-delay: -65ms !important; }
+#panel [data-widget-grid].is-editing > [data-widget]:nth-child(4n + 2) { animation-delay: -130ms !important; }
+#panel [data-widget-grid].is-editing > [data-widget]:nth-child(4n + 3) { animation-delay: -195ms !important; }
+#panel [data-widget-grid].is-editing > [data-widget]:nth-child(4n) { animation-delay: -25ms !important; }
+#panel [data-widget-grid].is-editing > [data-widget]:hover { animation-play-state: paused !important; }
+[data-widget-grid].is-editing > .category-heading { animation: none; }
+
+/* Pop-in for a widget just added back. */
 @keyframes widget-enter {
-  0% {
-    opacity: 0;
-    transform: scale(0.7) translateY(8px);
-  }
-  60% {
-    opacity: 1;
-    transform: scale(1.04) translateY(-2px);
-  }
-  100% {
-    transform: none;
-  }
+  0% { opacity: 0; transform: scale(0.7) translateY(8px); }
+  60% { opacity: 1; transform: scale(1.04) translateY(-2px); }
+  100% { transform: none; }
 }
 #panel [data-widget].widget-enter {
   animation: widget-enter 460ms var(--ease) both !important;
   z-index: 4;
 }
 
-/* A removed card flies out with a spring-ish shrink. */
-[data-widget].is-removing {
-  animation: none !important;
-  opacity: 0;
-  transform: scale(0.82);
-  transition:
-    opacity 200ms var(--ease),
-    transform 200ms var(--ease);
-  pointer-events: none;
-}
-
-/* Drag affordances. */
-[data-widget][draggable="true"] {
-  cursor: grab;
-}
+/* Drag affordance — reordering works in both states, like iOS. */
+[data-widget][draggable="true"] { cursor: grab; }
 [data-widget].is-dragging {
   opacity: 0.55;
   animation: none !important;
-  box-shadow: 0 16px 40px -12px #000a;
+  box-shadow: 0 16px 44px -12px #000b;
   z-index: 5;
 }
 
-/* --- Editor chrome ---------------------------------------------------- */
+/* --- Idle toolbar: a quiet entry point into edit mode --------------------- */
+.widget-editor-bar--idle {
+  justify-content: flex-start;
+  gap: 10px;
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  padding: 4px 2px 8px;
+  margin: 0 0 2px;
+}
+.widget-enter-edit {
+  min-height: 34px;
+  padding: 0 14px;
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  font-weight: 550;
+  cursor: pointer;
+  color: var(--ink);
+  border: 1px solid var(--glass-rim);
+  background: linear-gradient(150deg, var(--glass-body), var(--glass-body-2));
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  backdrop-filter: blur(12px) saturate(160%);
+  box-shadow: inset 0 1px 0 #ffffff66, 0 4px 14px -10px #0008;
+  transition: transform 160ms var(--ease), filter 160ms var(--ease);
+}
+.widget-enter-edit::before {
+  content: "✎";
+  margin-right: 6px;
+  color: var(--accent);
+}
+.widget-enter-edit:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.06);
+}
+
+/* --- Editor toolbar (edit mode only) ------------------------------------- */
 .widget-editor-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin: 4px 0 14px;
-  padding: 10px 14px;
-  border-radius: 16px;
-  border: 1px solid var(--glass-edge);
-  background: var(--glass);
-  backdrop-filter: blur(24px) saturate(160%);
-  -webkit-backdrop-filter: blur(24px) saturate(160%);
-  box-shadow: inset 0 1px 0 #ffffff26;
+  margin: 6px 0 12px;
+  padding: 9px 13px;
+  border-radius: 15px;
+  border: 1px solid var(--glass-rim);
+  background: linear-gradient(150deg, var(--glass-body), var(--glass-body-2));
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  backdrop-filter: blur(22px) saturate(180%);
+  box-shadow: inset 0 1px 0 #ffffff66, 0 8px 24px -16px #0007;
 }
 .widget-editor-hint {
   color: var(--muted);
@@ -216,120 +304,99 @@
   display: flex;
   gap: 8px;
 }
-.widget-add-button,
-.widget-done-button,
-.widget-sort-button {
+.widget-sort-button,
+.widget-jiggle-button {
   min-height: 34px;
   padding: 0 14px;
   border-radius: 999px;
   font-size: 0.8125rem;
   font-weight: 550;
   cursor: pointer;
-  transition:
-    transform 160ms var(--ease),
-    filter 160ms var(--ease);
-}
-.widget-add-button,
-.widget-sort-button {
-  border: 1px solid var(--glass-edge);
-  background: var(--soft);
+  border: 1px solid var(--glass-rim);
+  background: color-mix(in srgb, var(--soft) 60%, transparent);
   color: var(--ink);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  transition: transform 160ms var(--ease), filter 160ms var(--ease), background 160ms var(--ease);
 }
 .widget-sort-button {
   padding: 0 11px;
   font-variant-numeric: tabular-nums;
   color: var(--muted);
 }
-.widget-add-button[aria-expanded="true"] {
-  border-color: var(--selected-line);
-  background: var(--tint);
-  color: var(--accent);
-}
-.widget-done-button {
-  border: 0;
+.widget-jiggle-button span { color: var(--accent); }
+.widget-jiggle-button.is-active {
   background: var(--action);
   color: #fff;
+  border-color: transparent;
 }
-.widget-add-button:hover,
-.widget-done-button:hover,
-.widget-sort-button:hover {
+.widget-jiggle-button.is-active span { color: #fff; }
+.widget-sort-button:hover,
+.widget-jiggle-button:hover {
   filter: brightness(1.08);
   transform: translateY(-1px);
 }
 
-/* --- Widget library sheet --------------------------------------------- */
-.widget-library {
-  margin: 0 0 16px;
-  padding: 16px;
-  border-radius: 20px;
-  border: 1px solid var(--glass-edge);
-  background: var(--glass);
-  backdrop-filter: blur(32px) saturate(170%);
-  -webkit-backdrop-filter: blur(32px) saturate(170%);
-  box-shadow:
-    inset 0 1px 0 #ffffff33,
-    0 20px 50px -20px #000a;
-  animation: library-rise 300ms var(--ease) both;
+/* --- Component library: edit mode only ----------------------------------- */
+#panel:not(.is-widget-editing) .widget-library {
+  display: none !important;
 }
-@keyframes library-rise {
-  from {
-    opacity: 0;
-    transform: translateY(10px) scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
+.widget-library {
+  margin: 16px 0 4px;
+  padding: 15px 16px 16px;
+  border-radius: 20px;
+  border: 1px solid var(--glass-rim);
+  background: linear-gradient(155deg, var(--glass-body), var(--glass-body-2));
+  -webkit-backdrop-filter: blur(26px) saturate(190%) brightness(1.05);
+  backdrop-filter: blur(26px) saturate(190%) brightness(1.05);
+  box-shadow: inset 0 1px 0 #ffffff6b, 0 18px 44px -20px #0008;
 }
 .widget-library-head {
   display: flex;
   align-items: baseline;
   gap: 10px;
-  margin-bottom: 14px;
+  margin-bottom: 13px;
 }
-.widget-library-head strong {
-  font-size: 0.9375rem;
-}
-.widget-library-head small {
+.widget-library-head strong { font-size: 0.9375rem; }
+.widget-library-head small { color: var(--muted); font-size: 0.75rem; }
+.widget-library-count {
+  margin-left: auto;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ink) 8%, transparent);
   color: var(--muted);
   font-size: 0.75rem;
-}
-.widget-library-close {
-  margin-left: auto;
-  width: 26px;
-  height: 26px;
-  border: 0;
-  border-radius: 50%;
-  background: var(--soft);
-  color: var(--muted);
-  font-size: 1.1rem;
-  line-height: 1;
-  cursor: pointer;
+  font-variant-numeric: tabular-nums;
 }
 .widget-library-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
   gap: 10px;
 }
 .widget-library-item {
   display: flex;
   align-items: center;
   gap: 10px;
+  min-width: 0;
   padding: 10px 12px;
   border-radius: 14px;
-  border: 1px solid var(--glass-edge);
-  background: var(--surface);
+  border: 1px solid var(--glass-rim);
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
   color: var(--ink);
   text-align: left;
   cursor: pointer;
-  transition:
-    border-color 160ms var(--ease),
-    transform 160ms var(--ease);
-  animation: badge-pop 240ms var(--ease) both;
+  box-shadow: inset 0 1px 0 #ffffff4d;
+  transition: transform 160ms var(--ease), border-color 160ms var(--ease), background 160ms var(--ease);
 }
 .widget-library-item:hover {
-  border-color: var(--selected-line);
   transform: translateY(-2px);
+  border-color: var(--selected-line);
+  background: color-mix(in srgb, var(--tint) 60%, var(--surface));
 }
 .widget-library-item img,
 .widget-library-item > span:first-child {
@@ -344,13 +411,14 @@
 }
 .widget-library-item > span:nth-child(2) {
   flex: 1;
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   font-size: 0.8125rem;
 }
 .widget-library-item > b {
-  color: var(--accent);
+  color: var(--action);
   font-size: 1rem;
 }
 .widget-library-empty {
@@ -360,10 +428,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  [data-widget-grid].is-editing > [data-widget],
-  .widget-library,
-  .widget-library-item,
-  [data-widget-grid].is-editing > [data-widget] > .widget-badge {
+  #panel [data-widget-grid].is-editing > [data-widget],
+  #panel [data-widget].widget-enter,
+  [data-widget] > .widget-badge {
     animation: none !important;
   }
 }

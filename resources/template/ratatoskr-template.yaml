@@ -264,5 +264,5 @@ rule-providers:
   🚀 Voyager IP:          {<<: *RP-classical, url: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/resources/rules/aethersailor/Custom_Proxy_Classical_IP.yaml"}
   ⚡ Matrix Port:     {<<: *RP-classical, url: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/resources/rules/aethersailor/Custom_Port_Direct.yaml"}
   📦 Cargo Downloads:          {<<: *RP-domain, url: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/resources/rules/download/MultiThread_Download_Domain.yaml"}
-  ❎ AdGuard:           {type: http, behavior: domain, format: yaml, interval: 86400, url: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/resources/rules/adguard/Custom_AdGuard_Domain.yaml"}
+  ❎ AdGuard:           {<<: *RP-domain, url: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/resources/rules/adguard/Custom_AdGuard_Domain.yaml"}
 # =======================================================

@@ -73,13 +73,16 @@ test("strategy panel shows a fixed 节点选择 exit, not a redundant dropdown",
       other: false,
     },
   });
-  assert.equal((html.match(/data-strategy=/g) || []).length, 6);
+  // All 6 strategies are reachable: active ones as grid cards, the rest as
+  // "+" items in the always-visible component library.
+  assert.equal((html.match(/data-strategy="/g) || []).length, 3);
+  assert.equal((html.match(/data-widget-add="strategy"/g) || []).length, 3);
   assert.match(html, /🎚️ 节点选择/);
   assert.match(html, /🚀 手动切换/);
-  assert.match(html, /data-strategy="gateway"[^>]* disabled/);
+  assert.match(html, /data-widget-fixed data-strategy="gateway"/);
   assert.match(html, /default-exit-head[\s\S]*?节点选择/);
   assert.match(html, /⚡ 自动选择/);
-  assert.match(html, /已勾选的地区节点/);
+  assert.match(html, /已保留的地区节点/);
   assert.doesNotMatch(html, /id="default-strategy"/);
   assert.doesNotMatch(html, /<option/);
 });

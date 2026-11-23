@@ -1,22 +1,31 @@
-// iOS-like widget edit mode. Long-press empty space in a picker to make its
-// cards jiggle, tap the red minus to remove one (it flies into the library),
-// tap + to reopen the library and add a widget back, and drag to reorder.
+// iOS-like widget board for the four picker groups.
 //
-// This module only owns DOM gestures + chrome; the pure state changes live in
-// widget-mode.js and are covered by tests. Handlers are delegated on document
-// so they survive the wizard's full innerHTML re-renders.
+// Unified model (no second state to keep in sync):
+//   - a card's presence on the grid == it is enabled
+//   - idle state is a clean board with a quiet "编辑" entry (long-press works
+//     too); entering edit mode reveals the minus badges, sort buttons and the
+//     component library, and makes the cards wobble like iOS home-screen icons
+//   - exiting edit mode ("完成" / Esc) hides all of that again but KEEPS the
+//     result: a removed card stays removed, because profile state is the truth
+//   - DRAG-TO-REORDER always works, in edit mode or not — like iOS widgets,
+//     moving a card never requires entering the wobble mode
+//   - remove / add / sort / drag mutate the profile and update the DOM in
+//     place with FLIP animations; there is no full `render()` flash
+//
+// Pure state changes live in widget-mode.js (unit-tested). This module owns
+// DOM gestures + chrome; handlers are delegated on document so they survive
+// the wizard's occasional full re-renders.
 
 import {
-  WIDGET_KINDS,
   disabledIds,
   enabledIds,
   widgetLabel,
   setEnabled,
-  moveOrder,
   sortWidgets,
+  libraryItem,
   ORDER_KEY,
 } from "./widget-mode.js";
-import { esc } from "./ui.js";
+import { gridHTML } from "./widget-cards.js";
 import { catalog } from "../shared/compiler.js";
 import { renderEmoji } from "./emoji.js";
 
@@ -28,66 +37,103 @@ export const STEP_WIDGET = {
   4: "module",
 };
 
-const LONG_PRESS_MS = 480;
+const LONG_PRESS_MS = 420;
 let pressTimer = 0;
 let pressStart = null;
 
-// Chrome injected while editing: a floating "完成" pill and a "+ 添加组件"
-// button. The widget library opens as a sheet below the toolbar.
-export function editorChrome(kind, ctx) {
-  if (!ctx.widgetEditing) return "";
-  const disabled = disabledIds(kind, ctx.profile, catalog);
-  return (
-    `<div class="widget-editor-bar"><span class="widget-editor-hint">拖动排序 · 点击 <b>−</b> 移除</span><div class="widget-editor-actions"><button type="button" class="widget-sort-button" data-widget-sort="alpha" title="按名称首字母排序">A→Z</button><button type="button" class="widget-sort-button" data-widget-sort="default" title="恢复模板默认顺序">默认</button><button type="button" class="widget-add-button" data-widget-library="${kind}" aria-expanded="${ctx.widgetLibrary === kind}"><span aria-hidden="true">＋</span> 添加组件</button><button type="button" class="widget-done-button" data-widget-done>完成</button></div></div>` +
-    (ctx.widgetLibrary === kind
-      ? `<div class="widget-library" data-widget-library-panel="${kind}"><div class="widget-library-head"><strong>组件库</strong><small>点击添加回网格</small><button type="button" class="widget-library-close" data-widget-library-close aria-label="关闭组件库">×</button></div>${
-          disabled.length
-            ? `<div class="widget-library-grid">${disabled
-                .map((id) => {
-                  const w = widgetLabel(kind, id, catalog);
-                  return `<button type="button" class="widget-library-item" data-widget-add="${kind}" data-id="${esc(id)}">${w.icon ? `<img src="${esc(w.icon)}" alt="" decoding="async" onerror="this.hidden=true">` : `<span aria-hidden="true">${esc(w.text)}</span>`}<span>${esc(w.label)}</span><b aria-hidden="true">＋</b></button>`;
-                })
-                .join("")}</div>`
-            : `<p class="widget-library-empty">所有组件都在网格里了。</p>`
-        }</div>`
-      : "")
-  );
-}
-
-// Called after every render(): mark the panel as editable and inject chrome.
+// Panels render the toolbar + grid + library themselves (present on first
+// paint, testable as pure HTML). decorate only applies transient UI state:
+// jiggle class and the one-shot pop-in for a just-added widget.
 export function decorate(kind, ctx, panelEl) {
   if (!panelEl) return;
-  panelEl.classList.toggle("is-widget-editing", !!ctx.widgetEditing);
   const grid = panelEl.querySelector(`[data-widget-grid="${kind}"]`);
+  panelEl.classList.toggle("is-widget-editing", !!ctx.widgetEditing);
   if (grid) {
     grid.classList.toggle("is-editing", !!ctx.widgetEditing);
-    const on = new Set(enabledIds(kind, ctx.profile));
-    grid.querySelectorAll("[data-widget]").forEach((card) => {
-      // In edit mode only enabled cards live on the grid; the disabled ones
-      // move to the + library (this is what makes "remove" hide the card).
-      card.classList.toggle(
-        "is-library-only",
-        !!ctx.widgetEditing && !on.has(card.dataset.id),
-      );
-      if (ctx.enterWidgetId && card.dataset.id === ctx.enterWidgetId) {
+    if (ctx.enterWidgetId) {
+      const card = grid.querySelector(`[data-id="${CSS.escape(ctx.enterWidgetId)}"]`);
+      if (card) {
         card.classList.add("widget-enter");
-        setTimeout(() => card.classList.remove("widget-enter"), 500);
+        setTimeout(() => card.classList.remove("widget-enter"), 520);
       }
-      if (card.hasAttribute("data-widget-fixed")) return;
-      if (ctx.widgetEditing) card.setAttribute("draggable", "true");
-      else card.removeAttribute("draggable");
-    });
+    }
   }
-  // Consume the one-shot enter animation marker after it has been applied.
   ctx.enterWidgetId = null;
-  // Remove stale chrome from the previous render, then append fresh.
-  panelEl.querySelector(".widget-editor-root")?.remove();
-  if (!ctx.widgetEditing) return;
-  const root = document.createElement("div");
-  root.className = "widget-editor-root";
-  root.innerHTML = editorChrome(kind, ctx);
-  panelEl.append(root);
-  renderEmoji(root);
+}
+
+// --- FLIP ------------------------------------------------------------------
+// Snapshot the position of every card + library item in a grid group.
+function snapshot(root, kind) {
+  const map = new Map();
+  root
+    .querySelectorAll(`[data-widget-grid="${kind}"] [data-widget], [data-widget-library-panel="${kind}"] [data-widget-add]`)
+    .forEach((el) => map.set(el, el.getBoundingClientRect()));
+  return map;
+}
+
+// Animate elements from their old boxes to their new ones. Removed elements
+// (no longer in the DOM) get a fade-out ghost; new elements fade in.
+function flip(root, kind, before, { duration = 320 } = {}) {
+  const grid = root.querySelector(`[data-widget-grid="${kind}"]`);
+  const lib = root.querySelector(`[data-widget-library-panel="${kind}"]`);
+  const targets = [
+    ...(grid?.querySelectorAll("[data-widget]") || []),
+    ...(lib?.querySelectorAll("[data-widget-add]") || []),
+  ];
+  for (const el of targets) {
+    const old = before.get(el);
+    const now = el.getBoundingClientRect();
+    if (!old) {
+      el.animate(
+        [
+          { opacity: 0, transform: "scale(.72) translateY(8px)" },
+          { opacity: 1, transform: "none" },
+        ],
+        { duration, easing: "cubic-bezier(.22,1,.36,1)" },
+      );
+      continue;
+    }
+    const dx = old.left - now.left,
+      dy = old.top - now.top;
+    if (Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5) continue;
+    el.animate(
+      [{ transform: `translate(${dx}px, ${dy}px)` }, { transform: "none" }],
+      { duration, easing: "cubic-bezier(.22,1,.36,1)" },
+    );
+  }
+}
+
+// Repaint a whole grid+library region from the profile (used by sort and bulk
+// actions where card contents change, not just order).
+function repaint(root, kind, ctx, before) {
+  const grid = root.querySelector(`[data-widget-grid="${kind}"]`);
+  const libGrid = root.querySelector(`[data-widget-library-panel="${kind}"] [data-library-grid]`);
+  if (!grid || !libGrid) return;
+  grid.innerHTML = gridHTML(kind, ctx);
+  libGrid.innerHTML = disabledIds(kind, ctx.profile, catalog)
+    .map((id) => libraryItem(kind, id, catalog))
+    .join("");
+  const empty = root.querySelector(`[data-widget-library-panel="${kind}"] [data-library-empty]`);
+  if (empty) empty.remove();
+  if (!libGrid.children.length)
+    libGrid.insertAdjacentHTML("beforeend", `<p class="widget-library-empty" data-library-empty>所有组件都在网格里了。</p>`);
+  const count = root.querySelector(`[data-widget-library-panel="${kind}"] [data-library-count]`);
+  if (count) count.textContent = String(disabledIds(kind, ctx.profile, catalog).length);
+  renderEmoji(grid);
+  renderEmoji(libGrid);
+  flip(root, kind, before);
+}
+
+// Refresh the toolbar count text without touching the cards.
+function refreshCount(root, kind, ctx) {
+  const count = root.querySelector(`[data-widget-library-panel="${kind}"] [data-library-count]`);
+  if (count) count.textContent = String(disabledIds(kind, ctx.profile, catalog).length);
+  const toolbar = document.querySelector("#panel .toolbar .muted");
+  if (!toolbar) return;
+  const on = enabledIds(kind, ctx.profile).length;
+  if (kind === "region") toolbar.textContent = toolbar.textContent.replace(/\d+ 个保留地区/, `${on} 个保留地区`);
+  if (kind === "app") toolbar.textContent = `${on} 个已启用`;
+  if (kind === "module") toolbar.textContent = toolbar.textContent.replace(/^\d+/, String(on));
 }
 
 function cancelPress() {
@@ -100,109 +146,120 @@ function currentKind(ctx, step) {
   return STEP_WIDGET[step] || null;
 }
 
-// Bind the document-level delegates once. `api` supplies {ctx, getStep,
-// render, changed, toast}. Returns a disposer (rarely used).
-export function bind(api) {
-  const { ctx, getStep, render, changed, toast } = api;
+// The root element that holds both grids for the current step.
+function widgetRoot() {
+  return document.querySelector("#panel");
+}
 
-  // Long-press on empty panel space enters edit mode. We ignore interactive
-  // elements so a normal tap still toggles a checkbox / opens a select.
+// Bind the document-level delegates once.
+export function bind(api) {
+  const { ctx, getStep, render, changed, toast, onStateChange } = api;
+  // Apply the same side effects the old checkbox `change` handler carried,
+  // now that state changes flow through the widget board instead.
+  const afterState = (kind, id, on) => {
+    if (kind === "region") {
+      ctx.selectedRegions = true;
+      onStateChange?.("region", id, on);
+    } else if (kind === "strategy") {
+      if (!ctx.profile.strategies.includes(ctx.profile.defaultStrategy))
+        ctx.profile.defaultStrategy = "gateway";
+      onStateChange?.("strategy", id, on);
+    } else {
+      onStateChange?.(kind, id, on);
+    }
+  };
+
+  // Long-press empty grid space toggles the playful jiggle state. It no longer
+  // gates any capability — it is purely cosmetic now.
   document.addEventListener("pointerdown", (e) => {
     if (e.button !== 0) return;
     const kind = currentKind(ctx, getStep());
     if (!kind || ctx.widgetEditing) return;
     const panel = document.querySelector("#panel");
     if (!panel || !panel.contains(e.target)) return;
-    if (e.target.closest("button, input, select, a, .notice, details")) return;
-    pressStart = { x: e.clientX, y: e.clientY };
+    if (e.target.closest("button, input, select, a, .notice, details, .widget-library")) return;
+    pressStart = { x: e.clientX, y: e.clientY, kind };
     clearTimeout(pressTimer);
     pressTimer = setTimeout(() => {
       pressTimer = 0;
-      if (!pressStart) return;
+      if (!pressStart || pressStart.kind !== kind) return;
       ctx.widgetEditing = true;
-      ctx.widgetLibrary = null;
       render();
-      toast?.("编辑模式：拖动排序，点 − 移除，点 ＋ 添加");
+      toast?.("已进入编辑模式：可抖动整理、移除、排序与加回");
     }, LONG_PRESS_MS);
   });
-  const abortPress = (e) => {
-    if (
-      pressStart &&
-      (Math.abs(e.clientX - pressStart.x) > 10 ||
-        Math.abs(e.clientY - pressStart.y) > 10)
-    )
-      cancelPress();
-  };
-  document.addEventListener("pointermove", abortPress);
+  document.addEventListener("pointermove", (e) => {
+    if (pressStart && (Math.abs(e.clientX - pressStart.x) > 10 || Math.abs(e.clientY - pressStart.y) > 10)) cancelPress();
+  });
   document.addEventListener("pointerup", cancelPress);
   document.addEventListener("pointercancel", cancelPress);
 
-  // Click delegate for editor chrome (done / library / add / close / remove).
   document.addEventListener("click", (e) => {
     const btn = e.target.closest("button");
     if (!btn) return;
     const kind = currentKind(ctx, getStep());
+    const root = widgetRoot();
 
+    // Enter / exit edit mode. "完成" only exits mode — it never touches the
+    // profile, so a card removed earlier stays removed after leaving.
+    if (btn.hasAttribute("data-widget-enter")) {
+      ctx.widgetEditing = true;
+      render();
+      toast?.("已进入编辑模式：可抖动整理、移除、排序与加回");
+      return;
+    }
     if (btn.hasAttribute("data-widget-done")) {
       ctx.widgetEditing = false;
-      ctx.widgetLibrary = null;
       render();
+      toast?.("已退出编辑模式");
       return;
     }
     if (btn.dataset.widgetSort && kind) {
-      const mode = btn.dataset.widgetSort;
-      sortWidgets(kind, mode, ctx.profile, catalog);
+      const before = snapshot(root, kind);
+      sortWidgets(kind, btn.dataset.widgetSort, ctx.profile, catalog);
       changed();
-      render();
-      toast?.(mode === "alpha" ? "已按名称首字母排序" : "已恢复模板默认顺序");
+      repaint(root, kind, ctx, before);
+      toast?.(btn.dataset.widgetSort === "alpha" ? "已按名称首字母排序" : "已恢复模板默认顺序");
       return;
     }
-    if (btn.dataset.widgetLibrary) {
-      ctx.widgetLibrary = ctx.widgetLibrary === btn.dataset.widgetLibrary ? null : btn.dataset.widgetLibrary;
-      render();
-      return;
-    }
-    if (btn.hasAttribute("data-widget-library-close")) {
-      ctx.widgetLibrary = null;
-      render();
-      return;
-    }
-    if (btn.dataset.widgetAdd) {
+    // Add from the library: move the item into the grid, animate both sides.
+    if (btn.dataset.widgetAdd && kind) {
       const k = btn.dataset.widgetAdd,
         id = btn.dataset.id;
+      const before = snapshot(root, k);
       if (setEnabled(k, id, true, ctx.profile, catalog)) {
-        ctx.profile.order = ctx.profile.order || {};
-        ctx.enterWidgetId = id; // play the pop-in animation on the new card
         changed();
-        render();
+        afterState(k, id, true);
+        ctx.enterWidgetId = id;
+        repaint(root, k, ctx, before);
+        refreshCount(root, k, ctx);
         toast?.(`已添加「${widgetLabel(k, id, catalog).label}」`);
       }
       return;
     }
+    // Remove from the grid: card flies to the library, which is already open.
     if (btn.dataset.widgetRemove && kind) {
-      // The badge sits inside the <label> card; without this the label's
-      // default action re-checks the box we just switched off.
       e.preventDefault();
       e.stopPropagation();
       const k = btn.dataset.widgetRemove,
         id = btn.dataset.id;
-      const card = btn.closest("[data-widget]");
+      const before = snapshot(root, k);
       if (setEnabled(k, id, false, ctx.profile, catalog)) {
         changed();
-        if (card) {
-          card.classList.add("is-removing");
-          setTimeout(() => render(), 220);
-        } else render();
+        afterState(k, id, false);
+        repaint(root, k, ctx, before);
+        refreshCount(root, k, ctx);
+        toast?.(`已移除「${widgetLabel(k, id, catalog).label}」 · 可在组件库加回`);
       }
       return;
     }
   });
 
-  // HTML5 drag-and-drop reordering, delegated on dragstart/dragover/drop.
+  // Drag-to-reorder: FLIP each swap so cards glide instead of teleporting.
   let draggingId = null;
   document.addEventListener("dragstart", (e) => {
     const card = e.target.closest("[data-widget]");
-    if (!card || !ctx.widgetEditing || card.hasAttribute("data-widget-fixed")) {
+    if (!card || card.hasAttribute("data-widget-fixed")) {
       e.preventDefault();
       return;
     }
@@ -218,44 +275,31 @@ export function bind(api) {
     const grid = hovered.parentElement;
     const dragEl = grid.querySelector(`[data-id="${CSS.escape(draggingId)}"]`);
     if (!dragEl || dragEl === hovered) return;
-    // APP cards are grouped by category; keep reordering within one group so a
-    // dropped card never jumps sections on the next render.
-    if (
-      dragEl.dataset.categoryItem !== undefined &&
-      dragEl.dataset.categoryItem !== hovered.dataset.categoryItem
-    )
-      return;
+    if (dragEl.dataset.categoryItem !== undefined && dragEl.dataset.categoryItem !== hovered.dataset.categoryItem) return;
+    const before = snapshot(widgetRoot(), currentKind(ctx, getStep()));
     const rect = hovered.getBoundingClientRect();
     const after = e.clientX > rect.left + rect.width / 2;
-    // Insert the dragged card before/after the hovered one based on pointer.
     grid.insertBefore(dragEl, after ? hovered.nextSibling : hovered);
+    flip(widgetRoot(), currentKind(ctx, getStep()), before, { duration: 200 });
   });
   document.addEventListener("dragend", (e) => {
-    const card = e.target.closest("[data-widget]");
-    card?.classList.remove("is-dragging");
+    e.target.closest("[data-widget]")?.classList.remove("is-dragging");
     if (!draggingId) return;
     const kind = currentKind(ctx, getStep());
     if (kind) {
       const grid = document.querySelector(`[data-widget-grid="${kind}"]`);
       if (grid) {
-        const ids = [...grid.querySelectorAll("[data-widget]")].map(
-          (c) => c.dataset.id,
-        );
-        ctx.profile.order = {
-          ...ctx.profile.order,
-          [ORDER_KEY[kind]]: ids,
-        };
+        const ids = [...grid.querySelectorAll("[data-widget]")].map((c) => c.dataset.id);
+        ctx.profile.order = { ...ctx.profile.order, [ORDER_KEY[kind]]: ids };
         changed();
       }
     }
     draggingId = null;
   });
 
-  // Esc exits edit mode.
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && ctx.widgetEditing) {
       ctx.widgetEditing = false;
-      ctx.widgetLibrary = null;
       render();
     }
   });

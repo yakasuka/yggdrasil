@@ -1,41 +1,23 @@
-import { catalog, sortByOrder } from "../../shared/compiler.js";
-import { selectableRegions } from "../../shared/preview.js";
-import { esc, checked, selected, title, notice } from "../ui.js";
-import { displayOrder, widgetAttrs, removeBadge } from "../widget-mode.js";
+import { catalog } from "../../shared/compiler.js";
+import { esc, title, notice } from "../ui.js";
+import { gridHTML, toolbarHTML, librarySectionHTML } from "../widget-cards.js";
+import { activeOrder } from "../widget-mode.js";
+
 export function appsPanel(ctx) {
-  const regions = selectableRegions(catalog, ctx.inspection).filter((r) =>
-    r.id === "OTHER" ? ctx.profile.other : ctx.profile.countries.includes(r.id),
-  );
-  const options = [
-    ["proxy", "跟随代理"],
-    ...regions.map((r) => ["region:" + r.id, r.label]),
-    ["reject", "Reject"],
-    ["direct", "Direct"],
-  ];
+  const active = activeOrder("app", ctx.profile).length;
   return (
     title(
       "每个 APP，都有自己的去向。",
       "默认启用全部 APP，并跟随上一步选择的代理策略。也可以为 APP 固定一个已保留的地区。",
     ) +
-    `<div class="toolbar"><input type="search" id="app-search" placeholder="搜索 APP" value="${esc(ctx.search)}" aria-label="搜索 APP"><div class="toolbar-actions"><button class="text-button" data-apps="all">全部启用</button><button class="text-button" data-apps="none">全部关闭</button></div></div><div class="app-grid" data-widget-grid="app">${[
-      ...new Set(catalog.apps.map((a) => a.category)),
-    ]
-      .map(
-        (cat) =>
-          `<div class="category-heading" data-category="${esc(cat)}">${esc(cat)}</div>` +
-          sortByOrder(
-            catalog.apps.filter((a) => a.category === cat),
-            displayOrder("app", ctx.profile),
-          )
-            .map(
-              (a) =>
-                `<div class="app-card${a.entry ? " app-card--entry" : ""}" data-app-card="${esc(a.label.toLowerCase())}" data-category-item="${esc(cat)}"${widgetAttrs("app", a.id)}><label><input type="checkbox" data-app="${esc(a.id)}"${checked(ctx.profile.apps.includes(a.id))}>${a.icon ? `<img src="${esc(a.icon)}" alt="" decoding="async" onerror="this.hidden=true">` : ""}<span>${esc(a.label)}</span>${a.entry ? `<small class="entry-tag">策略入口</small>` : ""}</label><select data-policy="${esc(a.id)}" aria-label="${esc(a.label)} 默认出口"${ctx.profile.apps.includes(a.id) ? "" : " disabled"}>${options.map(([value, label]) => `<option value="${esc(value)}"${selected((ctx.profile.appPolicy[a.id] || "proxy") === value)}>${esc(label)}</option>`).join("")}</select>${a.entry ? `<small class="entry-hint">模板中的全部节点开关，暂未绑定规则</small>` : ""}${removeBadge("app", a.id)}</div>`,
-            )
-            .join(""),
-      )
-      .join("")}</div>` +
+    `<div class="toolbar"><input type="search" id="app-search" placeholder="搜索 APP" value="${esc(ctx.search)}" aria-label="搜索 APP"><span class="muted">${active} 个已启用</span><div class="toolbar-actions"><button class="text-button" data-apps="all">全部启用</button><button class="text-button" data-apps="none">全部移除</button></div></div>` +
+    `<div class="widget-editor-root">` +
+    toolbarHTML("app", ctx) +
+    `<div class="app-grid" data-widget-grid="app">${gridHTML("app", ctx)}</div>` +
+    librarySectionHTML("app", ctx) +
+    `</div>` +
     notice(
-      "APP、地区与策略入口均来自 Ratatoskr 模板，分类由模板中的 x-category 声明决定。带「策略入口」标记的是无规则开关组，可选择默认出口。「🌌 Others」是地区类别，在「地区节点」页勾选。规则集模块在下一步勾选。",
+      "APP、地区与策略入口均来自 Ratatoskr 模板，分类由模板中的 x-category 声明决定。带「策略入口」标记的是无规则开关组，可选择默认出口。「🌌 Others」是地区类别，在「地区节点」页保留。规则集模块在下一步保留。",
     )
   );
 }

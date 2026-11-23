@@ -926,6 +926,14 @@ bindWidgetEditor({
   render,
   changed,
   toast,
+  // Widget board changes replace the old checkbox `change` handler's work.
+  onStateChange(kind, id, on) {
+    if (kind === "region") resetPolicies();
+    if (kind === "app") {
+      // filterApps re-renders visibility (including the category headings).
+      filterApps();
+    }
+  },
 });
 render();
 // Resolve service.json (if the address was not baked into the bundle) before

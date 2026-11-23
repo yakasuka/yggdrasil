@@ -23,7 +23,7 @@ test("preview inspection offers template regions without inventing nodes", () =>
     inspection,
     preview: true,
   });
-  assert.match(html, /可提前决定保留哪些/);
+  assert.match(html, /下方组件库随时加回/);
   assert.match(html, /预览模式下不显示节点与连接耗时/);
 });
 
@@ -47,13 +47,19 @@ test("all template regions stay selectable even when the subscription has only a
   assert.equal(list.find((r) => r.id === "JP").count, 2);
 
   const html = regionsPanel({ profile, inspection, preview: false });
+  // In the widget model every template region is reachable: enabled ones are
+  // cards on the grid (data-region), disabled ones are + items in the library
+  // (data-widget-add). Together the full catalog stays selectable.
   for (const region of catalog.regions)
-    assert.match(html, new RegExp(`data-region="${region.id}"`));
-  assert.match(html, /data-region="OTHER"/);
-  assert.match(html, /即使订阅里没有对应节点也可以勾选/);
-  assert.match(html, /订阅中暂无节点，仍可勾选/);
-  // HK is still checked despite having zero nodes.
-  assert.match(html, /data-region="HK" checked/);
+    assert.match(
+      html,
+      new RegExp(`(data-region="${region.id}"|data-widget-add="region" data-id="${region.id}")`),
+    );
+  assert.match(html, /data-widget-add="region" data-id="OTHER"/);
+  assert.match(html, /即使订阅里没有对应节点也可以保留/);
+  assert.match(html, /订阅中暂无节点/);
+  // HK is still a grid widget despite having zero nodes.
+  assert.match(html, /data-region="HK"/);
 
   // The APP exit selector and the final summary use the same full list.
   const apps = appsPanel({ profile, inspection, preview: false, search: "" });
