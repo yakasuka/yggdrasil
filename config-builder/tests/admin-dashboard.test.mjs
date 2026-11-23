@@ -112,6 +112,21 @@ test("dashboard uses the builder stylesheet and renders stats as styled chips", 
   assert.ok(!html.includes('el("div","stat")'), "no stray stat text nodes");
 });
 
+test("dashboard groups editable sections into builder-style steps", () => {
+  const html = dashboardHTML({ linkBase: "https://x/y" });
+  ["general", "apps", "regions", "strategy", "rules", "configs"].forEach((step) => {
+    assert.ok(html.includes('data-step="' + step + '"'), "step rail: " + step);
+    assert.ok(html.includes('data-panel="' + step + '"'), "step panel: " + step);
+  });
+  assert.match(html, /STEP 01 \/ 06/);
+  const main = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)]
+    .map((m) => m[1]).find((s) => s.includes("fiText"));
+  assert.match(main, /var STEP_ORDER=\["general","apps","regions","strategy","rules","configs"\]/);
+  // Only the active category is on screen, instead of one endless flat list.
+  assert.match(main, /p\.hidden=p\.dataset\.panel!==which/);
+  assert.match(main, /showStep\("general"\)/);
+});
+
 test("dashboard edit fields expose controls, not wrappers, to patch handlers", () => {
   const html = dashboardHTML({ linkBase: "https://x/y" });
   const main = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)]
@@ -129,9 +144,12 @@ test("dashboard offers one-click copy for links and guards drafts", () => {
   const main = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)]
     .map((m) => m[1]).find((s) => s.includes("fiText"));
   assert.ok(main, "main dashboard script present");
-  // Every real link gets a copy button; legacy passwordless records do not.
+  // Every real link is directly clickable (new tab) and keeps a copy button;
+  // legacy passwordless records degrade to plain text.
   assert.match(main, /wrap\.appendChild\(copyButton\(url\)\)/);
-  assert.match(main, /if\(!\(row\.hasPwd&&!row\.pwd\)\)/);
+  assert.match(main, /a\.target="_blank"/);
+  assert.match(main, /a\.rel="noopener noreferrer"/);
+  assert.match(main, /if\(row\.hasPwd&&!row\.pwd\)/);
   assert.match(main, /function copyButton/);
   assert.match(main, /navigator\.clipboard\.writeText/);
   // A non-secure-context fallback must exist, and no markup may be injected.

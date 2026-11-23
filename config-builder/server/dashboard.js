@@ -117,6 +117,10 @@ const DASH_ONLY = `
 .dash-copy svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .dash-link{display:inline-flex;align-items:center;gap:8px;max-width:100%}
 .dash-link code{word-break:break-all}
+.dash-link a{color:var(--accent);text-decoration:none;display:inline-flex;align-items:flex-start;gap:5px}
+.dash-link a:hover{text-decoration:underline}
+.dash-link a::after{content:"↗";font-size:.75rem;line-height:1.4;opacity:.7}
+.step-panel[hidden],.dash-summary[hidden]{display:none}
 .dash-toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,16px);z-index:99;padding:10px 18px;border:1px solid var(--line);border-radius:99px;background:var(--surface);color:var(--ink);font-size:.8125rem;box-shadow:0 8px 30px #0003;opacity:0;pointer-events:none;transition:opacity 200ms var(--ease),transform 200ms var(--ease)}
 .dash-toast.show{opacity:1;transform:translate(-50%,0)}
 .dash-toast.err{color:var(--danger)}
@@ -193,16 +197,20 @@ export function dashboardHTML({
     <div class="eyebrow">YOUR CONFIGURATION</div>
     <h1>从这里开始。</h1>
     <p class="intro">配置工坊由一份模板生长而来。<br/>每一处修改，都有自己的去向。</p>
-    <nav id="steps" aria-label="工具步骤">
-      <button class="step-button" data-step="front" aria-current="step" type="button"><span><strong>前端配置</strong></span></button>
-      <button class="step-button" data-step="configs" type="button"><span><strong>订阅链接</strong></span></button>
+    <nav id="steps" aria-label="前端配置步骤">
+      <button class="step-button" data-step="general" aria-current="step" type="button"><span class="step-number">1</span><span><strong>基础设置</strong><small>端口 · 模式 · 控制</small></span></button>
+      <button class="step-button" data-step="apps" type="button"><span class="step-number">2</span><span><strong>应用分流</strong><small>分类 · 图标 · 出口</small></span></button>
+      <button class="step-button" data-step="regions" type="button"><span class="step-number">3</span><span><strong>地区节点</strong><small>旗帜 · 匹配规则</small></span></button>
+      <button class="step-button" data-step="strategy" type="button"><span class="step-number">4</span><span><strong>出口策略</strong><small>测速 · 核心策略组</small></span></button>
+      <button class="step-button" data-step="rules" type="button"><span class="step-number">5</span><span><strong>规则与规则源</strong><small>筛选 · 分流 · 更新</small></span></button>
+      <button class="step-button" data-step="configs" type="button"><span class="step-number">6</span><span><strong>订阅链接</strong><small>生成与访问权限</small></span></button>
     </nav>
     <div class="journey-note"><span aria-hidden="true">✳</span><div><strong>一处修改，处处生长。</strong><p>保存后立即生效，并由定时任务写回仓库。</p></div></div>
   </aside>
 
   <section class="workspace" id="workspace" tabindex="-1" aria-label="配置面板">
     <div class="panel-top">
-      <span id="step-caption" class="eyebrow">STEP 01 / 02</span>
+      <span id="step-caption" class="eyebrow">STEP 01 / 06</span>
       <span class="chip">RATATOSKR</span>
       <div class="panel-actions">
         <button class="icon-text-button" id="fi-reload" type="button" title="重新载入"><span aria-hidden="true">↻</span> 重新载入</button>
@@ -215,21 +223,42 @@ export function dashboardHTML({
       <button class="status-retry" id="fi-reload-mini" type="button" aria-label="重试连接" title="重试连接">↻</button>
     </div>
 
-    <div id="panel-front">
-      <h2 class="panel-title">每个 APP，都有自己的去向。</h2>
-      <p class="panel-description">这里的内容直接来自 Ratatoskr 模板。点击任意卡片即可修改应用、地区与出口；保存后配置工坊立即生效，无需重新部署。</p>
+    <h2 class="panel-title" id="step-title">先打好地基。</h2>
+    <p class="panel-description" id="step-desc">端口、运行模式与控制面板。所有修改都会写回 Ratatoskr 模板，保存后配置工坊立即生效。</p>
+
+    <section class="step-panel" data-panel="general">
       <div class="dash-summary" id="fi-summary"></div>
       <div class="section-label"><span>基础设置</span><small>端口 · 模式 · 日志</small></div>
       <div class="dash-choice-grid dash-editor" id="fi-general"><span class="muted">载入中…</span></div>
-      <div class="section-label"><span>应用分流</span><small>点击卡片编辑名称、图标、出口与规则</small></div>
+      <details class="dash-source">
+        <summary>高级 · 直接编辑 YAML 模板</summary>
+        <textarea id="fi-text" spellcheck="false" aria-label="YAML 模板内容" placeholder="正在载入模板…"></textarea>
+        <div class="panel-actions" style="margin-top:12px">
+          <button class="button primary" id="fi-save" type="button">应用源码</button>
+          <span class="dash-status dash-ok" id="fi-status" style="margin:0"></span>
+        </div>
+      </details>
+    </section>
+
+    <section class="step-panel" data-panel="apps" hidden>
+      <div class="section-label"><span>应用分流</span><small>每个分类一次看清 · 点击卡片编辑</small></div>
       <div class="toolbar"><input type="search" id="app-search" placeholder="搜索 APP" aria-label="搜索 APP"><span class="muted" id="fi-count">载入中…</span><div class="toolbar-actions"><button class="text-button" id="add-app" type="button">＋ 添加应用</button></div></div>
       <div class="app-grid dash-editor" id="fi-apps"><span class="muted">载入中…</span></div>
-      <div class="section-label"><span>地区节点</span><small>按模板分组</small></div>
+    </section>
+
+    <section class="step-panel" data-panel="regions" hidden>
+      <div class="section-label"><span>地区节点</span><small>旗帜 · 显示名 · 匹配规则</small></div>
       <div class="region-bars dash-editor" id="fi-regions"><span class="muted">载入中…</span></div>
-      <div class="section-label"><span>出口策略</span><small>策略入口</small></div>
+    </section>
+
+    <section class="step-panel" data-panel="strategy" hidden>
+      <div class="section-label"><span>出口策略</span><small>测速 URL · 间隔 · 容差 · 出口顺序</small></div>
       <div class="choice-grid dash-editor" id="fi-strategies"><span class="muted">载入中…</span></div>
       <div class="section-label"><span>核心策略组</span><small>入口 · 兜底 · 国内 · 特殊端口</small></div>
       <div class="dash-choice-grid dash-editor" id="fi-core"><span class="muted">载入中…</span></div>
+    </section>
+
+    <section class="step-panel" data-panel="rules" hidden>
       <div class="section-label"><span>节点筛选</span><small>净化 · 其他地区 · 地区正则</small></div>
       <div class="dash-choice-grid dash-editor" id="fi-filters"><span class="muted">载入中…</span></div>
       <div class="section-label"><span>规则模块</span><small>来自模板声明</small></div>
@@ -239,27 +268,17 @@ export function dashboardHTML({
       <div class="dash-rule-list" id="fi-rule-list"><span class="muted">载入中…</span></div>
       <div class="section-label"><span>规则源</span><small>URL · 更新间隔 · 行为</small></div>
       <div class="dash-choice-grid dash-editor" id="fi-providers"><span class="muted">载入中…</span></div>
-      <details class="dash-source">
-        <summary>高级 · 直接编辑 YAML 模板</summary>
-        <textarea id="fi-text" spellcheck="false" aria-label="YAML 模板内容" placeholder="正在载入模板…"></textarea>
-        <div class="panel-actions" style="margin-top:12px">
-          <button class="button primary" id="fi-save" type="button">应用源码</button>
-          <span class="dash-status dash-ok" id="fi-status" style="margin:0"></span>
-        </div>
-      </details>
-    </div>
+    </section>
 
-    <div id="panel-configs" hidden>
-      <h2 class="panel-title">所有订阅，都在这里。</h2>
-      <p class="panel-description">每一条链接都由配置工坊生成。这里可以查看真实口令与到期时间，也可以按内部 ID 删除任意配置。</p>
+    <section class="step-panel" id="panel-configs" data-panel="configs" hidden>
       <div class="service-status" data-state="ready" role="status"><span class="status-dot" aria-hidden="true"></span><span id="status">加载中…</span><button class="status-retry" id="refresh" type="button" aria-label="重新载入" title="重新载入">↻</button></div>
       <div class="dash-scroll"><div class="dash-msg" id="body">正在加载…</div></div>
-    </div>
+    </section>
 
     <footer class="wizard-footer">
       <button class="button secondary" id="back" type="button">上一步</button>
       <span id="progress-note" class="muted">一处修改，处处生长。</span>
-      <button class="button primary" id="next" type="button" data-target="configs">下一步 <span aria-hidden="true">→</span></button>
+      <button class="button primary" id="next" type="button" data-target="apps">下一步 <span aria-hidden="true">→</span></button>
     </footer>
   </section>
 </main>
@@ -350,26 +369,48 @@ function stamp(value){if(!value)return "—";var d=new Date(value);return isNaN(
 function esc(value){return String(value==null?"":value).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
 var EDIT_SVG='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4l10-10-4-4L4 16v4Z"/><path d="m13.5 6.5 4 4"/></svg>';
 
-/* ---- step navigation ---- */
-var panelFront=document.getElementById("panel-front");
-var panelConfigs=document.getElementById("panel-configs");
+/* ---- step navigation: same one-category-at-a-time flow as the builder ---- */
+var stepPanels=[].slice.call(document.querySelectorAll(".step-panel"));
 var caption=document.getElementById("step-caption");
+var stepTitle=document.getElementById("step-title");
+var stepDesc=document.getElementById("step-desc");
 var progressNote=document.getElementById("progress-note");
 var backButton=document.getElementById("back");
 var nextButton=document.getElementById("next");
 var stepButtons=[].slice.call(document.querySelectorAll(".step-button"));
+var stepActions=document.querySelector(".panel-top .panel-actions");
+var serviceSettings=document.getElementById("service-settings");
+var summaryStrip=document.getElementById("fi-summary");
+var STEP_ORDER=["general","apps","regions","strategy","rules","configs"];
+var STEP_META={
+  general:{title:"先打好地基。",desc:"端口、运行模式与控制面板。所有修改都会写回 Ratatoskr 模板，保存后配置工坊立即生效。",note:"一处修改，处处生长。"},
+  apps:{title:"每个 APP，都有自己的去向。",desc:"应用按模板分类展示。点击任意卡片即可修改名称、图标、默认出口与关联规则。",note:"分类清晰，去向明确。"},
+  regions:{title:"节点去哪里，由你决定。",desc:"编辑地区旗帜、显示名称与匹配正则。修改会同步到对应策略组与分流规则。",note:"地区即路线。"},
+  strategy:{title:"出口，决定每一次连接。",desc:"配置测速 URL、间隔、容差与出口顺序；核心策略组决定入口与兜底。",note:"策略是配置的心脏。"},
+  rules:{title:"让流量各得其所。",desc:"节点筛选、规则模块、分流顺序与规则源都在这里，编辑后立即参与配置生成。",note:"顺序决定出口。"},
+  configs:{title:"所有订阅，都在这里。",desc:"点击订阅链接可直接查看内容；也可以复制、删除配置。配置由订阅工坊生成。",note:"配置由订阅工坊生成。"}
+};
 function showStep(which){
-  var front=which==="front";
-  panelFront.hidden=!front;panelConfigs.hidden=front;
+  var i=STEP_ORDER.indexOf(which);
+  if(i<0)i=0;
+  which=STEP_ORDER[i];
+  var front=which!=="configs",meta=STEP_META[which];
+  stepPanels.forEach(function(p){p.hidden=p.dataset.panel!==which});
   stepButtons.forEach(function(b){if(b.dataset.step===which)b.setAttribute("aria-current","step");else b.removeAttribute("aria-current")});
-  caption.textContent=front?"STEP 01 / 02":"STEP 02 / 02";
-  document.querySelector(".panel-top .panel-actions").hidden=!front;
-  document.getElementById("service-settings").hidden=!front;
-  progressNote.textContent=front?"一处修改，处处生长。":"配置由订阅工坊生成。";
-  backButton.disabled=front;
-  nextButton.dataset.target=front?"configs":"front";
-  nextButton.innerHTML=front?'下一步 <span aria-hidden="true">→</span>':'返回前端配置 <span aria-hidden="true">←</span>';
+  caption.textContent="STEP "+String(i+1).padStart(2,"0")+" / "+String(STEP_ORDER.length).padStart(2,"0");
+  stepTitle.textContent=meta.title;
+  stepDesc.textContent=meta.desc;
+  stepActions.hidden=!front;
+  serviceSettings.hidden=!front;
+  summaryStrip.hidden=which!=="general";
+  progressNote.textContent=meta.note;
+  backButton.disabled=i===0;
+  var last=i===STEP_ORDER.length-1;
+  nextButton.dataset.target=last?"general":STEP_ORDER[i+1];
+  nextButton.innerHTML=last?'回到第一步 <span aria-hidden="true">↺</span>':'下一步 <span aria-hidden="true">→</span>';
   if(!front)load();
+  var ws=document.getElementById("workspace");
+  if(ws&&window.scrollY>ws.offsetTop-140)ws.scrollIntoView({behavior:"smooth",block:"start"});
 }
 window.addEventListener("beforeunload",function(e){
   if(!fiDirty)return;
@@ -382,7 +423,10 @@ function guardedStep(which){
   showStep(which);
 }
 stepButtons.forEach(function(b){b.addEventListener("click",function(){guardedStep(b.dataset.step)})});
-backButton.addEventListener("click",function(){guardedStep("front")});
+backButton.addEventListener("click",function(){
+  var i=STEP_ORDER.indexOf(document.querySelector('.step-button[aria-current="step"]').dataset.step);
+  if(i>0)guardedStep(STEP_ORDER[i-1]);
+});
 nextButton.addEventListener("click",function(){guardedStep(nextButton.dataset.target)});
 
 /* ---- front-end graphical editor ---- */
@@ -890,9 +934,17 @@ function render(rows){
     var created=el("td",stamp(row.createdAt));created.className="nowrap";tr.appendChild(created);
     var expires=el("td",row.expiresAt?stamp(row.expiresAt):"永久");expires.className="nowrap";tr.appendChild(expires);
     tr.appendChild(el("td",validity(row)));
-    var link=el("td"),url=linkFor(row),wrap=el("span"),code=el("code",url);
-    wrap.className="dash-link";wrap.appendChild(code);
-    if(!(row.hasPwd&&!row.pwd))wrap.appendChild(copyButton(url));
+    var link=el("td"),url=linkFor(row),wrap=el("span");
+    wrap.className="dash-link";
+    if(row.hasPwd&&!row.pwd){
+      // Legacy record: no password was stored, so no openable link exists.
+      wrap.appendChild(el("code",url));
+    }else{
+      var a=el("a");a.href=url;a.target="_blank";a.rel="noopener noreferrer";
+      a.title="在新标签打开订阅内容";a.appendChild(el("code",url));
+      wrap.appendChild(a);
+      wrap.appendChild(copyButton(url));
+    }
     link.appendChild(wrap);tr.appendChild(link);
     var act=el("td");act.className="actions";
     var del=el("button","删除");del.className="danger button secondary";del.type="button";
@@ -919,6 +971,7 @@ document.getElementById("refresh").addEventListener("click",load);
 document.getElementById("logout").addEventListener("click",function(){
   fetch("/config-builder/dashboard/logout",{method:"POST"}).then(function(){location.href="/config-builder/dashboard"});
 });
+showStep("general");
 load();
 loadFront();
 })();
