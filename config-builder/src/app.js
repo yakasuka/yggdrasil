@@ -1,5 +1,8 @@
 import "./styles.css";
 import "./motion.css";
+// Shared site footer (single definition used by the landing page too). Bundled
+// in so the wizard works wherever its own assets/app.js is served.
+import "../../assets/site-footer.js";
 import "./theme.js";
 import "./caustics.js";
 import { progressCursor, enterPanel, revealCard, celebrate } from "./motion.js";

@@ -783,48 +783,6 @@ main{position:relative;z-index:3}
 }
 
 /* ─────────────────────────────────────────────
-   Footer
-   ───────────────────────────────────────────── */
-footer{
-  position:relative;
-  z-index:3;
-  background:var(--bg);
-  border-top:1px solid var(--hairline);
-  padding:52px 24px 46px;
-  font-size:12px;
-  line-height:1.7;
-  color:var(--ink-3);
-  letter-spacing:0;
-}
-.foot-inner{
-  max-width:1024px;
-  margin:0 auto;
-  display:flex;
-  flex-wrap:wrap;
-  align-items:flex-start;
-  justify-content:space-between;
-  gap:28px;
-}
-.foot-brand{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  color:var(--ink-2);
-  font-weight:600;
-  font-size:13px;
-  letter-spacing:-.01em;
-}
-.foot-brand img{width:18px;height:18px;display:block;border-radius:5px;box-shadow:0 1px 3px rgba(0,0,0,.14)}
-.foot-links{display:flex;flex-wrap:wrap;gap:24px}
-.foot-links a{
-  color:var(--ink-3);
-  text-decoration:none;
-  transition:color .3s var(--ease);
-}
-.foot-links a:hover{color:var(--ink)}
-.foot-legal{width:100%;padding-top:26px;margin-top:6px;border-top:1px solid var(--hairline);display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px}
-
-/* ─────────────────────────────────────────────
    Toast
    ───────────────────────────────────────────── */
 #toast{
@@ -1729,28 +1687,7 @@ footer{
 
 </main>
 
-<footer>
-  <div class="foot-inner">
-    <div class="foot-brand">
-      <img src="./assets/favicon.png?v=b9d535601980" alt="" width="18" height="18">
-      <span>Yggdrasil</span>
-    </div>
-
-    <nav class="foot-links" aria-label="页脚导航">
-      <a href="https://github.com/yakasuka/yggdrasil/blob/main/docs/zh-CN.md">中文指南</a>
-      <a href="https://github.com/yakasuka/yggdrasil/blob/main/docs/en.md">English</a>
-      <a href="./config-builder/">配置工坊</a>
-      <a href="./resources/template/ratatoskr-template.yaml">Ratatoskr 模板</a>
-      <a href="https://github.com/yakasuka/yggdrasil#致谢--上游项目">致谢</a>
-      <a href="./LICENSE">授权协议</a>
-    </nav>
-
-    <div class="foot-legal">
-      <span>© 2026 Yggdrasil Project. All rights reserved.</span>
-      <span>Geo-powered Configuration · Permission Required</span>
-    </div>
-  </div>
-</footer>
+<site-footer></site-footer>
 
 <div id="toast" role="status" aria-live="polite">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -2707,5 +2644,6 @@ footer{
   }
 })();
 </script>
+<script type="module" src="./assets/site-footer.js"></script>
 </body>
 </html>

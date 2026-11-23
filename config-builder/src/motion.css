@@ -86,15 +86,15 @@ html[data-intro="skip"] .loading-copy {
 .site-header,
 .journey,
 .workspace,
-.site-footer {
+site-footer {
   transition:
     opacity 480ms var(--ease-fluid),
     transform 600ms var(--ease-fluid);
 }
 html[data-intro="pending"]
-  :is(.site-header, .journey, .workspace, .site-footer),
+  :is(.site-header, .journey, .workspace, site-footer),
 html[data-intro="morphing"]
-  :is(.site-header, .journey, .workspace, .site-footer) {
+  :is(.site-header, .journey, .workspace, site-footer) {
   opacity: 0;
   transform: translateY(16px);
   pointer-events: none;
@@ -232,7 +232,7 @@ html:not([data-intro="done"]):not([data-intro="skip"])
   .site-header,
   .journey,
   .workspace,
-  .site-footer,
+  site-footer,
   .caustic-copy,
   .caustic-meta,
   .caustic-hint,

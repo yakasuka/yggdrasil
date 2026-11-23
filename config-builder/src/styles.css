@@ -1503,17 +1503,6 @@ details > div {
   font-size: 0.6875rem;
   line-height: 1.8;
 }
-.site-footer {
-  max-width: 1192px;
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  margin: 32px auto 0;
-  padding: 0 0 32px;
-  color: var(--muted);
-  font-size: 0.6875rem;
-}
-
 /* Glass is reserved for layers above the work, rather than every card. */
 dialog {
   max-width: 860px;
@@ -1663,9 +1652,6 @@ noscript {
 
 @media (max-width: 1240px) {
   .site-header {
-    margin-inline: 24px;
-  }
-  .site-footer {
     margin-inline: 24px;
   }
 }
@@ -1926,13 +1912,6 @@ noscript {
   }
   .result {
     padding: 16px;
-  }
-  .site-footer {
-    flex-direction: column;
-    gap: 10px;
-    margin: 24px 24px 0;
-    padding-bottom: 24px;
-    font-size: 0.625rem;
   }
   dialog {
     padding: 20px;
