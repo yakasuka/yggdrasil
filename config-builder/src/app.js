@@ -44,6 +44,7 @@ import { applyShare, parseShareCode } from "../shared/share.js";
 import { previewInspection, previewRegions } from "../shared/preview.js";
 import { createShareCode, fetchShareCode } from "./share.js";
 import { bind as bindWidgetEditor, decorate as decorateWidgetEditor, STEP_WIDGET } from "./widget-editor.js";
+import { bindMultiSelect } from "./app-multiselect.js";
 const $ = (s) => document.querySelector(s);
 const steps = [
   "订阅来源",
@@ -86,6 +87,7 @@ let step = 0,
   probeController;
 let serviceRevision = 0;
 let pointToStep;
+let multiSelect = null;
 const panels = [
   sourcesPanel,
   regionsPanel,
@@ -311,6 +313,7 @@ function navigate(next) {
   if (next !== step) {
     ctx.widgetEditing = false;
     ctx.widgetLibrary = null;
+    multiSelect?.reset();
   }
   step = next;
   render();
@@ -788,6 +791,9 @@ function closePolicyPickers(except) {
   }
 }
 document.addEventListener("click", (e) => {
+  // APP batch mode owns clicks on cards (toggle/brush); the single-card exit
+  // popover must stay dormant until the mode is exited.
+  if (document.querySelector("#panel")?.classList.contains("is-app-multi")) return;
   // The pill lives INSIDE the whole-card trigger, so resolve it first.
   const pill = e.target.closest("[data-policy-option]");
   if (pill) {
@@ -798,10 +804,19 @@ document.addEventListener("click", (e) => {
       select.value = value;
       select.dispatchEvent(new Event("change", { bubbles: true }));
     }
-    // The card face shows only the app name now; the chosen exit is reflected
-    // by the highlighted capsule plus the card's accessible label.
     const label = pill.querySelector("span:last-child")?.textContent || "";
     picker.setAttribute("aria-label", `${picker.dataset.app || ""} · 默认出口 ${label}`.trim());
+    // Keep the persistent on-card exit pill in sync so the routing is visible
+    // without reopening the menu. Clone the already-rendered glyph (SVG or
+    // Twemoji flag) from the chosen capsule to avoid re-parsing emoji.
+    const current = picker.querySelector("[data-policy-current]");
+    if (current) {
+      const glyph = pill.querySelector(".policy-pill-glyph");
+      const glyphTarget = current.querySelector(".policy-current-glyph");
+      const labelTarget = current.querySelector(".policy-current-label");
+      if (glyph && glyphTarget) glyphTarget.innerHTML = glyph.innerHTML;
+      if (labelTarget) labelTarget.textContent = label;
+    }
     for (const p of picker.querySelectorAll("[data-policy-option]")) {
       const on = p === pill;
       p.classList.toggle("is-active", on);
@@ -836,6 +851,7 @@ document.addEventListener("keydown", (e) => {
   if (e.key !== "Enter" && e.key !== " ") return;
   const card = e.target.closest?.("[data-policy-trigger]");
   if (!card || ctx.widgetEditing) return;
+  if (document.querySelector("#panel")?.classList.contains("is-app-multi")) return;
   e.preventDefault();
   card.click();
 });
@@ -1026,6 +1042,10 @@ async function syncCatalogFromService() {
 }
 
 renderEmoji(document.body);
+multiSelect = bindMultiSelect({
+  onChanged: changed,
+  toast,
+});
 bindWidgetEditor({
   ctx,
   getStep: () => step,

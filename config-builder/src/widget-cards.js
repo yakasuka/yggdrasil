@@ -7,6 +7,7 @@ import { catalog, moduleView } from "../shared/compiler.js";
 import { selectableRegions } from "../shared/preview.js";
 import { strategyView } from "./strategy-catalog.js";
 import { esc, selected } from "./ui.js";
+import { uiIcon } from "./icons.js";
 import {
   activeOrder,
   disabledIds,
@@ -41,47 +42,53 @@ function strategyCard(id, ctx) {
   return `<div class="choice${s.fixed ? " fixed" : ""}${on ? " is-on" : ""}"${widgetAttrs("strategy", id, { fixed: !!s.fixed })} data-strategy="${esc(id)}">${s.icon ? `<img class="choice-icon" src="${esc(s.icon)}" alt="" decoding="async" onerror="this.hidden=true">` : ""}<span><strong>${esc(s.name)}</strong>${s.fixed ? `<span class="choice-badge">始终保留</span>` : ""}<small>${esc(s.description)}</small></span>${removeBadge("strategy", id, !!s.fixed)}</div>`;
 }
 
-// Policy option glyphs. Regions carry their own flag/name from the catalog;
-// the fixed exits get a stable emoji so every pill has a leading icon.
-function policyEmoji(value, region) {
-  if (value === "proxy") return "🎚️";
-  if (value === "reject") return "⛔";
-  if (value === "direct") return "➡️";
-  if (region) return region.flag || region.name || "🌐";
-  return "🌐";
+// Policy option glyphs, all in the project's crisp inline-SVG icon language.
+// Fixed exits get a stable SVG; regions keep their coloured flag (a meaningful
+// country marker, not one of the "ugly" generic emoji) with an SVG fallback.
+function policyGlyph(value, region) {
+  if (value === "proxy") return uiIcon("switch");
+  if (value === "reject") return uiIcon("ban");
+  if (value === "direct") return uiIcon("arrow");
+  if (region) {
+    return region.flag
+      ? `<span class="policy-flag" aria-hidden="true" data-emoji="${esc(region.flag)}">${esc(region.flag)}</span>`
+      : uiIcon("globe");
+  }
+  return uiIcon("globe");
+}
+
+// Shared exit option list ([value, label, glyph HTML]) used by both the
+// per-card pill menu and the batch bar, so they never drift apart.
+export function appExitOptions(ctx) {
+  const regions = selectableRegions(catalog, ctx.inspection).filter((r) =>
+    r.id === "OTHER" ? ctx.profile.other : ctx.profile.countries.includes(r.id),
+  );
+  return [
+    ["proxy", "跟随代理", policyGlyph("proxy")],
+    ...regions.map((r) => ["region:" + r.id, r.label, policyGlyph("region:" + r.id, r)]),
+    ["reject", "Reject", policyGlyph("reject")],
+    ["direct", "Direct", policyGlyph("direct")],
+  ];
 }
 
 function appCard(id, ctx) {
   const a = catalog.apps.find((x) => x.id === id);
   if (!a) return "";
-  const regions = selectableRegions(catalog, ctx.inspection).filter((r) =>
-    r.id === "OTHER" ? ctx.profile.other : ctx.profile.countries.includes(r.id),
-  );
-  // Each option: [value, label, emoji]. Region glyphs come from the catalog.
-  const options = [
-    ["proxy", "跟随代理", "🎚️"],
-    ...regions.map((r) => ["region:" + r.id, r.label, policyEmoji("region:" + r.id, r)]),
-    ["reject", "Reject", "⛔"],
-    ["direct", "Direct", "➡️"],
-  ];
+  const options = appExitOptions(ctx);
   const current = ctx.profile.appPolicy[id] || "proxy";
   const active = options.find(([value]) => value === current) || options[0];
   const pills = options
     .map(
-      ([value, label, emoji]) =>
-        `<button type="button" class="policy-pill${value === current ? " is-active" : ""}" data-policy-option="${esc(value)}" role="option" aria-selected="${value === current}"><span class="policy-pill-emoji" aria-hidden="true" data-emoji="${esc(emoji)}">${emoji}</span><span>${esc(label)}</span></button>`,
+      ([value, label, glyph]) =>
+        `<button type="button" class="policy-pill${value === current ? " is-active" : ""}" data-policy-option="${esc(value)}" role="option" aria-selected="${value === current}"><span class="policy-pill-glyph" aria-hidden="true">${glyph}</span><span>${esc(label)}</span></button>`,
     )
     .join("");
-  // The WHOLE card is the button: [icon] [current-exit emoji + name] [chevron].
-  // No nested dropdown box. The native <select> stays only as the data source
-  // for the existing change/compiler/share logic; the visible pill and the
-  // popover of option capsules are the interface. `data-policy-trigger` sits
-  // on the card root so a click anywhere opens the menu.
-  // Card face is intentionally clean: [icon] [app name] only — matching the
-  // reference. No chevron, no current-exit text/emoji on the card. The chosen
-  // exit lives in the popover (highlighted capsule) and in the aria-label;
-  // the hidden <select> remains the data source for all existing logic.
-  return `<div class="app-card app-card--policy${a.entry ? " app-card--entry" : ""}" data-app-card="${esc(a.label.toLowerCase())}" data-category-item="${esc(a.category)}"${widgetAttrs("app", id)} data-app="${esc(id)}" data-policy-picker data-policy-trigger role="button" tabindex="0" aria-haspopup="listbox" aria-expanded="false" aria-label="${esc(a.label)} · 默认出口 ${esc(active[1])}"><span class="app-card-main"><span class="app-card-icon">${a.icon ? `<img src="${esc(a.icon)}" alt="" decoding="async" onerror="this.hidden=true">` : `<span class="app-card-icon-fallback" aria-hidden="true">${esc(a.label.slice(0, 1))}</span>`}</span><span class="app-card-label">${esc(a.label)}</span></span><div class="policy-menu" data-policy-menu role="listbox" hidden>${pills}</div><select class="policy-native" data-policy="${esc(id)}" aria-label="${esc(a.label)} 默认出口" tabindex="-1" aria-hidden="true">${options.map(([value, label]) => `<option value="${esc(value)}"${selected(current === value)}>${esc(label)}</option>`).join("")}</select>${removeBadge("app", id)}</div>`;
+  // The WHOLE card is the trigger: tapping anywhere opens the exit popover.
+  // Unlike the earlier "icon + name only" face, the card now ALSO shows the
+  // current exit as a small persistent pill (glyph + short name), so the
+  // routing is visible at a glance without opening the menu. The hidden
+  // <select> stays the single data source for the compiler/share pipeline.
+  return `<div class="app-card app-card--policy${a.entry ? " app-card--entry" : ""}" data-app-card="${esc(a.label.toLowerCase())}" data-category-item="${esc(a.category)}"${widgetAttrs("app", id)} data-app="${esc(id)}" data-policy-picker data-policy-trigger role="button" tabindex="0" aria-haspopup="listbox" aria-expanded="false" aria-label="${esc(a.label)} · 默认出口 ${esc(active[1])}"><span class="app-card-main"><span class="app-card-icon">${a.icon ? `<img src="${esc(a.icon)}" alt="" decoding="async" onerror="this.hidden=true">` : `<span class="app-card-icon-fallback" aria-hidden="true">${esc(a.label.slice(0, 1))}</span>`}</span><span class="app-card-label">${esc(a.label)}</span><span class="policy-current" data-policy-current><span class="policy-current-glyph" aria-hidden="true">${active[2]}</span><span class="policy-current-label">${esc(active[1])}</span></span></span><div class="policy-menu" data-policy-menu role="listbox" hidden>${pills}</div><select class="policy-native" data-policy="${esc(id)}" aria-label="${esc(a.label)} 默认出口" tabindex="-1" aria-hidden="true">${options.map(([value, label]) => `<option value="${esc(value)}"${selected(current === value)}>${esc(label)}</option>`).join("")}</select>${removeBadge("app", id)}</div>`;
 }
 
 function moduleCard(id, ctx) {
@@ -135,21 +142,57 @@ export function libraryHTML(kind, ctx) {
 // remove, library, jiggle) only appear once edit mode is entered, matching
 // the iOS home-screen model: clean by default, editable on demand.
 export function toolbarHTML(kind, ctx) {
-  if (!ctx.widgetEditing)
+  if (!ctx.widgetEditing) {
+    const multi =
+      kind === "app"
+        ? `<button type="button" class="widget-sort-button" data-app-multi title="批量选择 APP：拖过即选中，可一键设置出口">${uiIcon("select-all")} 批量</button>`
+        : "";
     return (
       `<div class="widget-editor-bar widget-editor-bar--idle">` +
       `<span class="widget-editor-hint">长按卡片，或点“编辑”整理布局</span>` +
+      `<div class="widget-editor-actions">${multi}` +
       `<button type="button" class="widget-enter-edit" data-widget-enter>编辑</button>` +
-      `</div>`
+      `</div></div>`
     );
+  }
+  const multi =
+    kind === "app"
+      ? `<button type="button" class="widget-sort-button" data-app-multi title="批量选择 APP：拖过即选中，可一键设置出口">${uiIcon("select-all")} 批量</button>`
+      : "";
   return (
     `<div class="widget-editor-bar">` +
     `<span class="widget-editor-hint">拖动排序 · 点 <b>−</b> 移除 · 下方组件库点 <b>＋</b> 加回</span>` +
     `<div class="widget-editor-actions">` +
+    multi +
     `<button type="button" class="widget-sort-button" data-widget-sort="alpha" title="按名称首字母排序">A→Z</button>` +
     `<button type="button" class="widget-sort-button" data-widget-sort="default" title="恢复模板默认顺序">默认</button>` +
     `<button type="button" class="widget-jiggle-button is-active" data-widget-done><span aria-hidden="true">✓</span> 完成</button>` +
     `</div></div>`
+  );
+}
+
+// Batch-select action bar for the APP grid. Shown only while a multi-select
+// gesture is active. The exit capsules reuse appExitOptions() so they stay in
+// lock-step with the per-card menu; clicking one applies it to every selected
+// card. The select-all icon button selects every visible (unfiltered) card.
+export function appBatchBarHTML(ctx) {
+  const options = appExitOptions(ctx);
+  const exits = options
+    .map(
+      ([value, label, glyph]) =>
+        `<button type="button" class="batch-exit" data-batch-exit="${esc(value)}" title="把选中 APP 设为 ${esc(label)}"><span class="batch-exit-glyph" aria-hidden="true">${glyph}</span><span>${esc(label)}</span></button>`,
+    )
+    .join("");
+  return (
+    `<div class="app-batchbar" data-app-batchbar hidden>` +
+    `<div class="app-batchbar-top">` +
+    `<button type="button" class="batch-select-all" data-batch-select-all title="全选 / 取消全选">${uiIcon("select-all")}<span>全选</span></button>` +
+    `<span class="batch-count" data-batch-count>已选 0 个</span>` +
+    `<button type="button" class="batch-remove" data-batch-remove title="从网格移除选中 APP">${uiIcon("ban")}<span>移除</span></button>` +
+    `<button type="button" class="batch-done" data-batch-done>${uiIcon("check")}<span>完成</span></button>` +
+    `</div>` +
+    `<div class="app-batchbar-exits" role="group" aria-label="批量设置默认出口">${exits}</div>` +
+    `</div>`
   );
 }
 

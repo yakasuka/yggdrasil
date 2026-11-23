@@ -1071,9 +1071,11 @@ site-footer {
   gap: 10px;
   white-space: nowrap;
 }
+/* Content-sized columns instead of three equal stretches: cards hug their
+   icon + name + exit pill instead of leaving a wide empty right side. */
 .app-grid {
   margin-top: 12px;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 8px;
 }
 .category-heading {
@@ -1966,9 +1968,14 @@ noscript {
   .result input {
     font-size: 1rem;
   }
-  .choice-grid,
-  .app-grid {
+  .choice-grid {
     grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  /* .app-grid keeps its content-sized auto-fill columns on small screens:
+     forcing a single full-width column reintroduces the wide empty cards. */
+  .app-grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 10px;
   }
   .choice {

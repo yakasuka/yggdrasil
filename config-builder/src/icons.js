@@ -43,6 +43,8 @@ const PATHS = {
   warning: `<path class="icon-fill icon-warm" d="M12 4 2.8 20h18.4L12 4Z" stroke="none"/><path d="M12 10v4.5M12 17.2h.1" stroke="currentColor"/>`,
   check: `<path d="m5 12.5 4.5 4.5L19 7.5"/>`,
   arrow: `<path d="M5 12h14M13 6l6 6-6 6"/>`,
+  ban: `<circle cx="12" cy="12" r="8.5"/><path d="m6.2 6.2 11.6 11.6"/>`,
+  "select-all": `<rect x="4" y="4" width="11" height="11" rx="2"/><path d="m8 20 4-4 7-7M15 9l2.5 2.5L22 7"/>`,
   recycle: `<path d="m8 7 2-3.5 3 5M16 7l3.5 2-2 3.5M12 20l-3.5-2 1.2-2.2M5.5 15l-1-4 3.5.6M18.5 17l-3.5.6-.8-3.3"/><path d="M9 6h4M18.5 9v4M9.5 18h4"/>`,
   circle: `<circle cx="12" cy="12" r="6" class="icon-fill icon-accent" stroke="none"/>`,
 };

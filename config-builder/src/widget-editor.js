@@ -177,6 +177,9 @@ export function bind(api) {
     if (!kind || ctx.widgetEditing) return;
     const panel = document.querySelector("#panel");
     if (!panel || !panel.contains(e.target)) return;
+    // Batch multi-select owns all pointer gestures on the APP grid while its
+    // mode is active; long-press-to-edit must not fire mid brush stroke.
+    if (panel.classList.contains("is-app-multi")) return;
     if (e.target.closest("button, input, select, a, .notice, details, .widget-library")) return;
     pressStart = { x: e.clientX, y: e.clientY, kind };
     clearTimeout(pressTimer);
@@ -197,6 +200,9 @@ export function bind(api) {
   document.addEventListener("click", (e) => {
     const btn = e.target.closest("button");
     if (!btn) return;
+    // APP batch mode owns all clicks on the grid; never let an inner button
+    // (policy pill / remove badge) leak through to edit-mode actions.
+    if (document.querySelector("#panel")?.classList.contains("is-app-multi")) return;
     const kind = currentKind(ctx, getStep());
     const root = widgetRoot();
 
@@ -259,6 +265,12 @@ export function bind(api) {
   let draggingId = null;
   document.addEventListener("dragstart", (e) => {
     const card = e.target.closest("[data-widget]");
+    // In APP batch mode the brush gesture replaces drag-to-reorder; cards are
+    // marked draggable=false on enter, but guard here too for safety.
+    if (document.querySelector("#panel")?.classList.contains("is-app-multi")) {
+      e.preventDefault();
+      return;
+    }
     // Fixed ("always on") cards are draggable too — only deletion is locked.
     if (!card) {
       e.preventDefault();

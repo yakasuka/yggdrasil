@@ -1,6 +1,6 @@
 import { catalog } from "../../shared/compiler.js";
 import { esc, title, notice } from "../ui.js";
-import { gridHTML, toolbarHTML, librarySectionHTML } from "../widget-cards.js";
+import { gridHTML, toolbarHTML, librarySectionHTML, appBatchBarHTML } from "../widget-cards.js";
 import { activeOrder } from "../widget-mode.js";
 
 export function appsPanel(ctx) {
@@ -13,6 +13,7 @@ export function appsPanel(ctx) {
     `<div class="toolbar"><input type="search" id="app-search" placeholder="搜索 APP" value="${esc(ctx.search)}" aria-label="搜索 APP"><span class="muted">${active} 个已启用</span><div class="toolbar-actions"><button class="text-button" data-apps="all">全部启用</button><button class="text-button" data-apps="none">全部移除</button></div></div>` +
     `<div class="widget-editor-root">` +
     toolbarHTML("app", ctx) +
+    appBatchBarHTML(ctx) +
     `<div class="app-grid" data-widget-grid="app">${gridHTML("app", ctx)}</div>` +
     librarySectionHTML("app", ctx) +
     `</div>` +
