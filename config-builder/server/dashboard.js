@@ -74,6 +74,29 @@ const DASH_ONLY = `
 .dash-edit-act{margin-left:auto;flex:0 0 auto;width:24px;height:24px;display:grid;place-items:center;border:1px solid var(--line);border-radius:7px;color:var(--muted);background:var(--soft)}
 .dash-editor .app-card:hover .dash-edit-act{color:var(--accent);border-color:var(--selected-line)}
 .dash-edit-act svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.dash-choice-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:10px}
+.dash-row-card{display:flex;align-items:center;gap:10px;min-width:0;padding:12px 14px;border:1px solid var(--line);border-radius:13px;background:var(--soft);font-size:.8125rem}
+.dash-row-card>span:first-child{min-width:0;flex:1}
+.dash-row-card strong{display:block;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dash-row-card small{display:block;margin-top:3px;color:var(--muted);font-size:.6875rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dash-row-card[role="button"]{cursor:pointer;transition:border-color 160ms var(--ease),background 160ms var(--ease)}
+.dash-row-card[role="button"]:hover{border-color:var(--selected-line);background:var(--tint)}
+.dash-icon-btn{flex:0 0 auto;width:24px;height:24px;display:grid;place-items:center;padding:0;border:1px solid var(--line);border-radius:7px;background:var(--surface);color:var(--muted);font-size:.75rem;line-height:1;cursor:pointer;transition:color 160ms var(--ease),border-color 160ms var(--ease)}
+.dash-icon-btn:hover{color:var(--accent);border-color:var(--selected-line)}
+.dash-icon-btn:disabled{opacity:.35;cursor:default}
+.dash-rule-list{max-height:460px;overflow:auto;padding-right:4px}
+.dash-rule-list::-webkit-scrollbar{width:6px}
+.dash-rule-list::-webkit-scrollbar-thumb{background:var(--line);border-radius:99px}
+.dash-rule-row{display:flex;align-items:center;gap:8px;padding:9px 12px;margin-bottom:6px;border:1px solid var(--line);border-radius:11px;background:var(--soft);font-size:.75rem}
+.dash-rule-row.off{opacity:.5}
+.dash-rule-row code{font:12px ui-monospace,SFMono-Regular,Consolas,monospace;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dash-rule-row .dash-rule-type{flex:0 0 auto;padding:2px 7px;border-radius:6px;background:var(--tint);color:var(--accent);font-size:.625rem;font-weight:600}
+.dash-spacer{flex:1}
+.dash-modal-card textarea{width:100%;min-height:96px;resize:vertical;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--input);color:var(--ink);font:12px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace;outline:none}
+.dash-modal-card textarea:focus{border-color:var(--selected-line)}
+.dash-modal-card .dash-hint{margin:-6px 0 4px;font-size:.6875rem;line-height:1.6;color:var(--muted)}
+.dash-toggle{display:flex;align-items:center;gap:8px;margin:16px 0;font-size:.8125rem;color:var(--ink)}
+.dash-toggle input{width:16px;height:16px;accent-color:var(--accent)}
 .dash-source{margin-top:26px;border-top:1px solid var(--line);padding-top:18px}
 .dash-source summary{cursor:pointer;font-size:.8125rem;color:var(--muted)}
 .dash-source textarea{display:block;width:100%;min-height:320px;resize:vertical;margin-top:12px;padding:14px 16px;border:1px solid var(--line);border-radius:14px;background:var(--input);color:var(--ink);font:12px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace;outline:none;tab-size:2}
@@ -196,14 +219,26 @@ export function dashboardHTML({
       <h2 class="panel-title">每个 APP，都有自己的去向。</h2>
       <p class="panel-description">这里的内容直接来自 Ratatoskr 模板。点击任意卡片即可修改应用、地区与出口；保存后配置工坊立即生效，无需重新部署。</p>
       <div class="dash-summary" id="fi-summary"></div>
+      <div class="section-label"><span>基础设置</span><small>端口 · 模式 · 日志</small></div>
+      <div class="dash-choice-grid dash-editor" id="fi-general"><span class="muted">载入中…</span></div>
+      <div class="section-label"><span>应用分流</span><small>点击卡片编辑名称、图标、出口与规则</small></div>
       <div class="toolbar"><input type="search" id="app-search" placeholder="搜索 APP" aria-label="搜索 APP"><span class="muted" id="fi-count">载入中…</span><div class="toolbar-actions"><button class="text-button" id="add-app" type="button">＋ 添加应用</button></div></div>
       <div class="app-grid dash-editor" id="fi-apps"><span class="muted">载入中…</span></div>
       <div class="section-label"><span>地区节点</span><small>按模板分组</small></div>
       <div class="region-bars dash-editor" id="fi-regions"><span class="muted">载入中…</span></div>
       <div class="section-label"><span>出口策略</span><small>策略入口</small></div>
       <div class="choice-grid dash-editor" id="fi-strategies"><span class="muted">载入中…</span></div>
+      <div class="section-label"><span>核心策略组</span><small>入口 · 兜底 · 国内 · 特殊端口</small></div>
+      <div class="dash-choice-grid dash-editor" id="fi-core"><span class="muted">载入中…</span></div>
+      <div class="section-label"><span>节点筛选</span><small>净化 · 其他地区 · 地区正则</small></div>
+      <div class="dash-choice-grid dash-editor" id="fi-filters"><span class="muted">载入中…</span></div>
       <div class="section-label"><span>规则模块</span><small>来自模板声明</small></div>
       <div class="choice-grid dash-editor" id="fi-rules"><span class="muted">载入中…</span></div>
+      <div class="section-label"><span>分流规则</span><small>顺序决定出口 · 可编辑 / 启停 / 移动</small></div>
+      <div class="toolbar"><span class="muted" id="fi-rule-count">载入中…</span><div class="toolbar-actions"><button class="text-button" id="add-rule" type="button">＋ 添加规则</button></div></div>
+      <div class="dash-rule-list" id="fi-rule-list"><span class="muted">载入中…</span></div>
+      <div class="section-label"><span>规则源</span><small>URL · 更新间隔 · 行为</small></div>
+      <div class="dash-choice-grid dash-editor" id="fi-providers"><span class="muted">载入中…</span></div>
       <details class="dash-source">
         <summary>高级 · 直接编辑 YAML 模板</summary>
         <textarea id="fi-text" spellcheck="false" aria-label="YAML 模板内容" placeholder="正在载入模板…"></textarea>
@@ -452,11 +487,104 @@ function renderRules(cat){
     host.appendChild(c);
   });
 }
+function rowCard(title,subtitle,onOpen){
+  var c=document.createElement("div");c.className="dash-row-card";
+  c.setAttribute("role","button");c.tabIndex=0;
+  var text=document.createElement("span");
+  text.innerHTML="<strong>"+esc(title)+"</strong><small>"+esc(subtitle)+"</small>";
+  c.appendChild(text);
+  var edit=document.createElement("span");edit.className="dash-edit-act";edit.innerHTML=EDIT_SVG;c.appendChild(edit);
+  c.addEventListener("click",onOpen);
+  c.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();onOpen()}});
+  return c;
+}
+function renderGeneral(cat){
+  var host=document.getElementById("fi-general");host.textContent="";
+  var g=(cat.editor&&cat.editor.general)||{};
+  var open=function(){openEditor({kind:"general"})};
+  host.appendChild(rowCard("端口与访问",
+    "HTTP "+(g.port??"—")+" · SOCKS "+(g["socks-port"]??"—")+" · "+(g["allow-lan"]?"允许局域网":"仅本机"),open));
+  host.appendChild(rowCard("运行模式","mode: "+(g.mode||"—")+" · 日志 "+(g["log-level"]||"—"),open));
+  host.appendChild(rowCard("控制面板",(g["external-controller"]||"—")+" · 统一延迟 "+(g["unified-delay"]?"开":"关"),open));
+}
+function renderCore(cat){
+  var host=document.getElementById("fi-core");host.textContent="";
+  var groups=(cat.editor&&cat.editor.groups)||[];
+  var names=[];
+  Object.keys(cat.groups||{}).forEach(function(k){
+    var n=cat.groups[k];
+    if(typeof n==="string"&&groups.some(function(g){return g.name===n})&&names.indexOf(n)<0)names.push(n);
+  });
+  names.forEach(function(name){
+    var g=groups.find(function(x){return x.name===name});
+    host.appendChild(rowCard(name,g.type+" · "+(g.proxies?g.proxies.split(",").length+" 个出口":"无出口列表"),function(){
+      openEditor({kind:"core-group",item:g});
+    }));
+  });
+}
+function renderFilters(cat){
+  var host=document.getElementById("fi-filters");host.textContent="";
+  var f=(cat.editor&&cat.editor.filters)||{};
+  var items=[
+    {id:"all",label:"节点净化 FilterAll",value:f.all||""},
+    {id:"others",label:"其他地区 FilterOthers",value:f.others||""}
+  ];
+  Object.keys(f.regions||{}).forEach(function(id){
+    items.push({id:id,label:"地区 "+id,value:f.regions[id]||""});
+  });
+  items.forEach(function(item){
+    host.appendChild(rowCard(item.label,item.value?item.value.slice(0,42)+"…":"未设置",function(){
+      openEditor({kind:"filter",item:item});
+    }));
+  });
+}
+function ruleParts(rule){
+  var parts=String(rule||"").split(",");
+  return {type:parts[0]||"GEOSITE",key:parts[1]||"",target:parts[2]||"",extra:parts.slice(3).join(",")};
+}
+function joinRule(parts){
+  return [parts.type,parts.key,parts.target,parts.extra].filter(function(x){return x!== ""&&x!=null}).join(",");
+}
+function iconButton(symbol,title,onClick,disabled){
+  var b=document.createElement("button");b.type="button";b.className="dash-icon-btn";
+  b.textContent=symbol;b.title=title;b.setAttribute("aria-label",title);b.disabled=!!disabled;
+  b.addEventListener("click",function(e){e.stopPropagation();onClick()});return b;
+}
+function renderRuleList(cat){
+  var host=document.getElementById("fi-rule-list");host.textContent="";
+  var rules=(cat.editor&&cat.editor.rules)||[];
+  var enabled=rules.filter(function(r){return r.enabled}).length;
+  var count=document.getElementById("fi-rule-count");
+  if(count)count.textContent=enabled+" / "+rules.length+" 条启用 · 自上而下匹配";
+  rules.forEach(function(r,index){
+    var row=document.createElement("div");row.className="dash-rule-row"+(r.enabled?"":" off");
+    var type=document.createElement("span");type.className="dash-rule-type";type.textContent=r.type;row.appendChild(type);
+    var code=document.createElement("code");code.textContent=r.rule;code.title=r.rule;row.appendChild(code);
+    row.appendChild(iconButton(r.enabled?"◉":"○",r.enabled?"停用":"启用",function(){
+      sendOps([{kind:"rule",rule:r.rule,enabled:!r.enabled}]);
+    }));
+    row.appendChild(iconButton("✎","编辑规则",function(){openEditor({kind:"rule",item:r,index:index})}));
+    var spacer=document.createElement("span");spacer.className="dash-spacer";row.appendChild(spacer);
+    row.appendChild(iconButton("↑","上移",function(){sendOps([{kind:"rule-move",rule:r.rule,to:"up"}])}));
+    row.appendChild(iconButton("↓","下移",function(){sendOps([{kind:"rule-move",rule:r.rule,to:"down"}])}));
+    host.appendChild(row);
+  });
+}
+function renderProviders(cat){
+  var host=document.getElementById("fi-providers");host.textContent="";
+  (cat.providerModules||[]).forEach(function(m){
+    var v=m.value||{};
+    host.appendChild(rowCard(m.name,[v.behavior||"—",(v.interval||"—")+"s",m.module||""].join(" · "),function(){
+      openEditor({kind:"provider",item:m});
+    }));
+  });
+}
 function renderCatalog(cat,summary){
   if(!cat)return;
   state.catalog=cat;
   summaryStats(summary);
-  renderApps(cat);renderRegions(cat);renderStrategies(cat);renderRules(cat);
+  renderGeneral(cat);renderApps(cat);renderRegions(cat);renderStrategies(cat);renderCore(cat);
+  renderFilters(cat);renderRules(cat);renderRuleList(cat);renderProviders(cat);
 }
 function loadFront(){
   fiMsg("读取中…");
@@ -485,35 +613,95 @@ function field(label,control){
   control._wrapper=w;return control;
 }
 function appendField(control){modalBody.appendChild(control._wrapper||control)}
-function input(value,type){var i=document.createElement("input");i.type=type||"text";i.value=value||"";return i}
+function input(value,type){var i=document.createElement("input");i.type=type||"text";i.value=value==null?"":value;return i}
+function checkbox(value){var i=document.createElement("input");i.type="checkbox";i.checked=!!value;return i}
+function textarea(value){var t=document.createElement("textarea");t.value=value||"";t.spellcheck=false;return t}
 function select(options,value){
   var s=document.createElement("select");
   options.forEach(function(o){var op=document.createElement("option");op.value=o[0];op.textContent=o[1];if(o[0]===value)op.selected=true;s.appendChild(op)});
   return s;
 }
+function hint(text){var p=document.createElement("p");p.className="dash-hint";p.textContent=text;modalBody.appendChild(p)}
+function groupProps(name){
+  var groups=(state.catalog&&state.catalog.editor&&state.catalog.editor.groups)||[];
+  return groups.find(function(g){return g.name===name})||{};
+}
 function closeModal(){modal.hidden=true;editCtx=null}
 function openEditor(ctx){
-  editCtx=ctx;modalTitle.textContent=({app:"编辑应用",region:"编辑地区",strategy:"编辑出口策略"})[ctx.kind]||"编辑";
+  editCtx=ctx;
+  var titles={app:"编辑应用",region:"编辑地区",strategy:"编辑出口策略","core-group":"编辑策略组",general:"基础设置",filter:"编辑节点筛选",rule:"编辑分流规则","add-rule":"添加分流规则",provider:"编辑规则源"};
+  modalTitle.textContent=titles[ctx.kind]||"编辑";
   modalBody.textContent="";
-  var item=ctx.item,f={};
+  var item=ctx.item||{},f={},cat=state.catalog||{},g=groupProps(item.name);
   if(ctx.kind==="app"){
+    hint("组名："+item.name+" · 改名需到高级 YAML 中操作，以免断开规则引用。");
     f.label=field("显示名称",input(item.label));appendField(f.label);
     f.icon=field("图标 URL",input(item.icon));appendField(f.icon);
-    var cats=[];if(state.catalog)state.catalog.apps.forEach(function(a){if(cats.indexOf(a.category)<0)cats.push(a.category)});
+    var cats=[];if(cat.apps)cat.apps.forEach(function(a){if(cats.indexOf(a.category)<0)cats.push(a.category)});
     if(cats.indexOf(item.category)<0)cats.unshift(item.category);
     f.category=field("分类",select(cats.map(function(c){return [c,c]}),item.category));appendField(f.category);
     f.exit=field("默认出口",select([["proxy","跟随代理 / 节点选择"],["DIRECT","直连 DIRECT"]],item.firstProxyDirect?"DIRECT":"proxy"));appendField(f.exit);
+    f.proxies=field("出口顺序（逗号分隔）",textarea(g.proxies));appendField(f.proxies);
+    if(item.rules&&item.rules.length)hint("关联规则："+item.rules.join("｜")+"（可在下方「分流规则」中修改）");
   }else if(ctx.kind==="region"){
+    hint("组名："+(item.groupName||item.name));
     f.label=field("显示名称",input(item.label));appendField(f.label);
     f.flag=field("旗帜 Emoji",input(item.flag));appendField(f.flag);
     f.icon=field("图标 URL",input(item.icon));appendField(f.icon);
+    f.filter=field("节点匹配正则",textarea(item.filter));appendField(f.filter);
   }else if(ctx.kind==="strategy"){
+    hint("组名："+item.name+" · 类型："+(g.type||item.type));
     f.label=field("显示名称",input(item.label));appendField(f.label);
     f.description=field("说明",input(item.description));appendField(f.description);
     f.icon=field("图标 URL",input(item.icon));appendField(f.icon);
+    if(g.url){f.url=field("测速 URL",input(g.url));appendField(f.url)}
+    if(g.interval!=null&&g.interval!==""){f.interval=field("测速间隔（秒）",input(g.interval,"number"));appendField(f.interval)}
+    if(g.tolerance!=null&&g.tolerance!==""){f.tolerance=field("延迟容差（毫秒）",input(g.tolerance,"number"));appendField(f.tolerance)}
+    if(g.strategy){f.strategy=field("均衡策略",select([["consistent-hashing","consistent-hashing"],["round-robin","round-robin"]],g.strategy));appendField(f.strategy)}
+    if(g.proxies){f.proxies=field("出口顺序（逗号分隔）",textarea(g.proxies));appendField(f.proxies)}
+  }else if(ctx.kind==="core-group"){
+    hint("组名："+g.name+" · 类型："+g.type);
+    f.proxies=field("出口顺序（逗号分隔）",textarea(g.proxies));appendField(f.proxies);
+    if(g.icon){f.icon=field("图标 URL",input(g.icon));appendField(f.icon)}
+    if(g.url){f.url=field("测速 URL",input(g.url));appendField(f.url)}
+    if(g.interval!=null&&g.interval!==""){f.interval=field("间隔（秒）",input(g.interval,"number"));appendField(f.interval)}
+    if(g.tolerance!=null&&g.tolerance!==""){f.tolerance=field("容差（毫秒）",input(g.tolerance,"number"));appendField(f.tolerance)}
+  }else if(ctx.kind==="general"){
+    var cfg=(cat.editor&&cat.editor.general)||{};
+    f.port=field("HTTP 代理端口",input(cfg.port,"number"));appendField(f.port);
+    f.socksPort=field("SOCKS5 端口",input(cfg["socks-port"],"number"));appendField(f.socksPort);
+    f.allowLan=field("允许局域网连接",checkbox(cfg["allow-lan"]));appendField(f.allowLan);
+    f.mode=field("代理模式",select([["rule","rule · 规则分流"],["direct","direct · 全局直连"],["global","global · 全局代理"]],cfg.mode));appendField(f.mode);
+    f.logLevel=field("日志级别",select([["debug","debug"],["info","info"],["warning","warning"],["error","error"],["silent","silent"]],cfg["log-level"]));appendField(f.logLevel);
+    f.controller=field("REST API 监听地址",input(cfg["external-controller"]));appendField(f.controller);
+    f.unifiedDelay=field("统一延迟测速",checkbox(cfg["unified-delay"]));appendField(f.unifiedDelay);
+  }else if(ctx.kind==="filter"){
+    hint(item.id==="all"?"FilterAll 用于节点净化；改动后请确认策略组 filter 是否仍符合预期。":item.id==="others"?"FilterOthers 排除六大地区与广告关键词，改动后建议同步重生成规则。":"该正则决定哪些节点进入对应地区组。");
+    f.value=field("正则表达式",textarea(item.value));appendField(f.value);
+  }else if(ctx.kind==="rule"||ctx.kind==="add-rule"){
+    var p=ctx.kind==="add-rule"?{type:"GEOSITE",key:"",target:"",extra:""}:ruleParts(item.rule);
+    if(ctx.kind==="rule")hint("原规则："+item.rule);
+    f.type=field("规则类型",select([["GEOSITE","GEOSITE"],["RULE-SET","RULE-SET"],["GEOIP","GEOIP"],["DOMAIN","DOMAIN"],["IP","IP"],["MATCH","MATCH"]],p.type));appendField(f.type);
+    f.key=field("匹配项（如 openai / cn / gfw）",input(p.key));appendField(f.key);
+    var targets=["DIRECT","REJECT"],groups=(cat.editor&&cat.editor.groups)||[];
+    groups.forEach(function(x){if(targets.indexOf(x.name)<0)targets.push(x.name)});
+    if(p.target&&targets.indexOf(p.target)<0)targets.unshift(p.target);
+    f.target=field("出口（策略组）",select(targets.map(function(t){return [t,t]}),p.target));appendField(f.target);
+    f.extra=field("附加参数（如 no-resolve）",input(p.extra));appendField(f.extra);
+    if(ctx.kind==="rule"){f.enabled=field("启用该规则",checkbox(item.enabled));appendField(f.enabled)}
+  }else if(ctx.kind==="provider"){
+    var v=item.value||{};
+    hint("规则源名："+item.name+" · 修改后下一次拉取即生效。");
+    f.url=field("规则源 URL",input(v.url));appendField(f.url);
+    f.interval=field("更新间隔（秒）",input(v.interval,"number"));appendField(f.interval);
+    f.behavior=field("行为",select([["domain","domain"],["classical","classical"],["ipcidr","ipcidr"]],v.behavior));appendField(f.behavior);
+    f.format=field("格式",select([["yaml","yaml"],["text","text"]],v.format||"yaml"));appendField(f.format);
+    f.type=field("类型",select([["http","http"],["file","file"]],v.type||"http"));appendField(f.type);
   }
   editCtx.fields=f;
-  modalRemove.hidden=false;
+  var removable={app:1,region:1,strategy:1,rule:1};
+  modalRemove.hidden=!removable[ctx.kind];
+  modalRemove.textContent=ctx.kind==="rule"?"移除规则":"移除";
   modal.hidden=false;
 }
 document.getElementById("fi-modal-close").addEventListener("click",closeModal);
@@ -538,29 +726,77 @@ function sendOps(ops,onDone){
   .catch(function(e){fiMsg(e.message,"dash-err")})
   .finally(function(){btn.disabled=false});
 }
-document.getElementById("fi-modal-apply").addEventListener("click",function(){
-  if(!editCtx||editCtx.kind==="add")return;
-  var f=editCtx.fields,ops=[],item=editCtx.item;
-  var name=editCtx.kind==="region"?(item.groupName||item.name):item.name;
-  if(editCtx.kind==="app"){
+function proxyList(value){return String(value||"").replace(/[\\r\\n]+/g,", ").replace(/\\s*,\\s*/g,", ").replace(/^,|,$/g,"").trim()}
+function buildOps(){
+  var ctx=editCtx,f=ctx.fields,ops=[],item=ctx.item||{};
+  var name=ctx.kind==="region"?(item.groupName||item.name):item.name;
+  function props(fields){ops.push({kind:"group-props",name:name,fields:fields})}
+  if(ctx.kind==="app"){
     ops.push({kind:"meta",name:name,fields:{label:f.label.value.trim(),category:f.category.value}});
     ops.push({kind:"icon",name:name,value:f.icon.value.trim()});
     ops.push({kind:"exit",name:name,value:f.exit.value});
-  }else if(editCtx.kind==="region"){
+    var proxies=proxyList(f.proxies.value);
+    if(proxies)props({proxies:proxies});
+  }else if(ctx.kind==="region"){
     ops.push({kind:"meta",name:name,fields:{label:f.label.value.trim(),flag:f.flag.value.trim()}});
     ops.push({kind:"icon",name:name,value:f.icon.value.trim()});
-  }else if(editCtx.kind==="strategy"){
-    ops.push({kind:"meta",name:name,fields:{label:f.label.value.trim(),description:f.description.value.trim()}});
-    ops.push({kind:"icon",name:name,value:f.icon.value.trim()});
+    ops.push({kind:"filter",id:item.id,value:f.filter.value.trim()});
+  }else if(ctx.kind==="strategy"||ctx.kind==="core-group"){
+    if(f.label)ops.push({kind:"meta",name:name,fields:{label:f.label.value.trim(),description:f.description.value.trim()}});
+    if(f.icon)ops.push({kind:"icon",name:name,value:f.icon.value.trim()});
+    var fields={};
+    if(f.proxies&&proxyList(f.proxies.value))fields.proxies=proxyList(f.proxies.value);
+    if(f.url&&f.url.value.trim())fields.url=f.url.value.trim();
+    if(f.interval&&Number(f.interval.value)>0)fields.interval=Number(f.interval.value);
+    if(f.tolerance&&Number(f.tolerance.value)>0)fields.tolerance=Number(f.tolerance.value);
+    if(f.strategy)fields.strategy=f.strategy.value;
+    if(Object.keys(fields).length)props(fields);
+  }else if(ctx.kind==="general"){
+    var port=Number(f.port.value),socks=Number(f.socksPort.value);
+    if(!(port>0&&port<65536)){fiMsg("HTTP 端口需在 1–65535 之间","dash-err");return null}
+    if(!(socks>0&&socks<65536)){fiMsg("SOCKS5 端口需在 1–65535 之间","dash-err");return null}
+    ops.push({kind:"general",fields:{
+      port:port,"socks-port":socks,"allow-lan":f.allowLan.checked,
+      mode:f.mode.value,"log-level":f.logLevel.value,
+      "external-controller":f.controller.value.trim(),"unified-delay":f.unifiedDelay.checked
+    }});
+  }else if(ctx.kind==="filter"){
+    if(!f.value.value.trim()){fiMsg("正则不能为空","dash-err");return null}
+    ops.push({kind:"filter",id:item.id,value:f.value.value.trim()});
+  }else if(ctx.kind==="rule"||ctx.kind==="add-rule"){
+    var type=f.type.value,key=f.key.value.trim(),target=f.target.value.trim(),extra=f.extra.value.trim();
+    if(type!=="MATCH"&&(!key||!target)){fiMsg("规则需要匹配项与出口","dash-err");return null}
+    var value=[type,key,target,extra].filter(function(x){return x!==""}).join(",");
+    if(ctx.kind==="add-rule")ops.push({kind:"rule-add",rule:value});
+    else{
+      if(!f.enabled.checked)ops.push({kind:"rule",rule:item.rule,enabled:false});
+      else if(!item.enabled)ops.push({kind:"rule",rule:item.rule,enabled:true});
+      if(value!==item.rule)ops.push({kind:"rule-text",rule:item.rule,value:value});
+    }
+  }else if(ctx.kind==="provider"){
+    var fields2={url:f.url.value.trim(),interval:Number(f.interval.value)||28800,behavior:f.behavior.value,format:f.format.value,type:f.type.value};
+    if(!fields2.url){fiMsg("请填写规则源 URL","dash-err");return null}
+    ops.push({kind:"provider",name:item.name,fields:fields2});
   }
-  sendOps(ops);
+  return ops;
+}
+document.getElementById("fi-modal-apply").addEventListener("click",function(){
+  if(!editCtx||editCtx.kind==="add")return;
+  var ops=buildOps();if(ops&&ops.length)sendOps(ops);
 });
 modalRemove.addEventListener("click",function(){
   if(!editCtx)return;
   if(editCtx.kind==="add"){closeModal();return}
+  if(editCtx.kind==="rule"){
+    if(!window.confirm("停用规则 “"+editCtx.item.rule+"”？"))return;
+    sendOps([{kind:"rule",rule:editCtx.item.rule,enabled:false}]);return;
+  }
   var name=editCtx.kind==="region"?(editCtx.item.groupName||editCtx.item.name):editCtx.item.name;
   if(!window.confirm("从模板中移除 “"+name+"”？相关规则会一并注释掉。"))return;
   sendOps([{kind:"remove",name:name}]);
+});
+document.getElementById("add-rule").addEventListener("click",function(){
+  showStep("front");openEditor({kind:"add-rule"});
 });
 document.getElementById("add-app").addEventListener("click",function(){
   showStep("front");

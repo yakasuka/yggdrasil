@@ -93,6 +93,51 @@ test("add-app op inserts a new select group and its rule", async () => {
   assert.ok(app.rules.some((r) => r.includes("GEOSITE,notion")));
 });
 
+test("general / filter / group-props ops expose every template knob", async () => {
+  const out = patch([
+    { kind: "general", fields: { port: 8123, "allow-lan": false, "unified-delay": false } },
+    { kind: "filter", id: "all", value: "^(?!.*TEST).*$" },
+    { kind: "filter", id: "HK", value: "(?i)HONGKONG" },
+    { kind: "group-props", name: "⚡ 自动选择", fields: { interval: 600, tolerance: 20, url: "https://example.com/x" } },
+    { kind: "group-props", name: "🎚️ 节点选择", fields: { proxies: "DIRECT, 🏁 Final" } },
+  ]);
+  const cat = await catalogFromYaml(out);
+  assert.equal(cat.editor.general.port, 8123);
+  assert.equal(cat.editor.general["allow-lan"], false);
+  assert.equal(cat.editor.general["unified-delay"], false);
+  assert.equal(cat.cleanFilter, "^(?!.*TEST).*$");
+  assert.equal(cat.editor.filters.regions.HK, "(?i)HONGKONG");
+  const auto = cat.editor.groups.find((g) => g.name === "⚡ 自动选择");
+  assert.equal(auto.interval, 600);
+  assert.equal(auto.tolerance, 20);
+  assert.equal(auto.url, "https://example.com/x");
+  assert.equal(cat.editor.groups.find((g) => g.name === "🎚️ 节点选择").proxies, "DIRECT, 🏁 Final");
+});
+
+test("rule ops edit / move / add / disable a rule in place", async () => {
+  const rule = "GEOSITE,openai,⚡ OpenAI";
+  const before = bundled.editor.rules.findIndex((r) => r.rule === rule);
+  const edited = patch([{ kind: "rule-text", rule, value: "GEOSITE,openai,🏁 Final" }]);
+  assert.ok((await catalogFromYaml(edited)).editor.rules.some((r) => r.rule === "GEOSITE,openai,🏁 Final"));
+  const moved = await catalogFromYaml(patch([{ kind: "rule-move", rule, to: "down" }]));
+  assert.equal(moved.editor.rules.findIndex((r) => r.rule === rule), before + 1);
+  const added = await catalogFromYaml(patch([{ kind: "rule-add", rule: "GEOSITE,notion,🏁 Final" }]));
+  assert.equal(added.editor.rules.filter((r) => r.rule === "GEOSITE,notion,🏁 Final").length, 1);
+  const disabled = await catalogFromYaml(patch([{ kind: "rule", rule, enabled: false }]));
+  assert.equal(disabled.editor.rules.find((r) => r.rule === rule).enabled, false);
+});
+
+test("provider op updates a rule-provider URL and interval", async () => {
+  const out = patch([{ kind: "provider", name: "❎ AdGuard", fields: {
+    url: "https://example.com/adguard.yaml", interval: 7200,
+    behavior: "domain", format: "yaml", type: "http",
+  } }]);
+  const cat = await catalogFromYaml(out);
+  const provider = cat.providerModules.find((p) => p.name === "❎ AdGuard");
+  assert.equal(provider.value.url, "https://example.com/adguard.yaml");
+  assert.equal(provider.value.interval, 7200);
+});
+
 test("PATCH /api/admin/frontinfo applies ops, persists and returns catalog", async () => {
   const s = await service();
   const res = await s.fetch(new Request(ORIGIN + "/api/admin/frontinfo", {

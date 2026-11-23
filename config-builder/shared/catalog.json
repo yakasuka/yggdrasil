@@ -901,5 +901,1132 @@
     }
   ],
   "moduleMeta": {},
-  "version": "9b71b6ff10f7"
+  "editor": {
+    "general": {
+      "port": 7890,
+      "socks-port": 7891,
+      "allow-lan": true,
+      "mode": "rule",
+      "log-level": "info",
+      "external-controller": "127.0.0.1:9090",
+      "unified-delay": true
+    },
+    "filters": {
+      "all": "^(?!.*(?:(?i)=>|群|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|剩余流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|超时|收藏|福利|失联|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author|Traffic|\\d{4}-\\d{2}-\\d{2}|\\d+G)).*$",
+      "others": "^(?!.*(?:(?i)=>|(?i:🇭🇰|香港|Hong\\s?Kong|\\b(?:HK|HKG)\\d*\\b)|(?i:🇹🇼|台湾|Tai(?:wan)?|\\b(?:TW|TWN)\\d*\\b)|(?i:🇯🇵|日本|川日|东京|大阪|埼玉|Japan|\\b(?:JP|JPN)\\d*\\b)|(?i:🇰🇷|韩国|韓|首尔|Korea|\\b(?:KR|KOR)\\d*\\b)|(?i:🇸🇬|新加坡|狮|Singapore|\\b(?:SG|SGP)\\d*\\b)|(?i:🇺🇸|美国|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|拉斯维加斯|United States|\\b(?:US|USA)\\d*\\b)|群|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|剩余流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|超时|收藏|福利|失联|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author|Traffic|\\d{4}-\\d{2}-\\d{2}|\\d+G)).*$",
+      "regions": {
+        "HK": "(?i)^(?!=>).*(?:🇭🇰|香港|Hong\\s?Kong|\\b(?:HK|HKG)\\d*\\b)",
+        "TW": "(?i)^(?!=>).*(?:🇹🇼|台湾|Tai(?:wan)?|\\b(?:TW|TWN)\\d*\\b)",
+        "JP": "(?i)^(?!=>).*(?:🇯🇵|日本|川日|东京|大阪|埼玉|Japan|\\b(?:JP|JPN)\\d*\\b)",
+        "KR": "(?i)^(?!=>).*(?:🇰🇷|韩国|韓|首尔|Korea|\\b(?:KR|KOR)\\d*\\b)",
+        "SG": "(?i)^(?!=>).*(?:🇸🇬|新加坡|狮|Singapore|\\b(?:SG|SGP)\\d*\\b)",
+        "US": "(?i)^(?!=>).*(?:🇺🇸|美国|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|拉斯维加斯|United States|\\b(?:US|USA)\\d*\\b)"
+      }
+    },
+    "groups": [
+      {
+        "name": "🎚️ 节点选择",
+        "type": "select",
+        "proxies": "🚀 手动切换, ⚡ 自动选择, 🔯 故障转移, 🔮 负载均衡, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others, DIRECT",
+        "url": "",
+        "interval": "",
+        "tolerance": "",
+        "strategy": "",
+        "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/switch.png",
+        "filter": "",
+        "includeAll": false
+      },
+      {
+        "name": "🚀 手动切换",
+        "type": "select",
+        "proxies": "",
+        "url": "",
+        "interval": "",
+        "tolerance": "",
+        "strategy": "",
+        "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/proxy.png",
+        "filter": "^(?!.*(?:(?i)=>|群|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|剩余流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|超时|收藏|福利|失联|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author|Traffic|\\d{4}-\\d{2}-\\d{2}|\\d+G)).*$",
+        "includeAll": true
+      },
+      {
+        "name": "⚡ 自动选择",
+        "type": "url-test",
+        "proxies": "",
+        "url": "https://www.gstatic.com/generate_204",
+        "interval": 300,
+        "tolerance": 50,
+        "strategy": "",
+        "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/yggdrasil.png",
+        "filter": "^(?!.*(?:(?i)=>|群|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|剩余流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|超时|收藏|福利|失联|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author|Traffic|\\d{4}-\\d{2}-\\d{2}|\\d+G)).*$",
+        "includeAll": true
+      },
+      {
+        "name": "🔯 故障转移",
+        "type": "fallback",
+        "proxies": "",
+        "url": "https://www.gstatic.com/generate_204",
+        "interval": 300,
+        "tolerance": "",
+        "strategy": "",
+        "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/fallback.png",
+        "filter": "^(?!.*(?:(?i)=>|群|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|剩余流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|超时|收藏|福利|失联|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author|Traffic|\\d{4}-\\d{2}-\\d{2}|\\d+G)).*$",
+        "includeAll": true
+      },
+      {
+        "name": "🔮 负载均衡",
+        "type": "load-balance",
+        "proxies": "",
+        "url": "",
+        "interval": "",
+        "tolerance": "",
+        "strategy": "consistent-hashing",
+        "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/global.png",
+        "filter": "^(?!.*(?:(?i)=>|群|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|剩余流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|超时|收藏|福利|失联|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author|Traffic|\\d{4}-\\d{2}-\\d{2}|\\d+G)).*$",
+        "includeAll": true
+      },
+      {
+        "name": "📦 下载均衡",
+        "type": "load-balance",
+        "proxies": "",
+        "url": "",
+        "interval": "",
+        "tolerance": "",
+        "strategy": "round-robin",
+        "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/tracking.png",
+        "filter": "^(?!.*(?:(?i)=>|群|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|剩余流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|超时|收藏|福利|失联|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author|Traffic|\\d{4}-\\d{2}-\\d{2}|\\d+G)).*$",
+        "includeAll": true
+      },
+      {
+        "name": "⚡ OpenAI",
+        "type": "select",
+        "proxies": "🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others",
+        "url": "",
+        "interval": "",
+        "tolerance": "",
+        "strategy": "",
+        "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/chatgpt.png",
+        "filter": "",
+        "includeAll": false
+      },
+      {
+        "name": "🪐 Anthropic",
+        "type": "select",
+        "proxies": "🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others",
+        "url": "",
+        "interval": "",
+        "tolerance": "",
+        "strategy": "",
+        "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/claude.png",
+        "filter": "",
+        "includeAll": false
+      },
+      {
+        "name": "✨ Hermes",
+        "type": "select",
+        "proxies": "🚀 手动切换, ⚡ 自动选择, 🔯 故障转移, 🔮 负载均衡, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others, DIRECT",
+        "url": "",
+        "interval": "",
+        "tolerance": "",
+        "strategy": "",
+        "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/hermes.png",
+        "filter": "",
+        "includeAll": false
+      },
+      {
+        "name": "✨ AI 服务",
+        "type": "select",
+        "proxies": "🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others",
+        "url": "",
+        "interval": "",
+        "tolerance": "",
+        "strategy": "",
+        "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/ai.png",
+        "filter": "",
+        "includeAll": false
+      },
+      {
+        "name": "⬛ OKX",
+        "type": "select",
+        "proxies": "🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others",
+        "url": "",
+        "interval": "",
+        "tolerance": "",
+        "strategy": "",
+        "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/okx.png",
+        "filter": "",
+        "includeAll": false
+      },
+      {
+        "name": "🟨 Binance",
+        "type": "select",
+        "proxies": "🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others",
+        "url": "",
+        "interval": "",
+        "tolerance": "",
+        "strategy": "",
+        "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/binance.png",
+        "filter": "",
+        "includeAll": false
+      },
+      {
+        "name": "🟧 Bybit",
+        "type": "select",
+        "proxies": "🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others",
+        "url": "",
+        "interval": "",
+        "tolerance": "",
+        "strategy": "",
+        "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/bybit.png",
+        "filter": "",
+        "includeAll": false
+      },
+      {
+        "name": "🪙 Crypto",
+        "type": "select",
+        "proxies": "🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others",
+        "url": "",
+        "interval": "",
+        "tolerance": "",
+        "strategy": "",
+        "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/crypto.png",
+        "filter": "",
+        "includeAll": false
+      },
+      {
+        "name": "📺 YouTube",
+        "type": "select",
+        "proxies": "🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others",
+        "url": "",
+        "interval": "",
+        "tolerance": "",
+        "strategy": "",
+        "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/youtube.png",
+        "filter": "",
+        "includeAll": false
+      },
+      {
+        "name": "✨ Google",
+        "type": "select",
+        "proxies": "🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others",
+        "url": "",
+        "interval": "",
+        "tolerance": "",
+        "strategy": "",
+        "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/google.png",
+        "filter": "",
+        "includeAll": false
+      },
+      {
+        "name": "☁️ Cloudflare",
+        "type": "select",
+        "proxies": "🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others",
+        "url": "",
+        "interval": "",
+        "tolerance": "",
+        "strategy": "",
+        "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/cloudflare.png",
+        "filter": "",
+        "includeAll": false
+      },
+      {
+        "name": "📦 Amazon",
+        "type": "select",
+        "proxies": "🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others",
+        "url": "",
+        "interval": "",
+        "tolerance": "",
+        "strategy": "",
+        "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/amazon.png",
+        "filter": "",
+        "includeAll": false
+      },
+      {
+        "name": "🐙 GitHub",
+        "type": "select",
+        "proxies": "🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others",
+        "url": "",
+        "interval": "",
+        "tolerance": "",
+        "strategy": "",
+        "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/github.png",
+        "filter": "",
+        "includeAll": false
+      },
+      {
+        "name": "🪟 Microsoft",
+        "type": "select",
+        "proxies": "DIRECT, 🎚️ 节点选择, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others",
+        "url": "",
+        "interval": "",
+        "tolerance": "",
+        "strategy": "",
+        "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/microsoft.png",
+        "filter": "",
+        "includeAll": false
+      },
+      {
+        "name": "🎨 Adobe",
+        "type": "select",
+        "proxies": "🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others",
+        "url": "",
+        "interval": "",
+        "tolerance": "",
+        "strategy": "",
+        "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/adobe.png",
+        "filter": "",
+        "includeAll": false
+      },
+      {
+        "name": "⚪ Apple",
+        "type": "select",
+        "proxies": "DIRECT, 🎚️ 节点选择, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others",
+        "url": "",
+        "interval": "",
+        "tolerance": "",
+        "strategy": "",
+        "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/apple.png",
+        "filter": "",
+        "includeAll": false
+      },
+      {
+        "name": "𝕏 X",
+        "type": "select",
+        "proxies": "🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others",
+        "url": "",
+        "interval": "",
+        "tolerance": "",
+        "strategy": "",
+        "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/x.png",
+        "filter": "",
+        "includeAll": false
+      },
+      {
+        "name": "♾️ Meta",
+        "type": "select",
+        "proxies": "🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others",
+        "url": "",
+        "interval": "",
+        "tolerance": "",
+        "strategy": "",
+        "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/meta.png",
+        "filter": "",
+        "includeAll": false
+      },
+      {
+        "name": "🪽 Telegram",
+        "type": "select",
+        "proxies": "🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others",
+        "url": "",
+        "interval": "",
+        "tolerance": "",
+        "strategy": "",
+        "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/telegram.png",
+        "filter": "",
+        "includeAll": false
+      },
+      {
+        "name": "🎮 Discord",
+        "type": "select",
+        "proxies": "🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others",
+        "url": "",
+        "interval": "",
+        "tolerance": "",
+        "strategy": "",
+        "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/discord.png",
+        "filter": "",
+        "includeAll": false
+      },
+      {
+        "name": "💬 Chat",
+        "type": "select",
+        "proxies": "🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others",
+        "url": "",
+        "interval": "",
+        "tolerance": "",
+        "strategy": "",
+        "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/message.png",
+        "filter": "",
+        "includeAll": false
+      },
+      {
+        "name": "🫂 Social",
+        "type": "select",
+        "proxies": "🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others",
+        "url": "",
+        "interval": "",
+        "tolerance": "",
+        "strategy": "",
+        "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/social.png",
+        "filter": "",
+        "includeAll": false
+      },
+      {
+        "name": "🎶 TikTok",
+        "type": "select",
+        "proxies": "🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others",
+        "url": "",
+        "interval": "",
+        "tolerance": "",
+        "strategy": "",
+        "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/tiktok.png",
+        "filter": "",
+        "includeAll": false
+      },
+      {
+        "name": "🍿 Netflix",
+        "type": "select",
+        "proxies": "🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others",
+        "url": "",
+        "interval": "",
+        "tolerance": "",
+        "strategy": "",
+        "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/netflix.png",
+        "filter": "",
+        "includeAll": false
+      },
+      {
+        "name": "📺 Hulu",
+        "type": "select",
+        "proxies": "🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others",
+        "url": "",
+        "interval": "",
+        "tolerance": "",
+        "strategy": "",
+        "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/hulu.png",
+        "filter": "",
+        "includeAll": false
+      },
+      {
+        "name": "📦 Prime Video",
+        "type": "select",
+        "proxies": "🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others",
+        "url": "",
+        "interval": "",
+        "tolerance": "",
+        "strategy": "",
+        "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/primevideo.png",
+        "filter": "",
+        "includeAll": false
+      },
+      {
+        "name": "🎬 HBO",
+        "type": "select",
+        "proxies": "🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others",
+        "url": "",
+        "interval": "",
+        "tolerance": "",
+        "strategy": "",
+        "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/hbo.png",
+        "filter": "",
+        "includeAll": false
+      },
+      {
+        "name": "🏰 Disney+",
+        "type": "select",
+        "proxies": "🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others",
+        "url": "",
+        "interval": "",
+        "tolerance": "",
+        "strategy": "",
+        "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/disney.png",
+        "filter": "",
+        "includeAll": false
+      },
+      {
+        "name": "🟣 Twitch",
+        "type": "select",
+        "proxies": "🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others",
+        "url": "",
+        "interval": "",
+        "tolerance": "",
+        "strategy": "",
+        "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/twitch.png",
+        "filter": "",
+        "includeAll": false
+      },
+      {
+        "name": "💚 Spotify",
+        "type": "select",
+        "proxies": "🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others",
+        "url": "",
+        "interval": "",
+        "tolerance": "",
+        "strategy": "",
+        "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/spotify.png",
+        "filter": "",
+        "includeAll": false
+      },
+      {
+        "name": "🍿 Entertainment",
+        "type": "select",
+        "proxies": "🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others",
+        "url": "",
+        "interval": "",
+        "tolerance": "",
+        "strategy": "",
+        "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/media.png",
+        "filter": "",
+        "includeAll": false
+      },
+      {
+        "name": "📰 News",
+        "type": "select",
+        "proxies": "🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others",
+        "url": "",
+        "interval": "",
+        "tolerance": "",
+        "strategy": "",
+        "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/news.png",
+        "filter": "",
+        "includeAll": false
+      },
+      {
+        "name": "📺 Bilibili",
+        "type": "select",
+        "proxies": "DIRECT, 🎚️ 节点选择, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others",
+        "url": "",
+        "interval": "",
+        "tolerance": "",
+        "strategy": "",
+        "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/bilibili.png",
+        "filter": "",
+        "includeAll": false
+      },
+      {
+        "name": "👾 Steam",
+        "type": "select",
+        "proxies": "🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others",
+        "url": "",
+        "interval": "",
+        "tolerance": "",
+        "strategy": "",
+        "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/steam.png",
+        "filter": "",
+        "includeAll": false
+      },
+      {
+        "name": "🎁 Epic",
+        "type": "select",
+        "proxies": "DIRECT, 🎚️ 节点选择, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others",
+        "url": "",
+        "interval": "",
+        "tolerance": "",
+        "strategy": "",
+        "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/epic.png",
+        "filter": "",
+        "includeAll": false
+      },
+      {
+        "name": "🕹️ TapTap",
+        "type": "select",
+        "proxies": "DIRECT, 🎚️ 节点选择, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others",
+        "url": "",
+        "interval": "",
+        "tolerance": "",
+        "strategy": "",
+        "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/taptap.png",
+        "filter": "",
+        "includeAll": false
+      },
+      {
+        "name": "⚡ Speedtest",
+        "type": "select",
+        "proxies": "🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others",
+        "url": "",
+        "interval": "",
+        "tolerance": "",
+        "strategy": "",
+        "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/speedtest.png",
+        "filter": "",
+        "includeAll": false
+      },
+      {
+        "name": "🔌 特殊端口",
+        "type": "select",
+        "proxies": "🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others",
+        "url": "",
+        "interval": "",
+        "tolerance": "",
+        "strategy": "",
+        "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/port.png",
+        "filter": "",
+        "includeAll": false
+      },
+      {
+        "name": "❎ 广告拦截",
+        "type": "select",
+        "proxies": "🎚️ 节点选择, DIRECT, REJECT",
+        "url": "",
+        "interval": "",
+        "tolerance": "",
+        "strategy": "",
+        "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/adguard.png",
+        "filter": "",
+        "includeAll": false
+      },
+      {
+        "name": "😈 R18",
+        "type": "select",
+        "proxies": "🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others",
+        "url": "",
+        "interval": "",
+        "tolerance": "",
+        "strategy": "",
+        "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/r18.png",
+        "filter": "",
+        "includeAll": false
+      },
+      {
+        "name": "🏯 China",
+        "type": "select",
+        "proxies": "DIRECT, 🎚️ 节点选择, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others",
+        "url": "",
+        "interval": "",
+        "tolerance": "",
+        "strategy": "",
+        "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/cn.png",
+        "filter": "",
+        "includeAll": false
+      },
+      {
+        "name": "🏁 Final",
+        "type": "select",
+        "proxies": "🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others",
+        "url": "",
+        "interval": "",
+        "tolerance": "",
+        "strategy": "",
+        "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/final.png",
+        "filter": "",
+        "includeAll": false
+      },
+      {
+        "name": "🌆 Hong Kong",
+        "type": "select",
+        "proxies": "",
+        "url": "",
+        "interval": "",
+        "tolerance": "",
+        "strategy": "",
+        "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/hk.png",
+        "filter": "(?i)^(?!=>).*(?:🇭🇰|香港|Hong\\s?Kong|\\b(?:HK|HKG)\\d*\\b)",
+        "includeAll": true
+      },
+      {
+        "name": "🧋 Taiwan",
+        "type": "select",
+        "proxies": "",
+        "url": "",
+        "interval": "",
+        "tolerance": "",
+        "strategy": "",
+        "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/tw.png",
+        "filter": "(?i)^(?!=>).*(?:🇹🇼|台湾|Tai(?:wan)?|\\b(?:TW|TWN)\\d*\\b)",
+        "includeAll": true
+      },
+      {
+        "name": "⛩️ Japan",
+        "type": "select",
+        "proxies": "",
+        "url": "",
+        "interval": "",
+        "tolerance": "",
+        "strategy": "",
+        "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/jp.png",
+        "filter": "(?i)^(?!=>).*(?:🇯🇵|日本|川日|东京|大阪|埼玉|Japan|\\b(?:JP|JPN)\\d*\\b)",
+        "includeAll": true
+      },
+      {
+        "name": "🎤 South Korea",
+        "type": "select",
+        "proxies": "",
+        "url": "",
+        "interval": "",
+        "tolerance": "",
+        "strategy": "",
+        "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/kr.png",
+        "filter": "(?i)^(?!=>).*(?:🇰🇷|韩国|韓|首尔|Korea|\\b(?:KR|KOR)\\d*\\b)",
+        "includeAll": true
+      },
+      {
+        "name": "🏙️ Singapore",
+        "type": "select",
+        "proxies": "",
+        "url": "",
+        "interval": "",
+        "tolerance": "",
+        "strategy": "",
+        "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/sg.png",
+        "filter": "(?i)^(?!=>).*(?:🇸🇬|新加坡|狮|Singapore|\\b(?:SG|SGP)\\d*\\b)",
+        "includeAll": true
+      },
+      {
+        "name": "🗽 United States",
+        "type": "select",
+        "proxies": "",
+        "url": "",
+        "interval": "",
+        "tolerance": "",
+        "strategy": "",
+        "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/us.png",
+        "filter": "(?i)^(?!=>).*(?:🇺🇸|美国|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|拉斯维加斯|United States|\\b(?:US|USA)\\d*\\b)",
+        "includeAll": true
+      },
+      {
+        "name": "🌌 Others",
+        "type": "select",
+        "proxies": "",
+        "url": "",
+        "interval": "",
+        "tolerance": "",
+        "strategy": "",
+        "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/others.png",
+        "filter": "^(?!.*(?:(?i)=>|(?i:🇭🇰|香港|Hong\\s?Kong|\\b(?:HK|HKG)\\d*\\b)|(?i:🇹🇼|台湾|Tai(?:wan)?|\\b(?:TW|TWN)\\d*\\b)|(?i:🇯🇵|日本|川日|东京|大阪|埼玉|Japan|\\b(?:JP|JPN)\\d*\\b)|(?i:🇰🇷|韩国|韓|首尔|Korea|\\b(?:KR|KOR)\\d*\\b)|(?i:🇸🇬|新加坡|狮|Singapore|\\b(?:SG|SGP)\\d*\\b)|(?i:🇺🇸|美国|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|拉斯维加斯|United States|\\b(?:US|USA)\\d*\\b)|群|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|剩余流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|超时|收藏|福利|失联|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author|Traffic|\\d{4}-\\d{2}-\\d{2}|\\d+G)).*$",
+        "includeAll": true
+      }
+    ],
+    "rules": [
+      {
+        "rule": "GEOSITE,adobe,🎨 Adobe",
+        "type": "GEOSITE",
+        "key": "adobe",
+        "target": "🎨 Adobe",
+        "extra": "",
+        "enabled": true
+      },
+      {
+        "rule": "RULE-SET,❎ AdGuard,❎ 广告拦截",
+        "type": "RULE-SET",
+        "key": "❎ AdGuard",
+        "target": "❎ 广告拦截",
+        "extra": "",
+        "enabled": true
+      },
+      {
+        "rule": "GEOSITE,private,DIRECT",
+        "type": "GEOSITE",
+        "key": "private",
+        "target": "DIRECT",
+        "extra": "",
+        "enabled": true
+      },
+      {
+        "rule": "GEOIP,private,DIRECT,no-resolve",
+        "type": "GEOIP",
+        "key": "private",
+        "target": "DIRECT",
+        "extra": "no-resolve",
+        "enabled": true
+      },
+      {
+        "rule": "RULE-SET,📦 Cargo Downloads,📦 下载均衡",
+        "type": "RULE-SET",
+        "key": "📦 Cargo Downloads",
+        "target": "📦 下载均衡",
+        "extra": "",
+        "enabled": true
+      },
+      {
+        "rule": "RULE-SET,🪐 Astra Domain,DIRECT",
+        "type": "RULE-SET",
+        "key": "🪐 Astra Domain",
+        "target": "DIRECT",
+        "extra": "",
+        "enabled": true
+      },
+      {
+        "rule": "RULE-SET,🔮 Prism IP,DIRECT",
+        "type": "RULE-SET",
+        "key": "🔮 Prism IP",
+        "target": "DIRECT",
+        "extra": "",
+        "enabled": true
+      },
+      {
+        "rule": "RULE-SET,🪐 Orbit Domain,🎚️ 节点选择",
+        "type": "RULE-SET",
+        "key": "🪐 Orbit Domain",
+        "target": "🎚️ 节点选择",
+        "extra": "",
+        "enabled": true
+      },
+      {
+        "rule": "RULE-SET,🚀 Voyager IP,🎚️ 节点选择",
+        "type": "RULE-SET",
+        "key": "🚀 Voyager IP",
+        "target": "🎚️ 节点选择",
+        "extra": "",
+        "enabled": true
+      },
+      {
+        "rule": "GEOSITE,cn,DIRECT",
+        "type": "GEOSITE",
+        "key": "cn",
+        "target": "DIRECT",
+        "extra": "",
+        "enabled": true
+      },
+      {
+        "rule": "GEOIP,cn,DIRECT,no-resolve",
+        "type": "GEOIP",
+        "key": "cn",
+        "target": "DIRECT",
+        "extra": "no-resolve",
+        "enabled": true
+      },
+      {
+        "rule": "GEOIP,cn,DIRECT",
+        "type": "GEOIP",
+        "key": "cn",
+        "target": "DIRECT",
+        "extra": "",
+        "enabled": true
+      },
+      {
+        "rule": "GEOSITE,google-cn,DIRECT",
+        "type": "GEOSITE",
+        "key": "google-cn",
+        "target": "DIRECT",
+        "extra": "",
+        "enabled": true
+      },
+      {
+        "rule": "GEOSITE,steam@cn,DIRECT",
+        "type": "GEOSITE",
+        "key": "steam@cn",
+        "target": "DIRECT",
+        "extra": "",
+        "enabled": true
+      },
+      {
+        "rule": "GEOSITE,steam,👾 Steam",
+        "type": "GEOSITE",
+        "key": "steam",
+        "target": "👾 Steam",
+        "extra": "",
+        "enabled": true
+      },
+      {
+        "rule": "GEOSITE,epicgames,🎁 Epic",
+        "type": "GEOSITE",
+        "key": "epicgames",
+        "target": "🎁 Epic",
+        "extra": "",
+        "enabled": true
+      },
+      {
+        "rule": "GEOSITE,taptap,🕹️ TapTap",
+        "type": "GEOSITE",
+        "key": "taptap",
+        "target": "🕹️ TapTap",
+        "extra": "",
+        "enabled": true
+      },
+      {
+        "rule": "GEOSITE,category-games,DIRECT",
+        "type": "GEOSITE",
+        "key": "category-games",
+        "target": "DIRECT",
+        "extra": "",
+        "enabled": true
+      },
+      {
+        "rule": "GEOSITE,category-public-tracker,DIRECT",
+        "type": "GEOSITE",
+        "key": "category-public-tracker",
+        "target": "DIRECT",
+        "extra": "",
+        "enabled": true
+      },
+      {
+        "rule": "GEOSITE,netflix,🍿 Netflix",
+        "type": "GEOSITE",
+        "key": "netflix",
+        "target": "🍿 Netflix",
+        "extra": "",
+        "enabled": true
+      },
+      {
+        "rule": "GEOSITE,hulu,📺 Hulu",
+        "type": "GEOSITE",
+        "key": "hulu",
+        "target": "📺 Hulu",
+        "extra": "",
+        "enabled": true
+      },
+      {
+        "rule": "GEOSITE,primevideo,📦 Prime Video",
+        "type": "GEOSITE",
+        "key": "primevideo",
+        "target": "📦 Prime Video",
+        "extra": "",
+        "enabled": true
+      },
+      {
+        "rule": "GEOSITE,hbo,🎬 HBO",
+        "type": "GEOSITE",
+        "key": "hbo",
+        "target": "🎬 HBO",
+        "extra": "",
+        "enabled": true
+      },
+      {
+        "rule": "GEOSITE,disney,🏰 Disney+",
+        "type": "GEOSITE",
+        "key": "disney",
+        "target": "🏰 Disney+",
+        "extra": "",
+        "enabled": true
+      },
+      {
+        "rule": "GEOSITE,twitch,🟣 Twitch",
+        "type": "GEOSITE",
+        "key": "twitch",
+        "target": "🟣 Twitch",
+        "extra": "",
+        "enabled": true
+      },
+      {
+        "rule": "GEOSITE,spotify,💚 Spotify",
+        "type": "GEOSITE",
+        "key": "spotify",
+        "target": "💚 Spotify",
+        "extra": "",
+        "enabled": true
+      },
+      {
+        "rule": "GEOSITE,bilibili,📺 Bilibili",
+        "type": "GEOSITE",
+        "key": "bilibili",
+        "target": "📺 Bilibili",
+        "extra": "",
+        "enabled": true
+      },
+      {
+        "rule": "GEOSITE,telegram,🪽 Telegram",
+        "type": "GEOSITE",
+        "key": "telegram",
+        "target": "🪽 Telegram",
+        "extra": "",
+        "enabled": true
+      },
+      {
+        "rule": "GEOSITE,openai,⚡ OpenAI",
+        "type": "GEOSITE",
+        "key": "openai",
+        "target": "⚡ OpenAI",
+        "extra": "",
+        "enabled": true
+      },
+      {
+        "rule": "GEOSITE,anthropic,🪐 Anthropic",
+        "type": "GEOSITE",
+        "key": "anthropic",
+        "target": "🪐 Anthropic",
+        "extra": "",
+        "enabled": true
+      },
+      {
+        "rule": "GEOSITE,category-ai-!cn,✨ AI 服务",
+        "type": "GEOSITE",
+        "key": "category-ai-!cn",
+        "target": "✨ AI 服务",
+        "extra": "",
+        "enabled": true
+      },
+      {
+        "rule": "GEOSITE,apple,⚪ Apple",
+        "type": "GEOSITE",
+        "key": "apple",
+        "target": "⚪ Apple",
+        "extra": "",
+        "enabled": true
+      },
+      {
+        "rule": "GEOSITE,youtube,📺 YouTube",
+        "type": "GEOSITE",
+        "key": "youtube",
+        "target": "📺 YouTube",
+        "extra": "",
+        "enabled": true
+      },
+      {
+        "rule": "GEOSITE,tiktok,🎶 TikTok",
+        "type": "GEOSITE",
+        "key": "tiktok",
+        "target": "🎶 TikTok",
+        "extra": "",
+        "enabled": true
+      },
+      {
+        "rule": "GEOSITE,instagram,♾️ Meta",
+        "type": "GEOSITE",
+        "key": "instagram",
+        "target": "♾️ Meta",
+        "extra": "",
+        "enabled": true
+      },
+      {
+        "rule": "GEOSITE,twitter,𝕏 X",
+        "type": "GEOSITE",
+        "key": "twitter",
+        "target": "𝕏 X",
+        "extra": "",
+        "enabled": true
+      },
+      {
+        "rule": "GEOSITE,github,🐙 GitHub",
+        "type": "GEOSITE",
+        "key": "github",
+        "target": "🐙 GitHub",
+        "extra": "",
+        "enabled": true
+      },
+      {
+        "rule": "GEOSITE,category-speedtest,⚡ Speedtest",
+        "type": "GEOSITE",
+        "key": "category-speedtest",
+        "target": "⚡ Speedtest",
+        "extra": "",
+        "enabled": true
+      },
+      {
+        "rule": "GEOSITE,okx,⬛ OKX",
+        "type": "GEOSITE",
+        "key": "okx",
+        "target": "⬛ OKX",
+        "extra": "",
+        "enabled": true
+      },
+      {
+        "rule": "GEOSITE,binance,🟨 Binance",
+        "type": "GEOSITE",
+        "key": "binance",
+        "target": "🟨 Binance",
+        "extra": "",
+        "enabled": true
+      },
+      {
+        "rule": "GEOSITE,bybit,🟧 Bybit",
+        "type": "GEOSITE",
+        "key": "bybit",
+        "target": "🟧 Bybit",
+        "extra": "",
+        "enabled": true
+      },
+      {
+        "rule": "GEOSITE,discord,🎮 Discord",
+        "type": "GEOSITE",
+        "key": "discord",
+        "target": "🎮 Discord",
+        "extra": "",
+        "enabled": true
+      },
+      {
+        "rule": "GEOSITE,category-communication,💬 Chat",
+        "type": "GEOSITE",
+        "key": "category-communication",
+        "target": "💬 Chat",
+        "extra": "",
+        "enabled": true
+      },
+      {
+        "rule": "GEOSITE,category-social-media-!cn,🫂 Social",
+        "type": "GEOSITE",
+        "key": "category-social-media-!cn",
+        "target": "🫂 Social",
+        "extra": "",
+        "enabled": true
+      },
+      {
+        "rule": "GEOSITE,cloudflare,☁️ Cloudflare",
+        "type": "GEOSITE",
+        "key": "cloudflare",
+        "target": "☁️ Cloudflare",
+        "extra": "",
+        "enabled": true
+      },
+      {
+        "rule": "GEOSITE,google,✨ Google",
+        "type": "GEOSITE",
+        "key": "google",
+        "target": "✨ Google",
+        "extra": "",
+        "enabled": true
+      },
+      {
+        "rule": "GEOSITE,microsoft,🪟 Microsoft",
+        "type": "GEOSITE",
+        "key": "microsoft",
+        "target": "🪟 Microsoft",
+        "extra": "",
+        "enabled": true
+      },
+      {
+        "rule": "GEOSITE,category-cryptocurrency,🪙 Crypto",
+        "type": "GEOSITE",
+        "key": "category-cryptocurrency",
+        "target": "🪙 Crypto",
+        "extra": "",
+        "enabled": true
+      },
+      {
+        "rule": "GEOSITE,amazon,📦 Amazon",
+        "type": "GEOSITE",
+        "key": "amazon",
+        "target": "📦 Amazon",
+        "extra": "",
+        "enabled": true
+      },
+      {
+        "rule": "GEOSITE,category-porn,😈 R18",
+        "type": "GEOSITE",
+        "key": "category-porn",
+        "target": "😈 R18",
+        "extra": "",
+        "enabled": true
+      },
+      {
+        "rule": "GEOSITE,category-media,📰 News",
+        "type": "GEOSITE",
+        "key": "category-media",
+        "target": "📰 News",
+        "extra": "",
+        "enabled": true
+      },
+      {
+        "rule": "GEOSITE,category-entertainment,🍿 Entertainment",
+        "type": "GEOSITE",
+        "key": "category-entertainment",
+        "target": "🍿 Entertainment",
+        "extra": "",
+        "enabled": true
+      },
+      {
+        "rule": "RULE-SET,⚡ Matrix Port,🔌 特殊端口",
+        "type": "RULE-SET",
+        "key": "⚡ Matrix Port",
+        "target": "🔌 特殊端口",
+        "extra": "",
+        "enabled": true
+      },
+      {
+        "rule": "GEOSITE,gfw,🎚️ 节点选择",
+        "type": "GEOSITE",
+        "key": "gfw",
+        "target": "🎚️ 节点选择",
+        "extra": "",
+        "enabled": true
+      },
+      {
+        "rule": "MATCH,🏁 Final",
+        "type": "MATCH",
+        "key": "🏁 Final",
+        "target": "",
+        "extra": "",
+        "enabled": true
+      }
+    ]
+  },
+  "version": "fd96385fec5c"
 }

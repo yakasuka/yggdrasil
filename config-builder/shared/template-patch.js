@@ -15,6 +15,13 @@
 //   { kind:"remove",  name }                 // comment out group + its rules
 //   { kind:"rule",    rule, enabled:boolean }// comment/uncomment a rule line
 //   { kind:"add-app", name, label, category, icon, rule, firstDirect }
+//   { kind:"general", fields:{port?, ...} }  // top-level general settings
+//   { kind:"filter",  id, value }            // FilterAll / FilterOthers / region regex
+//   { kind:"group-props", name, fields }     // type / url / interval / proxies / ...
+//   { kind:"rule-text", rule, value }        // rewrite one rule line in place
+//   { kind:"rule-move", rule, to:"up"|"down" }
+//   { kind:"rule-add", rule }                // insert before MATCH
+//   { kind:"provider", name, fields }        // rule-providers entry
 
 const escapeRe = (s) => String(s).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
@@ -177,6 +184,156 @@ function applyAddApp(lines, op) {
   }
 }
 
+// Render a value back into a YAML flow map without losing the author's inline
+// comment or the surrounding one-line style.
+function yamlValue(value, key) {
+  if (key === "proxies" || Array.isArray(value)) {
+    const inner = Array.isArray(value) ? value.join(", ") : String(value).replace(/^\[|\]$/g, "");
+    return "[" + inner + "]";
+  }
+  if (typeof value === "boolean" || typeof value === "number") return String(value);
+  const s = String(value ?? "");
+  if (s === "") return '""';
+  if (/^(true|false|null|~)$/i.test(s) || /^[-+]?\d+(\.\d+)?$/.test(s)) return s;
+  // Loopback controller values are valid plain scalars even with a colon.
+  if (/^127\.0\.0\.1:\d+$/.test(s)) return s;
+  return JSON.stringify(s);
+}
+
+function replaceFlowValue(line, key, value) {
+  const re = new RegExp(
+    "(\\b" + escapeRe(key) + "\\s*:\\s*)(?:\"[^\"]*\"|'[^']*'|\\[[^\\]]*\\]|\\*[\\w-]+|[^\\s,}]+)",
+  );
+  if (!re.test(line)) throw Error("策略组缺少可编辑字段：" + key);
+  return line.replace(re, (_m, prefix) => prefix + yamlValue(value, key));
+}
+
+function applyGeneral(lines, op) {
+  for (const [key, value] of Object.entries(op.fields || {})) {
+    const idx = lines.findIndex((line) => new RegExp("^" + escapeRe(key) + "\\s*:").test(line));
+    if (idx < 0) throw Error("找不到基础设置：" + key);
+    const line = lines[idx];
+    const commentAt = line.indexOf(" #");
+    const comment = commentAt >= 0 ? line.slice(commentAt).trimEnd() : "";
+    const head = (commentAt >= 0 ? line.slice(0, commentAt) : line).trimEnd();
+    lines[idx] = head.slice(0, head.indexOf(":") + 1) + " " + yamlValue(value, key) + (comment ? "         " + comment : "");
+  }
+}
+
+function applyFilter(lines, op) {
+  const id = String(op.id || "");
+  const key = id === "all" ? "FilterAll" : id === "others" ? "FilterOthers" : id;
+  const anchor = "&" + (key.startsWith("Filter") ? key : "Filter" + key) + " ";
+  const idx = lines.findIndex((line) => {
+    const t = line.trimStart();
+    return t.startsWith(key + ":") && t.includes(anchor);
+  });
+  if (idx < 0) throw Error("找不到节点筛选规则：" + id);
+  const value = String(op.value ?? "").replace(/'/g, "''");
+  const cut = lines[idx].indexOf(anchor) + anchor.length;
+  lines[idx] = lines[idx].slice(0, cut) + "'" + value + "'";
+}
+
+function applyGroupProps(lines, op) {
+  const idx = groupLineIndex(lines, op.name);
+  if (idx < 0) throw Error("找不到策略组：" + op.name);
+  for (const [key, value] of Object.entries(op.fields || {})) {
+    if (key === "proxies") {
+      lines[idx] = lines[idx].replace(
+        /proxies:\s*\[[^\]]*\]/,
+        "proxies: " + yamlValue(value, "proxies"),
+      );
+    } else {
+      lines[idx] = replaceFlowValue(lines[idx], key, value);
+    }
+  }
+}
+
+function ruleLineIndex(lines, rule) {
+  const needle = String(rule || "").trim();
+  return lines.findIndex((line) => {
+    const t = line.trim().replace(/^#\s*/, "").replace(/^-\s*/, "");
+    return t === needle;
+  });
+}
+
+function rulesRange(lines) {
+  const start = lines.findIndex((l) => /^rules:\s*$/.test(l.trim()));
+  if (start < 0) throw Error("模板缺少 rules: 段");
+  let end = lines.length;
+  for (let i = start + 1; i < lines.length; i++) {
+    if (/^\S/.test(lines[i])) { end = i; break; }
+  }
+  return [start, end];
+}
+
+function applyRuleText(lines, op) {
+  const idx = ruleLineIndex(lines, op.rule);
+  if (idx < 0) throw Error("找不到规则：" + op.rule);
+  const m = lines[idx].match(/^(\s*)(#\s*)?-\s+.*$/);
+  if (!m) throw Error("规则行格式不受支持：" + op.rule);
+  const value = String(op.value || "").replace(/^\s*-\s*/, "").trim();
+  if (!/^(GEOSITE|RULE-SET|GEOIP|DOMAIN|IP|MATCH)/i.test(value))
+    throw Error("规则必须以 GEOSITE / RULE-SET / GEOIP 等类型开头");
+  lines[idx] = m[1] + (m[2] || "") + "- " + value;
+}
+
+function applyRuleMove(lines, op) {
+  const idx = ruleLineIndex(lines, op.rule);
+  if (idx < 0) throw Error("找不到规则：" + op.rule);
+  const [start, end] = rulesRange(lines);
+  const up = op.to !== "down";
+  let target = up ? idx - 1 : idx + 1;
+  while (target > start && target < end - 1 &&
+         (!lines[target].trim() || /^\s*#/.test(lines[target]))) {
+    target += up ? -1 : 1;
+  }
+  if (target <= start || target >= end) return;
+  const tmp = lines[idx];
+  lines[idx] = lines[target];
+  lines[target] = tmp;
+}
+
+function applyRuleAdd(lines, op) {
+  const [start, end] = rulesRange(lines);
+  const value = String(op.rule || "").replace(/^\s*-\s*/, "").trim();
+  if (!/^(GEOSITE|RULE-SET|GEOIP|DOMAIN|IP|MATCH)/i.test(value))
+    throw Error("规则必须以 GEOSITE / RULE-SET / GEOIP 等类型开头");
+  let at = end;
+  for (let i = start + 1; i < end; i++) {
+    if (/^\s*-\s*MATCH,/i.test(lines[i])) { at = i; break; }
+  }
+  lines.splice(at, 0, "  - " + value);
+}
+
+function sectionRange(lines, heading) {
+  const start = lines.findIndex((l) => new RegExp("^" + escapeRe(heading) + "\\s*:\\s*$").test(l.trim()));
+  if (start < 0) throw Error("模板缺少 " + heading + ": 段");
+  let end = lines.length;
+  for (let i = start + 1; i < lines.length; i++) {
+    if (/^\S/.test(lines[i])) { end = i; break; }
+  }
+  return [start, end];
+}
+
+function applyProvider(lines, op) {
+  const [start, end] = sectionRange(lines, "rule-providers");
+  const idx = lines.findIndex((line, i) =>
+    i > start && i < end &&
+    new RegExp("^\\s*" + escapeRe(op.name) + "\\s*:\\s*\\{").test(line));
+  if (idx < 0) throw Error("找不到规则源：" + op.name);
+  for (const [key, value] of Object.entries(op.fields || {})) {
+    if (key === "<<") throw Error("锚点字段不可编辑");
+    const re = new RegExp("(\\b" + escapeRe(key) + "\\s*:\\s*)(?:\"[^\"]*\"|'[^']*'|[^\\s,}]+)");
+    if (re.test(lines[idx])) {
+      lines[idx] = replaceFlowValue(lines[idx], key, value);
+    } else {
+      // Inherited from an anchor — make the override explicit on this line.
+      lines[idx] = lines[idx].replace(/(\{\s*)/, "$1" + key + ": " + yamlValue(value, key) + ", ");
+    }
+  }
+}
+
 /**
  * Apply a list of operations to template text. Returns the patched text.
  * `parse` is the YAML flow parser (from the `yaml` package) used to merge
@@ -194,6 +351,13 @@ export function applyTemplateOps(text, ops, parse) {
       case "remove": applyRemove(lines, op); break;
       case "rule": applyRule(lines, op); break;
       case "add-app": applyAddApp(lines, op); break;
+      case "general": applyGeneral(lines, op); break;
+      case "filter": applyFilter(lines, op); break;
+      case "group-props": applyGroupProps(lines, op); break;
+      case "rule-text": applyRuleText(lines, op); break;
+      case "rule-move": applyRuleMove(lines, op); break;
+      case "rule-add": applyRuleAdd(lines, op); break;
+      case "provider": applyProvider(lines, op); break;
       default: throw Error("未知编辑操作：" + op.kind);
     }
   }

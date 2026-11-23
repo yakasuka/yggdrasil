@@ -346,6 +346,60 @@ export async function catalogFromYaml(text) {
       return { rule, module };
     });
 
+  // Owner-facing view of the raw template. The dashboard needs every editable
+  // knob — general settings, raw filters, full group properties, and all rule
+  // lines including commented-out ones — while the compiler keeps using the
+  // stable schema-2 fields above. Keeping this view additive means no existing
+  // consumer has to change when the editor grows a new control.
+  const general = {};
+  for (const key of [
+    "port", "socks-port", "allow-lan", "mode", "log-level",
+    "external-controller", "unified-delay",
+  ]) {
+    if (key in t) general[key] = t[key];
+  }
+  const editorRules = [];
+  let inRules = false;
+  for (const line of text.split(/\r?\n/)) {
+    if (/^rules:\s*$/.test(line.trim())) { inRules = true; continue; }
+    if (inRules && /^\S/.test(line)) break;
+    if (!inRules) continue;
+    const m = line.match(/^(\s*)(#\s*)?-\s+(.+?)\s*$/);
+    if (!m) continue;
+    const rule = m[3].trim();
+    if (!/^(GEOSITE|RULE-SET|GEOIP|DOMAIN|IP|MATCH)/i.test(rule)) continue;
+    const parts = rule.split(",");
+    editorRules.push({
+      rule,
+      type: parts[0],
+      key: parts[1] || "",
+      target: parts[2] || "",
+      extra: parts.slice(3).join(","),
+      enabled: !m[2],
+    });
+  }
+  const editor = {
+    general,
+    filters: {
+      all: t.FilterAll || "",
+      others: t.FilterOthers || "",
+      regions: { ...(t.FilterRegions || {}) },
+    },
+    groups: groups.map((g) => ({
+      name: g.name,
+      type: g.type || "",
+      proxies: Array.isArray(g.proxies) ? g.proxies.join(", ") : "",
+      url: g.url || "",
+      interval: g.interval ?? "",
+      tolerance: g.tolerance ?? "",
+      strategy: g.strategy || "",
+      icon: g.icon || "",
+      filter: g.filter == null ? "" : String(g.filter),
+      includeAll: !!g["include-all"],
+    })),
+    rules: editorRules,
+  };
+
   const model = {
     schema: 2,
     source: "ratatoskr-template.yaml (derived)",
@@ -365,6 +419,7 @@ export async function catalogFromYaml(text) {
     baseRules: orderedRules.filter((r) => r.module),
     providerModules,
     moduleMeta,
+    editor,
   };
   model.version = await hash(JSON.stringify(model));
   return model;

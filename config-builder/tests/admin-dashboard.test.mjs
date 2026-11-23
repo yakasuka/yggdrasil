@@ -98,6 +98,13 @@ test("dashboard uses the builder stylesheet and renders stats as styled chips", 
   // The dashboard shares the configurator's design tokens verbatim.
   assert.match(html, /--glass:/);
   assert.match(html, /class="caustic-hero"/);
+  // Every editable part of the template has its own graphical section.
+  ["fi-general", "fi-apps", "fi-regions", "fi-strategies", "fi-core",
+   "fi-filters", "fi-rules", "fi-rule-list", "fi-providers"].forEach((id) =>
+    assert.ok(html.includes('id="' + id + '"'), "dashboard section " + id));
+  assert.match(html, /function buildOps/);
+  assert.match(html, /kind:"group-props"/);
+  assert.match(html, /kind:"provider"/);
   assert.match(html, /class="site-header"/);
   // Stats must be real elements with a class, not stray "stat" text nodes —
   // the old el("div","stat") bug rendered "stat地区 6 stat应用 39..." as text.
