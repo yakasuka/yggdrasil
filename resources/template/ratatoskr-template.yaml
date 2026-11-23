@@ -7,7 +7,7 @@
 # url 填写实际节点订阅地址；支持的订阅格式以当前 Mihomo 内核为准
 # proxy-providers:  # 远程节点订阅入口
 #   xyang:  # 订阅名称，供策略组引用或自动汇入使用
-#     url: "https://example.com/sub?token=YOUR_SUBSCRIPTION_TOKEN"  # 机场提供的节点订阅地址
+#     url: "https://example.com/sub?token=xxxxx"  # 机场提供的节点订阅地址
 #     type: http  # HTTP 型订阅，下载远程节点内容
 #     interval: 86400  # 订阅更新间隔：86400 秒 / 24 小时
 #     health-check: {enable: true, lazy: true, url: "https://www.gstatic.com/generate_204", interval: 3600, timeout: 10000}  # 启用延迟测试，间隔 3600 秒；lazy 表示未使用时不主动定时测速
@@ -15,6 +15,7 @@
 
 # ── 自动订阅区域 / Auto Providers ──
 # 预留自动写入区域；使用自动注入功能时保留下面的起止标记
+
 # >>> AUTO-PROVIDERS-START
 
 # <<< AUTO-PROVIDERS-END
