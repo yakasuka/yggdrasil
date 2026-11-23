@@ -64,17 +64,22 @@ test("manual default maps to the template group name when compiling", async () =
   assert.equal(gateway.proxies[0], catalog.groups.manual);
 });
 
-test("strategy panel renders six cards with 节点选择 selected by default", () => {
+test("strategy panel shows a fixed 节点选择 exit, not a redundant dropdown", () => {
   const html = strategiesPanel({
     profile: {
       strategies: ["auto", ...CORE_STRATEGY_IDS],
       defaultStrategy: "gateway",
+      countries: ["JP"],
+      other: false,
     },
   });
   assert.equal((html.match(/data-strategy=/g) || []).length, 6);
   assert.match(html, /🎚️ 节点选择/);
   assert.match(html, /🚀 手动切换/);
   assert.match(html, /data-strategy="gateway"[^>]* disabled/);
-  assert.match(html, /<option value="gateway"[^>]* selected>节点选择<\/option>/);
-  assert.match(html, /首次打开客户端时使用/);
+  assert.match(html, /default-exit-head[\s\S]*?节点选择/);
+  assert.match(html, /⚡ 自动选择/);
+  assert.match(html, /已勾选的地区节点/);
+  assert.doesNotMatch(html, /id="default-strategy"/);
+  assert.doesNotMatch(html, /<option/);
 });

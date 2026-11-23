@@ -16,7 +16,7 @@ export const STRATEGY_VIEW = [
     name: "🎚️ 节点选择",
     label: "节点选择",
     description: "所有规则的统一出口，在这里切换一次即可更换全部节点。",
-    icon: "../assets/icons/proxy.png",
+    icon: "../assets/icons/switch.png",
     fixed: true,
   },
   {
@@ -24,7 +24,7 @@ export const STRATEGY_VIEW = [
     name: "🚀 手动切换",
     label: "手动切换",
     description: "汇集全部节点，手动挑选具体出口。",
-    icon: "../assets/icons/switch.png",
+    icon: "../assets/icons/proxy.png",
     fixed: true,
   },
   {
