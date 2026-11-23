@@ -9,9 +9,17 @@ import {
   parseConfigQuery,
 } from "../shared/config-link.js";
 import { createWorker } from "../worker/application.js";
+import { catalogLoader } from "../worker/catalog.js";
 import { dashboardHTML } from "./dashboard.js";
 import { loadConfig, serviceEnv } from "./config.js";
 import { fileStorage } from "./storage.js";
+import {
+  FRONTINFO_KEY,
+  clearFrontInfo,
+  draftAwareLoader,
+  readFrontInfo,
+  saveFrontInfo,
+} from "./frontinfo.js";
 import { createPresetStore } from "./presets.js";
 import { fetcher, ipFetcher, probe, resolver } from "./node-platform.js";
 import { createUrlProbe } from "./url-probe.js";
@@ -28,6 +36,7 @@ const INTERNAL_PARTS = /^([A-Za-z0-9_-]{22})\/([A-Za-z0-9_-]{43})$/;
 const ID_RE = /^[A-Za-z0-9_-]{22}$/;
 const KEY_RE = /^[A-Za-z0-9_-]{43}$/;
 const ADMIN_PATH = "/api/admin/configs";
+const FRONTINFO_PATH = "/api/admin/frontinfo";
 const DASHBOARD_PATH = CONFIG_PATH + "/dashboard";
 
 function aliasFromFilename(filename) {
@@ -187,7 +196,14 @@ export function createService({
     });
     if (urlProbe) effectivePlatform = { ...platform, urlProbe };
   }
-  const application = createWorker({ ...effectivePlatform });
+  // A saved front-end draft must change what the public /api/catalog serves
+  // immediately, before any Action commits it. Wrap the normal loader so the
+  // draft wins while one exists; the template text is public, non-secret data.
+  const loadCatalog = draftAwareLoader(
+    storage,
+    catalogLoader(effectivePlatform.fetcher),
+  );
+  const application = createWorker({ ...effectivePlatform, loadCatalog });
   const env = serviceEnv(config, storage);
   const presets = createPresetStore(storage, { ttl: config.presetTtl });
 
@@ -237,6 +253,8 @@ export function createService({
         const html = dashboardHTML({
           linkBase: config.publicLinkBase || base + CONFIG_PATH,
           adminPath: ADMIN_PATH,
+          frontInfoPath: FRONTINFO_PATH,
+          catalogPath: SERVICE_ROUTES.catalog,
         });
         return withCors(
           request,
@@ -257,7 +275,10 @@ export function createService({
 
       // Owner-only management API. Not linked from any frontend or endpoint
       // discovery response; requires HTTP Basic credentials from ADMIN_USERS.
-      if (path === ADMIN_PATH && !adminAuthorized(request, config))
+      if (
+        (path === ADMIN_PATH || path === FRONTINFO_PATH) &&
+        !adminAuthorized(request, config)
+      )
         return withCors(request, unauthorized(), config);
       if (path === ADMIN_PATH && method === "GET") {
         const records = await storage.list();
@@ -335,6 +356,56 @@ export function createService({
         await storage.delete(key);
         await storage.delete("profile:" + mapping.id);
         return withCors(request, json({ removed: true }), config);
+      }
+
+      // Owner-editable front-end information (the Ratatoskr YAML template).
+      // GET loads the current draft, PUT validates + saves an edit, DELETE
+      // discards the draft and falls back to the committed repository version.
+      if (path === FRONTINFO_PATH && method === "GET")
+        return withCors(request, json(await readFrontInfo(storage)), config);
+      if (path === FRONTINFO_PATH && method === "DELETE") {
+        await clearFrontInfo(storage);
+        return withCors(request, json({ removed: true }), config);
+      }
+      if (path === FRONTINFO_PATH && method === "PUT") {
+        const raw = await request.text();
+        let payload;
+        try {
+          payload = JSON.parse(raw);
+        } catch {
+          return withCors(request, json({ error: "请求内容无效。" }, 400), config);
+        }
+        let saved;
+        try {
+          saved = await saveFrontInfo(storage, payload?.text);
+        } catch (error) {
+          return withCors(
+            request,
+            json({ error: error.message || "模板校验失败。" }, 400),
+            config,
+          );
+        }
+        return withCors(
+          request,
+          json({ ok: true, updatedAt: saved.updatedAt, summary: saved.summary }),
+          config,
+        );
+      }
+
+      // Public, read-only draft feed for the sync Action. The template is
+      // non-secret (it is already published in the repository), so exposing
+      // the current draft here lets GitHub Actions pull it with plain HTTPS —
+      // no PAT or backend-held GitHub credential required. Returns 204 when
+      // there is no pending draft.
+      if (path === "/api/frontinfo" && method === "GET") {
+        const draft = await storage.get(FRONTINFO_KEY, "json");
+        if (!draft || typeof draft.text !== "string")
+          return withCors(request, new Response(null, { status: 204 }), config);
+        return withCors(
+          request,
+          json({ text: draft.text, updatedAt: draft.updatedAt || null }),
+          config,
+        );
       }
 
       // The backend is the only place that emits real links. The only

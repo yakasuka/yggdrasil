@@ -161,6 +161,7 @@ test("Pages Function routes and proxy source are published at the repo root", ()
     "/config-builder/dashboard/login",
     "/config-builder/dashboard/logout",
     "/api/admin/configs",
+    "/api/admin/frontinfo",
   ]);
   for (const file of [
     "functions/sub.js",
@@ -170,6 +171,7 @@ test("Pages Function routes and proxy source are published at the repo root", ()
     "functions/config-builder/dashboard/login.js",
     "functions/config-builder/dashboard/logout.js",
     "functions/api/admin/configs.js",
+    "functions/api/admin/frontinfo.js",
     "config-builder/shared/dashboard-login.js",
     "config-builder/shared/pages-proxy.js",
   ]) {
