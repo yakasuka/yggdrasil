@@ -1,10 +1,14 @@
 import { esc, checked, title, notice, usageCards, latencyPill, latencyLegend } from "../ui.js";
-import { catalog } from "../../shared/compiler.js";
+import { catalog, sortByOrder } from "../../shared/compiler.js";
 import { selectableRegions } from "../../shared/preview.js";
+import { displayOrder, widgetAttrs, removeBadge } from "../widget-mode.js";
 export function regionsPanel(ctx) {
   // Every template region is selectable, even when the subscription has no
   // nodes for it. The live inspection only supplies the displayed node count.
-  const regions = selectableRegions(catalog, ctx.inspection),
+  const regions = sortByOrder(
+      selectableRegions(catalog, ctx.inspection),
+      displayOrder("region", ctx.profile),
+    ),
     nodes = ctx.inspection?.nodes || [],
     withNodes = regions.filter((r) => r.count > 0).length;
   return (
@@ -21,7 +25,7 @@ export function regionsPanel(ctx) {
           true,
         )
       : "") +
-    `<div class="toolbar"><span class="muted">${nodes.length} 个节点 · ${regions.length} 个可选地区（${withNodes} 个有节点）</span><div class="toolbar-actions"><button class="text-button" data-regions="all">全部保留</button><button class="text-button" data-regions="none">全部取消</button></div></div><div class="region-bars">${regions.map((r) => `<label class="region-bar"><input type="checkbox" data-region="${r.id}"${checked(r.id === "OTHER" ? ctx.profile.other : ctx.profile.countries.includes(r.id))}>${r.icon ? `<img class="region-flag" src="${esc(r.icon)}" alt="" decoding="async" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'flag',textContent:'${esc(r.flag)}'}))">` : `<span class="flag" aria-hidden="true">${esc(r.flag)}</span>`}<span class="region-name">${esc(r.label)}</span><small class="region-count${r.count ? "" : " is-empty"}" title="${r.count ? `${r.count} 个节点` : "订阅中暂无节点，仍可勾选"}">${r.count}</small></label>`).join("")}</div>` +
+    `<div class="toolbar"><span class="muted">${nodes.length} 个节点 · ${regions.length} 个可选地区（${withNodes} 个有节点）</span><div class="toolbar-actions"><button class="text-button" data-regions="all">全部保留</button><button class="text-button" data-regions="none">全部取消</button></div></div><div class="region-bars" data-widget-grid="region">${regions.map((r) => `<label class="region-bar"${widgetAttrs("region", r.id)}><input type="checkbox" data-region="${r.id}"${checked(r.id === "OTHER" ? ctx.profile.other : ctx.profile.countries.includes(r.id))}>${r.icon ? `<img class="region-flag" src="${esc(r.icon)}" alt="" decoding="async" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'flag',textContent:'${esc(r.flag)}'}))">` : `<span class="flag" aria-hidden="true">${esc(r.flag)}</span>`}<span class="region-name">${esc(r.label)}</span><small class="region-count${r.count ? "" : " is-empty"}" title="${r.count ? `${r.count} 个节点` : "订阅中暂无节点，仍可勾选"}">${r.count}</small>${removeBadge("region", r.id)}</label>`).join("")}</div>` +
     notice(
       ctx.preview
         ? "预览模式下不显示节点与连接耗时；填写订阅并解析后会出现实际节点。"

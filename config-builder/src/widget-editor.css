@@ -1,0 +1,361 @@
+/* ============================================================
+   Widget edit mode · Liquid Glass
+   A restrained, Apple-like glass surface + iOS home-screen jiggle.
+   All colour comes from the existing theme variables, so it stays
+   neutral and adapts to light/dark automatically.
+   ============================================================ */
+
+/* --- Liquid glass card skin ------------------------------------------- */
+.choice,
+.region-bar,
+.app-card {
+  position: relative;
+  isolation: isolate;
+  border-radius: 18px;
+  border: 1px solid var(--glass-edge);
+  background: linear-gradient(150deg, var(--glass), var(--surface));
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  box-shadow:
+    inset 0 1px 0 #ffffff2e,
+    inset 0 -1px 0 #00000012,
+    0 6px 22px -14px #0007;
+  overflow: clip;
+  transition:
+    border-color 220ms var(--ease),
+    box-shadow 220ms var(--ease),
+    transform 220ms var(--ease);
+}
+/* Specular highlight that sweeps the top edge of the glass. */
+.choice::before,
+.region-bar::before,
+.app-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 45%;
+  background: linear-gradient(180deg, #ffffff1f, transparent);
+  pointer-events: none;
+  z-index: -1;
+}
+.choice:has(input:checked),
+.region-bar:has(input:checked),
+.app-card:has(input:checked) {
+  border-color: var(--selected-line);
+  box-shadow:
+    inset 0 1px 0 #ffffff3d,
+    inset 0 -1px 0 #00000012,
+    0 0 0 1px var(--selected-line),
+    0 10px 28px -16px var(--accent);
+}
+.choice:hover,
+.region-bar:hover,
+.app-card:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 1px 0 #ffffff3d,
+    0 12px 30px -16px #0009;
+}
+:root[data-theme="light"] .choice::before,
+:root[data-theme="light"] .region-bar::before,
+:root[data-theme="light"] .app-card::before {
+  background: linear-gradient(180deg, #ffffffb8, transparent);
+}
+
+/* --- Jiggle (iOS home-screen edit) ------------------------------------ */
+@keyframes widget-jiggle {
+  0% {
+    transform: rotate(-0.55deg) translate3d(-0.3px, 0, 0);
+  }
+  50% {
+    transform: rotate(0.55deg) translate3d(0.3px, -0.6px, 0);
+  }
+  100% {
+    transform: rotate(-0.55deg) translate3d(-0.3px, 0, 0);
+  }
+}
+/* `#panel` prefix raises specificity above motion.css's `animation: none`. */
+#panel [data-widget-grid].is-editing > [data-widget] {
+  animation: widget-jiggle 260ms ease-in-out infinite !important;
+  will-change: transform;
+}
+/* Stagger phase so cards don't jiggle in lockstep, like iOS. */
+#panel [data-widget-grid].is-editing > [data-widget]:nth-child(4n + 1) {
+  animation-delay: -65ms !important;
+}
+#panel [data-widget-grid].is-editing > [data-widget]:nth-child(4n + 2) {
+  animation-delay: -130ms !important;
+}
+#panel [data-widget-grid].is-editing > [data-widget]:nth-child(4n + 3) {
+  animation-delay: -195ms !important;
+}
+#panel [data-widget-grid].is-editing > [data-widget]:nth-child(4n) {
+  animation-delay: -25ms !important;
+}
+#panel [data-widget-grid].is-editing > [data-widget]:hover {
+  animation-play-state: paused !important;
+}
+
+/* The category headings are grid children but not widgets — keep them still. */
+[data-widget-grid].is-editing > .category-heading {
+  animation: none;
+}
+
+/* --- Remove / fixed badges -------------------------------------------- */
+.widget-badge {
+  position: absolute;
+  top: -7px;
+  left: -7px;
+  z-index: 3;
+  width: 24px;
+  height: 24px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  font-size: 1rem;
+  line-height: 1;
+  color: #fff;
+  background: #ff453a;
+  box-shadow: 0 2px 8px #ff453a66;
+  cursor: pointer;
+}
+.widget-badge--fixed {
+  background: var(--soft);
+  color: var(--muted);
+  box-shadow: 0 2px 8px #0004;
+  font-size: 0.7rem;
+}
+[data-widget-grid].is-editing > [data-widget] > .widget-badge {
+  display: flex;
+  animation: badge-pop 220ms var(--ease) both;
+}
+@keyframes badge-pop {
+  from {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* While editing, switched-off widgets leave the grid and live only in the + library. */
+#panel [data-widget-grid].is-editing > [data-widget].is-library-only {
+  display: none;
+}
+
+/* A widget added back from the library pops in, iOS-style. */
+@keyframes widget-enter {
+  0% {
+    opacity: 0;
+    transform: scale(0.7) translateY(8px);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.04) translateY(-2px);
+  }
+  100% {
+    transform: none;
+  }
+}
+#panel [data-widget].widget-enter {
+  animation: widget-enter 460ms var(--ease) both !important;
+  z-index: 4;
+}
+
+/* A removed card flies out with a spring-ish shrink. */
+[data-widget].is-removing {
+  animation: none !important;
+  opacity: 0;
+  transform: scale(0.82);
+  transition:
+    opacity 200ms var(--ease),
+    transform 200ms var(--ease);
+  pointer-events: none;
+}
+
+/* Drag affordances. */
+[data-widget][draggable="true"] {
+  cursor: grab;
+}
+[data-widget].is-dragging {
+  opacity: 0.55;
+  animation: none !important;
+  box-shadow: 0 16px 40px -12px #000a;
+  z-index: 5;
+}
+
+/* --- Editor chrome ---------------------------------------------------- */
+.widget-editor-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 4px 0 14px;
+  padding: 10px 14px;
+  border-radius: 16px;
+  border: 1px solid var(--glass-edge);
+  background: var(--glass);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  box-shadow: inset 0 1px 0 #ffffff26;
+}
+.widget-editor-hint {
+  color: var(--muted);
+  font-size: 0.8125rem;
+}
+.widget-editor-hint b {
+  color: #ff453a;
+  font-weight: 700;
+}
+.widget-editor-actions {
+  display: flex;
+  gap: 8px;
+}
+.widget-add-button,
+.widget-done-button {
+  min-height: 34px;
+  padding: 0 14px;
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  font-weight: 550;
+  cursor: pointer;
+  transition:
+    transform 160ms var(--ease),
+    filter 160ms var(--ease);
+}
+.widget-add-button {
+  border: 1px solid var(--glass-edge);
+  background: var(--soft);
+  color: var(--ink);
+}
+.widget-add-button[aria-expanded="true"] {
+  border-color: var(--selected-line);
+  background: var(--tint);
+  color: var(--accent);
+}
+.widget-done-button {
+  border: 0;
+  background: var(--action);
+  color: #fff;
+}
+.widget-add-button:hover,
+.widget-done-button:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+/* --- Widget library sheet --------------------------------------------- */
+.widget-library {
+  margin: 0 0 16px;
+  padding: 16px;
+  border-radius: 20px;
+  border: 1px solid var(--glass-edge);
+  background: var(--glass);
+  backdrop-filter: blur(32px) saturate(170%);
+  -webkit-backdrop-filter: blur(32px) saturate(170%);
+  box-shadow:
+    inset 0 1px 0 #ffffff33,
+    0 20px 50px -20px #000a;
+  animation: library-rise 300ms var(--ease) both;
+}
+@keyframes library-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.widget-library-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.widget-library-head strong {
+  font-size: 0.9375rem;
+}
+.widget-library-head small {
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+.widget-library-close {
+  margin-left: auto;
+  width: 26px;
+  height: 26px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--soft);
+  color: var(--muted);
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.widget-library-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+}
+.widget-library-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid var(--glass-edge);
+  background: var(--surface);
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 160ms var(--ease),
+    transform 160ms var(--ease);
+  animation: badge-pop 240ms var(--ease) both;
+}
+.widget-library-item:hover {
+  border-color: var(--selected-line);
+  transform: translateY(-2px);
+}
+.widget-library-item img,
+.widget-library-item > span:first-child {
+  flex: 0 0 auto;
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  object-fit: contain;
+  font-size: 1.1rem;
+  line-height: 26px;
+  text-align: center;
+}
+.widget-library-item > span:nth-child(2) {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.8125rem;
+}
+.widget-library-item > b {
+  color: var(--accent);
+  font-size: 1rem;
+}
+.widget-library-empty {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.8125rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-widget-grid].is-editing > [data-widget],
+  .widget-library,
+  .widget-library-item,
+  [data-widget-grid].is-editing > [data-widget] > .widget-badge {
+    animation: none !important;
+  }
+}

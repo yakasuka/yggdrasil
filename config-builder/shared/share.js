@@ -22,6 +22,7 @@ export const SHARE_FIELDS = [
   "apps",
   "appPolicy",
   "modules",
+  "order",
   "port",
   "allowLan",
   "lifetime",
@@ -167,6 +168,20 @@ export function applyShare(base, shared, model) {
   const port = Number(shared.port);
   if (Number.isInteger(port) && port >= 1024 && port <= 65535) next.port = port;
   if (LIFETIMES.some((x) => x.id === shared.lifetime)) next.lifetime = shared.lifetime;
+  // Widget grid order is cosmetic and validated by normalize(); carry it over
+  // when present so a shared layout is preserved.
+  if (shared.order && typeof shared.order === "object") {
+    const cleanOrder = (value, allowed) =>
+      Array.isArray(value)
+        ? [...new Set(value.filter((id) => allowed.includes(id)))]
+        : [];
+    next.order = {
+      regions: cleanOrder(shared.order.regions, [...knownRegions, "OTHER"]),
+      strategies: cleanOrder(shared.order.strategies, knownStrategies),
+      apps: cleanOrder(shared.order.apps, knownApps),
+      modules: cleanOrder(shared.order.modules, knownModules),
+    };
+  }
   next.allowLan = bool(shared.allowLan, base.allowLan);
   // Airport URLs are private: keep what the importer already typed unless the
   // sharer deliberately included them.

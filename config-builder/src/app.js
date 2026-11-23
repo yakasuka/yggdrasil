@@ -1,5 +1,6 @@
 import "./styles.css";
 import "./motion.css";
+import "./widget-editor.css";
 // Shared site footer (single definition used by the landing page too). Bundled
 // in so the wizard works wherever its own assets/app.js is served.
 import "../../assets/site-footer.js";
@@ -41,6 +42,7 @@ import { reviewPanel, resultPanel, shareResult } from "./panels/review.js";
 import { applyShare, parseShareCode } from "../shared/share.js";
 import { previewInspection, previewRegions } from "../shared/preview.js";
 import { createShareCode, fetchShareCode } from "./share.js";
+import { bind as bindWidgetEditor, decorate as decorateWidgetEditor, STEP_WIDGET } from "./widget-editor.js";
 const $ = (s) => document.querySelector(s);
 const steps = [
   "订阅来源",
@@ -71,6 +73,9 @@ const ctx = {
   // Once the user touches the region pickers, a later subscription parse
   // must not discard their choices — even regions with no live nodes.
   selectedRegions: false,
+  // iOS-style widget editing state (transient UI, not part of the profile).
+  widgetEditing: false,
+  widgetLibrary: null,
 };
 let step = 0,
   busy = false,
@@ -259,6 +264,7 @@ function render() {
     updateSummary();
     if (result) showResult();
   }
+  if (STEP_WIDGET[step]) decorateWidgetEditor(STEP_WIDGET[step], ctx, $("#panel"));
 }
 function filterApps() {
   document
@@ -301,6 +307,10 @@ function goToStep(next) {
   navigate(next);
 }
 function navigate(next) {
+  if (next !== step) {
+    ctx.widgetEditing = false;
+    ctx.widgetLibrary = null;
+  }
   step = next;
   render();
   enterPanel($("#panel"));
@@ -910,6 +920,13 @@ document.addEventListener("click", async (e) => {
   }
 });
 renderEmoji(document.body);
+bindWidgetEditor({
+  ctx,
+  getStep: () => step,
+  render,
+  changed,
+  toast,
+});
 render();
 // Resolve service.json (if the address was not baked into the bundle) before
 // probing, so the first health check already targets the right backend.

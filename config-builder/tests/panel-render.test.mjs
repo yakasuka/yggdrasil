@@ -31,6 +31,29 @@ for (const [label, panel] of panels) {
   });
 }
 
+test("every picker panel exposes a widget grid with per-card ids", () => {
+  // The editor locates cards via [data-widget-grid] + [data-widget]; if a
+  // panel forgets either marker it silently can't jiggle/reorder/remove.
+  const grids = {
+    地区节点: [regionsPanel, "region", "data-region"],
+    节点策略: [strategiesPanel, "strategy", "data-strategy"],
+    "APP 分流": [appsPanel, "app", "data-app"],
+    规则模块: [rulesPanel, "module", "data-module"],
+  };
+  for (const [label, [panel, kind, controlAttr]] of Object.entries(grids)) {
+    const html = panel({ profile: defaults(), inspection: null, service: "ready" });
+    assert.ok(
+      html.includes(`data-widget-grid="${kind}"`),
+      `${label} must mark its grid`,
+    );
+    assert.ok(
+      html.includes(`data-widget="${kind}"`),
+      `${label} must tag its cards`,
+    );
+    assert.ok(html.includes(controlAttr), `${label} keeps its control`);
+  }
+});
+
 test("规则模块面板列出模板中的全部规则模块", () => {
   const html = rulesPanel({ profile: defaults() });
   assert.match(html, /个规则模块/);

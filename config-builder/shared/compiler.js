@@ -169,6 +169,14 @@ export function defaults(model = catalog) {
     apps: model.apps.map((a) => a.id),
     appPolicy: {},
     modules: ruleModules(model),
+    // Widget grid order, one array per group. Defaults follow the catalog;
+    // the user can reorder cards in the iOS-style edit mode.
+    order: {
+      regions: [...model.regions.map((r) => r.id), "OTHER"],
+      strategies: strategyIds(model),
+      apps: model.apps.map((a) => a.id),
+      modules: ruleModules(model),
+    },
     port: 7890,
     allowLan: true,
     lifetime: "30d",
@@ -213,6 +221,28 @@ function selection(value, allowed, field, max = 1000) {
   )
     fail("存在无效的选择项，请刷新页面。", field);
   return unique(value);
+}
+// Order of the four widget groups. Invalid ids are dropped and any id the
+// template knows about but the saved profile predates is appended, so a new
+// region/app/strategy/module always shows up instead of being lost by sorting.
+function orderIds(value, allowed, fallback) {
+  const kept = Array.isArray(value)
+    ? value.filter((id) => allowed.includes(id))
+    : [...fallback];
+  return unique([...kept, ...allowed.filter((id) => !kept.includes(id))]);
+}
+// Stable sort by a saved id order; ids not present in `order` keep their
+// relative position at the end. Shared by the compiler and the wizard panels.
+export function sortByOrder(items, order = [], idOf = (x) => x.id) {
+  const rank = new Map(order.map((id, i) => [id, i]));
+  return [...items].sort((a, b) => {
+    const ai = rank.get(idOf(a)),
+      bi = rank.get(idOf(b));
+    if (ai === undefined && bi === undefined) return 0;
+    if (ai === undefined) return 1;
+    if (bi === undefined) return -1;
+    return ai - bi;
+  });
 }
 export function normalize(input, model = catalog, { migrate = false } = {}) {
   if (!input || input.version !== 2) fail("配置版本不受支持，请刷新页面。");
@@ -303,6 +333,15 @@ export function normalize(input, model = catalog, { migrate = false } = {}) {
   } catch {
     fail("请选择有效的 Token 持续时间。", "lifetime");
   }
+  // Widget order is cosmetic: normalise against the same allow-lists so a
+  // stale/over-long saved order can never inject unknown ids or break compile.
+  const savedOrder = input.order && typeof input.order === "object" ? input.order : {};
+  p.order = {
+    regions: orderIds(savedOrder.regions, [...knownCountries, "OTHER"], p.order.regions),
+    strategies: orderIds(savedOrder.strategies, knownStrategies, p.order.strategies),
+    apps: orderIds(savedOrder.apps, knownApps, p.order.apps),
+    modules: orderIds(savedOrder.modules, knownModules, p.order.modules),
+  };
   return p;
 }
 const strip = (p) => p.replaceAll("(?i)", "");
@@ -345,7 +384,10 @@ const hash = async (text) =>
 export async function compile(input, model = catalog, options = {}) {
   const p = normalize(input, model, options),
     g = model.groups,
-    regions = model.regions.filter((r) => p.countries.includes(r.id));
+    regions = sortByOrder(
+      model.regions.filter((r) => p.countries.includes(r.id)),
+      p.order.regions,
+    );
   const allFilter =
     "(?i)(?:" +
     [
@@ -355,7 +397,10 @@ export async function compile(input, model = catalog, options = {}) {
     ")";
   // Derive active strategies from the catalog so a strategy added to the
   // template is compiled automatically; legacy table supplies type fallback.
-  const active = strategyDefs(model).filter((s) => p.strategies.includes(s.id));
+  const active = sortByOrder(
+    strategyDefs(model).filter((s) => p.strategies.includes(s.id)),
+    p.order.strategies,
+  );
   // preferred 只决定「节点选择」组在客户端里默认选中哪一项。选择 gateway
   // 时保持模板原样（先进入「手动切换」挑节点），不把入口组自己塞进成员，
   // 避免自引用；所有规则仍然统一走节点选择。
@@ -416,7 +461,10 @@ export async function compile(input, model = catalog, options = {}) {
     "REJECT",
     "DIRECT",
   ]);
-  const apps = model.apps.filter((a) => p.apps.includes(a.id));
+  const apps = sortByOrder(
+    model.apps.filter((a) => p.apps.includes(a.id)),
+    p.order.apps,
+  );
   for (const app of apps) {
     // Author-authored switch/entry groups (e.g. ✨ Hermes) are already emitted
     // as core groups above. Emitting them again would create a duplicate group
