@@ -82,11 +82,27 @@ test("dashboard inline script compiles (escapes survive the template literal)", 
   // generated inline script contains a broken regex and every click handler
   // silently fails to bind. Compiling the script catches that regression.
   const html = dashboardHTML({ linkBase: "https://x/y" });
-  const match = html.match(/<script>([\s\S]*?)<\/script>/);
-  assert.ok(match, "inline script present");
-  assert.doesNotThrow(() => new Script(match[1]), "inline script must parse");
+  const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)];
+  assert.ok(scripts.length > 0, "inline scripts present");
+  scripts.forEach((match, i) =>
+    assert.doesNotThrow(() => new Script(match[1]), `inline script ${i} must parse`),
+  );
   // The CRLF normaliser must ship as literal backslashes, not real newlines.
-  assert.match(match[1], /replace\(\/\\r\\n\/g,"\\n"\)/);
+  const main = scripts.map((m) => m[1]).find((s) => s.includes("fiText"));
+  assert.ok(main, "main dashboard script present");
+  assert.match(main, /replace\(\/\\r\\n\/g,"\\n"\)/);
+});
+
+test("dashboard uses the builder stylesheet and renders stats as styled chips", () => {
+  const html = dashboardHTML({ linkBase: "https://x/y" });
+  // The dashboard shares the configurator's design tokens verbatim.
+  assert.match(html, /--glass:/);
+  assert.match(html, /class="caustic-hero"/);
+  assert.match(html, /class="site-header"/);
+  // Stats must be real elements with a class, not stray "stat" text nodes —
+  // the old el("div","stat") bug rendered "stat地区 6 stat应用 39..." as text.
+  assert.match(html, /box\.className="dash-stat"/);
+  assert.ok(!html.includes('el("div","stat")'), "no stray stat text nodes");
 });
 
 test("dashboard requires Basic auth, supports HEAD, and hides API from discovery", async () => {
