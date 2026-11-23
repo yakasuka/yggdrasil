@@ -172,16 +172,40 @@ function waterSurface() {
     frame = 0;
     resume();
   });
-  canvas.addEventListener("pointerdown", (event) => {
-    if (reduced.matches) return;
+  // Press-and-drag paints a trail of ripples; a plain click still drops one.
+  // Pointer events cover mouse, pen and touch with a single code path.
+  let dragging = false,
+    lastDropAt = 0;
+  const dropRipple = (clientX, clientY, now) => {
     const rect = canvas.getBoundingClientRect(),
       i = nextDrop++ % 5;
-    data[i * 4] = (event.clientX - rect.left) / rect.width;
-    data[i * 4 + 1] = 1 - (event.clientY - rect.top) / rect.height;
+    data[i * 4] = (clientX - rect.left) / rect.width;
+    data[i * 4 + 1] = 1 - (clientY - rect.top) / rect.height;
     data[i * 4 + 3] = 1;
-    born[i] = performance.now();
+    born[i] = now;
+    lastDropAt = now;
     resume();
+  };
+  canvas.addEventListener("pointerdown", (event) => {
+    if (reduced.matches) return;
+    dragging = true;
+    canvas.setPointerCapture?.(event.pointerId);
+    dropRipple(event.clientX, event.clientY, performance.now());
   });
+  canvas.addEventListener("pointermove", (event) => {
+    if (!dragging || reduced.matches) return;
+    const now = performance.now();
+    // Throttle the trail so dragging feels continuous without flooding the
+    // five ripple slots every frame.
+    if (now - lastDropAt < 70) return;
+    dropRipple(event.clientX, event.clientY, now);
+  });
+  const stopDragging = () => {
+    dragging = false;
+  };
+  canvas.addEventListener("pointerup", stopDragging);
+  canvas.addEventListener("pointercancel", stopDragging);
+  canvas.addEventListener("lostpointercapture", stopDragging);
   canvas.addEventListener("webglcontextlost", (event) => {
     event.preventDefault();
     cancelAnimationFrame(frame);

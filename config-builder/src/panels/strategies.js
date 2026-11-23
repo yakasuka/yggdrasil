@@ -1,11 +1,14 @@
 import { STRATEGY_VIEW } from "../strategy-catalog.js";
 import { esc, checked, title, notice } from "../ui.js";
-import { uiIcon } from "../icons.js";
+
+// Use the bright emoji from the template itself (🎚️ 🚀 ⚡ …) as the card
+// glyph; renderEmoji() paints it as a full-colour Twemoji in every browser.
+const leadingEmoji = (name) => (name.match(/^\S+/)?.[0] || "✨");
 
 export function strategiesPanel(ctx) {
   const card = (s) => {
     const on = s.fixed || ctx.profile.strategies.includes(s.id);
-    return `<label class="choice${s.fixed ? " fixed" : ""}"><input type="checkbox" data-strategy="${s.id}"${checked(on)}${s.fixed ? " disabled" : ""}>${s.iconName ? uiIcon(s.iconName, "choice-icon") : ""}<span><strong>${esc(s.name)}</strong>${s.fixed ? `<span class="choice-badge">始终保留</span>` : ""}<small>${esc(s.description)}</small></span></label>`;
+    return `<label class="choice${s.fixed ? " fixed" : ""}"><input type="checkbox" data-strategy="${s.id}"${checked(on)}${s.fixed ? " disabled" : ""}><span class="choice-emoji" aria-hidden="true">${esc(leadingEmoji(s.name))}</span><span><strong>${esc(s.name)}</strong>${s.fixed ? `<span class="choice-badge">始终保留</span>` : ""}<small>${esc(s.description)}</small></span></label>`;
   };
   // 所有规则统一走「节点选择」；这个组里能选什么取决于上面的勾选。
   const automatic = STRATEGY_VIEW.filter(
