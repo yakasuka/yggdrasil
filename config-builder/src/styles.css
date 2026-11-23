@@ -1112,14 +1112,6 @@ site-footer {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.app-card select {
-  flex: 0 0 auto;
-  width: 96px;
-  min-height: 30px;
-  margin: 0;
-  padding: 5px 8px;
-  font-size: 0.8125rem;
-}
 /* Author-authored switch/entry groups (e.g. Hermes) carry no rule yet, but
    are still shown because the template defines them. Keep the label compact
    and put the explanatory note on its own line so it never crowds the picker. */
@@ -1972,8 +1964,7 @@ noscript {
   input[type="search"],
   select,
   textarea,
-  .result input,
-  .app-card select {
+  .result input {
     font-size: 1rem;
   }
   .choice-grid,
@@ -1990,10 +1981,8 @@ noscript {
   .app-card label {
     flex: 1 1 120px;
   }
-  .app-card select {
-    width: 125px;
-    font-size: 1rem;
-    padding: 8px;
+  .app-card .policy-menu {
+    min-width: 148px;
   }
   .region-bars {
     grid-template-columns: 1fr;
@@ -2108,9 +2097,6 @@ noscript {
   }
   .app-card label {
     flex-basis: 110px;
-  }
-  .app-card select {
-    width: 115px;
   }
 }
 @supports not (backdrop-filter: blur(1px)) {

@@ -72,7 +72,7 @@ FilterOthers: &FilterOthers '^(?!.*(?:(?i)=>|(?i:🇭🇰|香港|Hong\s?Kong|\b(
 proxy-groups:
 
   # ── 策略入口 / Switch ──
-  # Hermes 与节点选择同为总开关；下方 @meta 注释将其归入「策略入口」，与 APP 无关。
+  # Hermes 的展示分类由其 @meta 注释声明（见「应用分流」段），与此处无关。
   # 展示用元数据只写在 @meta 注释里，不进入 Clash 配置行，也不进入生成的配置。
   
   - {name: 🎚️ 节点选择, type: select, proxies: [🚀 手动切换, ⚡ 自动选择, 🔯 故障转移, 🔮 负载均衡, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others, DIRECT], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/switch.png"}
@@ -95,7 +95,8 @@ proxy-groups:
   # ── 应用分流 / Proxy App ──
   - {name: ⚡ OpenAI,      type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/chatgpt.png"}     # OpenAI / ChatGPT
   - {name: 🪐 Anthropic,   type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/claude.png"}      # Anthropic / Claude
-  - {name: ✨ Hermes, type: select, proxies: [🚀 手动切换, ⚡ 自动选择, 🔯 故障转移, 🔮 负载均衡, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others, DIRECT], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/hermes.png"}
+  # @meta {id: hermes, label: Hermes, category: AI 与开发}
+  - {name: ✨ Hermes,      type: select, proxies: [🚀 手动切换, ⚡ 自动选择, 🔯 故障转移, 🔮 负载均衡, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others, DIRECT], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/hermes.png"}
   - {name: ✨ AI 服务,     type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/ai.png"}          # AI 杂项 (Perplexity / Groq / Cerebras / HuggingFace / Cursor / ElevenLabs / ComfyUI / 兜底)
   - {name: ⬛ OKX,         type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/okx.png"}      # 加密货币
   - {name: 🟨 Binance,     type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/binance.png"}      # 加密货币
@@ -138,14 +139,9 @@ proxy-groups:
   - {name: 🔌 特殊端口,     type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/port.png"}                  # 特殊端口流量
   - {name: ❎ 广告拦截,       type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/adguard.png"}       # 默认节点选择（不启用拦截），需要时手动切 REJECT
   # ── 补充应用 / Extra Apps ──
-  # Notion、teamviewer 的规则定义在下方 rules；此处提供对应的出口选择组。
   # 展示元数据写在 @meta 注释里（label / category），不污染 Clash 配置行。
   # @meta {label: R18, category: 其他服务}
   - {name: 😈 R18, type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/r18.png"}
-  # @meta {label: Notion, category: 其他服务}
-  - {name: 📦 Notion, type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others]}
-  # @meta {label: teamviewer, category: 其他服务}
-  - {name: ↔️ teamviewer, type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others]}
 
   # ── 国内与兜底 / CN & Final ──
   - {name: 🏯 China,             type: select, proxies: [DIRECT, 🎚️ 节点选择, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/cn.png"}          # 默认国内直连
@@ -217,7 +213,6 @@ rules:
   - GEOSITE,bilibili,📺 Bilibili
 
   # ── 应用与类目 / Services ──
-  - GEOSITE,Notion,📦 Notion
   - GEOSITE,telegram,🪽 Telegram
   - GEOSITE,openai,⚡ OpenAI
   - GEOSITE,anthropic,🪐 Anthropic
@@ -235,12 +230,12 @@ rules:
   - GEOSITE,discord,🎮 Discord
   - GEOSITE,category-communication,💬 Chat
   - GEOSITE,category-social-media-!cn,🫂 Social
-  - GEOSITE,teamviewer,↔️ teamviewer
   - GEOSITE,cloudflare,☁️ Cloudflare
   - GEOSITE,google,✨ Google
   - GEOSITE,microsoft,🪟 Microsoft
   - GEOSITE,category-cryptocurrency,🪙 Crypto
   - GEOSITE,amazon,📦 Amazon
+  - GEOSITE,category-porn,😈 R18
 
   - GEOSITE,category-media,📰 News
   - GEOSITE,category-entertainment,🍿 Entertainment
@@ -271,4 +266,4 @@ rule-providers:
   ⚡ Matrix Port:     {<<: *RP-classical, url: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/resources/rules/aethersailor/Custom_Port_Direct.yaml"}
   📦 Cargo Downloads:          {<<: *RP-domain, url: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/resources/rules/download/MultiThread_Download_Domain.yaml"}
   ❎ AdGuard:           {<<: *RP-domain, url: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/resources/rules/adguard/Custom_AdGuard_Domain.yaml"}
-# =======================================================
+# =======================================================

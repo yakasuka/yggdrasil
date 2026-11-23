@@ -16,17 +16,30 @@ export const selected = (value) => (value ? " selected" : "");
 //   < 400ms        -> 良好   · blue
 //   < 800ms        -> 堵塞   · amber
 //   >= 800ms       -> 超时   · red
+// Normalise to a real number first: the probe response can carry latency as a
+// numeric string, and Number.isFinite("120") is false — which used to drop
+// every measured node into the grey "未检测" bucket with no colour at all.
+export const toLatencyNumber = (ms) => {
+  if (typeof ms === "number") return ms;
+  if (typeof ms === "string" && ms.trim() !== "") {
+    const n = Number(ms);
+    return Number.isFinite(n) ? n : null;
+  }
+  return null;
+};
 export function latencyTone(ms) {
-  if (ms === null || ms === undefined || !Number.isFinite(ms))
+  const n = toLatencyNumber(ms);
+  if (n === null || !Number.isFinite(n))
     return { tone: "idle", label: "未检测" };
-  if (ms < 150) return { tone: "good", label: "顺畅" };
-  if (ms < 400) return { tone: "ok", label: "良好" };
-  if (ms < 800) return { tone: "congested", label: "堵塞" };
+  if (n < 150) return { tone: "good", label: "顺畅" };
+  if (n < 400) return { tone: "ok", label: "良好" };
+  if (n < 800) return { tone: "congested", label: "堵塞" };
   return { tone: "timeout", label: "超时" };
 }
 export function latencyPill(ms) {
-  const { tone, label } = latencyTone(ms);
-  const value = Number.isFinite(ms) ? `${Math.round(ms)} ms` : "—";
+  const n = toLatencyNumber(ms);
+  const { tone, label } = latencyTone(n);
+  const value = Number.isFinite(n) ? `${Math.round(n)} ms` : "—";
   return `<span class="latency-pill latency-pill--${tone}" title="${label}"><i aria-hidden="true"></i><b>${value}</b><small>${label}</small></span>`;
 }
 export const latencyLegend = () =>

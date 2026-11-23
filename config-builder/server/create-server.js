@@ -90,6 +90,7 @@ function adminAuthorized(request, config) {
 
 const REWRITES = [
   [SERVICE_ROUTES.status, ["GET"], "/api/health"],
+  [SERVICE_ROUTES.catalog, ["GET"], "/api/catalog"],
   [SERVICE_ROUTES.inspect, ["POST"], "/api/inspect"],
   [SERVICE_ROUTES.preview, ["POST"], "/api/preview"],
   [SERVICE_ROUTES.probe, ["POST"], "/api/probe"],

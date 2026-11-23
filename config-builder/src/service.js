@@ -38,6 +38,36 @@ export function serviceOrigin(value) {
 // credentials are never included.
 const STORAGE_KINDS = new Set(["kv", "self-hosted", "file", "disk"]);
 
+// Fetch the authoritative catalog the service compiled against. The returned
+// model is schema-2 shaped (same as the bundled catalog.json). It carries no
+// secrets. Failures are non-fatal: callers keep the bundled snapshot.
+export async function fetchCatalog(origin, fetcher = fetch) {
+  const base = serviceOrigin(origin);
+  if (!base) return null;
+  try {
+    const response = await fetcher(base + SERVICE_ROUTES.catalog, {
+      credentials: "omit",
+      cache: "no-store",
+      redirect: "error",
+      signal: AbortSignal.timeout(10000),
+    });
+    if (!response.ok) return null;
+    const model = await response.json();
+    if (
+      !model ||
+      model.schema !== 2 ||
+      !Array.isArray(model.apps) ||
+      !Array.isArray(model.regions) ||
+      !Array.isArray(model.orderedRules) ||
+      typeof model.version !== "string"
+    )
+      return null;
+    return model;
+  } catch {
+    return null;
+  }
+}
+
 export async function probeService(origin, version, fetcher = fetch) {
   const base = serviceOrigin(origin);
   if (!base)
@@ -82,12 +112,14 @@ export async function probeService(origin, version, fetcher = fetch) {
     };
   if (!STORAGE_KINDS.has(health.storage) || health.format !== "mihomo")
     return { state: "offline", message: "该地址未提供兼容的订阅服务。" };
-  if (health.version !== version)
-    return {
-      state: "mismatch",
-      message: "页面与订阅服务版本不一致，请更新后重试。",
-    };
+  // Version drift is no longer a hard failure. Compilation always runs against
+  // the server's own catalog, and the frontend syncs that catalog at startup.
+  // A residual mismatch (e.g. a template changed mid-session) only means the
+  // pickers may be one step behind; surface it as a note, not a lockout.
+  const versionMismatch = health.version !== version;
   return {
+    versionMismatch,
+    serverVersion: health.version,
     state: "ready",
     message:
       "已连接。在线解析与持久订阅可用；机场链接和生成的配置只经过该服务。",

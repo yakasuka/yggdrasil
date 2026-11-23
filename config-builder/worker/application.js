@@ -71,6 +71,9 @@ export function createWorker(options = {}) {
               ready: !!env.SUBSCRIPTIONS,
               storage: env.SUBSCRIPTIONS ? "kv" : "unavailable",
               version: model.version,
+              // The catalogue version the server actually compiles against,
+              // so a frontend driven by a remote template can verify parity.
+              catalogVersion: model.version,
               format: "mihomo",
               capabilities: {
                 inspect: true,
@@ -78,6 +81,14 @@ export function createWorker(options = {}) {
               },
             }),
           );
+        }
+        if (url.pathname === "/api/catalog" && request.method === "GET") {
+          // Read-only: the derived catalogue carries no credentials or node
+          // data (it is the public template plus display metadata). Exposing
+          // it lets the static frontend follow template edits at runtime
+          // instead of relying on a build-time snapshot.
+          const model = await loadCatalog(env);
+          return out(json(model));
         }
         if (
           [

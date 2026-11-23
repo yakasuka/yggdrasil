@@ -85,12 +85,9 @@ test("Others is a region group, not an APP; Hermes placement is YAML-declared", 
   assert.equal(derived.groups.otherGroupName, "🌌 Others");
   const hermes = derived.apps.find((a) => a.name.includes("Hermes"));
   // No name is special-cased in code: Hermes' category comes from its authored
-  // `x-category: 策略入口` in the template. AI must contain only real AI apps.
-  assert.equal(hermes.category, "策略入口", "Hermes follows the template's x-category");
-  assert.ok(
-    !derived.apps.some((a) => a.category === "AI 与开发" && a.name.includes("Hermes")),
-    "no hardcoded Hermes→AI exception remains",
-  );
+  // `# @meta {category: AI 与开发}` in the template. The frontend mirrors the
+  // config file, so wherever the author places it is where it appears.
+  assert.equal(hermes.category, "AI 与开发", "Hermes follows the template's @meta category");
   assert.equal(hermes.entry, true, "Hermes stays a rule-less switch entry");
 });
 

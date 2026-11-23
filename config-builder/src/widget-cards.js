@@ -41,19 +41,47 @@ function strategyCard(id, ctx) {
   return `<div class="choice${s.fixed ? " fixed" : ""}${on ? " is-on" : ""}"${widgetAttrs("strategy", id, { fixed: !!s.fixed })} data-strategy="${esc(id)}">${s.icon ? `<img class="choice-icon" src="${esc(s.icon)}" alt="" decoding="async" onerror="this.hidden=true">` : ""}<span><strong>${esc(s.name)}</strong>${s.fixed ? `<span class="choice-badge">始终保留</span>` : ""}<small>${esc(s.description)}</small></span>${removeBadge("strategy", id, !!s.fixed)}</div>`;
 }
 
+// Policy option glyphs. Regions carry their own flag/name from the catalog;
+// the fixed exits get a stable emoji so every pill has a leading icon.
+function policyEmoji(value, region) {
+  if (value === "proxy") return "🎚️";
+  if (value === "reject") return "⛔";
+  if (value === "direct") return "➡️";
+  if (region) return region.flag || region.name || "🌐";
+  return "🌐";
+}
+
 function appCard(id, ctx) {
   const a = catalog.apps.find((x) => x.id === id);
   if (!a) return "";
   const regions = selectableRegions(catalog, ctx.inspection).filter((r) =>
     r.id === "OTHER" ? ctx.profile.other : ctx.profile.countries.includes(r.id),
   );
+  // Each option: [value, label, emoji]. Region glyphs come from the catalog.
   const options = [
-    ["proxy", "跟随代理"],
-    ...regions.map((r) => ["region:" + r.id, r.label]),
-    ["reject", "Reject"],
-    ["direct", "Direct"],
+    ["proxy", "跟随代理", "🎚️"],
+    ...regions.map((r) => ["region:" + r.id, r.label, policyEmoji("region:" + r.id, r)]),
+    ["reject", "Reject", "⛔"],
+    ["direct", "Direct", "➡️"],
   ];
-  return `<div class="app-card${a.entry ? " app-card--entry" : ""}" data-app-card="${esc(a.label.toLowerCase())}" data-category-item="${esc(a.category)}"${widgetAttrs("app", id)} data-app="${esc(id)}"><div class="app-card-main">${a.icon ? `<img src="${esc(a.icon)}" alt="" decoding="async" onerror="this.hidden=true">` : ""}<span>${esc(a.label)}</span>${a.entry ? `<small class="entry-tag">策略入口</small>` : ""}</div><select data-policy="${esc(id)}" aria-label="${esc(a.label)} 默认出口">${options.map(([value, label]) => `<option value="${esc(value)}"${selected((ctx.profile.appPolicy[id] || "proxy") === value)}>${esc(label)}</option>`).join("")}</select>${a.entry ? `<small class="entry-hint">模板中的全部节点开关，暂未绑定规则</small>` : ""}${removeBadge("app", id)}</div>`;
+  const current = ctx.profile.appPolicy[id] || "proxy";
+  const active = options.find(([value]) => value === current) || options[0];
+  const pills = options
+    .map(
+      ([value, label, emoji]) =>
+        `<button type="button" class="policy-pill${value === current ? " is-active" : ""}" data-policy-option="${esc(value)}" role="option" aria-selected="${value === current}"><span class="policy-pill-emoji" aria-hidden="true" data-emoji="${esc(emoji)}">${emoji}</span><span>${esc(label)}</span></button>`,
+    )
+    .join("");
+  // The WHOLE card is the button: [icon] [current-exit emoji + name] [chevron].
+  // No nested dropdown box. The native <select> stays only as the data source
+  // for the existing change/compiler/share logic; the visible pill and the
+  // popover of option capsules are the interface. `data-policy-trigger` sits
+  // on the card root so a click anywhere opens the menu.
+  // Card face is intentionally clean: [icon] [app name] only — matching the
+  // reference. No chevron, no current-exit text/emoji on the card. The chosen
+  // exit lives in the popover (highlighted capsule) and in the aria-label;
+  // the hidden <select> remains the data source for all existing logic.
+  return `<div class="app-card app-card--policy${a.entry ? " app-card--entry" : ""}" data-app-card="${esc(a.label.toLowerCase())}" data-category-item="${esc(a.category)}"${widgetAttrs("app", id)} data-app="${esc(id)}" data-policy-picker data-policy-trigger role="button" tabindex="0" aria-haspopup="listbox" aria-expanded="false" aria-label="${esc(a.label)} · 默认出口 ${esc(active[1])}"><span class="app-card-main"><span class="app-card-icon">${a.icon ? `<img src="${esc(a.icon)}" alt="" decoding="async" onerror="this.hidden=true">` : `<span class="app-card-icon-fallback" aria-hidden="true">${esc(a.label.slice(0, 1))}</span>`}</span><span class="app-card-label">${esc(a.label)}</span></span><div class="policy-menu" data-policy-menu role="listbox" hidden>${pills}</div><select class="policy-native" data-policy="${esc(id)}" aria-label="${esc(a.label)} 默认出口" tabindex="-1" aria-hidden="true">${options.map(([value, label]) => `<option value="${esc(value)}"${selected(current === value)}>${esc(label)}</option>`).join("")}</select>${removeBadge("app", id)}</div>`;
 }
 
 function moduleCard(id, ctx) {

@@ -25,8 +25,10 @@
   --glass-wash-a: 0.20;
   --glass-body: color-mix(in srgb, #ffffff 62%, transparent);
   --glass-body-2: color-mix(in srgb, #eef2f8 58%, transparent);
-  --glass-rim: #ffffff;
-  --glass-shadow: 0 14px 34px -18px #1d1d1f40;
+  /* A pure-white rim on a near-white page reads as a stray halo. Tint it with
+     the page's own ink so the card edge stays crisp without a white ring. */
+  --glass-rim: color-mix(in srgb, var(--ink) 12%, transparent);
+  --glass-shadow: 0 14px 34px -18px #1d1d1f2e;
 }
 
 /* The board: one shared light field for the grid + its library. Every widget
@@ -91,10 +93,32 @@
   pointer-events: none;
   z-index: -1;
 }
+/* Keep the specular sheen subtle in light mode — a near-solid white gradient
+   over a white page is what produced the odd white halo around each card. */
 :root[data-theme="light"] .choice::before,
 :root[data-theme="light"] .region-bar::before,
 :root[data-theme="light"] .app-card::before {
-  background: linear-gradient(180deg, #ffffffcc, #ffffff30 50%, transparent);
+  background: linear-gradient(180deg, #ffffff5c, #ffffff14 50%, transparent);
+}
+/* Replace the stark white inset/hairline shadows with ink-tinted ones so no
+   white ring is painted around the rim on light surfaces. */
+:root[data-theme="light"] .choice,
+:root[data-theme="light"] .region-bar,
+:root[data-theme="light"] .app-card {
+  box-shadow:
+    inset 0 1px 0 #ffffff8f,
+    inset 0 -1px 0 #1d1d1f08,
+    0 1px 2px #1d1d1f0a,
+    var(--glass-shadow);
+}
+:root[data-theme="light"] .choice:hover,
+:root[data-theme="light"] .region-bar:hover,
+:root[data-theme="light"] .app-card:hover {
+  box-shadow:
+    inset 0 1px 0 #ffffffa6,
+    inset 0 -1px 0 #1d1d1f08,
+    0 2px 6px #1d1d1f12,
+    0 18px 38px -20px #1d1d1f2e;
 }
 /* A faint diagonal sheen sweeping the glass, like a light source at the top. */
 .choice::after,
@@ -122,29 +146,43 @@
     0 18px 38px -18px #000a;
 }
 
-/* APP cards: cards are now <div> (no checkbox), so the icon+name uses a main
-   wrapper with the same flex behaviour the old <label> had. */
+/* APP cards: a clean translucent pill showing just [icon] [app name].
+   Tapping the whole card opens the exit picker popover below. */
 .app-card .app-card-main {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   flex: 1;
   min-width: 0;
-  min-height: 26px;
-  font-size: 0.75rem;
+  min-height: 30px;
+  font-size: 0.85rem;
+  font-weight: 550;
 }
-.app-card .app-card-main > span {
+.app-card .app-card-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--surface) 70%, var(--tint));
+  overflow: hidden;
+}
+.app-card .app-card-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.app-card .app-card-icon-fallback {
+  font-size: 0.9rem;
+  font-weight: 650;
+  color: var(--accent);
+}
+.app-card .app-card-label {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-.app-card select {
-  flex: 0 0 auto;
-  width: 96px;
-  min-height: 30px;
-  margin: 0;
-  padding: 5px 8px;
-  font-size: 0.8125rem;
 }
 .app-card .entry-hint {
   flex-basis: 100%;
@@ -152,8 +190,119 @@
   font-size: 0.6875rem;
   line-height: 1.4;
 }
-/* Selecting an exit or dragging must not trigger the corner badge. */
-.app-card select { position: relative; z-index: 2; }
+
+/* --- Policy picker: the WHOLE card is a pill button -----------------------
+   Clicking the card pops a floating tray of small capsule options below it.
+   The native <select> is kept only as the data source (hidden). No nested
+   dropdown box around the trigger — the card itself is the button. */
+.app-card--policy {
+  position: relative;
+  cursor: pointer;
+  border-radius: 999px;
+  padding: 8px 12px;
+  -webkit-user-select: none;
+  user-select: none;
+  transition:
+    border-color 180ms var(--ease),
+    box-shadow 180ms var(--ease),
+    background 180ms var(--ease);
+}
+.app-card--policy:hover {
+  border-color: color-mix(in srgb, var(--accent) 50%, var(--line));
+}
+.app-card--policy:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+/* Lift the card while its tray is open so the menu paints above siblings. */
+.app-card--policy.is-open {
+  z-index: 40;
+  border-color: var(--accent);
+  box-shadow: 0 10px 30px -12px #0006;
+}
+.app-card .policy-native {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* The popover: a soft glass tray of small capsule options, opened downward. */
+.app-card .policy-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: max-content;
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 7px;
+  border: 1px solid var(--glass-rim);
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--surface) 86%, transparent);
+  -webkit-backdrop-filter: blur(26px) saturate(180%);
+  backdrop-filter: blur(26px) saturate(180%);
+  box-shadow:
+    inset 0 1px 0 #ffffff3d,
+    0 16px 40px -12px #0009;
+  animation: policy-pop 160ms var(--ease) both;
+}
+:root[data-theme="light"] .app-card .policy-menu {
+  background: color-mix(in srgb, #ffffff 92%, transparent);
+  box-shadow:
+    inset 0 1px 0 #ffffff,
+    0 16px 40px -12px #1d1d1f3d;
+}
+@keyframes policy-pop {
+  from { opacity: 0; transform: translateY(-5px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.app-card .policy-menu[hidden] { display: none; }
+.app-card .policy-pill {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 7px 12px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink);
+  font-size: 0.8rem;
+  line-height: 1.2;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background 150ms var(--ease),
+    border-color 150ms var(--ease),
+    transform 150ms var(--ease);
+}
+.app-card .policy-pill-emoji {
+  flex: 0 0 auto;
+  display: inline-flex;
+  font-size: 1.05rem;
+  line-height: 1;
+}
+.app-card .policy-pill:hover {
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+}
+.app-card .policy-pill:active { transform: scale(0.98); }
+.app-card .policy-pill.is-active {
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+  font-weight: 600;
+}
 
 /* --- Corner affordance ---------------------------------------------------- */
 .widget-badge {
@@ -231,12 +380,29 @@
   z-index: 4;
 }
 
+/* Clean drag image: a light clone used only as the HTML5 drag snapshot.
+   Strip the pseudo-element sheen/highlights and the halo so the ghost is a
+   single rounded card, not a rectangle with four ugly corners. */
+.drag-ghost {
+  pointer-events: none !important;
+  z-index: -1 !important;
+  overflow: hidden !important;
+  box-shadow: 0 10px 30px -12px #0006 !important;
+}
+.drag-ghost::before,
+.drag-ghost::after {
+  display: none !important;
+}
+
 /* Drag affordance — reordering works in both states, like iOS. */
 [data-widget][draggable="true"] { cursor: grab; }
 [data-widget].is-dragging {
-  opacity: 0.55;
+  opacity: 0.42;
   animation: none !important;
-  box-shadow: 0 16px 44px -12px #000b;
+  /* The default drag snapshot bakes this shadow + the square pseudo-element
+     corners into the drag image. A clean custom drag image is set in JS, so
+     keep the in-place placeholder quiet instead. */
+  box-shadow: none;
   z-index: 5;
 }
 

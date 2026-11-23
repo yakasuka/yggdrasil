@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import {
   probeService,
+  fetchCatalog,
   serviceOrigin,
   subscriptionURL,
   usageURL,
@@ -63,7 +64,6 @@ test("health checks distinguish static sites, missing storage and incompatible t
       "尚未连接存储",
     ],
     [Response.json({ ...health, ready: "true" }), "offline", "暂不可用"],
-    [Response.json({ ...health, version: "old" }), "mismatch", "版本不一致"],
   ];
   for (const [response, state, message] of cases) {
     const result = await probeService(
@@ -83,6 +83,39 @@ test("health checks distinguish static sites, missing storage and incompatible t
   );
   assert.equal(failed.state, "offline");
   assert.ok(!failed.message.includes("private request detail"));
+});
+
+test("a stale frontend version is a warning, not a hard version-mismatch lockout", async () => {
+  const result = await probeService(
+    "https://service.example",
+    "stale-frontend-version",
+    async () => Response.json(health),
+  );
+  assert.equal(result.state, "ready");
+  assert.equal(result.versionMismatch, true);
+  assert.equal(result.serverVersion, health.version);
+});
+
+test("fetchCatalog returns a schema-2 model and rejects malformed responses", async () => {
+  const model = { schema: 2, version: "v1", apps: [], regions: [], orderedRules: [] };
+  const good = await fetchCatalog(
+    "https://service.example",
+    async (url, options) => {
+      assert.equal(url, "https://service.example/api/catalog");
+      assert.equal(options.credentials, "omit");
+      assert.equal(options.cache, "no-store");
+      return Response.json(model);
+    },
+  );
+  assert.deepEqual(good, model);
+  const bad = await fetchCatalog("https://service.example", async () =>
+    Response.json({ schema: 1 }),
+  );
+  assert.equal(bad, null);
+  const failed = await fetchCatalog("https://service.example", async () => {
+    throw Error("offline");
+  });
+  assert.equal(failed, null);
 });
 
 test("the browser entry is a static client that only calls the self-hosted service", () => {

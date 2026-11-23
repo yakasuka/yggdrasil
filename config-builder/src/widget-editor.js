@@ -268,6 +268,22 @@ export function bind(api) {
     e.dataTransfer.effectAllowed = "move";
     e.dataTransfer.setData("text/plain", draggingId);
     card.classList.add("is-dragging");
+    // The browser's default drag snapshot includes the card's box-shadow and
+    // the square pseudo-element corners, which shows up as an ugly four-corner
+    // frame. Build a clean, rounded drag image from a light clone instead.
+    const ghost = card.cloneNode(true);
+    ghost.classList.remove("is-dragging");
+    ghost.classList.add("drag-ghost");
+    ghost.removeAttribute("id");
+    ghost.style.position = "fixed";
+    ghost.style.top = "-10000px";
+    ghost.style.left = "-10000px";
+    ghost.style.width = card.offsetWidth + "px";
+    ghost.style.margin = "0";
+    document.body.appendChild(ghost);
+    e.dataTransfer.setDragImage(ghost, card.offsetWidth / 2, card.offsetHeight / 2);
+    // Remove after the snapshot is taken (next task, after dragstart returns).
+    setTimeout(() => ghost.remove(), 0);
   });
   document.addEventListener("dragover", (e) => {
     const hovered = e.target.closest("[data-widget]");

@@ -20,6 +20,7 @@ import {
   subscriptionURL,
   usageURL,
   probeService,
+  fetchCatalog,
 } from "./service.js";
 import {
   serviceBase,
@@ -464,11 +465,13 @@ async function probeAll(providers, rev) {
       }
       ctx.probeDone = Math.min(ids.length, i + 10);
       renderNav();
-      if (step === 1)
-        for (const item of data.nodes) {
-          const cell = document.querySelector(`[data-latency="${item.id}"]`);
-          if (cell) cell.innerHTML = latencyPill(item.latencyMs);
-        }
+      // Update any latency cells currently in the DOM regardless of which step
+      // the user is on — probe results can arrive after they have navigated
+      // back, and the node data is already stored on ctx.inspection.
+      for (const item of data.nodes) {
+        const cell = document.querySelector(`[data-latency="${item.id}"]`);
+        if (cell) cell.innerHTML = latencyPill(item.latencyMs);
+      }
     } catch {
       break;
     }
@@ -770,6 +773,73 @@ document.addEventListener("change", (e) => {
     changed();
   }
 });
+
+// Capsule policy picker (APP cards). The native <select> stays hidden as the
+// data source; these handlers drive the visible trigger + pill popover and
+// funnel every choice back through the select's `change` event so the existing
+// profile/compiler pipeline needs no changes.
+function closePolicyPickers(except) {
+  for (const picker of document.querySelectorAll("[data-policy-picker]")) {
+    if (picker === except) continue;
+    picker.classList.remove("is-open");
+    picker.setAttribute("aria-expanded", "false");
+    const menu = picker.querySelector("[data-policy-menu]");
+    if (menu) menu.hidden = true;
+  }
+}
+document.addEventListener("click", (e) => {
+  // The pill lives INSIDE the whole-card trigger, so resolve it first.
+  const pill = e.target.closest("[data-policy-option]");
+  if (pill) {
+    const picker = pill.closest("[data-policy-picker]");
+    const select = picker.querySelector("select[data-policy]");
+    const value = pill.dataset.policyOption;
+    if (select && select.value !== value) {
+      select.value = value;
+      select.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+    // The card face shows only the app name now; the chosen exit is reflected
+    // by the highlighted capsule plus the card's accessible label.
+    const label = pill.querySelector("span:last-child")?.textContent || "";
+    picker.setAttribute("aria-label", `${picker.dataset.app || ""} · 默认出口 ${label}`.trim());
+    for (const p of picker.querySelectorAll("[data-policy-option]")) {
+      const on = p === pill;
+      p.classList.toggle("is-active", on);
+      p.setAttribute("aria-selected", String(on));
+    }
+    closePolicyPickers();
+    return;
+  }
+  // The remove "−" badge also sits on the card; never open the menu for it —
+  // widget-editor.js owns that click (and layout editing in general).
+  if (e.target.closest("[data-widget-remove]")) return;
+  const trigger = e.target.closest("[data-policy-trigger]");
+  if (trigger) {
+    if (ctx.widgetEditing) return;
+    const picker = trigger.closest("[data-policy-picker]") || trigger;
+    const willOpen = !picker.classList.contains("is-open");
+    closePolicyPickers(picker);
+    picker.classList.toggle("is-open", willOpen);
+    picker.setAttribute("aria-expanded", String(willOpen));
+    const menu = picker.querySelector("[data-policy-menu]");
+    if (menu) menu.hidden = !willOpen;
+    return;
+  }
+  if (!e.target.closest("[data-policy-picker]")) closePolicyPickers();
+});
+// Keyboard parity for the whole-card button (role=button).
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    closePolicyPickers();
+    return;
+  }
+  if (e.key !== "Enter" && e.key !== " ") return;
+  const card = e.target.closest?.("[data-policy-trigger]");
+  if (!card || ctx.widgetEditing) return;
+  e.preventDefault();
+  card.click();
+});
+
 document.addEventListener("click", async (e) => {
   const el = e.target.closest("button");
   if (!el || el.disabled) return;
@@ -919,6 +989,42 @@ document.addEventListener("click", async (e) => {
     }
   }
 });
+// The bundled catalog is a build-time snapshot. Before the first paint, ask
+// the service for the catalog it actually compiled against (derived from the
+// live template). Mutating in place keeps every `import { catalog }` reference
+// in sync, so all pickers, categories, rules and icons follow the config file
+// — additions and deletions included — without a frontend rebuild. On any
+// failure we keep the bundled snapshot and degrade gracefully.
+async function syncCatalogFromService() {
+  try {
+    const remote = await fetchCatalog(serviceBase());
+    if (!remote) return;
+    // Reuse the exact same object identity so all importers observe the update.
+    for (const key of Object.keys(catalog)) delete catalog[key];
+    Object.assign(catalog, remote);
+    // Refresh derived profile fields so ids removed from the template no
+    // longer linger and ids added by it appear. "all" modes mirror the catalog
+    // exactly; custom selections keep only ids that still exist.
+    const fresh = defaults(catalog);
+    const keep = (list, known) =>
+      (list || []).filter((id) => known.includes(id));
+    ctx.profile.apps =
+      ctx.profile.appsMode === "all"
+        ? fresh.apps
+        : keep(ctx.profile.apps, fresh.apps);
+    // Modules have no separate mode field: a fresh load starts with all of
+    // them. Mirror the authoritative list so template edits are reflected.
+    ctx.profile.modules = fresh.modules;
+    ctx.profile.strategies = keep(ctx.profile.strategies, fresh.strategies);
+    ctx.profile.countries = keep(ctx.profile.countries, fresh.countries);
+    ctx.profile.appPolicy = { ...ctx.profile.appPolicy };
+    for (const id of Object.keys(ctx.profile.appPolicy))
+      if (!catalog.apps.some((a) => a.id === id)) delete ctx.profile.appPolicy[id];
+  } catch {
+    /* keep bundled catalog */
+  }
+}
+
 renderEmoji(document.body);
 bindWidgetEditor({
   ctx,
@@ -935,7 +1041,11 @@ bindWidgetEditor({
     }
   },
 });
-render();
-// Resolve service.json (if the address was not baked into the bundle) before
-// probing, so the first health check already targets the right backend.
-void discoverService().then(() => checkService());
+// Resolve service.json (if the address was not baked into the bundle) first,
+// then sync the authoritative catalog, then paint once with the final data.
+void (async () => {
+  await discoverService();
+  await syncCatalogFromService();
+  render();
+  await checkService();
+})();
