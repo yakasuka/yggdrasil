@@ -1136,10 +1136,12 @@ site-footer {
   line-height: 1.35;
   color: var(--muted);
 }
-/* Compact horizontal region bars: flag + name + node count on one line. */
+/* Compact horizontal region bars: flag + name + node count on one line.
+   Auto-fit columns keep each card close to its content instead of stretching
+   it to half the panel width and leaving a large empty gap. */
 .region-bars {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
   gap: 8px;
   margin: 18px 0;
 }
@@ -1827,9 +1829,6 @@ noscript {
   .fields {
     grid-template-columns: 1fr;
   }
-  .region-bars {
-    grid-template-columns: 1fr;
-  }
   .caustic-copy {
     left: 30px;
     right: 30px;
@@ -1983,9 +1982,6 @@ noscript {
   }
   .app-card .policy-menu {
     min-width: 148px;
-  }
-  .region-bars {
-    grid-template-columns: 1fr;
   }
   .region-bar {
     gap: 8px;
