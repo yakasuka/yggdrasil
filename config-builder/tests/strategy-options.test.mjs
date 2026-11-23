@@ -42,11 +42,17 @@ test("older profiles gain both select groups without a backend regeneration", ()
   assert.deepEqual(p.strategies, ["auto", ...CORE_STRATEGY_IDS]);
 });
 
-test("节点选择 cannot become the default exit because it would point to itself", () => {
-  assert.throws(
-    () => normalize({ ...base(), defaultStrategy: "gateway" }),
-    /默认策略/,
+test("节点选择 is the default exit and never becomes its own proxy", async () => {
+  assert.equal(defaults(catalog).defaultStrategy, "gateway");
+  const p = normalize({ ...base(), defaultStrategy: "gateway" });
+  assert.equal(p.defaultStrategy, "gateway");
+  const out = await compile(p, catalog);
+  const doc = parse(out.yaml, { merge: true, maxAliasCount: 100 });
+  const gateway = doc["proxy-groups"].find(
+    (g) => g.name === catalog.groups.gateway,
   );
+  assert.equal(gateway.proxies[0], catalog.groups.manual);
+  assert.ok(!gateway.proxies.includes(catalog.groups.gateway));
 });
 
 test("manual default maps to the template group name when compiling", async () => {
@@ -58,14 +64,17 @@ test("manual default maps to the template group name when compiling", async () =
   assert.equal(gateway.proxies[0], catalog.groups.manual);
 });
 
-test("strategy panel renders six cards and both select groups", () => {
+test("strategy panel renders six cards with 节点选择 selected by default", () => {
   const html = strategiesPanel({
-    profile: { strategies: ["auto", ...CORE_STRATEGY_IDS], defaultStrategy: "manual" },
+    profile: {
+      strategies: ["auto", ...CORE_STRATEGY_IDS],
+      defaultStrategy: "gateway",
+    },
   });
   assert.equal((html.match(/data-strategy=/g) || []).length, 6);
   assert.match(html, /🎚️ 节点选择/);
   assert.match(html, /🚀 手动切换/);
   assert.match(html, /data-strategy="gateway"[^>]* disabled/);
-  assert.match(html, /<option value="manual"[^>]* selected>手动切换<\/option>/);
-  assert.doesNotMatch(html, /<option value="gateway"/);
+  assert.match(html, /<option value="gateway"[^>]* selected>节点选择<\/option>/);
+  assert.match(html, /首次打开客户端时使用/);
 });

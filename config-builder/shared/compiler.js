@@ -115,7 +115,8 @@ export function defaults(model = catalog) {
     // automatic strategies can still be switched off there.
     other: true,
     strategies: [...CORE_STRATEGY_IDS, ...STRATEGIES.map((s) => s.id)],
-    defaultStrategy: "manual",
+    // 节点选择是所有规则的入口组，也是客户端里唯一需要切换的地方。
+    defaultStrategy: "gateway",
     appsMode: "all",
     apps: model.apps.map((a) => a.id),
     appPolicy: {},
@@ -183,11 +184,12 @@ export function normalize(input, model = catalog, { migrate = false } = {}) {
     ...CORE_STRATEGY_IDS,
   ]);
   p.defaultStrategy = input.defaultStrategy;
-  // 节点选择是规则入口组，不能指向自己，因此不参与默认出口下拉。
-  const defaultAllowed = ["manual", ...STRATEGIES.map((x) => x.id)];
+  // 节点选择是固定入口组，始终可用；其余策略需已启用。
+  const defaultAllowed = [...CORE_STRATEGY_IDS, ...STRATEGIES.map((x) => x.id)];
   if (
     !defaultAllowed.includes(p.defaultStrategy) ||
-    (p.defaultStrategy !== "manual" && !p.strategies.includes(p.defaultStrategy))
+    (!CORE_STRATEGY_IDS.includes(p.defaultStrategy) &&
+      !p.strategies.includes(p.defaultStrategy))
   )
     fail("请选择已启用的默认策略。", "strategies");
   const knownCountries = model.regions.map((r) => r.id);
@@ -306,10 +308,15 @@ export async function compile(input, model = catalog, options = {}) {
   const active = STRATEGIES.filter((s) => p.strategies.includes(s.id)).map(
     (s) => ({ ...s, ...(model.strategies.find((x) => x.id === s.id) || {}) }),
   );
+  // preferred 只决定「节点选择」组在客户端里默认选中哪一项。选择 gateway
+  // 时保持模板原样（先进入「手动切换」挑节点），不把入口组自己塞进成员，
+  // 避免自引用；所有规则仍然统一走节点选择。
   const preferred =
-    p.defaultStrategy === "manual"
+    p.defaultStrategy === "gateway"
       ? g.manual
-      : active.find((s) => s.id === p.defaultStrategy)?.name || g.manual;
+      : p.defaultStrategy === "manual"
+        ? g.manual
+        : active.find((s) => s.id === p.defaultStrategy)?.name || g.manual;
   const exits = unique([
     preferred,
     g.manual,

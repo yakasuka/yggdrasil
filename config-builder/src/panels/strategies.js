@@ -6,11 +6,9 @@ export function strategiesPanel(ctx) {
     const on = s.fixed || ctx.profile.strategies.includes(s.id);
     return `<label class="choice${s.fixed ? " fixed" : ""}"><input type="checkbox" data-strategy="${s.id}"${checked(on)}${s.fixed ? " disabled" : ""}>${s.icon ? `<img class="choice-icon" src="${esc(s.icon)}" alt="" loading="lazy" onerror="this.hidden=true">` : ""}<span><strong>${esc(s.name)}</strong>${s.fixed ? `<span class="choice-badge">始终保留</span>` : ""}<small>${esc(s.description)}</small></span></label>`;
   };
-  // 节点选择是规则的入口组，不能成为自己的默认出口。
+  // 节点选择是固定入口组，始终是合法的默认出口。
   const options = STRATEGY_VIEW.filter(
-    (s) =>
-      s.id !== "gateway" &&
-      (s.fixed || ctx.profile.strategies.includes(s.id)),
+    (s) => s.fixed || ctx.profile.strategies.includes(s.id),
   )
     .map(
       (s) =>
@@ -21,11 +19,11 @@ export function strategiesPanel(ctx) {
   return (
     title(
       "让节点，按你的方式连接。",
-      "选择需要保留的自动策略。节点选择与手动切换始终保留，手动切换可作为默认出口。",
+      "节点选择与手动切换始终保留；默认出口决定客户端首次打开时的策略。",
     ) +
-    `<div class="choice-grid">${STRATEGY_VIEW.map(card).join("")}</div><label class="inline-field"><span>默认代理策略<small>APP 选择「跟随代理」时使用</small></span><select id="default-strategy">${options}</select></label>` +
+    `<div class="choice-grid">${STRATEGY_VIEW.map(card).join("")}</div><label class="inline-field"><span>默认代理策略<small>首次打开客户端时使用</small></span><select id="default-strategy">${options}</select></label>` +
     notice(
-      "自动策略使用同一延迟检测地址，并启用统一延迟。轮询分配新连接，不拆分单条连接。",
+      "所有规则默认走「节点选择」，在客户端切换一次即可更换全部节点。这里只决定首次打开时默认选中的策略；自动策略使用同一延迟检测地址并启用统一延迟，轮询分配只作用于新连接。",
     )
   );
 }

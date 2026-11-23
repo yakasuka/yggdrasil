@@ -143,10 +143,10 @@ export function applyShare(base, shared, model) {
     next.appsMode === "all"
       ? knownApps
       : ids(shared.apps, knownApps, base.apps);
-  const defaultIds = ["manual", ...STRATEGIES.map((s) => s.id)];
+  const defaultIds = [...CORE_STRATEGY_IDS, ...STRATEGIES.map((s) => s.id)];
   next.defaultStrategy =
     defaultIds.includes(shared.defaultStrategy) &&
-    (shared.defaultStrategy === "manual" ||
+    (CORE_STRATEGY_IDS.includes(shared.defaultStrategy) ||
       next.strategies.includes(shared.defaultStrategy))
       ? shared.defaultStrategy
       : base.defaultStrategy;

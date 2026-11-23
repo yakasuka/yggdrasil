@@ -41,9 +41,9 @@ import {
 } from "../shared/nodes.js";
 import { filename, contentDisposition } from "../shared/profile.js";
 import { profile, text } from "./helpers.mjs";
-test("defaults select all apps, manual routing, and expose no editable rules", () => {
+test("defaults select all apps, gateway routing, and expose no editable rules", () => {
   const p = defaults();
-  assert.equal(p.defaultStrategy, "manual");
+  assert.equal(p.defaultStrategy, "gateway");
   assert.deepEqual(
     p.apps,
     catalog.apps.map((a) => a.id),

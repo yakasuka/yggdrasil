@@ -724,7 +724,7 @@ document.addEventListener("change", (e) => {
   if (el.dataset.strategy) {
     toggle(ctx.profile.strategies, el.dataset.strategy, el.checked);
     if (!ctx.profile.strategies.includes(ctx.profile.defaultStrategy))
-      ctx.profile.defaultStrategy = "manual";
+      ctx.profile.defaultStrategy = "gateway";
     changed();
     render();
   }
