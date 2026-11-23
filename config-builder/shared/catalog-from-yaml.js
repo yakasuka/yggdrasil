@@ -18,8 +18,13 @@ const REGION_LABELS = {
   TR: "土耳其", BR: "巴西", AR: "阿根廷", OTHER: "其他地区",
 };
 
+// Category is derived from the group name only as a last-resort fallback.
+// Authored `x-category` on the YAML node always wins, so an APP's placement is
+// declared in the template (machine- and human-readable) rather than hard-coded
+// here. No name is special-cased — e.g. Hermes is a switch entry and carries
+// its own `x-category: 策略入口` in the template.
 const category = (name) =>
-  /OpenAI|Anthropic|Hermes|AI/.test(name)
+  /OpenAI|Anthropic|AI/.test(name)
     ? "AI 与开发"
     : /OKX|Binance|Bybit|Crypto|Coin|Cryptocurrency/.test(name)
       ? "数字资产"
@@ -111,10 +116,18 @@ export async function catalogFromYaml(text) {
   const ports =
     groups.find((g) => g.name.includes("特殊端口"))?.name || "🔌 特殊端口";
   const othersGroup = groups.find((g) => g.name.includes("Others"));
+  // Core switch groups are located by their authored `x-id` first, so the
+  // template declares what each group IS instead of the code guessing from its
+  // name. Name-based lookup stays only as a fallback for older templates.
+  const byId = (id) => groups.find((g) => metaOf(g).id === id);
   const hermes =
-    groups.find((g) => g.name.includes("Hermes"))?.name || "✨ Hermes";
+    byId("hermes")?.name ||
+    groups.find((g) => g.name.includes("Hermes"))?.name ||
+    "✨ Hermes";
   const china =
-    groups.find((g) => g.name.includes("China"))?.name || "🏯 China";
+    byId("china")?.name ||
+    groups.find((g) => g.name.includes("China"))?.name ||
+    "🏯 China";
   const core = {
     gateway,
     manual,
@@ -220,17 +233,12 @@ export async function catalogFromYaml(text) {
     }
   }
 
-  // Apps and "switch entries" are select groups that are not core/region/
-  // strategy groups. The author's principle: EVERYTHING written in the YAML
-  // must be selectable in the configurator — including switch/entry groups
-  // like ✨ Hermes that carry no rule of their own (they are total-node
-  // switches the author may wire up with rules later). Previously such groups
-  // were dropped by `.filter(a => a.rules.length)` and hermes was hard-reserved,
-  // so Hermes never appeared anywhere in the UI. Now:
-  //   - a select group with >=1 rule  -> a normal app (routing target)
-  //   - a select group with 0 rules   -> an entry/switch (still shown)
-  // Only the true core/region/strategy groups are excluded; they already have
-  // their own dedicated pickers (地区节点 / 节点策略 / 规则模块).
+  // Every select group written in the template is selectable, including
+  // rule-less switch entries (they are total-node switches the author may wire
+  // to a rule later). Only core/region/strategy groups are excluded — they have
+  // their own pickers. Classification is data-driven: `x-category` on the group
+  // wins; otherwise a rule-less entry defaults to 策略入口, and other groups fall
+  // back to the name classifier. No specific name is special-cased in code.
   const reserved = new Set([
     gateway,
     manual,
@@ -253,12 +261,10 @@ export async function catalogFromYaml(text) {
     .map((g) => {
       const rules = t.rules.filter((r) => r.split(",")[2] === g.name);
       const meta = metaOf(g);
-      // A rule-less select group is a switch/entry (e.g. ✨ Hermes). Give it a
-      // stable id from its group name so it survives in profiles and shares.
+      // A rule-less select group is a switch/entry; derive a stable id from its
+      // name so it survives in profiles and shares. Category resolution order:
+      // authored x-category > (rule-less entry ? 策略入口) > name classifier.
       const isEntry = rules.length === 0;
-      // Entries still go through the classifier so Hermes lands under the AI
-      // category where the user expects it. Only entries the classifier cannot
-      // place fall back to the generic "策略入口" bucket.
       const derivedCategory = category(g.name);
       return {
         id: meta.id || rules[0]?.split(",")[1] || stripIcon(g.name),

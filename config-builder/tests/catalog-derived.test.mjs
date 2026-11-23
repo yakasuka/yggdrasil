@@ -77,14 +77,20 @@ test("rule-less switch groups from the YAML are shown as entry pickers (Hermes)"
   );
 });
 
-test("Others is a region group, not an APP; Hermes is categorised as AI", async () => {
+test("Others is a region group, not an APP; Hermes placement is YAML-declared", async () => {
   const derived = await catalogFromYaml(template);
   // 🌌 Others selects nodes outside the six filter-defined countries. It is
   // surfaced on the regions page (core.other), never as an APP switch card.
   assert.ok(!derived.apps.some((a) => a.name.includes("Others")));
   assert.equal(derived.groups.otherGroupName, "🌌 Others");
   const hermes = derived.apps.find((a) => a.name.includes("Hermes"));
-  assert.equal(hermes.category, "AI 与开发", "Hermes belongs to the AI group");
+  // No name is special-cased in code: Hermes' category comes from its authored
+  // `x-category: 策略入口` in the template. AI must contain only real AI apps.
+  assert.equal(hermes.category, "策略入口", "Hermes follows the template's x-category");
+  assert.ok(
+    !derived.apps.some((a) => a.category === "AI 与开发" && a.name.includes("Hermes")),
+    "no hardcoded Hermes→AI exception remains",
+  );
   assert.equal(hermes.entry, true, "Hermes stays a rule-less switch entry");
 });
 

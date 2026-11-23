@@ -13,6 +13,7 @@ import {
   widgetLabel,
   setEnabled,
   moveOrder,
+  sortWidgets,
   ORDER_KEY,
 } from "./widget-mode.js";
 import { esc } from "./ui.js";
@@ -37,7 +38,7 @@ export function editorChrome(kind, ctx) {
   if (!ctx.widgetEditing) return "";
   const disabled = disabledIds(kind, ctx.profile, catalog);
   return (
-    `<div class="widget-editor-bar"><span class="widget-editor-hint">拖动排序 · 点击 <b>−</b> 移除</span><div class="widget-editor-actions"><button type="button" class="widget-add-button" data-widget-library="${kind}" aria-expanded="${ctx.widgetLibrary === kind}"><span aria-hidden="true">＋</span> 添加组件</button><button type="button" class="widget-done-button" data-widget-done>完成</button></div></div>` +
+    `<div class="widget-editor-bar"><span class="widget-editor-hint">拖动排序 · 点击 <b>−</b> 移除</span><div class="widget-editor-actions"><button type="button" class="widget-sort-button" data-widget-sort="alpha" title="按名称首字母排序">A→Z</button><button type="button" class="widget-sort-button" data-widget-sort="default" title="恢复模板默认顺序">默认</button><button type="button" class="widget-add-button" data-widget-library="${kind}" aria-expanded="${ctx.widgetLibrary === kind}"><span aria-hidden="true">＋</span> 添加组件</button><button type="button" class="widget-done-button" data-widget-done>完成</button></div></div>` +
     (ctx.widgetLibrary === kind
       ? `<div class="widget-library" data-widget-library-panel="${kind}"><div class="widget-library-head"><strong>组件库</strong><small>点击添加回网格</small><button type="button" class="widget-library-close" data-widget-library-close aria-label="关闭组件库">×</button></div>${
           disabled.length
@@ -146,6 +147,14 @@ export function bind(api) {
       ctx.widgetEditing = false;
       ctx.widgetLibrary = null;
       render();
+      return;
+    }
+    if (btn.dataset.widgetSort && kind) {
+      const mode = btn.dataset.widgetSort;
+      sortWidgets(kind, mode, ctx.profile, catalog);
+      changed();
+      render();
+      toast?.(mode === "alpha" ? "已按名称首字母排序" : "已恢复模板默认顺序");
       return;
     }
     if (btn.dataset.widgetLibrary) {

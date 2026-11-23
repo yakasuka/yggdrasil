@@ -6,6 +6,7 @@ import {
   displayOrder,
   setEnabled,
   moveOrder,
+  sortWidgets,
   enabledIds,
 } from "../src/widget-mode.js";
 import { defaults, catalog, normalize } from "../shared/compiler.js";
@@ -84,6 +85,31 @@ test("invalid ids are ignored by setEnabled / moveOrder", () => {
   moveOrder("app", "not-a-real-app", null, p, catalog);
   // moveOrder filters invalid ids out but keeps the known set intact.
   assert.ok(p.order.apps.includes(allIds("app", catalog)[0]));
+});
+
+test("sortWidgets alpha orders by label and default restores template order", () => {
+  const p = defaults(catalog);
+  const original = [...allIds("app", catalog)];
+  // Mutate the saved order first so both modes have something to change.
+  p.order.apps = [...original].reverse();
+
+  const defaultOrder = sortWidgets("app", "default", p, catalog);
+  assert.deepEqual(defaultOrder, original, "default = catalog order");
+
+  const alpha = sortWidgets("app", "alpha", p, catalog);
+  assert.equal(alpha.length, original.length, "alpha keeps every id");
+  assert.deepEqual([...alpha].sort(), [...original].sort(), "alpha is a permutation");
+  const collator = new Intl.Collator("zh-CN", { numeric: true, sensitivity: "base" });
+  // The persisted order is what displayOrder reads back.
+  assert.deepEqual(p.order.apps, alpha);
+  assert.deepEqual(displayOrder("app", p, catalog), alpha);
+  // Verify it is actually sorted by label (not just a permutation).
+  const label = (id) => {
+    const a = catalog.apps.find((x) => x.id === id);
+    return a ? a.label || id : id;
+  };
+  for (let i = 1; i < alpha.length; i++)
+    assert.ok(collator.compare(label(alpha[i - 1]), label(alpha[i])) <= 0, "alpha sorted by label");
 });
 
 test("order survives normalize()", () => {

@@ -48,7 +48,10 @@ test("all four lifetimes create unique encrypted profiles and permanent tokens o
         "ratatoskr · Eaibee.yaml",
       ),
     );
-    assert.ok((await read.text()).includes("# Ratatoskr · Eaibee"));
+    // Generated configs are comment-free; verify real content instead of a banner.
+    const served = await read.text();
+    assert.ok(served.includes("proxy-groups:"));
+    assert.ok(!/^\s*#/m.test(served), "no comments in the served config");
   }
 });
 test("the same token serves a newly added template APP without regenerating the link", async () => {
@@ -75,7 +78,11 @@ test("the same token serves a newly added template APP without regenerating the 
   const yaml = await read.text();
   assert.equal(read.status, 200);
   assert.ok(yaml.includes("🧪 Live App"));
-  assert.ok(yaml.includes(box.value.version));
+  // Config is comment-free, so the model version is not embedded as a comment.
+  // Verify the served config still parses and carries the new APP as a real group.
+  const doc = parse(yaml, { merge: true, maxAliasCount: 100 });
+  assert.ok(doc["proxy-groups"].some((g) => g.name === "🧪 Live App"));
+  assert.ok(!/^\s*#/m.test(yaml), "no comments in the served config");
 });
 test("expired and invalid capability links cannot read configuration", async () => {
   const service = app(),

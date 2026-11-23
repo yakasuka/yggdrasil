@@ -2,7 +2,7 @@ import { parse, stringify } from "yaml";
 import catalog from "./catalog.json" with { type: "json" };
 import { filename, lifetime } from "./profile.js";
 import { classifyNodes } from "./nodes.js";
-import { renderFromTemplate } from "./template-render.js";
+import { renderFromTemplate, stripYamlComments } from "./template-render.js";
 export { catalog };
 export const STRATEGIES = [
   {
@@ -397,8 +397,26 @@ export async function compile(input, model = catalog, options = {}) {
     ")";
   // Derive active strategies from the catalog so a strategy added to the
   // template is compiled automatically; legacy table supplies type fallback.
+  // A rule may use a strategy group as its exit (e.g. an enabled rule targeting
+  // 📦 下载均衡). Keep that exit group alive even when the user did not tick it,
+  // otherwise the rule would reference a group that was never generated. This
+  // is data-driven: read the rule's target out of the template, no name is
+  // special-cased in code.
+  const enabledRuleTargets = new Set(
+    model.orderedRules
+      .filter(
+        (r) =>
+          (!r.app || p.apps.includes(r.app)) &&
+          (!r.module || p.modules.includes(r.module)),
+      )
+      .map((r) => r.rule.split(",")[2]),
+  );
+  const activeDefs = strategyDefs(model);
+  const activeIds = new Set(p.strategies);
+  for (const s of activeDefs)
+    if (enabledRuleTargets.has(s.name)) activeIds.add(s.id);
   const active = sortByOrder(
-    strategyDefs(model).filter((s) => p.strategies.includes(s.id)),
+    activeDefs.filter((s) => activeIds.has(s.id)),
     p.order.strategies,
   );
   // preferred 只决定「节点选择」组在客户端里默认选中哪一项。选择 gateway
@@ -629,9 +647,12 @@ export async function compile(input, model = catalog, options = {}) {
   // banners, inline comments, flow-style one-liners and GEOSITE/GEOIP rules.
   // Falls back to a parse of the built config if a template is unavailable.
   const template = model.templateText;
-  const yaml = template
+  const rendered = template
     ? renderFromTemplate(template, config, p, model)
     : parseConfigFallback(config, p, model);
+  // The source template keeps its comments (human/AI readable), but the config
+  // handed to the Mihomo client is comment-free.
+  const yaml = stripYamlComments(rendered);
   return {
     yaml,
     config,

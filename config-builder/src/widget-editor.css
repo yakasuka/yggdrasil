@@ -217,7 +217,8 @@
   gap: 8px;
 }
 .widget-add-button,
-.widget-done-button {
+.widget-done-button,
+.widget-sort-button {
   min-height: 34px;
   padding: 0 14px;
   border-radius: 999px;
@@ -228,10 +229,16 @@
     transform 160ms var(--ease),
     filter 160ms var(--ease);
 }
-.widget-add-button {
+.widget-add-button,
+.widget-sort-button {
   border: 1px solid var(--glass-edge);
   background: var(--soft);
   color: var(--ink);
+}
+.widget-sort-button {
+  padding: 0 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
 }
 .widget-add-button[aria-expanded="true"] {
   border-color: var(--selected-line);
@@ -244,7 +251,8 @@
   color: #fff;
 }
 .widget-add-button:hover,
-.widget-done-button:hover {
+.widget-done-button:hover,
+.widget-sort-button:hover {
   filter: brightness(1.08);
   transform: translateY(-1px);
 }

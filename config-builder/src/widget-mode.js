@@ -149,6 +149,24 @@ export function widgetAttrs(kind, id, { fixed = false } = {}) {
   return ` data-widget="${kind}" data-id="${esc(id)}"${fixed ? " data-widget-fixed" : ""}`;
 }
 
+// Sort all widgets of a kind into one of two canonical orders and persist it.
+//   "alpha"   — by display label (locale-aware, so Chinese sorts sensibly)
+//   "default" — the template/catalog order, dropping any saved order
+// Returns the new order. Used by the edit-mode quick-sort buttons.
+export function sortWidgets(kind, mode, profile, model = catalog) {
+  const ids = allIds(kind, model);
+  let order;
+  if (mode === "default") {
+    order = ids;
+  } else {
+    const label = (id) => widgetLabel(kind, id, model).label || id;
+    const collator = new Intl.Collator("zh-CN", { numeric: true, sensitivity: "base" });
+    order = [...ids].sort((a, b) => collator.compare(label(a), label(b)));
+  }
+  profile.order = { ...profile.order, [ORDER_KEY[kind]]: order };
+  return order;
+}
+
 // Reorder: move `id` so it sits immediately before `beforeId` (or at the end
 // when beforeId is null). Mutates `profile.order` and returns the new order.
 export function moveOrder(kind, id, beforeId, profile, model = catalog) {

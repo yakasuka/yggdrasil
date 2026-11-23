@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { parse } from "yaml";
 import { compile, catalog, ruleModules } from "../shared/compiler.js";
+import { stripYamlComments } from "../shared/template-render.js";
 import { profile } from "./helpers.mjs";
 
 const template = await readFile(
@@ -30,23 +31,49 @@ function assertValidRefs(doc) {
   assert.ok(doc.rules.some((r) => r.startsWith("MATCH,")));
 }
 
-test("render keeps the author's comments, section banners and flow style", async () => {
-  const { yaml } = await compile(profile());
-  assert.ok(yaml.startsWith("# Ratatoskr · Eaibee"));
+test("source template keeps its comments; generated config is comment-free but keeps flow style", async () => {
+  // The source YAML stays human/AI readable with section banners and comments.
   for (const banner of [
-    "1. 远程节点调用 Proxy Providers",
-    "2. 基础设置 General",
-    "4. 节点筛选 Node Filters",
-    "6. 分流规则 Rules",
-    "7. 规则源 Rule Providers",
+    "1 · 节点订阅 / Proxy Providers",
+    "2 · 基础设置 / General",
+    "6 · 分流规则 / Rules",
+    "7 · 规则源 / Rule Providers",
   ])
-    assert.ok(yaml.includes(banner), `missing banner: ${banner}`);
-  // Inline comments and flow one-liners survive verbatim.
+    assert.ok(template.includes(banner), `source missing banner: ${banner}`);
+  assert.ok(/^\s*#/m.test(template), "source template has comments");
+
+  // The generated config drops every comment but keeps structure, flow-style
+  // one-liners and YAML anchors (they are data, not comments).
+  const { yaml } = await compile(profile());
+  assert.ok(!/^\s*#/m.test(yaml), "generated config has no comment lines");
+  assert.ok(!/\s+#/.test(yaml), "generated config has no inline comments");
   assert.ok(yaml.includes("port: 7890"));
-  assert.ok(yaml.includes("HTTP 代理端口"));
-  assert.ok(yaml.includes("{name: ⚡ 自动选择"));
-  assert.ok(yaml.includes("FilterRegions: &FilterRegions"));
-  assert.ok(yaml.includes("<<: *RP-domain"));
+  assert.ok(yaml.includes("{name: ⚡ 自动选择"), "flow one-liners survive");
+  assert.ok(yaml.includes("FilterRegions: &FilterRegions"), "anchors survive");
+  assert.ok(yaml.includes("<<: *RP-domain"), "merge keys survive");
+});
+
+test("stripYamlComments keeps # inside quotes and drops real comments", () => {
+  const src = [
+    "# a full comment",
+    "port: 7890  # inline note",
+    'url: "https://example.com/sub#fragment"  # keep the fragment',
+    "name: 'a # b' # trailing",
+    "FilterAll: &FilterAll '^(?!.*(?:(?i)=>|群)).*$'",
+    "",
+    "rules:",
+    "  - GEOSITE,private,DIRECT",
+  ].join("\n");
+  const out = stripYamlComments(src);
+  assert.ok(!/^\s*#/m.test(out), "no full comment lines");
+  assert.ok(out.includes("port: 7890"), "inline comment removed, value kept");
+  assert.ok(out.includes("https://example.com/sub#fragment"), "# in URL preserved");
+  assert.ok(out.includes("name: 'a # b'"), "# in single quotes preserved");
+  assert.ok(out.includes("FilterAll: &FilterAll"), "anchor kept");
+  // Still parses after stripping.
+  const doc = parse(out, { merge: true, maxAliasCount: 100 });
+  assert.equal(doc.port, 7890);
+  assert.ok(Array.isArray(doc.rules));
 });
 
 test("render injects airport URLs as remote proxy-providers, never inlines nodes", async () => {
@@ -125,7 +152,7 @@ test("render keeps EVERY template group/region/rule regardless of selection", as
         for (const region of ["🌆 Hong Kong", "🧋 Taiwan", "⛩️ Japan", "🎤 South Korea", "🏙️ Singapore", "🗽 United States", "🌌 Others"])
           assert.ok(group.proxies.includes(region), `${label}: ${name} must keep ${region} as an option`);
     }
-    assert.ok(yaml.includes("6. 分流规则 Rules"), label);
+    assert.ok(doc.rules.some((r) => r.startsWith("MATCH,")), label);
     assert.ok(yaml.includes("proxy-providers:"), label);
   }
 });

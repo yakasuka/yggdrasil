@@ -206,4 +206,34 @@ function proxyProviderLines(p, model) {
   return out;
 }
 
+// Strip YAML comments from a RENDERED config, keeping the source template's
+// comments intact (the template stays human-readable). The generated config is
+// meant for the Mihomo client: comments are noise there. A `#` starts a comment
+// only outside quotes and at line start or after whitespace — this preserves
+// `#` inside URLs (e.g. `https://x/#fragment`) and inside quoted values.
+export function stripYamlComments(text) {
+  const out = [];
+  for (const line of text.split("\n")) {
+    let quote = null; // null | '"' | "'"
+    let cut = line.length;
+    for (let i = 0; i < line.length; i++) {
+      const c = line[i];
+      if (quote) {
+        if (c === "\\" && quote === '"') { i++; continue; } // escaped char
+        if (c === quote) {
+          // YAML doubles a quote inside a single-quoted scalar to escape it.
+          if (quote === "'" && line[i + 1] === "'") { i++; continue; }
+          quote = null;
+        }
+        continue;
+      }
+      if (c === '"' || c === "'") { quote = c; continue; }
+      if (c === "#" && (i === 0 || /\s/.test(line[i - 1]))) { cut = i; break; }
+    }
+    const kept = line.slice(0, cut).replace(/\s+$/, "");
+    if (kept.trim()) out.push(kept);
+  }
+  return out.length ? out.join("\n") + "\n" : "";
+}
+
 export { renderFromTemplate as default };
