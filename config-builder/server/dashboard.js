@@ -58,6 +58,20 @@ body{padding-bottom:64px}
 .dash-badge{display:inline-block;padding:3px 10px;border-radius:99px;font-size:.6875rem;border:1px solid var(--line);background:var(--soft);color:var(--muted)}
 .dash-badge.locked{color:var(--warning);border-color:var(--warning-bg);background:var(--warning-bg)}
 .dash-badge.open{color:var(--muted)}
+.dash-copy{flex:0 0 auto;border:1px solid var(--line);background:var(--soft);color:var(--muted);border-radius:8px;padding:4px 8px;font-size:.6875rem;line-height:1.2;cursor:pointer;display:inline-flex;align-items:center;gap:4px;transition:color 160ms var(--ease),border-color 160ms var(--ease),background 160ms var(--ease)}
+.dash-copy:hover{color:var(--accent);border-color:var(--selected-line);background:var(--tint)}
+.dash-copy:active{transform:scale(.96)}
+.dash-copy svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.dash-link{display:inline-flex;align-items:center;gap:8px;max-width:100%}
+.dash-link code{word-break:break-all}
+.dash-toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,16px);z-index:99;padding:10px 18px;border:1px solid var(--line);border-radius:99px;background:var(--surface);color:var(--ink);font-size:.8125rem;box-shadow:0 8px 30px #0003;opacity:0;pointer-events:none;transition:opacity 200ms var(--ease),transform 200ms var(--ease)}
+.dash-toast.show{opacity:1;transform:translate(-50%,0)}
+.dash-toast.err{color:var(--danger)}
+.dash-empty{display:flex;flex-direction:column;align-items:center;gap:8px;padding:8px}
+.dash-empty strong{font-weight:600;color:var(--ink);font-size:.9375rem}
+.dash-empty p{margin:0;font-size:.8125rem;line-height:1.7}
+.dash-empty a{color:var(--accent);text-decoration:none}
+.dash-empty a:hover{text-decoration:underline}
 .dash-err{color:var(--danger)}
 .dash-ok{color:var(--ok)}
 button.danger{color:var(--danger);border-color:var(--danger-bg)}
@@ -151,6 +165,7 @@ export function dashboardHTML({
     </div>
   </section>
 </main>
+<div class="dash-toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
 (function(){
@@ -178,6 +193,40 @@ toggle.addEventListener("click",function(){
 });
 applyTheme();
 function el(tag,text){var n=document.createElement(tag);if(text!=null)n.textContent=text;return n}
+var toast=document.getElementById("toast"),toastTimer=null;
+function notify(text,isErr){
+  toast.textContent=text;
+  toast.className="dash-toast show"+(isErr?" err":"");
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(function(){toast.className="dash-toast"},2400);
+}
+function copyIcon(){
+  var s=document.createElementNS("http://www.w3.org/2000/svg","svg");
+  s.setAttribute("viewBox","0 0 24 24");s.setAttribute("aria-hidden","true");
+  var p=document.createElementNS("http://www.w3.org/2000/svg","path");
+  p.setAttribute("d","M9 9h10v10H9zM5 15H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v1");
+  s.appendChild(p);return s;
+}
+function copyButton(text,label){
+  var b=el("button");b.className="dash-copy";b.type="button";
+  b.title=label||"复制订阅链接";b.setAttribute("aria-label",b.title);
+  b.appendChild(copyIcon());b.appendChild(el("span","复制"));
+  b.addEventListener("click",function(){
+    var done=function(){notify("已复制订阅链接");var sp=b.getElementsByTagName("span")[0];if(sp){var old=sp.textContent;sp.textContent="已复制";setTimeout(function(){sp.textContent=old},1500)}};
+    var fail=function(){notify("复制失败，请手动选择链接",true)};
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(done).catch(function(){fallbackCopy(text,done,fail)});
+    }else fallbackCopy(text,done,fail);
+  });
+  return b;
+}
+function fallbackCopy(text,done,fail){
+  var ta=el("textarea");ta.value=text;ta.setAttribute("readonly","");
+  ta.style.cssText="position:fixed;top:-1000px;opacity:0";
+  document.body.appendChild(ta);ta.select();var ok=false;
+  try{ok=document.execCommand("copy")}catch(e){}
+  document.body.removeChild(ta);ok?done():fail();
+}
 function stamp(value){
   if(!value)return "—";
   var d=new Date(value);
@@ -201,7 +250,15 @@ function linkFor(row){
 }
 function render(rows){
   body.textContent="";
-  if(!rows.length){body.className="dash-msg";body.appendChild(el("div","还没有生成任何配置。"));return}
+  if(!rows.length){
+    body.className="dash-msg";
+    var empty=el("div"),emptyClass="dash-empty";
+    empty.className=emptyClass;
+    empty.appendChild(el("strong","还没有生成任何配置"));
+    var tip=el("p");tip.appendChild(document.createTextNode("配置由订阅工坊生成。"));
+    var a=el("a","打开配置工坊");a.href="../";tip.appendChild(document.createTextNode(" "));tip.appendChild(a);
+    empty.appendChild(tip);body.appendChild(empty);return;
+  }
   body.className="";
   var table=el("table"),head=el("thead"),hr=el("tr");
   table.className="dash-table";
@@ -217,7 +274,10 @@ function render(rows){
     var created=el("td",stamp(row.createdAt));created.className="nowrap";tr.appendChild(created);
     var expires=el("td",expiry(row));expires.className="nowrap";tr.appendChild(expires);
     tr.appendChild(el("td",validity(row)));
-    var link=el("td"),code=el("code",linkFor(row));link.appendChild(code);tr.appendChild(link);
+    var link=el("td"),url=linkFor(row),wrap=el("span"),code=el("code",url);
+    wrap.className="dash-link";wrap.appendChild(code);
+    if(!(row.hasPwd&&!row.pwd))wrap.appendChild(copyButton(url));
+    link.appendChild(wrap);tr.appendChild(link);
     var act=el("td");act.className="actions";
     var del=el("button","删除");del.className="danger button secondary";del.type="button";
     del.addEventListener("click",function(){
@@ -253,7 +313,14 @@ function showTab(which){
   paneConfigs.hidden=!configs;
   paneFront.hidden=configs;
 }
-tabConfigs.addEventListener("click",function(){showTab("configs")});
+window.addEventListener("beforeunload",function(e){
+  if(!fiDirty)return;
+  e.preventDefault();e.returnValue="";
+});
+tabConfigs.addEventListener("click",function(){
+  if(fiDirty&&!window.confirm("前端模板有未保存的修改，切换后将丢失。确定继续？"))return;
+  showTab("configs");
+});
 tabFront.addEventListener("click",function(){showTab("front");loadFront()});
 
 /* ---- front-end template editor ---- */

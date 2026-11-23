@@ -105,6 +105,28 @@ test("dashboard uses the builder stylesheet and renders stats as styled chips", 
   assert.ok(!html.includes('el("div","stat")'), "no stray stat text nodes");
 });
 
+test("dashboard offers one-click copy for links and guards drafts", () => {
+  const html = dashboardHTML({ linkBase: "https://x/y" });
+  const main = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)]
+    .map((m) => m[1]).find((s) => s.includes("fiText"));
+  assert.ok(main, "main dashboard script present");
+  // Every real link gets a copy button; legacy passwordless records do not.
+  assert.match(main, /wrap\.appendChild\(copyButton\(url\)\)/);
+  assert.match(main, /if\(!\(row\.hasPwd&&!row\.pwd\)\)/);
+  assert.match(main, /function copyButton/);
+  assert.match(main, /navigator\.clipboard\.writeText/);
+  // A non-secure-context fallback must exist, and no markup may be injected.
+  assert.match(main, /function fallbackCopy/);
+  assert.match(main, /document\.execCommand\("copy"\)/);
+  assert.match(main, /notify\(/);
+  assert.ok(html.includes('id="toast"'), "toast feedback region present");
+  // Unsaved template edits must be warned about on unload and tab switch.
+  assert.match(main, /addEventListener\("beforeunload"/);
+  assert.match(main, /if\(fiDirty&&!window\.confirm\(/);
+  // Empty state points back to the builder.
+  assert.match(main, /打开配置工坊/);
+});
+
 test("dashboard requires Basic auth, supports HEAD, and hides API from discovery", async () => {
   const s = await service();
   const denied = await dash(s, "");
