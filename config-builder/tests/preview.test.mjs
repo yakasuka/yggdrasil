@@ -65,7 +65,7 @@ test("OTHER region uses the template's macOSicons icon, not a generic globe", ()
   const list = selectableRegions(catalog, null);
   const other = list.find((r) => r.id === "OTHER");
   assert.ok(other.icon, "OTHER carries an icon from the template");
-  assert.match(other.icon, /assets\/icons\/others\.png/);
+  assert.match(other.icon, /assets\/icons\/v2\/others\.png/);
   assert.equal(catalog.groups.otherIcon, other.icon);
   // The regions panel renders that icon as an <img> rather than a flag span.
   const profile = defaults(catalog);

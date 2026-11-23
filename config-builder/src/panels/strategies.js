@@ -4,7 +4,7 @@ import { esc, checked, title, notice } from "../ui.js";
 export function strategiesPanel(ctx) {
   const card = (s) => {
     const on = s.fixed || ctx.profile.strategies.includes(s.id);
-    return `<label class="choice${s.fixed ? " fixed" : ""}"><input type="checkbox" data-strategy="${s.id}"${checked(on)}${s.fixed ? " disabled" : ""}>${s.icon ? `<img class="choice-icon" src="${esc(s.icon)}" alt="" loading="lazy" onerror="this.hidden=true">` : ""}<span><strong>${esc(s.name)}</strong>${s.fixed ? `<span class="choice-badge">始终保留</span>` : ""}<small>${esc(s.description)}</small></span></label>`;
+    return `<label class="choice${s.fixed ? " fixed" : ""}"><input type="checkbox" data-strategy="${s.id}"${checked(on)}${s.fixed ? " disabled" : ""}>${s.icon ? `<img class="choice-icon" src="${esc(s.icon)}" alt="" decoding="async" onerror="this.hidden=true">` : ""}<span><strong>${esc(s.name)}</strong>${s.fixed ? `<span class="choice-badge">始终保留</span>` : ""}<small>${esc(s.description)}</small></span></label>`;
   };
   // 所有规则统一走「节点选择」；这个组里能选什么取决于上面的勾选。
   const automatic = STRATEGY_VIEW.filter(
