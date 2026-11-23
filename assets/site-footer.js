@@ -97,7 +97,6 @@ const TEMPLATE = `
   </nav>
   <div class="foot-legal">
     <span>© 2026 Yggdrasil Project. All rights reserved.</span>
-    <span>Geo-powered Configuration · Permission Required</span>
   </div>
 </div>
 `;
