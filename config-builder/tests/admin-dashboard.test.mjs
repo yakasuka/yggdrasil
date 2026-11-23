@@ -146,7 +146,7 @@ test("dashboard offers one-click copy for links and guards drafts", () => {
   assert.ok(main, "main dashboard script present");
   // Every real link is directly clickable (new tab) and keeps a copy button;
   // legacy passwordless records degrade to plain text.
-  assert.match(main, /wrap\.appendChild\(copyButton\(url\)\)/);
+  assert.match(main, /main\.appendChild\(copyButton\(url\)\)/);
   assert.match(main, /a\.target="_blank"/);
   assert.match(main, /a\.rel="noopener noreferrer"/);
   assert.match(main, /if\(row\.hasPwd&&!row\.pwd\)/);

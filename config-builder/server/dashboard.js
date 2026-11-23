@@ -117,9 +117,11 @@ const DASH_ONLY = `
 .dash-copy:hover{color:var(--accent);border-color:var(--selected-line);background:var(--tint)}
 .dash-copy:active{transform:scale(.96)}
 .dash-copy svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.dash-link{display:inline-flex;align-items:center;gap:8px;max-width:100%}
+.dash-link{display:inline-flex;flex-direction:column;align-items:flex-start;gap:4px;max-width:280px}
+.dash-link-main{display:inline-flex;align-items:center;gap:8px;max-width:100%}
 .dash-link code{word-break:break-all}
-.dash-link a{color:var(--accent);text-decoration:none;display:inline-flex;align-items:flex-start;gap:5px}
+.dash-link .dash-link-url{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted);font-size:.6875rem}
+.dash-link a{color:var(--accent);text-decoration:none;display:inline-flex;align-items:flex-start;gap:5px;white-space:nowrap}
 .dash-link a:hover{text-decoration:underline}
 .dash-link a::after{content:"↗";font-size:.75rem;line-height:1.4;opacity:.7}
 .step-panel[hidden],.dash-summary[hidden]{display:none}
@@ -925,29 +927,34 @@ function render(rows){
   body.className="";
   var table=el("table");table.className="dash-table";
   var head=el("thead"),hr=el("tr");
-  ["配置名称","访问","生成时间","到期时间","有效期","订阅链接","操作"].forEach(function(h){hr.appendChild(el("th",h))});
+  ["配置名称","订阅链接","访问","生成时间","到期时间","有效期","操作"].forEach(function(h){hr.appendChild(el("th",h))});
   head.appendChild(hr);table.appendChild(head);
   var tb=el("tbody");
   rows.forEach(function(row){
     var tr=el("tr");tr.appendChild(el("td",row.token));
-    var access=el("td"),badge=el("span",row.hasPwd?"需口令":"公开");
-    badge.className="dash-badge "+(row.hasPwd?"locked":"open");
-    access.appendChild(badge);tr.appendChild(access);
-    var created=el("td",stamp(row.createdAt));created.className="nowrap";tr.appendChild(created);
-    var expires=el("td",row.expiresAt?stamp(row.expiresAt):"永久");expires.className="nowrap";tr.appendChild(expires);
-    tr.appendChild(el("td",validity(row)));
+    // Put the link right after the name so it is visible without scrolling a
+    // wide table sideways; the full URL stays available as small text/copy.
     var link=el("td"),url=linkFor(row),wrap=el("span");
     wrap.className="dash-link";
     if(row.hasPwd&&!row.pwd){
       // Legacy record: no password was stored, so no openable link exists.
       wrap.appendChild(el("code",url));
     }else{
+      var main=el("span");main.className="dash-link-main";
       var a=el("a");a.href=url;a.target="_blank";a.rel="noopener noreferrer";
-      a.title="在新标签打开订阅内容";a.appendChild(el("code",url));
-      wrap.appendChild(a);
-      wrap.appendChild(copyButton(url));
+      a.title="在新标签打开订阅内容";a.appendChild(el("span","打开订阅内容"));
+      main.appendChild(a);main.appendChild(copyButton(url));
+      wrap.appendChild(main);
+      var preview=el("code",url);preview.className="dash-link-url";preview.title=url;
+      wrap.appendChild(preview);
     }
     link.appendChild(wrap);tr.appendChild(link);
+    var access=el("td"),badge=el("span",row.hasPwd?"需口令":"公开");
+    badge.className="dash-badge "+(row.hasPwd?"locked":"open");
+    access.appendChild(badge);tr.appendChild(access);
+    var created=el("td",stamp(row.createdAt));created.className="nowrap";tr.appendChild(created);
+    var expires=el("td",row.expiresAt?stamp(row.expiresAt):"永久");expires.className="nowrap";tr.appendChild(expires);
+    tr.appendChild(el("td",validity(row)));
     var act=el("td");act.className="actions";
     var del=el("button","删除");del.className="danger button secondary";del.type="button";
     del.addEventListener("click",function(){
