@@ -91,10 +91,46 @@ export async function catalogFromYaml(text) {
   // charset). Strip it before handing the text to the parser / catalog so no
   // derived artifact inherits it.
   text = text.replace(/^\uFEFF/, "");
+  // Presentational metadata (`@meta` comments) lives OUTSIDE the Clash config
+  // lines so the YAML stays clean and the generated config carries no x-*
+  // keys. Before parsing, attach each `# @meta {...}` to the proxy-group line
+  // immediately below it as x-* fields, so `metaOf()` keeps working unchanged.
+  // This is data-driven: no name is special-cased in code.
+  const META_COMMENT = /^\s*#\s*@meta\s+(\{.*\})\s*$/;
+  const GROUP_LINE = /^\s*-\s*\{/;
+  const NAME_IN_LINE = /name\s*:\s*([^,}]+)/;
+  const unquote = (s) => s.trim().replace(/^(['"])|(['"])$/g, "");
+  const pendingMeta = new Map(); // group name -> @meta object
+  const lines = text.split("\n");
+  for (let i = 0; i < lines.length; i++) {
+    const m = lines[i].match(META_COMMENT);
+    if (!m) continue;
+    let meta;
+    try {
+      meta = parse(m[1]);
+    } catch {
+      continue;
+    }
+    if (!meta || typeof meta !== "object") continue;
+    // Scan forward past blank/comment lines to the next flow-map group.
+    for (let j = i + 1; j < lines.length; j++) {
+      if (!lines[j].trim() || /^\s*#/.test(lines[j])) continue;
+      if (!GROUP_LINE.test(lines[j])) break;
+      const nameMatch = lines[j].match(NAME_IN_LINE);
+      if (nameMatch) pendingMeta.set(unquote(nameMatch[1]), meta);
+      break;
+    }
+  }
   const t = parse(text, { merge: true, maxAliasCount: 100 });
   if (!Array.isArray(t["proxy-groups"]) || !Array.isArray(t.rules))
     throw Error("模板结构不受支持，缺少 proxy-groups 或 rules。");
   const groups = t["proxy-groups"];
+  // Apply collected @meta to matching groups as x-* fields, so every
+  // downstream `metaOf()` call sees the same shape as inline x-* keys.
+  for (const g of groups) {
+    const meta = pendingMeta.get(g.name);
+    if (meta) for (const [key, value] of Object.entries(meta)) g["x-" + key] = value;
+  }
   const named = (name) => groups.find((g) => g.name === name);
 
   // Core strategy groups are identified by their role in the template, not by

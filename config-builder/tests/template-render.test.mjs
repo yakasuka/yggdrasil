@@ -169,3 +169,18 @@ test("full modules render includes every rule module's rulesets", async () => {
     );
   assertValidRefs(doc);
 });
+
+test("generated config carries no configurator-only x-* keys or @meta comments", async () => {
+  const p = profile();
+  const { yaml } = await compile(p);
+  // Presentational metadata must never reach the Mihomo client config.
+  assert.equal(/\bx-(category|id|label|description|symbol|flag|module)\s*:/.test(yaml), false);
+  assert.equal(yaml.includes("@meta"), false);
+  // AdGuard is authored via a shared anchor, not an inline param dump.
+  assert.equal(/AdGuard:\s*\{[^}]*type:\s*http/.test(yaml), false);
+  // Yet the real groups and rule providers still render.
+  assert.ok(yaml.includes("name: ✨ Hermes"));
+  assert.ok(yaml.includes("❎ AdGuard:"));
+  const doc = parse(yaml, { merge: true, maxAliasCount: 100 });
+  assertValidRefs(doc);
+});

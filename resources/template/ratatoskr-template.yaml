@@ -72,8 +72,10 @@ FilterOthers: &FilterOthers '^(?!.*(?:(?i)=>|(?i:🇭🇰|香港|Hong\s?Kong|\b(
 proxy-groups:
 
   # ── 策略入口 / Switch ──
-  # Hermes 与节点选择同为总开关；x-category 将其归入「策略入口」，与 APP 无关。
-  - {name: ✨ Hermes, x-category: 策略入口, x-id: hermes, x-label: Hermes, x-description: "全部节点总开关，与节点选择等价。", type: select, proxies: [🚀 手动切换, ⚡ 自动选择, 🔯 故障转移, 🔮 负载均衡, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others, DIRECT], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/hermes.png"}
+  # Hermes 与节点选择同为总开关；下方 @meta 注释将其归入「策略入口」，与 APP 无关。
+  # 展示用元数据只写在 @meta 注释里，不进入 Clash 配置行，也不进入生成的配置。
+  # @meta {id: hermes, category: 策略入口, label: Hermes, description: "全部节点总开关，与节点选择等价。"}
+  - {name: ✨ Hermes, type: select, proxies: [🚀 手动切换, ⚡ 自动选择, 🔯 故障转移, 🔮 负载均衡, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others, DIRECT], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/hermes.png"}
   - {name: 🎚️ 节点选择, type: select, proxies: [🚀 手动切换, ⚡ 自动选择, 🔯 故障转移, 🔮 负载均衡, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others, DIRECT], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/switch.png"}
 
   # ── 全部节点 / Proxy ──
@@ -137,9 +139,13 @@ proxy-groups:
   - {name: ❎ 广告拦截,       type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/adguard.png"}       # 默认节点选择（不启用拦截），需要时手动切 REJECT
   # ── 补充应用 / Extra Apps ──
   # Notion、teamviewer 的规则定义在下方 rules；此处提供对应的出口选择组。
-  - {name: 😈 R18, x-label: R18, x-category: 其他服务, type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/r18.png"}
-  - {name: 📦 Notion, x-label: Notion, x-category: 其他服务, type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others]}
-  - {name: ↔️ teamviewer, x-label: teamviewer, x-category: 其他服务, type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others]}
+  # 展示元数据写在 @meta 注释里（label / category），不污染 Clash 配置行。
+  # @meta {label: R18, category: 其他服务}
+  - {name: 😈 R18, type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/r18.png"}
+  # @meta {label: Notion, category: 其他服务}
+  - {name: 📦 Notion, type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others]}
+  # @meta {label: teamviewer, category: 其他服务}
+  - {name: ↔️ teamviewer, type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others]}
 
   # ── 国内与兜底 / CN & Final ──
   - {name: 🏯 China,             type: select, proxies: [DIRECT, 🎚️ 节点选择, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/cn.png"}          # 默认国内直连
@@ -256,6 +262,7 @@ rules:
 rule-anchor:
   domain:    &RP-domain    {type: http, behavior: domain,    format: yaml, interval: 28800}
   classical: &RP-classical {type: http, behavior: classical, format: yaml, interval: 28800}
+  daily:     &RP-daily     {type: http, behavior: domain,    format: yaml, interval: 86400}
 
 rule-providers:
   🪐 Astra Domain:         {<<: *RP-domain,    url: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/resources/rules/aethersailor/Custom_Direct_Domain.yaml"}
@@ -264,5 +271,5 @@ rule-providers:
   🚀 Voyager IP:          {<<: *RP-classical, url: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/resources/rules/aethersailor/Custom_Proxy_Classical_IP.yaml"}
   ⚡ Matrix Port:     {<<: *RP-classical, url: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/resources/rules/aethersailor/Custom_Port_Direct.yaml"}
   📦 Cargo Downloads:          {<<: *RP-domain, url: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/resources/rules/download/MultiThread_Download_Domain.yaml"}
-  ❎ AdGuard:           {type: http, behavior: domain, format: yaml, interval: 86400, url: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/resources/rules/adguard/Custom_AdGuard_Domain.yaml"}
+  ❎ AdGuard:           {<<: *RP-daily, url: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/resources/rules/adguard/Custom_AdGuard_Domain.yaml"}
 # =======================================================
