@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { Script } from "node:vm";
 import { mkdtemp } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -73,6 +74,19 @@ test("dashboard HTML is self-contained and escapes its boot config", () => {
   const hostile = dashboardHTML({ linkBase: "</script><script>alert(1)" });
   assert.ok(!hostile.includes("</script><script>alert(1)"));
   assert.ok(hostile.includes("\\u003c/script\\u003e\\u003cscript\\u003e"));
+});
+
+test("dashboard inline script compiles (escapes survive the template literal)", () => {
+  // dashboardHTML returns a template literal. Backslash escapes such as the
+  // CRLF normaliser must be double-escaped in the source, otherwise the
+  // generated inline script contains a broken regex and every click handler
+  // silently fails to bind. Compiling the script catches that regression.
+  const html = dashboardHTML({ linkBase: "https://x/y" });
+  const match = html.match(/<script>([\s\S]*?)<\/script>/);
+  assert.ok(match, "inline script present");
+  assert.doesNotThrow(() => new Script(match[1]), "inline script must parse");
+  // The CRLF normaliser must ship as literal backslashes, not real newlines.
+  assert.match(match[1], /replace\(\/\\r\\n\/g,"\\n"\)/);
 });
 
 test("dashboard requires Basic auth, supports HEAD, and hides API from discovery", async () => {
