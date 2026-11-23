@@ -744,7 +744,6 @@ document.addEventListener("change", (e) => {
     changed();
   }
   const mapping = {
-    "default-strategy": "defaultStrategy",
     lifetime: "lifetime",
     "allow-lan": "allowLan",
   };
