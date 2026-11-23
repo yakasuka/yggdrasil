@@ -137,7 +137,7 @@ export function dashboardHTML({
 <title>config-builder · Yggdrasil</title>
 <style>${styleSheet()}\n${DASH_ONLY}</style>
 <script>
-(()=>{try{document.documentElement.dataset.theme=localStorage.getItem("yggdrasil:config-builder:theme")==="light"?"light":"dark"}catch{document.documentElement.dataset.theme="dark"}})();
+(()=>{var r=document.documentElement;try{r.dataset.theme=localStorage.getItem("yggdrasil:config-builder:theme")==="light"?"light":"dark"}catch{r.dataset.theme="dark"}r.dataset.intro="skip"})();
 </script>
 </head>
 <body>
