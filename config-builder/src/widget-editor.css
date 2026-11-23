@@ -57,13 +57,7 @@
 /* --- Glass card skin ------------------------------------------------------
    translucency + blur (refraction) + a specular top edge + a crisp rim.
    Selection is NOT a blue fill — presence on the grid already means "on".
-   overflow stays visible so the corner affordance can sit off the edge.
-
-   The blur lives on the full-size ::after layer, NOT on the card itself: a
-   backdrop-filter element clips its descendants to its own border box, which
-   sliced the remove badge (positioned outside the top-left corner) into a
-   red sliver. Keeping the card filter-free lets the badge hang off the edge
-   the way iOS delete badges do, while ::after still refracts the board. */
+   overflow stays visible so the corner affordance can sit off the edge. */
 .choice,
 .region-bar,
 .app-card {
@@ -72,6 +66,8 @@
   border-radius: 17px;
   border: 1px solid var(--glass-rim);
   background: linear-gradient(155deg, var(--glass-body), var(--glass-body-2));
+  -webkit-backdrop-filter: blur(22px) saturate(190%) brightness(1.06);
+  backdrop-filter: blur(22px) saturate(190%) brightness(1.06);
   box-shadow:
     inset 0 1px 0 #ffffff66,
     inset 0 -1px 0 #00000010,
@@ -124,9 +120,7 @@
     0 2px 6px #1d1d1f12,
     0 18px 38px -20px #1d1d1f2e;
 }
-/* Full-size glass layer: refraction + a faint diagonal sheen. It sits at
-   z-index -1 (behind card content) and carries the blur so the card element
-   itself stays unfiltered and cannot clip the corner badge. */
+/* A faint diagonal sheen sweeping the glass, like a light source at the top. */
 .choice::after,
 .region-bar::after,
 .app-card::after {
@@ -134,8 +128,6 @@
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  -webkit-backdrop-filter: blur(22px) saturate(190%) brightness(1.06);
-  backdrop-filter: blur(22px) saturate(190%) brightness(1.06);
   background: linear-gradient(118deg, transparent 32%, #ffffff12 48%, transparent 62%);
   pointer-events: none;
   z-index: -1;
@@ -313,55 +305,53 @@
 }
 
 /* --- Corner affordance ---------------------------------------------------- */
+/* iOS-style delete badge: a flat, solid disc with a crisp white dash. No
+   translucent white rim or coloured glow — those made the card border bleed
+   through and turned the control into a chunky "keycap". The opaque ring uses
+   the card colour so it cleanly masks the card edge behind it. */
 .widget-badge {
+  --badge-ring: var(--surface);
   position: absolute;
   top: -6px;
   left: -6px;
   z-index: 4;
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
-  border: 0;
+  border: 2px solid var(--badge-ring);
   border-radius: 50%;
-  font-size: 0.9rem;
   line-height: 1;
   color: #fff;
   background: #ff3b30;
-  box-shadow: 0 1px 3px #0003;
+  box-shadow: 0 1px 3px #0002;
   cursor: pointer;
-  opacity: 0.9;
-  transform: scale(0.9);
-  transition: transform 180ms var(--ease), opacity 180ms var(--ease);
+  transition: transform 180ms var(--ease);
 }
-.widget-badge > span {
-  font-size: 1.05rem;
-  line-height: 0;
-  margin-top: -1px;
+/* The dash is drawn, not a font glyph, so its weight stays even at any zoom. */
+.widget-badge--remove span {
+  display: block;
+  width: 10px;
+  height: 2px;
+  border-radius: 1px;
+  background: currentColor;
 }
-.widget-badge:hover {
-  opacity: 1;
+.widget-badge--remove:hover {
   transform: scale(1.12);
 }
 /* The whole point of edit mode: corner affordances only exist there. */
 #panel:not(.is-widget-editing) .widget-badge {
   display: none !important;
 }
-[data-widget-grid].is-editing > [data-widget] > .widget-badge {
-  opacity: 1;
-  transform: scale(1);
-}
 .widget-badge--fixed {
-  background: color-mix(in srgb, var(--soft) 80%, transparent);
-  color: var(--muted);
-  box-shadow: 0 2px 8px #0003;
+  background: #8e8e93;
   cursor: default;
 }
 .widget-badge--fixed svg {
-  width: 13px;
-  height: 13px;
+  width: 12px;
+  height: 12px;
   display: block;
 }
 
