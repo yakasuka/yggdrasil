@@ -57,6 +57,11 @@ const hash = async (text) =>
  * Works in Node (build step / server) and in browsers (no fs dependency).
  */
 export async function catalogFromYaml(text) {
+  // The template carries a UTF-8 BOM so browsers show the Chinese comments
+  // correctly when the raw .yaml is opened (GitHub Pages serves it without a
+  // charset). Strip it before handing the text to the parser / catalog so no
+  // derived artifact inherits it.
+  text = text.replace(/^\uFEFF/, "");
   const t = parse(text, { merge: true, maxAliasCount: 100 });
   if (!Array.isArray(t["proxy-groups"]) || !Array.isArray(t.rules))
     throw Error("模板结构不受支持，缺少 proxy-groups 或 rules。");

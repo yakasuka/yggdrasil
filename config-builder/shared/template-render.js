@@ -42,7 +42,9 @@ function splitFlow(inner) {
  */
 export function renderFromTemplate(template, config, p, model) {
   const g = model.groups;
-  const source = template.replace(/\r\n/g, "\n");
+  // Strip a leading UTF-8 BOM (present on the raw template for browser
+  // display) so the first section banner stays a normal comment line.
+  const source = template.replace(/^\uFEFF/, "").replace(/\r\n/g, "\n");
   const lines = source.split("\n");
 
   // Config uses short icon names for regions; the template uses full names.
