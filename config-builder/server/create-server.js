@@ -17,6 +17,7 @@ import {
   FRONTINFO_KEY,
   clearFrontInfo,
   draftAwareLoader,
+  editFrontInfo,
   readFrontInfo,
   saveFrontInfo,
 } from "./frontinfo.js";
@@ -388,6 +389,38 @@ export function createService({
         return withCors(
           request,
           json({ ok: true, updatedAt: saved.updatedAt, summary: saved.summary }),
+          config,
+        );
+      }
+      // Graphical edits: apply surgical operations to the template and return
+      // the freshly derived catalog so cards can re-render in place.
+      if (path === FRONTINFO_PATH && method === "PATCH") {
+        const raw = await request.text();
+        let payload;
+        try {
+          payload = JSON.parse(raw);
+        } catch {
+          return withCors(request, json({ error: "请求内容无效。" }, 400), config);
+        }
+        let result;
+        try {
+          result = await editFrontInfo(storage, payload?.ops);
+        } catch (error) {
+          return withCors(
+            request,
+            json({ error: error.message || "编辑失败。" }, 400),
+            config,
+          );
+        }
+        return withCors(
+          request,
+          json({
+            ok: true,
+            text: result.record.text,
+            updatedAt: result.record.updatedAt,
+            summary: result.record.summary,
+            catalog: result.catalog,
+          }),
           config,
         );
       }

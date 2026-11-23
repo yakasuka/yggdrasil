@@ -8,7 +8,9 @@
 // No GitHub credential lives here: the Action writes to the repository with
 // its built-in GITHUB_TOKEN, and reaches this service over plain HTTPS.
 
+import { parse } from "yaml";
 import { catalogFromYaml } from "../shared/catalog-from-yaml.js";
+import { applyTemplateOps } from "../shared/template-patch.js";
 import bundled from "../shared/catalog.json" with { type: "json" };
 
 export const FRONTINFO_KEY = "frontinfo:draft";
@@ -29,11 +31,16 @@ function summarize(model) {
 export async function readFrontInfo(storage) {
   const draft = await storage.get(FRONTINFO_KEY, "json");
   if (draft && typeof draft.text === "string") {
+    let catalog = null;
+    try {
+      catalog = await catalogFromYaml(draft.text);
+    } catch {}
     return {
       text: draft.text,
       source: "draft",
       updatedAt: draft.updatedAt || null,
       summary: draft.summary || null,
+      catalog,
     };
   }
   return {
@@ -41,6 +48,7 @@ export async function readFrontInfo(storage) {
     source: "repository",
     updatedAt: null,
     summary: summarize(bundled),
+    catalog: bundled,
   };
 }
 
@@ -62,6 +70,26 @@ export async function saveFrontInfo(storage, text) {
   // value handed to put() must itself be a JSON string.
   await storage.put(FRONTINFO_KEY, JSON.stringify(record));
   return record;
+}
+
+// Graphical edits: apply a set of surgical operations to the current text
+// (draft first, repository version otherwise), validate the result by deriving
+// a catalog, then save. Returning the derived catalog lets the UI re-render
+// its cards immediately without re-fetching.
+export async function editFrontInfo(storage, ops) {
+  if (!Array.isArray(ops) || !ops.length)
+    throw new Error("没有需要保存的修改。");
+  const current = await readFrontInfo(storage);
+  const patched = applyTemplateOps(current.text, ops, parse);
+  const model = await catalogFromYaml(patched); // throws on malformed output
+  const summary = summarize(model);
+  const record = {
+    text: patched,
+    summary,
+    updatedAt: new Date().toISOString(),
+  };
+  await storage.put(FRONTINFO_KEY, JSON.stringify(record));
+  return { record, catalog: model };
 }
 
 export async function clearFrontInfo(storage) {
