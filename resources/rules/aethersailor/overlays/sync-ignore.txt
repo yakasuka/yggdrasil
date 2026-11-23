@@ -1,0 +1,4 @@
+# Rule files listed here (one filename per line) are NOT synced from upstream,
+# even though sync-rule-providers.mjs auto-discovers every Custom_*.yaml.
+# Use this to opt out of an upstream file you do not want in this project.
+# Lines starting with # and blank lines are ignored.

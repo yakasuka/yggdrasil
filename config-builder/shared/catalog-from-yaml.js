@@ -5,9 +5,11 @@
 // apps, icons, rules — shows up in the picker automatically.
 import { parse } from "yaml";
 
-// The template carries region codes and match patterns but no Chinese label.
-// Only the display label lives here; the region list itself always comes from
-// the template, so adding/removing a region there is reflected immediately.
+// Fallback display labels for region codes. These are only used when the
+// template does not author a label via `x-configurator: {label: ...}` on the
+// region group. The region LIST always comes from the template's FilterRegions,
+// so adding/removing a region there is reflected automatically even if its code
+// is unknown here.
 const REGION_LABELS = {
   HK: "香港", TW: "台湾", MO: "澳门", JP: "日本", KR: "韩国", SG: "新加坡",
   TH: "泰国", MY: "马来西亚", VN: "越南", PH: "菲律宾", ID: "印度尼西亚",
@@ -41,6 +43,28 @@ const stripIcon = (value) =>
   String(value ?? "")
     .replace(/^(\p{Extended_Pictographic}(?:\uFE0F)?(?:\u200D\p{Extended_Pictographic}(?:\uFE0F)?)*)\s*/u, "")
     .trim();
+
+// Read optional author metadata from a YAML node. The template uses flow-style
+// one-liners, where nested mappings (`x-configurator: {…}`) are not allowed —
+// so flat `x-*` keys are the ergonomic form there. Both shapes are accepted:
+//   {name: …, x-label: 法国, x-category: 开发工具}          (flow friendly)
+//   {name: …, x-configurator: {label: 法国, category: …}}   (block style)
+const X_KEYS = [
+  "id", "label", "category", "description", "symbol", "flag",
+  "module", "icon", "name",
+];
+const metaOf = (node) => {
+  if (!node || typeof node !== "object") return {};
+  const nested = node["x-configurator"];
+  const flat = {};
+  for (const key of X_KEYS) {
+    const value = node["x-" + key];
+    if (value !== undefined) flat[key] = value;
+  }
+  return nested && typeof nested === "object"
+    ? { ...flat, ...nested }
+    : flat;
+};
 
 const hash = async (text) =>
   Array.from(
@@ -113,10 +137,13 @@ export async function catalogFromYaml(text) {
   const regions = Object.entries(regionDefs).map(([id, filter]) => {
     const group = groups.find((g) => g.filter === filter);
     if (group) regionGroups.push(group);
+    const meta = metaOf(group);
     return {
       id,
-      label: REGION_LABELS[id] || id,
-      flag: flagFrom(filter),
+      // Template-authored label wins; the built-in table is only a fallback
+      // so a brand-new country code still shows something readable.
+      label: meta.label || REGION_LABELS[id] || id,
+      flag: meta.flag || flagFrom(filter),
       // `name` is the short icon used inside the configurator's own generated
       // config. `groupName` is the faithful full name from the template, used
       // by the template renderer to keep the author's original group lines.
@@ -127,38 +154,71 @@ export async function catalogFromYaml(text) {
     };
   });
 
-  // Automatic strategies are the non-select proxy groups.
+  // Automatic strategies are the non-select proxy groups. Each carries the
+  // semantics (type / strategy) the compiler needs plus optional display text
+  // authored via `x-configurator`. A NEW strategy group added to the template
+  // is therefore fully described by the catalog — no front-end/compiler edit.
   const strategyGroups = groups.filter((g) =>
     ["url-test", "fallback", "load-balance"].includes(g.type),
   );
-  const strategies = strategyGroups.map((g) => ({
-    id:
+  const usedStrategyIds = new Set();
+  const strategies = strategyGroups.map((g) => {
+    const meta = metaOf(g);
+    const inferred =
       g.type === "url-test"
         ? "auto"
         : g.type === "fallback"
           ? "fallback"
           : g.strategy === "round-robin"
             ? "download"
-            : "balanced",
-    name: g.name,
-    icon: g.icon || "",
-  }));
+            : "balanced";
+    // Authored id wins; if a second group of the same type would collide,
+    // fall back to a stable id derived from its name.
+    let id = meta.id || inferred;
+    if (usedStrategyIds.has(id)) id = stripIcon(g.name) || `${inferred}-${usedStrategyIds.size}`;
+    usedStrategyIds.add(id);
+    return {
+      id,
+      name: g.name,
+      type: g.type,
+      ...(g.strategy ? { strategy: g.strategy } : {}),
+      icon: meta.icon || g.icon || "",
+      label: meta.label || stripIcon(g.name) || id,
+      description: meta.description || "来自示例模板的自动策略组。",
+    };
+  });
 
   // Rule sets and their module grouping come straight from rule-providers.
+  // A provider may author its own module id / display text via
+  // `x-configurator: {module, label, description, symbol}`; otherwise we infer
+  // the module from the rule target and name so new rule sets still work.
   const providerModules = Object.entries(t["rule-providers"] || {}).map(
     ([name, value]) => {
       const target = t.rules
         .find((r) => r.startsWith("RULE-SET," + name + ","))
         ?.split(",")[2];
+      const meta = metaOf(value);
       const module =
-        target === "DIRECT"
+        meta.module ||
+        (target === "DIRECT"
           ? "direct-extra"
           : /Port|端口/i.test(name)
             ? "ports"
-            : "proxy-extra";
+            : "proxy-extra");
       return { name, value, module };
     },
   );
+
+  // Display text for rule modules, authored on rule-providers. Feeds the
+  // moduleView() resolver in compiler.js; unknown modules fall back to a
+  // generic label there, so nothing is ever dropped from the UI.
+  const moduleMeta = {};
+  for (const p of providerModules) {
+    const meta = metaOf(p.value);
+    if (meta.label || meta.description || meta.symbol) {
+      moduleMeta[p.module] = { ...(moduleMeta[p.module] || {}), ...meta };
+    }
+  }
 
   // Apps and "switch entries" are select groups that are not core/region/
   // strategy groups. The author's principle: EVERYTHING written in the YAML
@@ -192,7 +252,7 @@ export async function catalogFromYaml(text) {
     .filter((g) => g.type === "select" && !reserved.has(g.name))
     .map((g) => {
       const rules = t.rules.filter((r) => r.split(",")[2] === g.name);
-      const meta = g["x-configurator"] || {};
+      const meta = metaOf(g);
       // A rule-less select group is a switch/entry (e.g. ✨ Hermes). Give it a
       // stable id from its group name so it survives in profiles and shares.
       const isEntry = rules.length === 0;
@@ -262,6 +322,7 @@ export async function catalogFromYaml(text) {
     orderedRules,
     baseRules: orderedRules.filter((r) => r.module),
     providerModules,
+    moduleMeta,
   };
   model.version = await hash(JSON.stringify(model));
   return model;

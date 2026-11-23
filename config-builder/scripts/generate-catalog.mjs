@@ -2,13 +2,14 @@
 // This is the single source of truth for every picker option (regions, apps,
 // rule sets, icons). Run automatically before build so editing the template
 // updates the static frontends and the self-hosted service together.
-import { readFile, writeFile } from "node:fs/promises";
+import { writeFile } from "node:fs/promises";
 import { catalogFromYaml } from "../shared/catalog-from-yaml.js";
+import { readTemplate } from "./template-io.mjs";
 
 const templatePath = new URL("../../resources/template/ratatoskr-template.yaml", import.meta.url);
 const catalogPath = new URL("../shared/catalog.json", import.meta.url);
 
-const text = await readFile(templatePath, "utf8");
+const text = await readTemplate(templatePath);
 const catalog = await catalogFromYaml(text);
 await writeFile(catalogPath, JSON.stringify(catalog, null, 2) + "\n");
 console.log(

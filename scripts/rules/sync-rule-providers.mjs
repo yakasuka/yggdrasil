@@ -6,6 +6,10 @@
  * hash of that file's local overlay. A file is rebuilt only when one of them
  * changes, so unrelated commits in the upstream repo never cause a rebuild.
  *
+ * The file list is DISCOVERED from the upstream directory on every run: any
+ * `Custom_*.yaml` added upstream is synced automatically. To opt a file out,
+ * list its name (one per line) in `overlays/sync-ignore.txt`.
+ *
  * Usage:
  *   node scripts/rules/sync-rule-providers.mjs            # rebuild only changed files
  *   node scripts/rules/sync-rule-providers.mjs --force   # rebuild everything
@@ -24,15 +28,30 @@ const API_ROOT = `https://api.github.com/repos/${UPSTREAM_REPO}/contents/rule`;
 const ROOT = 'resources/rules/aethersailor';
 const OVERLAY_DIR = path.join(ROOT, 'overlays');
 const STATE_FILE = path.join(ROOT, '.upstream-state.json');
+// One filename per line. Files listed here are skipped even if upstream adds
+// them, so an unwanted upstream file can be opted out without a code change.
+const IGNORE_FILE = path.join(OVERLAY_DIR, 'sync-ignore.txt');
 
-// Keep the upstream file names exactly as they are in Aethersailor's repo.
-const FILES = [
-  'Custom_Direct_Domain.yaml',
-  'Custom_Direct_Classical_IP.yaml',
-  'Custom_Proxy_Domain.yaml',
-  'Custom_Proxy_Classical_IP.yaml',
-  'Custom_Port_Direct.yaml',
-];
+/**
+ * Discover `Custom_*.yaml` files from upstream instead of maintaining a
+ * hardcoded list, so newly published rule sets are picked up automatically.
+ */
+async function discoverFiles() {
+  const response = await fetch(`${API_ROOT}?ref=${UPSTREAM_BRANCH}`, { headers });
+  if (!response.ok) {
+    throw new Error(`list ${UPSTREAM_REPO}/rule: GitHub API ${response.status} ${response.statusText}`);
+  }
+  const entries = await response.json();
+  if (!Array.isArray(entries)) throw new Error('unexpected directory listing from GitHub API');
+  const ignored = new Set(
+    read(IGNORE_FILE).split(/\r?\n/).map(clean).filter(Boolean),
+  );
+  return entries
+    .filter((e) => e.type === 'file' && /^Custom_.*\.yaml$/i.test(e.name))
+    .map((e) => e.name)
+    .filter((name) => !ignored.has(name))
+    .sort();
+}
 
 const force = process.argv.includes('--force');
 const token = process.env.GITHUB_TOKEN || process.env.GH_TOKEN;
@@ -58,6 +77,8 @@ function parseItems(text) {
 
 const state = JSON.parse(read(STATE_FILE) || '{}');
 const changed = [];
+const FILES = await discoverFiles();
+console.log(`discovered ${FILES.length} upstream rule files: ${FILES.join(', ')}`);
 
 for (const name of FILES) {
   const overlayPath = path.join(OVERLAY_DIR, name);

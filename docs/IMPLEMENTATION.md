@@ -2,7 +2,7 @@
 
 ## 数据流
 
-`config-builder/shared/catalog.json` 是 APP、国家/地区、规则与规则模块的静态目录数据，它是仓库示例模板 `resources/template/ratatoskr-template.yaml` 的同源快照（`cleanFilter` 与模板 `FilterAll` 完全一致），前端 bundle 与自建服务在构建时直接读取它，不提取个人订阅与节点凭据。新增 APP、地区或规则模块时直接编辑该文件并重新构建。`shared/template.js` 的 `catalogFromTemplate` 只在 `TEMPLATE_URL` 指向带 `x-configurator` 元数据的远程模板时于运行时解析目录，测试夹具位于 `tests/fixtures/template-with-metadata.yaml`。
+`config-builder/shared/catalog.json` 是 APP、国家/地区、规则与规则模块的静态目录数据，它是仓库示例模板 `resources/template/ratatoskr-template.yaml` 的同源快照（`cleanFilter` 与模板 `FilterAll` 完全一致），前端 bundle 与自建服务在构建时直接读取它，不提取个人订阅与节点凭据。**唯一真相源是 `resources/template/ratatoskr-template.yaml`**：新增 APP / 地区 / 规则 / 规则集 / 策略时只改模板，再跑 `npm --prefix config-builder run build` 自动重新派生 `catalog.json` 与两站 bundle，不要手改派生产物。详见下方「如何新增内容」。`shared/template.js` 的 `catalogFromTemplate` 只在 `TEMPLATE_URL` 指向带 `x-configurator` 元数据的远程模板时于运行时解析目录，测试夹具位于 `tests/fixtures/template-with-metadata.yaml`。
 
 前端是发布在 Cloudflare Pages 与 GitHub Pages 上的**静态文件**，两套站点共用同一份 `assets/app.js`。`src/config.js` 解析自建服务地址（HTML meta → 构建注入的 `SERVICE_BASE_URL` → 同源），`src/app.js` 通过 `apiFetch()` 跨源提交机场链接到 `/api/inspect`；`worker/subscriptions.js` 由 `server/` 直接运行，拉取订阅后由 `shared/subscription.js` 解码 Base64、YAML 或节点链接，`shared/nodes.js` 用模板 filter 分类并只返回脱敏清单。浏览器不直连机场、不缓存完整节点、不写入本地存储；服务端按 `ALLOWED_ORIGINS` 做 CORS 白名单。
 
@@ -25,9 +25,9 @@
 | Base64、YAML 和协议链接转换 | `shared/subscription.js` |
 | 脱敏节点清单、地区匹配、流量汇总 | `shared/nodes.js` |
 | 只展示拥有的地区、地区去留 | `src/panels/regions.js` |
-| 四种策略、默认手动 | `src/panels/strategies.js`、`shared/compiler.js` |
+| 策略卡片（模板自动派生 + 前端文案覆盖）、默认节点选择 | `src/strategy-catalog.js`（`strategyView`）、`src/panels/strategies.js`、`shared/compiler.js`（`strategyDefs`） |
 | APP 默认全选、跟随代理、地区/Direct/Reject | `src/panels/apps.js`、`shared/compiler.js` |
-| 规则模块按钮块、按模块裁剪规则 | `src/panels/rules.js`、`shared/compiler.js`（`RULE_MODULES` / `ruleModules`） |
+| 规则模块按钮块、按模块裁剪规则 | `src/panels/rules.js`、`shared/compiler.js`（`moduleView` / `ruleModules`，`RULE_MODULES` 为兼容兜底表） |
 | 模板规则、最终出口跟随代理 | `shared/compiler.js` 的参数校验和组装 |
 | 最终确认、预览、下载及按钮位置 | `src/panels/review.js`、`src/app.js`、`index.html` |
 | 用户名文件名、Token 有效期 | `shared/profile.js` |
@@ -86,13 +86,27 @@
 
 管理后台在 `server/dashboard.js` 里作为自包含 HTML 生成（内联样式与脚本，无外部依赖），由 `server/create-server.js` 在 `GET /config-builder/dashboard` 用管理端 Basic 凭据保护并返回，响应带 `Content-Security-Policy` 与 `X-Frame-Options`。启动时把 `linkBase`（`PUBLIC_LINK_BASE` 或后端自身地址）与 API 路径以 JSON 注入，注入前把 `<`、`>` 编码为 JSON unicode 转义以防闭合脚本标签；列表数据由页面运行时从同源管理 API 拉取并用 `textContent` 渲染，避免配置名注入。管理 API 在 `GET` 时把映射记录里的明文 `pwd` 一并返回，页面用它 `encodeURIComponent` 拼出真实订阅链接（不再显示占位符）；旧记录没有 `pwd` 字段时退化为占位符，保持兼容。CF 域名下由 `functions/config-builder/dashboard.js` 与 `functions/api/admin/configs.js` 两个边缘函数用 `shared/pages-proxy.js` 的 `proxyAdmin()` 就地代理这两条路径，透传 `Authorization` 请求头与 `WWW-Authenticate` 质询、以及 DELETE 的 body，地址栏始终停在 Pages 域名。`DELETE /api/admin/configs` 优先按内部 id 在 `storage.list()` 里定位 alias 记录，再删 alias 与 `profile:<id>`；旧的 `{token,pwd}` 方式保留兼容。
 
-## 扩展模板
+## 扩展模板 · 如何新增内容（自动补漏）
 
-新增 APP 时，在模板加入 select 策略组和指向它的规则；可用 `x-configurator` 元数据指定标签、分类及 ID。构建会自动生成页面项。旧 Token 的 `appsMode: all` 会在下一次读取时包含新增 APP。
+**唯一真相源是 `resources/template/ratatoskr-template.yaml`。** 新增内容只改模板，然后跑 `npm --prefix config-builder run build`（会自动重新生成 `catalog.json` 与两站 bundle）。任何内容都**不需要手改** `catalog.json`、`app.js`、`compiler.js` 的展示表或前端面板——这些地方对未知项都有通用兜底，绝不漏显示。`tests/auto-discovery.test.mjs` 会注入新地区 / APP / 策略 / 规则模块，验证它们一路派生到展示层，漏一个就 red。
 
-新增地区时，增加带 `x-configurator: { kind: region, id, label, flag }` 的策略组和 filter。浏览器与服务端使用同一匹配规则，并遵循模板中的分类优先级；页面只展示实际节点中匹配到的地区。生成文件也剔除未保留地区，其他地区不会重新包含已识别但被取消的国家。
+关于元数据标注：模板的策略组用 flow 单行（`{name: …}`），**flow 映射里不能嵌套映射**，所以标注一律用扁平 `x-*` 键；若某组改写成 block 多行，也可用嵌套 `x-configurator: {…}`。两者等效，由 `metaOf()` 统一读取。可用键：`x-id` / `x-label` / `x-category` / `x-description` / `x-symbol` / `x-flag` / `x-module` / `x-icon`。不标注也能用，只是标签/分类走兜底推断。
 
-规则由模板统一维护，不接受页面自定义规则和最终出口。新增协议需要修改共用解析器并增加转换、凭据保护和 Mihomo 语法验证；不在地区或 APP 面板内增加协议逻辑。
+| 新增 | 在模板里的操作 | 可选标注（想要精准文案时） | 自动发生什么 |
+| --- | --- | --- | --- |
+| **APP** | 加一个 `select` 策略组 + 一条指向它的 `rules` 行 | `x-label`、`x-category`、`x-id`、`icon:` | 进 apps 面板；图标读 `icon:`，id 由规则 key 派生；旧 Token 的 `appsMode: all` 下次读取自动包含 |
+| **国家 / 地区** | `FilterRegions` 加一行 `XX: &FilterXX '正则'`，加一个引用 `*FilterXX` 的 select 组 | 组上 `x-label`（中文名）、`x-flag`、`icon:` | 进地区面板；旗帜从正则里的 emoji 提取，内置 `REGION_LABELS` 只是新国家代码未标注时的兜底；`FilterOthers` 用 `generate-ratatoskr-filters.mjs` 重算 |
+| **自动策略** | 加一个 `url-test` / `fallback` / `load-balance` 组 | `x-id`（稳定 id）、`x-label`、`x-icon` | 进策略页并参与编译；类型/语义由组本身携带，前端 `strategy-catalog.js` 的文案表只做覆盖，未知策略用通用文案 |
+| **规则集 / 规则模块** | `rule-providers` 加一项 + 一条 `RULE-SET,<名>,<目标>` 规则 | provider 上 `x-module`、`x-label`、`x-symbol`、`x-description` | 进规则模块面板；未标注则按规则目标（DIRECT→直连 / 含 Port→端口 / 其余→代理）自动归类；`moduleView()` 保证未知模块也有卡片 |
+| **规则行** | `rules:` 加一行，目标填已有组名 | 目标组自带 label 即可 | 进 `orderedRules`，跟随其目标 APP 或模块裁剪 |
+
+**规则集文件来源**（`resources/rules/`）：Aethersailor 上游规则由 `scripts/rules/sync-rule-providers.mjs` **自动发现**所有 `Custom_*.yaml`（每 15 分钟轮询），新增文件无需改代码；要排除某个上游文件，把文件名写进 `resources/rules/aethersailor/overlays/sync-ignore.txt`。AdGuard 规则用 `resources/rules/adguard/adguard-filters.json` 的 `enabled` 开关控制。同步下来的文件要在模板的 `rule-providers` 里加一项引用才会进入配置。
+
+**BOM 与编码**：模板带 UTF-8 BOM，保证浏览器直接打开 `.yaml` 时中文不乱码（GitHub Pages 对 `.yaml` 不返回 charset）。所有读写都走 `scripts/template-io.mjs`：读时剥 BOM、写时补回，不要在脚本里直接用 `readFile`/`writeFile` 处理模板。
+
+**另一条派生路径**：`shared/template.js` 的 `catalogFromTemplate` 是给 `TEMPLATE_URL` 指向**外部远程模板**用的，采用 schema 1 约定（顶层 `x-configurator` + 组上 `x-configurator: {kind: region/strategy/app, id, label, ...}`），测试夹具在 `tests/fixtures/template-with-metadata.yaml`。它同样支持策略语义与模块元数据，与本地派生路径保持一致。
+
+规则仍由模板统一维护，不接受页面自定义规则或最终出口。新增协议需改共用解析器并增加转换、凭据保护和 Mihomo 语法验证，不在地区或 APP 面板加协议逻辑。
 
 ## 动效维护
 

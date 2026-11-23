@@ -1,9 +1,12 @@
-import { catalog, RULE_MODULES, ruleModules } from "../../shared/compiler.js";
-import { esc, checked, title, notice } from "../ui.js";
+import { catalog, moduleView, ruleModules } from "../../shared/compiler.js";
+import { esc, checked, notice } from "../ui.js";
 export function rulesPanel(ctx) {
   const present = ruleModules(catalog);
   const count = (id) => catalog.orderedRules.filter((r) => r.module === id).length;
-  const modules = RULE_MODULES.filter((m) => present.includes(m.id));
+  // Iterate the modules actually present in the template and resolve display
+  // text per ID. A module newly added to the template still gets a card via
+  // moduleView's generic fallback instead of being filtered out.
+  const modules = present.map((id) => moduleView(id, catalog));
   return (
     title(
       "挑选，生长所需的枝叶。",

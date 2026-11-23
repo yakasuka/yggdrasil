@@ -75,22 +75,36 @@
     {
       "id": "auto",
       "name": "⚡ 自动选择",
-      "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/yggdrasil.png"
+      "type": "url-test",
+      "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/yggdrasil.png",
+      "label": "自动选择",
+      "description": "来自示例模板的自动策略组。"
     },
     {
       "id": "fallback",
       "name": "🔯 故障转移",
-      "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/fallback.png"
+      "type": "fallback",
+      "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/fallback.png",
+      "label": "故障转移",
+      "description": "来自示例模板的自动策略组。"
     },
     {
       "id": "balanced",
       "name": "🔮 负载均衡",
-      "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/global.png"
+      "type": "load-balance",
+      "strategy": "consistent-hashing",
+      "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/global.png",
+      "label": "负载均衡",
+      "description": "来自示例模板的自动策略组。"
     },
     {
       "id": "download",
       "name": "📦 下载均衡",
-      "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/tracking.png"
+      "type": "load-balance",
+      "strategy": "round-robin",
+      "icon": "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/tracking.png",
+      "label": "下载均衡",
+      "description": "来自示例模板的自动策略组。"
     }
   ],
   "apps": [
@@ -863,5 +877,6 @@
       "module": "proxy-extra"
     }
   ],
-  "version": "0d342c56fe20"
+  "moduleMeta": {},
+  "version": "87f4e8f775c0"
 }

@@ -1,7 +1,7 @@
-import { readFile, writeFile } from "node:fs/promises";
+import { readTemplate, writeTemplate } from "./template-io.mjs";
 
 const configPath = new URL("../../resources/template/ratatoskr-template.yaml", import.meta.url);
-const config = await readFile(configPath, "utf8");
+const config = await readTemplate(configPath);
 
 const regionBlock = config.match(
   /^FilterRegions: &FilterRegions\r?\n((?:[ \t]+[A-Z]{2}: &Filter[A-Za-z]+ '[^']+'\r?\n)+)/m
@@ -52,5 +52,5 @@ if (updatedConfig === config) {
   throw new Error("Could not find the FilterOthers line to update");
 }
 
-await writeFile(configPath, updatedConfig, "utf8");
+await writeTemplate(configPath, updatedConfig);
 console.log(`Updated FilterOthers using ${regionPatterns.length} region filters.`);

@@ -80,11 +80,18 @@ export async function catalogFromTemplate(text) {
   }
   const strategies = t["proxy-groups"]
     .filter((g) => g["x-configurator"]?.kind === "strategy")
-    .map((g) => ({
-      id: g["x-configurator"].id,
-      name: g.name,
-      icon: g.icon || "",
-    }));
+    .map((g) => {
+      const m = g["x-configurator"] || {};
+      return {
+        id: m.id,
+        name: g.name,
+        type: g.type || "url-test",
+        ...(g.strategy ? { strategy: g.strategy } : {}),
+        icon: m.icon || g.icon || "",
+        label: m.label || g.name.replace(/^[^\p{L}\p{N}]+/u, "").trim() || m.id,
+        description: m.description || "来自远程模板的自动策略组。",
+      };
+    });
   const reserved = new Set([
     ...Object.values(groups),
     ...regions.map((r) => r.name),
@@ -113,19 +120,29 @@ export async function catalogFromTemplate(text) {
     throw Error("APP 需要唯一 ID。");
   const appNames = new Map(apps.map((a) => [a.name, a.id]));
   const providerModules = Object.entries(t["rule-providers"] || {}).map(
-    ([name, value]) => ({
-      name,
-      value,
-      module:
-        t.rules
-          .find((r) => r.startsWith("RULE-SET," + name + ","))
-          ?.split(",")[2] === "DIRECT"
-          ? "direct-extra"
-          : /Port|端口/i.test(name)
-            ? "ports"
-            : "proxy-extra",
-    }),
+    ([name, value]) => {
+      const m = value?.["x-configurator"] || {};
+      return {
+        name,
+        value,
+        module:
+          m.module ||
+          (t.rules
+            .find((r) => r.startsWith("RULE-SET," + name + ","))
+            ?.split(",")[2] === "DIRECT"
+            ? "direct-extra"
+            : /Port|端口/i.test(name)
+              ? "ports"
+              : "proxy-extra"),
+      };
+    },
   );
+  const moduleMeta = {};
+  for (const p of providerModules) {
+    const m = p.value?.["x-configurator"] || {};
+    if (m.label || m.description || m.symbol)
+      moduleMeta[p.module] = { ...(moduleMeta[p.module] || {}), ...m };
+  }
   const orderedRules = t.rules
     .filter((r) => !r.startsWith("MATCH,"))
     .map((rule) => {
@@ -156,6 +173,7 @@ export async function catalogFromTemplate(text) {
     orderedRules,
     baseRules: orderedRules.filter((r) => r.module),
     providerModules,
+    moduleMeta,
   };
   model.version = Array.from(
     new Uint8Array(

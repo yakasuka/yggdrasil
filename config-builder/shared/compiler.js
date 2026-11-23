@@ -40,6 +40,29 @@ export const STRATEGIES = [
 // wizard as fixed strategy cards; the backend maps these IDs to the real group
 // names from the template instead of inventing display strings.
 export const CORE_STRATEGY_IDS = ["gateway", "manual"];
+
+// The authoritative strategy list comes from the derived catalog (template).
+// STRATEGIES above is only a curated display/type fallback for the four
+// well-known IDs; a brand-new strategy group added to the template carries its
+// own type/name/label/description, so this resolver always returns a complete
+// definition and never drops an unknown strategy.
+const humanizeStrategy = (id) =>
+  String(id).replace(/[-_]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+export const strategyDefs = (model = catalog) =>
+  (model.strategies || []).map((s) => {
+    const legacy = STRATEGIES.find((x) => x.id === s.id) || {};
+    return {
+      ...legacy,
+      ...s,
+      label: s.label || legacy.label || humanizeStrategy(s.id),
+      description: s.description || legacy.description || "来自示例模板的自动策略组。",
+      type: s.type || legacy.type || "url-test",
+    };
+  });
+export const strategyIds = (model = catalog) => [
+  ...CORE_STRATEGY_IDS,
+  ...strategyDefs(model).map((s) => s.id),
+];
 // Rule modules are the template-authored rule groups (private / china / gfw /
 // game / community rule-sets ...). They are presented as toggle blocks in the
 // configurator. IDs come from the catalog so a remote template can add or drop
@@ -93,6 +116,31 @@ export const RULE_MODULES = [
 export const ruleModules = (model = catalog) => [
   ...new Set(model.orderedRules.filter((r) => r.module).map((r) => r.module)),
 ];
+
+// Display text for a module ID, resolved in three tiers so a module added to
+// the template is NEVER dropped from the picker:
+//   1. x-configurator metadata authored on the provider/rule in the template
+//   2. the legacy RULE_MODULES table (keeps the current seven modules curated)
+//   3. a generic fallback derived from the ID itself
+// `model.moduleMeta` is optional; older catalogs simply skip tier 1.
+const humanize = (id) =>
+  String(id)
+    .replace(/[-_]+/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase())
+    .trim();
+export const moduleView = (id, model = catalog) => {
+  const authored = model.moduleMeta?.[id] || {};
+  const legacy = RULE_MODULES.find((m) => m.id === id) || {};
+  return {
+    id,
+    label: authored.label || legacy.label || humanize(id),
+    description:
+      authored.description ||
+      legacy.description ||
+      "模板自定义规则模块，规则来自示例模板。",
+    symbol: authored.symbol || legacy.symbol || "🧩",
+  };
+};
 export class ConfigError extends Error {
   constructor(message, field = "") {
     super(message);
@@ -114,7 +162,7 @@ export function defaults(model = catalog) {
     // strategies start enabled. The select groups are fixed in the wizard;
     // automatic strategies can still be switched off there.
     other: true,
-    strategies: [...CORE_STRATEGY_IDS, ...STRATEGIES.map((s) => s.id)],
+    strategies: strategyIds(model),
     // 节点选择是所有规则的入口组，也是客户端里唯一需要切换的地方。
     defaultStrategy: "gateway",
     appsMode: "all",
@@ -176,7 +224,7 @@ export function normalize(input, model = catalog, { migrate = false } = {}) {
   if (!p.title || p.title.length > 60 || /[\x00-\x1f]/.test(p.title))
     fail("请填写 1–60 个字符的配置名称。", "title");
   p.providers = normalizeProviders(input.providers);
-  const knownStrategies = [...CORE_STRATEGY_IDS, ...STRATEGIES.map((x) => x.id)];
+  const knownStrategies = strategyIds(model);
   p.strategies = unique([
     ...selection(input.strategies, knownStrategies, "strategies", knownStrategies.length),
     // Old saved profiles predate these IDs; both select groups are always
@@ -185,7 +233,7 @@ export function normalize(input, model = catalog, { migrate = false } = {}) {
   ]);
   p.defaultStrategy = input.defaultStrategy;
   // 节点选择是固定入口组，始终可用；其余策略需已启用。
-  const defaultAllowed = [...CORE_STRATEGY_IDS, ...STRATEGIES.map((x) => x.id)];
+  const defaultAllowed = knownStrategies;
   if (
     !defaultAllowed.includes(p.defaultStrategy) ||
     (!CORE_STRATEGY_IDS.includes(p.defaultStrategy) &&
@@ -305,9 +353,9 @@ export async function compile(input, model = catalog, options = {}) {
       ...(p.other ? [strip(regionFilter([], model, { other: true }))] : []),
     ].join("|") +
     ")";
-  const active = STRATEGIES.filter((s) => p.strategies.includes(s.id)).map(
-    (s) => ({ ...s, ...(model.strategies.find((x) => x.id === s.id) || {}) }),
-  );
+  // Derive active strategies from the catalog so a strategy added to the
+  // template is compiled automatically; legacy table supplies type fallback.
+  const active = strategyDefs(model).filter((s) => p.strategies.includes(s.id));
   // preferred 只决定「节点选择」组在客户端里默认选中哪一项。选择 gateway
   // 时保持模板原样（先进入「手动切换」挑节点），不把入口组自己塞进成员，
   // 避免自引用；所有规则仍然统一走节点选择。
