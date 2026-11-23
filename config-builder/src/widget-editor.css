@@ -455,11 +455,14 @@
 
 /* Clean drag image: a light clone used only as the HTML5 drag snapshot.
    Strip the pseudo-element sheen/highlights and the halo so the ghost is a
-   single rounded card, not a rectangle with four ugly corners. */
+   single rounded card, not a rectangle with four ugly corners.
+   Do NOT set overflow:hidden here — it slices the corner remove badge (which
+   hangs outside the card, like the live card) into a red sliver in the drag
+   snapshot. The pseudo-elements below are already hidden, so no clipping is
+   needed to tame the old square corners. */
 .drag-ghost {
   pointer-events: none !important;
   z-index: -1 !important;
-  overflow: hidden !important;
   box-shadow: 0 10px 30px -12px #0006 !important;
 }
 .drag-ghost::before,
