@@ -66,7 +66,9 @@ const DASH_ONLY = `
 .dash-stat{display:inline-flex;align-items:baseline;gap:6px;padding:5px 12px;border:1px solid var(--line);border-radius:99px;background:var(--soft);color:var(--muted);font-size:.6875rem;transition:transform 180ms var(--ease),border-color 180ms var(--ease)}
 .dash-stat:hover{transform:translateY(-2px);border-color:var(--selected-line)}
 .dash-stat b{color:var(--ink);font-weight:650;font-size:.8125rem}
-.app-card[hidden],.region-bar[hidden],.choice[hidden],.category-heading[hidden]{display:none}
+.app-card[hidden],.region-bar[hidden],.choice[hidden],.category-heading[hidden],.panel-actions[hidden],.service-status[hidden]{display:none}
+.dash-scroll::-webkit-scrollbar{height:6px}
+.dash-table .dash-badge{white-space:nowrap}
 .dash-editor .app-card,.dash-editor .region-bar,.dash-editor .choice{cursor:pointer}
 .dash-editor .app-card:hover,.dash-editor .region-bar:hover,.dash-editor .choice:hover{border-color:var(--selected-line);background:var(--tint)}
 .dash-edit-act{margin-left:auto;flex:0 0 auto;width:24px;height:24px;display:grid;place-items:center;border:1px solid var(--line);border-radius:7px;color:var(--muted);background:var(--soft)}
@@ -326,6 +328,8 @@ function showStep(which){
   panelFront.hidden=!front;panelConfigs.hidden=front;
   stepButtons.forEach(function(b){if(b.dataset.step===which)b.setAttribute("aria-current","step");else b.removeAttribute("aria-current")});
   caption.textContent=front?"STEP 01 / 02":"STEP 02 / 02";
+  document.querySelector(".panel-top .panel-actions").hidden=!front;
+  document.getElementById("service-settings").hidden=!front;
   progressNote.textContent=front?"一处修改，处处生长。":"配置由订阅工坊生成。";
   backButton.disabled=front;
   nextButton.dataset.target=front?"configs":"front";
