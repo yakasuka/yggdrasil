@@ -57,7 +57,13 @@
 /* --- Glass card skin ------------------------------------------------------
    translucency + blur (refraction) + a specular top edge + a crisp rim.
    Selection is NOT a blue fill — presence on the grid already means "on".
-   overflow stays visible so the corner affordance can sit off the edge. */
+   overflow stays visible so the corner affordance can sit off the edge.
+
+   The blur lives on the full-size ::after layer, NOT on the card itself: a
+   backdrop-filter element clips its descendants to its own border box, which
+   sliced the remove badge (positioned outside the top-left corner) into a
+   red sliver. Keeping the card filter-free lets the badge hang off the edge
+   the way iOS delete badges do, while ::after still refracts the board. */
 .choice,
 .region-bar,
 .app-card {
@@ -66,8 +72,6 @@
   border-radius: 17px;
   border: 1px solid var(--glass-rim);
   background: linear-gradient(155deg, var(--glass-body), var(--glass-body-2));
-  -webkit-backdrop-filter: blur(22px) saturate(190%) brightness(1.06);
-  backdrop-filter: blur(22px) saturate(190%) brightness(1.06);
   box-shadow:
     inset 0 1px 0 #ffffff66,
     inset 0 -1px 0 #00000010,
@@ -120,7 +124,9 @@
     0 2px 6px #1d1d1f12,
     0 18px 38px -20px #1d1d1f2e;
 }
-/* A faint diagonal sheen sweeping the glass, like a light source at the top. */
+/* Full-size glass layer: refraction + a faint diagonal sheen. It sits at
+   z-index -1 (behind card content) and carries the blur so the card element
+   itself stays unfiltered and cannot clip the corner badge. */
 .choice::after,
 .region-bar::after,
 .app-card::after {
@@ -128,6 +134,8 @@
   position: absolute;
   inset: 0;
   border-radius: inherit;
+  -webkit-backdrop-filter: blur(22px) saturate(190%) brightness(1.06);
+  backdrop-filter: blur(22px) saturate(190%) brightness(1.06);
   background: linear-gradient(118deg, transparent 32%, #ffffff12 48%, transparent 62%);
   pointer-events: none;
   z-index: -1;
