@@ -105,6 +105,18 @@ test("dashboard uses the builder stylesheet and renders stats as styled chips", 
   assert.ok(!html.includes('el("div","stat")'), "no stray stat text nodes");
 });
 
+test("dashboard edit fields expose controls, not wrappers, to patch handlers", () => {
+  const html = dashboardHTML({ linkBase: "https://x/y" });
+  const main = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)]
+    .map((m) => m[1]).find((s) => s.includes("fiText"));
+  assert.ok(main, "main dashboard script present");
+  // field() must return the input/select so f.<name>.value works when the
+  // apply button builds PATCH ops; returning the div silently broke saving.
+  assert.match(main, /control\._wrapper=w;return control/);
+  assert.ok(!main.includes("modalBody.appendChild(f."), "no wrapper fields");
+  assert.match(main, /f\.label\.value\.trim\(\)/);
+});
+
 test("dashboard offers one-click copy for links and guards drafts", () => {
   const html = dashboardHTML({ linkBase: "https://x/y" });
   const main = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)]

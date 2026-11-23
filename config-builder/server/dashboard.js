@@ -478,8 +478,13 @@ function loadFront(){
 /* ---- graphical edit modal ---- */
 function field(label,control){
   var w=document.createElement("div");w.className="field";
-  w.appendChild(el("label",label));w.appendChild(control);return w;
+  w.appendChild(el("label",label));w.appendChild(control);
+  // Return the CONTROL, not its wrapper: every caller reads the value from
+  // the field map when building patch ops. Returning the wrapper used to
+  // make all graphical saves throw before the request was ever sent.
+  control._wrapper=w;return control;
 }
+function appendField(control){modalBody.appendChild(control._wrapper||control)}
 function input(value,type){var i=document.createElement("input");i.type=type||"text";i.value=value||"";return i}
 function select(options,value){
   var s=document.createElement("select");
@@ -492,20 +497,20 @@ function openEditor(ctx){
   modalBody.textContent="";
   var item=ctx.item,f={};
   if(ctx.kind==="app"){
-    f.label=field("显示名称",input(item.label));modalBody.appendChild(f.label);
-    f.icon=field("图标 URL",input(item.icon));modalBody.appendChild(f.icon);
+    f.label=field("显示名称",input(item.label));appendField(f.label);
+    f.icon=field("图标 URL",input(item.icon));appendField(f.icon);
     var cats=[];if(state.catalog)state.catalog.apps.forEach(function(a){if(cats.indexOf(a.category)<0)cats.push(a.category)});
     if(cats.indexOf(item.category)<0)cats.unshift(item.category);
-    f.category=field("分类",select(cats.map(function(c){return [c,c]}),item.category));modalBody.appendChild(f.category);
-    f.exit=field("默认出口",select([["proxy","跟随代理 / 节点选择"],["DIRECT","直连 DIRECT"]],item.firstProxyDirect?"DIRECT":"proxy"));modalBody.appendChild(f.exit);
+    f.category=field("分类",select(cats.map(function(c){return [c,c]}),item.category));appendField(f.category);
+    f.exit=field("默认出口",select([["proxy","跟随代理 / 节点选择"],["DIRECT","直连 DIRECT"]],item.firstProxyDirect?"DIRECT":"proxy"));appendField(f.exit);
   }else if(ctx.kind==="region"){
-    f.label=field("显示名称",input(item.label));modalBody.appendChild(f.label);
-    f.flag=field("旗帜 Emoji",input(item.flag));modalBody.appendChild(f.flag);
-    f.icon=field("图标 URL",input(item.icon));modalBody.appendChild(f.icon);
+    f.label=field("显示名称",input(item.label));appendField(f.label);
+    f.flag=field("旗帜 Emoji",input(item.flag));appendField(f.flag);
+    f.icon=field("图标 URL",input(item.icon));appendField(f.icon);
   }else if(ctx.kind==="strategy"){
-    f.label=field("显示名称",input(item.label));modalBody.appendChild(f.label);
-    f.description=field("说明",input(item.description));modalBody.appendChild(f.description);
-    f.icon=field("图标 URL",input(item.icon));modalBody.appendChild(f.icon);
+    f.label=field("显示名称",input(item.label));appendField(f.label);
+    f.description=field("说明",input(item.description));appendField(f.description);
+    f.icon=field("图标 URL",input(item.icon));appendField(f.icon);
   }
   editCtx.fields=f;
   modalRemove.hidden=false;
@@ -569,7 +574,7 @@ document.getElementById("add-app").addEventListener("click",function(){
     category:field("分类",select(cats.map(function(c){return [c,c]}),cats[0])),
     rule:field("分流规则（如 GEOSITE,notion,🧩 Notion，可留空）",input(""))
   };
-  Object.keys(f).forEach(function(k){modalBody.appendChild(f[k])});
+  Object.keys(f).forEach(function(k){appendField(f[k])});
   editCtx={kind:"add",fields:f};modalRemove.hidden=true;modal.hidden=false;
 });
 // The generic apply handler above handles app/region/strategy; add-app needs its own op.
