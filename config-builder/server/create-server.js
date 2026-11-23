@@ -267,7 +267,7 @@ export function createService({
               "X-Content-Type-Options": "nosniff",
               "X-Frame-Options": "DENY",
               "Content-Security-Policy":
-                "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'self'",
+                "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'self'; img-src 'self' data: https:;",
             },
           }),
           config,

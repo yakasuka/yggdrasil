@@ -15,37 +15,63 @@
 
 import { readFileSync } from "node:fs";
 
-function styleSheet() {
+function readAsset(relative) {
   try {
-    const url = new URL("../src/styles.css", import.meta.url);
-    return readFileSync(url, "utf8").replace(/^\uFEFF?@charset[^;]+;\s*/i, "");
+    return readFileSync(new URL(relative, import.meta.url), "utf8")
+      .replace(/^\uFEFF?@charset[^;]+;\s*/i, "")
+      // A literal closing tag inside an inlined script would terminate the
+      // <script> element early (even when it only appears in a JS comment).
+      .replace(/<\/script>/gi, "<\\/script>");
   } catch {
     return "";
   }
 }
 
-// Dashboard-only rules. They use only the builder's CSS variables so the look
-// stays identical: step rail, stat chips, card edit affordance, modal, and the
-// subscription table.
+// The exact stylesheet shipped with the configurator (styles.css +
+// widget-editor.css + motion.css, prebuilt as assets/app.css). Sharing the
+// compiled file — rather than a hand-written approximation — is what makes
+// the two pages look like the same product down to the last pixel.
+function styleSheet() {
+  return readAsset("../assets/app.css") || readAsset("../src/styles.css");
+}
+
+// The same WebGL water surface used by the configurator. caustics.js is the
+// single source of truth; we lift just its waterSurface() core and drop the
+// full-screen intro choreography, which has no place on the dashboard.
+function waterScript() {
+  const src = readAsset("../src/caustics.js");
+  const start = src.indexOf("function waterSurface()");
+  const end = src.indexOf("if (canvas && hero && stage)");
+  if (start < 0 || end < 0) return "";
+  const scope = `var canvas=document.querySelector("#caustic-water"),hero=document.querySelector(".caustic-hero"),stage=null,root=document.documentElement,reduced=matchMedia("(prefers-reduced-motion: reduce)"),morph=null,animatedView=null,transitioning=false;\n`;
+  return scope + src.slice(start, end) + "\nwaterSurface();\n";
+}
+
+// The shared footer is a custom element with its own Shadow DOM. Inlining its
+// source keeps the dashboard self-contained under its strict CSP.
+function footerScript() {
+  return readAsset("../../assets/site-footer.js");
+}
+
+// Only dashboard-specific glue is defined here. Every other rule — cards,
+// pills, grids, headers, hero, footer — comes from the builder stylesheet.
 const DASH_ONLY = `
-body{padding-bottom:40px}
-.brand-logo-fallback{width:40px;height:40px;border-radius:11px;flex:none;display:grid;place-items:center;background:linear-gradient(145deg,#7fd4ff,#0a63b8);box-shadow:inset 0 1px 0 #ffffff66}
-.brand-logo-fallback::after{content:"✳";color:#fff;font-size:1.15rem}
-.step-button[aria-current="step"]{border-color:var(--selected-line);background:var(--tint)}
-.dash-stat{padding:7px 13px;background:var(--soft);border:1px solid var(--line);border-radius:14px;font-size:.75rem;color:var(--muted);display:inline-flex;align-items:baseline;gap:6px;transition:transform 180ms var(--ease),border-color 180ms var(--ease)}
+.site-header .brand{text-decoration:none}
+.header-link{display:inline-flex;align-items:center;gap:5px;padding:0;border:0;background:none;color:var(--muted);font-size:.75rem;cursor:pointer;text-decoration:none;transition:color 180ms var(--ease)}
+.header-link:hover{color:var(--accent)}
+.header-link svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#steps .step-button>span{display:inline-flex}
+#steps .step-button[aria-current="step"] strong::before{content:"→ ";color:var(--accent)}
+.dash-summary{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 18px}
+.dash-stat{display:inline-flex;align-items:baseline;gap:6px;padding:5px 12px;border:1px solid var(--line);border-radius:99px;background:var(--soft);color:var(--muted);font-size:.6875rem;transition:transform 180ms var(--ease),border-color 180ms var(--ease)}
 .dash-stat:hover{transform:translateY(-2px);border-color:var(--selected-line)}
-.dash-stat b{color:var(--ink);font-weight:650;font-size:.9375rem}
-.dash-section-title{margin:26px 0 2px;font-size:.75rem;font-weight:600;letter-spacing:.12em;color:var(--muted);text-transform:uppercase}
-.dash-section-title:first-child{margin-top:4px}
-.dash-editor .app-card{cursor:pointer}
-.dash-editor .app-card:hover{border-color:var(--selected-line);background:var(--tint)}
-.dash-editor .app-card label{cursor:pointer}
+.dash-stat b{color:var(--ink);font-weight:650;font-size:.8125rem}
+.app-card[hidden],.region-bar[hidden],.choice[hidden],.category-heading[hidden]{display:none}
+.dash-editor .app-card,.dash-editor .region-bar,.dash-editor .choice{cursor:pointer}
+.dash-editor .app-card:hover,.dash-editor .region-bar:hover,.dash-editor .choice:hover{border-color:var(--selected-line);background:var(--tint)}
 .dash-edit-act{margin-left:auto;flex:0 0 auto;width:24px;height:24px;display:grid;place-items:center;border:1px solid var(--line);border-radius:7px;color:var(--muted);background:var(--soft)}
 .dash-editor .app-card:hover .dash-edit-act{color:var(--accent);border-color:var(--selected-line)}
 .dash-edit-act svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.dash-editor .region-bar,.dash-editor .choice{cursor:pointer}
-.dash-editor .region-bar:hover,.dash-editor .choice:hover{border-color:var(--selected-line);background:var(--tint)}
-.dash-editor .choice{min-height:0;padding:14px 16px}
 .dash-source{margin-top:26px;border-top:1px solid var(--line);padding-top:18px}
 .dash-source summary{cursor:pointer;font-size:.8125rem;color:var(--muted)}
 .dash-source textarea{display:block;width:100%;min-height:320px;resize:vertical;margin-top:12px;padding:14px 16px;border:1px solid var(--line);border-radius:14px;background:var(--input);color:var(--ink);font:12px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace;outline:none;tab-size:2}
@@ -116,62 +142,66 @@ export function dashboardHTML({
 </head>
 <body>
 <header class="site-header">
-  <div class="brand">
-    <img class="brand-logo" src="/assets/favicon.png" alt="" decoding="async" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'">
-    <span class="brand-logo-fallback" style="display:none" aria-hidden="true"></span>
+  <a class="brand" href="../" aria-label="Yggdrasil 项目首页">
+    <img src="/assets/favicon.png" width="40" height="40" alt="" decoding="async">
     <span>Yggdrasil<small>config dashboard</small></span>
-  </div>
+  </a>
   <div class="header-links">
-    <span class="engine"><i aria-hidden="true"></i>服务在线</span>
+    <span class="engine"><i aria-hidden="true"></i>为 “为秩序而生” 而生</span>
     <div class="appearance-tools" aria-label="外观设置">
       <button class="theme-toggle button secondary" id="theme-toggle" type="button" aria-label="切换到浅色模式" title="切换主题"><span aria-hidden="true" id="theme-toggle-icon" class="theme-icon"><svg viewBox="0 0 24 24" class="theme-icon-svg"><g class="theme-icon-sun"><circle cx="12" cy="12" r="4.1"/><path class="theme-icon-rays" d="M12 2.4v2.3M12 19.3v2.3M2.4 12h2.3M19.3 12h2.3M5.2 5.2 6.8 6.8M17.2 17.2 18.8 18.8M5.2 18.8 6.8 17.2M17.2 6.8 18.8 5.2"/></g><path class="theme-icon-moon" d="M20.3 14.9A8.5 8.5 0 0 1 9.1 3.7a8.5 8.5 0 1 0 11.2 11.2Z"/></svg></span><span id="theme-toggle-label">浅色</span></button>
     </div>
-    <button class="button secondary" id="logout" type="button">退出登录</button>
+    <a class="header-link" href="https://github.com/yakasuka/yggdrasil" target="_blank" rel="noopener noreferrer">GitHub <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a>
+    <button class="header-link" id="logout" type="button">退出登录</button>
   </div>
 </header>
 
 <main class="layout">
-  <section class="caustic-hero" aria-label="配置管理">
-    <canvas id="caustic-water" class="caustic-fallback" aria-hidden="true"></canvas>
-    <div class="caustic-meta"><span><i aria-hidden="true"></i>RATATOSKR · CONFIG STUDIO</span><span>自由生长，生生不息。</span></div>
-    <div class="caustic-copy"><div><p>管理订阅链接 · 编辑驱动整个配置工坊的信息</p><h2>配置管理</h2></div></div>
+  <section class="caustic-hero" aria-label="动态水面效果。点击水面产生涟漪">
+    <canvas id="caustic-water" aria-hidden="true"></canvas>
+    <div class="caustic-meta"><span><i aria-hidden="true"></i> RATATOSKR · CONFIG STUDIO</span><span>自由生长，生生不息。</span></div>
+    <div class="caustic-copy"><div><p>管理订阅链接 · 编辑驱动整个配置工坊的信息</p><h2>配置管理</h2></div><a href="#workspace">开始管理 <span aria-hidden="true">↓</span></a></div>
+    <div class="caustic-hint">点击水面，感受涟漪 <svg class="hint-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v14M6 12l6 6 6-6"/></svg></div>
   </section>
 
-  <aside class="journey" aria-label="工具导航">
-    <div class="eyebrow">OWNER CONSOLE</div>
-    <h1>控制台</h1>
-    <p class="intro">配置工坊由一份模板生长而来。<br/>在这里打理它。</p>
+  <aside class="journey" aria-label="配置进度">
+    <div class="eyebrow">YOUR CONFIGURATION</div>
+    <h1>从这里开始。</h1>
+    <p class="intro">配置工坊由一份模板生长而来。<br/>每一处修改，都有自己的去向。</p>
     <nav id="steps" aria-label="工具步骤">
-      <button class="step-button" data-step="front" aria-current="step" type="button"><span class="step-number">1</span><span><strong>前端配置</strong><small>应用 · 地区 · 出口 · 规则</small></span></button>
-      <button class="step-button" data-step="configs" type="button"><span class="step-number">2</span><span><strong>订阅链接</strong><small>生成与访问权限</small></span></button>
+      <button class="step-button" data-step="front" aria-current="step" type="button"><span><strong>前端配置</strong></span></button>
+      <button class="step-button" data-step="configs" type="button"><span><strong>订阅链接</strong></span></button>
     </nav>
     <div class="journey-note"><span aria-hidden="true">✳</span><div><strong>一处修改，处处生长。</strong><p>保存后立即生效，并由定时任务写回仓库。</p></div></div>
   </aside>
 
   <section class="workspace" id="workspace" tabindex="-1" aria-label="配置面板">
     <div class="panel-top">
-      <span id="step-caption" class="eyebrow">FRONTEND CONFIGURATION</span>
+      <span id="step-caption" class="eyebrow">STEP 01 / 02</span>
       <span class="chip">RATATOSKR</span>
       <div class="panel-actions">
-        <button class="button secondary" id="fi-reload" type="button" title="重新载入">↻ 重新载入</button>
-        <button class="button secondary" id="fi-reset" type="button">放弃草稿</button>
+        <button class="icon-text-button" id="fi-reload" type="button" title="重新载入"><span aria-hidden="true">↻</span> 重新载入</button>
+        <button class="icon-text-button" id="fi-reset" type="button"><span aria-hidden="true">✕</span> 放弃草稿</button>
       </div>
     </div>
     <div class="service-status" id="service-settings" data-state="ready" role="status">
       <span class="status-dot" aria-hidden="true"></span>
       <span id="fi-source">读取中…</span>
+      <button class="status-retry" id="fi-reload-mini" type="button" aria-label="重试连接" title="重试连接">↻</button>
     </div>
 
     <div id="panel-front">
+      <h2 class="panel-title">每个 APP，都有自己的去向。</h2>
+      <p class="panel-description">这里的内容直接来自 Ratatoskr 模板。点击任意卡片即可修改应用、地区与出口；保存后配置工坊立即生效，无需重新部署。</p>
       <div class="dash-summary" id="fi-summary"></div>
-      <h3 class="dash-section-title">应用分流</h3>
-      <div class="app-grid" id="fi-apps"><span class="muted">载入中…</span></div>
-      <h3 class="dash-section-title">地区节点</h3>
-      <div class="region-bars" id="fi-regions"><span class="muted">载入中…</span></div>
-      <h3 class="dash-section-title">出口策略</h3>
-      <div class="choice-grid" id="fi-strategies"><span class="muted">载入中…</span></div>
-      <h3 class="dash-section-title">规则模块</h3>
-      <div class="choice-grid" id="fi-rules"><span class="muted">载入中…</span></div>
+      <div class="toolbar"><input type="search" id="app-search" placeholder="搜索 APP" aria-label="搜索 APP"><span class="muted" id="fi-count">载入中…</span><div class="toolbar-actions"><button class="text-button" id="add-app" type="button">＋ 添加应用</button></div></div>
+      <div class="app-grid dash-editor" id="fi-apps"><span class="muted">载入中…</span></div>
+      <div class="section-label"><span>地区节点</span><small>按模板分组</small></div>
+      <div class="region-bars dash-editor" id="fi-regions"><span class="muted">载入中…</span></div>
+      <div class="section-label"><span>出口策略</span><small>策略入口</small></div>
+      <div class="choice-grid dash-editor" id="fi-strategies"><span class="muted">载入中…</span></div>
+      <div class="section-label"><span>规则模块</span><small>来自模板声明</small></div>
+      <div class="choice-grid dash-editor" id="fi-rules"><span class="muted">载入中…</span></div>
       <details class="dash-source">
         <summary>高级 · 直接编辑 YAML 模板</summary>
         <textarea id="fi-text" spellcheck="false" aria-label="YAML 模板内容" placeholder="正在载入模板…"></textarea>
@@ -183,19 +213,20 @@ export function dashboardHTML({
     </div>
 
     <div id="panel-configs" hidden>
-      <div class="service-status" data-state="ready" role="status"><span class="status-dot" aria-hidden="true"></span><span id="status"></span></div>
-      <h3 class="dash-section-title">已生成的配置</h3>
+      <h2 class="panel-title">所有订阅，都在这里。</h2>
+      <p class="panel-description">每一条链接都由配置工坊生成。这里可以查看真实口令与到期时间，也可以按内部 ID 删除任意配置。</p>
+      <div class="service-status" data-state="ready" role="status"><span class="status-dot" aria-hidden="true"></span><span id="status">加载中…</span><button class="status-retry" id="refresh" type="button" aria-label="重新载入" title="重新载入">↻</button></div>
       <div class="dash-scroll"><div class="dash-msg" id="body">正在加载…</div></div>
     </div>
 
     <footer class="wizard-footer">
-      <button class="button secondary" id="add-app" type="button">＋ 添加应用</button>
-      <span id="progress-note" class="muted"></span>
-      <span style="flex:1"></span>
-      <button class="button primary" id="refresh" type="button">刷新列表</button>
+      <button class="button secondary" id="back" type="button">上一步</button>
+      <span id="progress-note" class="muted">一处修改，处处生长。</span>
+      <button class="button primary" id="next" type="button" data-target="configs">下一步 <span aria-hidden="true">→</span></button>
     </footer>
   </section>
 </main>
+<site-footer base="/"></site-footer>
 
 <div class="dash-toast" id="toast" role="status" aria-live="polite"></div>
 
@@ -212,6 +243,8 @@ export function dashboardHTML({
   </div>
 </div>
 
+<script>${waterScript()}</script>
+<script type="module">${footerScript()}</script>
 <script>
 (function(){
 "use strict";
@@ -284,24 +317,34 @@ var EDIT_SVG='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4l10-10
 var panelFront=document.getElementById("panel-front");
 var panelConfigs=document.getElementById("panel-configs");
 var caption=document.getElementById("step-caption");
+var progressNote=document.getElementById("progress-note");
+var backButton=document.getElementById("back");
+var nextButton=document.getElementById("next");
 var stepButtons=[].slice.call(document.querySelectorAll(".step-button"));
 function showStep(which){
   var front=which==="front";
   panelFront.hidden=!front;panelConfigs.hidden=front;
   stepButtons.forEach(function(b){if(b.dataset.step===which)b.setAttribute("aria-current","step");else b.removeAttribute("aria-current")});
-  caption.textContent=front?"FRONTEND CONFIGURATION":"SUBSCRIPTION LINKS";
+  caption.textContent=front?"STEP 01 / 02":"STEP 02 / 02";
+  progressNote.textContent=front?"一处修改，处处生长。":"配置由订阅工坊生成。";
+  backButton.disabled=front;
+  nextButton.dataset.target=front?"configs":"front";
+  nextButton.innerHTML=front?'下一步 <span aria-hidden="true">→</span>':'返回前端配置 <span aria-hidden="true">←</span>';
   if(!front)load();
 }
 window.addEventListener("beforeunload",function(e){
   if(!fiDirty)return;
   e.preventDefault();e.returnValue="";
 });
-stepButtons.forEach(function(b){b.addEventListener("click",function(){
+function guardedStep(which){
   var current=document.querySelector('.step-button[aria-current="step"]');
-  if(current===b)return;
+  if(current&&current.dataset.step===which)return;
   if(fiDirty&&!window.confirm("前端模板有未保存的修改，切换后将丢失。确定继续？"))return;
-  showStep(b.dataset.step)
-})});
+  showStep(which);
+}
+stepButtons.forEach(function(b){b.addEventListener("click",function(){guardedStep(b.dataset.step)})});
+backButton.addEventListener("click",function(){guardedStep("front")});
+nextButton.addEventListener("click",function(){guardedStep(nextButton.dataset.target)});
 
 /* ---- front-end graphical editor ---- */
 var state={text:"",catalog:null,source:"repository",updatedAt:null};
@@ -332,17 +375,27 @@ function iconImg(url,cls,fallback){
 }
 function renderApps(cat){
   var host=document.getElementById("fi-apps");host.textContent="";
+  var apps=cat.apps||[];
+  var count=document.getElementById("fi-count");
+  if(count)count.textContent=apps.length+" 个应用 · 点击编辑";
   var groups={};
-  (cat.apps||[]).forEach(function(a){(groups[a.category||"其他服务"]=groups[a.category||"其他服务"]||[]).push(a)});
+  apps.forEach(function(a){(groups[a.category||"其他服务"]=groups[a.category||"其他服务"]||[]).push(a)});
   Object.keys(groups).forEach(function(catName){
     var heading=el("div",catName);heading.className="category-heading";heading.setAttribute("data-category",catName);
     host.appendChild(heading);
     groups[catName].forEach(function(a){
       var card=document.createElement("div");
-      card.className="app-card"+(a.entry?" app-card--entry":"");
+      card.className="app-card app-card--policy"+(a.entry?" app-card--entry":"");
       card.setAttribute("role","button");card.tabIndex=0;
+      card.setAttribute("data-app-label",String(a.label||"").toLowerCase());
       card.setAttribute("aria-label","编辑 "+a.label);
-      card.innerHTML='<label>'+iconImg(a.icon,"",a.label.slice(0,1))+'<span>'+esc(a.label)+'</span></label>'+
+      var icon=a.icon
+        ? '<img src="'+esc(a.icon)+'" alt="" decoding="async" onerror="this.hidden=true">'
+        : '<span class="app-card-icon-fallback">'+esc(String(a.label||"✳").slice(0,1))+'</span>';
+      card.innerHTML='<span class="app-card-main"><span class="app-card-icon">'+icon+'</span>'+
+        '<span class="app-card-label">'+esc(a.label)+'</span>'+
+        '<span class="policy-current"><span class="policy-current-glyph" aria-hidden="true">⇢</span>'+
+        '<span class="policy-current-label">'+esc(a.firstProxyDirect?"DIRECT":"节点选择")+'</span></span></span>'+
         (a.entry?'<span class="entry-tag">入口</span>':'')+
         '<span class="dash-edit-act">'+EDIT_SVG+'</span>';
       function open(){openEditor({kind:"app",item:a})}
@@ -352,6 +405,13 @@ function renderApps(cat){
     });
   });
 }
+var appSearch=document.getElementById("app-search");
+appSearch.addEventListener("input",function(){
+  var q=appSearch.value.trim().toLowerCase();
+  [].forEach.call(document.querySelectorAll("#fi-apps .app-card"),function(card){
+    card.hidden=!!q&&(card.getAttribute("data-app-label")||"").indexOf(q)<0;
+  });
+});
 function renderRegions(cat){
   var host=document.getElementById("fi-regions");host.textContent="";
   (cat.regions||[]).forEach(function(r){
