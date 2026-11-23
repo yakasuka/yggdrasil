@@ -259,7 +259,8 @@ export function bind(api) {
   let draggingId = null;
   document.addEventListener("dragstart", (e) => {
     const card = e.target.closest("[data-widget]");
-    if (!card || card.hasAttribute("data-widget-fixed")) {
+    // Fixed ("always on") cards are draggable too — only deletion is locked.
+    if (!card) {
       e.preventDefault();
       return;
     }

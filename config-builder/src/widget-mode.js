@@ -164,9 +164,10 @@ export function libraryItem(kind, id, model = catalog) {
 // Attributes every draggable card carries so the app can delegate drag and
 // edit gestures without re-binding listeners on each full re-render.
 export function widgetAttrs(kind, id, { fixed = false } = {}) {
-  // Dragging works without entering any edit mode in the unified widget model;
-  // fixed widgets keep their marker so the editor never drags or removes them.
-  return ` data-widget="${kind}" data-id="${esc(id)}"${fixed ? " data-widget-fixed" : " draggable=\"true\""}`;
+  // Dragging works for every card, fixed ones included — the two "always on"
+  // strategies can be reordered but never removed. The fixed marker now ONLY
+  // guards deletion (lock badge + setEnabled); it does not block dragging.
+  return ` data-widget="${kind}" data-id="${esc(id)}" draggable="true"${fixed ? " data-widget-fixed" : ""}`;
 }
 
 // Sort all widgets of a kind into one of two canonical orders and persist it.
