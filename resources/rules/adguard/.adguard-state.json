@@ -1,531 +1,531 @@
 {
   "filter_2": {
-    "etag": "W/\"c8920ba90da3379f6a4b1fe804e92440\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:58 GMT",
-    "sha256": "0d425aa7587f1ab2",
-    "syncedAt": "2026-11-21T19:25:41.600Z"
+    "etag": "W/\"ed0130c0bd93dc599333ce8bc940cf20\"",
+    "lastModified": "Mon, 23 Nov 2026 09:57:10 GMT",
+    "sha256": "b6d84798a6322f90",
+    "syncedAt": "2026-11-23T10:56:11.516Z"
   },
   "filter_3": {
-    "etag": "W/\"aae600de9b8086fe51a162e3e947abba\"",
-    "lastModified": "Sat, 21 Nov 2026 18:52:05 GMT",
-    "sha256": "291ef9ca533f5f29",
-    "syncedAt": "2026-11-21T19:25:42.119Z"
+    "etag": "W/\"689612a3e4b723a249c257860409731b\"",
+    "lastModified": "Mon, 23 Nov 2026 09:57:24 GMT",
+    "sha256": "e442987d0dea7a4f",
+    "syncedAt": "2026-11-23T10:56:09.901Z"
   },
   "filter_15": {
-    "etag": "W/\"0aa7ace1bbb6644dd667f43de744f4b8\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:56 GMT",
-    "sha256": "2945e838c8eaf263",
-    "syncedAt": "2026-11-21T19:25:44.367Z"
+    "etag": "W/\"d6b956f0dfa251e44986be4d1114b247\"",
+    "lastModified": "Mon, 23 Nov 2026 09:57:11 GMT",
+    "sha256": "ce2c5e3c3f350084",
+    "syncedAt": "2026-11-23T10:56:10.537Z"
   },
   "filter_104": {
-    "etag": "W/\"705d1af7be86cabc5cbd64f30e857916\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:52 GMT",
-    "sha256": "b292f815d78aca00",
-    "syncedAt": "2026-11-21T19:25:46.576Z"
+    "etag": "W/\"e69c730f13a7eadae152c048a2e9b673\"",
+    "lastModified": "Mon, 23 Nov 2026 09:57:10 GMT",
+    "sha256": "ec4e2ea4210af938",
+    "syncedAt": "2026-11-23T10:56:11.643Z"
   },
   "filter_208": {
     "etag": "W/\"f4abb979ddf382d521b9bf74d730f881\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:54 GMT",
+    "lastModified": "Mon, 23 Nov 2026 09:57:12 GMT",
     "sha256": "c875b69ffddea17c",
-    "syncedAt": "2026-11-21T19:25:52.720Z"
+    "syncedAt": "2026-11-23T10:56:13.737Z"
   },
   "filter_224": {
-    "etag": "W/\"f2184a2ee79cd93b9be87a6bc00a6642\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:53 GMT",
-    "sha256": "97abf233ec392097",
-    "syncedAt": "2026-11-21T19:25:54.190Z"
+    "etag": "W/\"cf51668fc3e7b9e82bec55cbd09e9a47\"",
+    "lastModified": "Mon, 23 Nov 2026 09:57:11 GMT",
+    "sha256": "e1c04d752a2f1b63",
+    "syncedAt": "2026-11-23T10:56:14.141Z"
   },
   "filter_1": {
-    "etag": "W/\"2802658911fbb61687125fc22af9bd07\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:53 GMT",
-    "sha256": "ea2373c5cac89f4c",
-    "syncedAt": "2026-11-21T19:25:40.787Z"
+    "etag": "W/\"4dab1e88d18751d8e2e4f191f451976e\"",
+    "lastModified": "Mon, 23 Nov 2026 09:57:11 GMT",
+    "sha256": "be8ed00ae63d53c4",
+    "syncedAt": "2026-11-23T10:56:08.168Z"
   },
   "filter_4": {
-    "etag": "W/\"0f641882802659035fd5088f184b244c\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:52 GMT",
-    "sha256": "118096036c47cb01",
-    "syncedAt": "2026-11-21T19:25:40.163Z"
+    "etag": "W/\"608891bfa23fbc86174472c4467a735b\"",
+    "lastModified": "Mon, 23 Nov 2026 09:57:11 GMT",
+    "sha256": "b3f99ecb20c2059a",
+    "syncedAt": "2026-11-23T10:56:08.939Z"
   },
   "filter_5": {
     "etag": "W/\"a156ea549b5dc6ad890ee8b1d10689e2\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:51 GMT",
+    "lastModified": "Mon, 23 Nov 2026 09:57:09 GMT",
     "sha256": "a1aba3b22a6ad93d",
-    "syncedAt": "2026-11-21T19:25:39.254Z"
+    "syncedAt": "2026-11-23T10:56:08.313Z"
   },
   "filter_6": {
     "etag": "W/\"4ed2897408d678834b50d5f581aab748\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:52 GMT",
+    "lastModified": "Mon, 23 Nov 2026 09:57:10 GMT",
     "sha256": "3d3a8071a4788431",
-    "syncedAt": "2026-11-21T19:25:40.084Z"
+    "syncedAt": "2026-11-23T10:56:08.780Z"
   },
   "filter_7": {
-    "etag": "W/\"abddddf3b90222b9672388ed82a224d6\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:52 GMT",
-    "sha256": "54533ea0efd5ece8",
-    "syncedAt": "2026-11-21T19:25:40.094Z"
+    "etag": "W/\"d56e317b0d76e35532ee0b76421992b0\"",
+    "lastModified": "Mon, 23 Nov 2026 09:57:10 GMT",
+    "sha256": "7807ab02c4d37a58",
+    "syncedAt": "2026-11-23T10:56:08.916Z"
   },
   "filter_8": {
     "etag": "W/\"b5f0b41c00e47435bbbb5055a393e3fc\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:52 GMT",
+    "lastModified": "Mon, 23 Nov 2026 09:57:10 GMT",
     "sha256": "5039b7d24d4e79c7",
-    "syncedAt": "2026-11-21T19:25:39.297Z"
+    "syncedAt": "2026-11-23T10:56:08.355Z"
   },
   "filter_9": {
-    "etag": "W/\"463c8d86bab850a77246b0a8f0329280\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:52 GMT",
-    "sha256": "e93b8ad6cc52f043",
-    "syncedAt": "2026-11-21T19:25:41.197Z"
+    "etag": "W/\"5546bf140f19fd7bc72f5f09ed28cbd2\"",
+    "lastModified": "Mon, 23 Nov 2026 09:57:10 GMT",
+    "sha256": "3227cc705c35fe3c",
+    "syncedAt": "2026-11-23T10:56:09.286Z"
   },
   "filter_10": {
     "etag": "W/\"2079eae51ee5ccd909911c2c3758fa6b\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:51 GMT",
+    "lastModified": "Mon, 23 Nov 2026 09:57:09 GMT",
     "sha256": "75324dbb025a5429",
-    "syncedAt": "2026-11-21T19:25:41.364Z"
+    "syncedAt": "2026-11-23T10:56:08.965Z"
   },
   "filter_11": {
-    "etag": "W/\"463cc3a125c108500e8b63eb1bd7a901\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:52 GMT",
-    "sha256": "9c2599938de9b165",
-    "syncedAt": "2026-11-21T19:25:42.129Z"
+    "etag": "W/\"9c781a740c1778dfd6af0cf9ed574359\"",
+    "lastModified": "Mon, 23 Nov 2026 09:57:10 GMT",
+    "sha256": "f430f29569f44651",
+    "syncedAt": "2026-11-23T10:56:09.468Z"
   },
   "filter_13": {
-    "etag": "W/\"3ba61963b118074ec8c27ad2421c80c8\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:52 GMT",
-    "sha256": "ee5c91219a7b6e7f",
-    "syncedAt": "2026-11-21T19:25:41.738Z"
+    "etag": "W/\"779f4363256a212b1cb26ce88caa5fb4\"",
+    "lastModified": "Mon, 23 Nov 2026 09:57:10 GMT",
+    "sha256": "43bf6db17dcb58ec",
+    "syncedAt": "2026-11-23T10:56:09.274Z"
   },
   "filter_14": {
-    "etag": "W/\"dcabc6d695d57475d29ac9b1f45523cd\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:56 GMT",
-    "sha256": "14e8345dbfca33ae",
-    "syncedAt": "2026-11-21T19:25:44.419Z"
+    "etag": "W/\"d846e5018b24bfd7c00492e93a7c2854\"",
+    "lastModified": "Mon, 23 Nov 2026 09:57:14 GMT",
+    "sha256": "67bf73150d501eb7",
+    "syncedAt": "2026-11-23T10:56:10.145Z"
   },
   "filter_16": {
-    "etag": "W/\"1aab636f644ceb87048a0510aadd71b2\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:51 GMT",
-    "sha256": "f1b93a990acf5d38",
-    "syncedAt": "2026-11-21T19:25:43.876Z"
+    "etag": "W/\"235baf8cc3e3cd0df47217c37d877143\"",
+    "lastModified": "Mon, 23 Nov 2026 09:57:10 GMT",
+    "sha256": "6211daafe8fe087b",
+    "syncedAt": "2026-11-23T10:56:09.931Z"
   },
   "filter_17": {
     "etag": "W/\"1db45e21aa2d0c764a0f455ffe6a9e9f\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:51 GMT",
+    "lastModified": "Mon, 23 Nov 2026 09:57:09 GMT",
     "sha256": "7fe664be68a4d7fe",
-    "syncedAt": "2026-11-21T19:25:42.754Z"
+    "syncedAt": "2026-11-23T10:56:09.938Z"
   },
   "filter_18": {
-    "etag": "W/\"8d19ca32658349d81defb77663fb0bb8\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:53 GMT",
-    "sha256": "0343bc4a8dfab442",
-    "syncedAt": "2026-11-21T19:25:44.127Z"
+    "etag": "W/\"b179d5e7ed3d85f812e3b4ed17e7ad32\"",
+    "lastModified": "Mon, 23 Nov 2026 09:57:10 GMT",
+    "sha256": "9ef45632f5d00737",
+    "syncedAt": "2026-11-23T10:56:10.193Z"
   },
   "filter_19": {
-    "etag": "W/\"4b3341c4f7a9956e04b3f513a06afc22\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:53 GMT",
-    "sha256": "a1edc1a445a72564",
-    "syncedAt": "2026-11-21T19:25:44.027Z"
+    "etag": "W/\"225d1d6703f9c37ca97a9bda7cc617cc\"",
+    "lastModified": "Mon, 23 Nov 2026 09:57:12 GMT",
+    "sha256": "dbf01fb30701a6f8",
+    "syncedAt": "2026-11-23T10:56:10.169Z"
   },
   "filter_20": {
-    "etag": "W/\"98aa114f87f732665faf71f052d39120\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:52 GMT",
-    "sha256": "b30d7993021a714d",
-    "syncedAt": "2026-11-21T19:25:44.706Z"
+    "etag": "W/\"3ec74dc3fbdecdae11737bb11d0306b3\"",
+    "lastModified": "Mon, 23 Nov 2026 09:57:10 GMT",
+    "sha256": "43df1649205281cc",
+    "syncedAt": "2026-11-23T10:56:10.657Z"
   },
   "filter_21": {
-    "etag": "W/\"a258d452424631f7c2da7cfb17e51169\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:52 GMT",
-    "sha256": "9a32d212d2227a07",
-    "syncedAt": "2026-11-21T19:25:44.152Z"
+    "etag": "W/\"9f36add481cdb973085e99107024fe5d\"",
+    "lastModified": "Mon, 23 Nov 2026 09:57:11 GMT",
+    "sha256": "10e0447e4b91381a",
+    "syncedAt": "2026-11-23T10:56:10.855Z"
   },
   "filter_22": {
-    "etag": "W/\"0b5c989e573eabb0b5fab8b9e63fb07f\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:51 GMT",
-    "sha256": "b655d5f427893fdf",
-    "syncedAt": "2026-11-21T19:25:44.376Z"
+    "etag": "W/\"2e498dfd0a128e59dcbaf7e2996dccfb\"",
+    "lastModified": "Mon, 23 Nov 2026 09:57:10 GMT",
+    "sha256": "6fb1055bd9ffe098",
+    "syncedAt": "2026-11-23T10:56:10.549Z"
   },
   "filter_23": {
     "etag": "W/\"8fb08fc1fa71dd7a02091f5f9406c798\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:51 GMT",
+    "lastModified": "Mon, 23 Nov 2026 09:57:09 GMT",
     "sha256": "85ec90c096da5c37",
-    "syncedAt": "2026-11-21T19:25:45.563Z"
+    "syncedAt": "2026-11-23T10:56:10.825Z"
   },
   "filter_25": {
     "etag": "W/\"0e2a37898112179046b3af9d98db81f8\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:51 GMT",
+    "lastModified": "Mon, 23 Nov 2026 09:57:09 GMT",
     "sha256": "d0fd595d34454ddd",
-    "syncedAt": "2026-11-21T19:25:45.375Z"
+    "syncedAt": "2026-11-23T10:56:10.544Z"
   },
   "filter_26": {
     "etag": "W/\"e7c6f61bb99aaa823db104debf3be951\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:52 GMT",
+    "lastModified": "Mon, 23 Nov 2026 09:57:11 GMT",
     "sha256": "ff94f4d7532b6cc8",
-    "syncedAt": "2026-11-21T19:25:45.767Z"
+    "syncedAt": "2026-11-23T10:56:10.893Z"
   },
   "filter_27": {
-    "etag": "W/\"2fb574283aafd0d3e02a1301225498fa\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:52 GMT",
-    "sha256": "4c38013ec3636aad",
-    "syncedAt": "2026-11-21T19:25:46.143Z"
+    "etag": "W/\"6cc648f1267bd304a0ac33246d8a2c77\"",
+    "lastModified": "Mon, 23 Nov 2026 09:57:10 GMT",
+    "sha256": "43bb71f5a5f4aef4",
+    "syncedAt": "2026-11-23T10:56:11.527Z"
   },
   "filter_101": {
-    "etag": "W/\"fe60a2b7b68473639d69af982c2be2f2\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:54 GMT",
-    "sha256": "50b2cf241b299199",
-    "syncedAt": "2026-11-21T19:25:46.974Z"
+    "etag": "W/\"fba5881c39e938ae197ca2ad5761b33c\"",
+    "lastModified": "Mon, 23 Nov 2026 09:57:12 GMT",
+    "sha256": "740e49befb320bae",
+    "syncedAt": "2026-11-23T10:56:11.771Z"
   },
   "filter_102": {
-    "etag": "W/\"94f0334d3fe930285cc5e972c11445be\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:52 GMT",
-    "sha256": "ad698bdf22a9ff29",
-    "syncedAt": "2026-11-21T19:25:46.062Z"
+    "etag": "W/\"a0433074461f3222bde5fe406a8194fb\"",
+    "lastModified": "Mon, 23 Nov 2026 09:57:10 GMT",
+    "sha256": "67eba5b0f8138258",
+    "syncedAt": "2026-11-23T10:56:10.901Z"
   },
   "filter_103": {
     "etag": "W/\"552defdc834f94413f3490b4dcb33dc9\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:51 GMT",
+    "lastModified": "Mon, 23 Nov 2026 09:57:10 GMT",
     "sha256": "5b47eb3c30aadf6c",
-    "syncedAt": "2026-11-21T19:25:45.807Z"
+    "syncedAt": "2026-11-23T10:56:11.041Z"
   },
   "filter_105": {
     "etag": "W/\"475a4f4932b24fe15ff4bf0c7ca66ec9\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:52 GMT",
+    "lastModified": "Mon, 23 Nov 2026 09:57:10 GMT",
     "sha256": "86b7518c091908ea",
-    "syncedAt": "2026-11-21T19:25:46.800Z"
+    "syncedAt": "2026-11-23T10:56:11.203Z"
   },
   "filter_106": {
-    "etag": "W/\"484d952502272edb45437f8aa7bc95e7\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:51 GMT",
-    "sha256": "bbe09c422df5fe6b",
-    "syncedAt": "2026-11-21T19:25:46.977Z"
+    "etag": "W/\"4b37aee54669316a2fde189f09a01aca\"",
+    "lastModified": "Mon, 23 Nov 2026 09:57:09 GMT",
+    "sha256": "e5fed38ebede4c91",
+    "syncedAt": "2026-11-23T10:56:11.248Z"
   },
   "filter_107": {
     "etag": "W/\"1759f024ed1b81dc657bcb43b4c73012\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:52 GMT",
+    "lastModified": "Mon, 23 Nov 2026 09:57:10 GMT",
     "sha256": "108eea4b10869d26",
-    "syncedAt": "2026-11-21T19:25:47.460Z"
+    "syncedAt": "2026-11-23T10:56:11.550Z"
   },
   "filter_108": {
-    "etag": "W/\"5005bdb6fa88d1551830e9e60da2c2bb\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:52 GMT",
-    "sha256": "3e4fc3f9bdb286d5",
-    "syncedAt": "2026-11-21T19:25:47.232Z"
+    "etag": "W/\"341c9d572622f7aa23861f6b1dcd357a\"",
+    "lastModified": "Mon, 23 Nov 2026 09:57:10 GMT",
+    "sha256": "00d6f5aa2577d31e",
+    "syncedAt": "2026-11-23T10:56:11.914Z"
   },
   "filter_109": {
-    "etag": "W/\"9724d38f92230da48e4f711c032e107c\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:51 GMT",
-    "sha256": "a5434597c0bf9382",
-    "syncedAt": "2026-11-21T19:25:47.740Z"
+    "etag": "W/\"4f88511442f394538ec9a2e58737535c\"",
+    "lastModified": "Mon, 23 Nov 2026 09:57:10 GMT",
+    "sha256": "bf5bb737b384605d",
+    "syncedAt": "2026-11-23T10:56:12.550Z"
   },
   "filter_110": {
     "etag": "W/\"8b4e718b5466e4dcd7e2ae12202afa80\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:51 GMT",
+    "lastModified": "Mon, 23 Nov 2026 09:57:09 GMT",
     "sha256": "509bd4b53481825b",
-    "syncedAt": "2026-11-21T19:25:47.537Z"
+    "syncedAt": "2026-11-23T10:56:11.886Z"
   },
   "filter_111": {
     "etag": "W/\"067b3bc15440e38ffdbb9fec8a87d02c\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:52 GMT",
+    "lastModified": "Mon, 23 Nov 2026 09:57:10 GMT",
     "sha256": "a91f31dc33c72110",
-    "syncedAt": "2026-11-21T19:25:47.965Z"
+    "syncedAt": "2026-11-23T10:56:11.875Z"
   },
   "filter_112": {
-    "etag": "W/\"170725f5446dbdd4fcf3ff3f216bde98\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:51 GMT",
-    "sha256": "8213b9ef4edddfe7",
-    "syncedAt": "2026-11-21T19:25:48.211Z"
+    "etag": "W/\"617216a05ddfd3703194e657743a82a3\"",
+    "lastModified": "Mon, 23 Nov 2026 09:57:09 GMT",
+    "sha256": "14271239125fa611",
+    "syncedAt": "2026-11-23T10:56:11.929Z"
   },
   "filter_113": {
-    "etag": "W/\"7ad4fe77a5390ad191d9a8bfb2c4d9b5\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:52 GMT",
-    "sha256": "c41959f85d61743a",
-    "syncedAt": "2026-11-21T19:25:48.862Z"
+    "etag": "W/\"3913c53b25daba60782ff9220bb0f42f\"",
+    "lastModified": "Mon, 23 Nov 2026 09:57:10 GMT",
+    "sha256": "678aca1075c775cc",
+    "syncedAt": "2026-11-23T10:56:11.978Z"
   },
   "filter_114": {
     "etag": "W/\"a21075e89b80bc0a70747b6bffc49d7e\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:52 GMT",
+    "lastModified": "Mon, 23 Nov 2026 09:57:10 GMT",
     "sha256": "c23188310d0d3640",
-    "syncedAt": "2026-11-21T19:25:48.399Z"
+    "syncedAt": "2026-11-23T10:56:12.106Z"
   },
   "filter_118": {
-    "etag": "W/\"b0761aa89c7ef1b8bf884c624c52200c\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:53 GMT",
-    "sha256": "1899e35179c2993f",
-    "syncedAt": "2026-11-21T19:25:49.870Z"
+    "etag": "W/\"48d1fa9aea2081398a56b9afc0aab536\"",
+    "lastModified": "Mon, 23 Nov 2026 09:57:10 GMT",
+    "sha256": "49c595ba7a6cf1b9",
+    "syncedAt": "2026-11-23T10:56:12.846Z"
   },
   "filter_119": {
     "etag": "W/\"117bfe3ccd6271653fb133ff2ab20f85\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:52 GMT",
+    "lastModified": "Mon, 23 Nov 2026 09:57:10 GMT",
     "sha256": "5e404bddb382878a",
-    "syncedAt": "2026-11-21T19:25:48.837Z"
+    "syncedAt": "2026-11-23T10:56:12.237Z"
   },
   "filter_120": {
-    "etag": "W/\"47fd01f19553e55d741487104180f9f9\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:51 GMT",
-    "sha256": "4fa7be6f819fe00e",
-    "syncedAt": "2026-11-21T19:25:49.244Z"
+    "etag": "W/\"d89e29b5f37aaf9ebbf4e109811902d9\"",
+    "lastModified": "Mon, 23 Nov 2026 09:57:09 GMT",
+    "sha256": "c55fc78f2d1f152e",
+    "syncedAt": "2026-11-23T10:56:12.291Z"
   },
   "filter_121": {
     "etag": "W/\"14f37dfb8ca776f84183a200f9e45416\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:52 GMT",
+    "lastModified": "Mon, 23 Nov 2026 09:57:10 GMT",
     "sha256": "a38457b2d8bf7f91",
-    "syncedAt": "2026-11-21T19:25:49.118Z"
+    "syncedAt": "2026-11-23T10:56:12.325Z"
   },
   "filter_122": {
-    "etag": "W/\"842f386a5a925f73e507e974c0545829\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:54 GMT",
-    "sha256": "8b51c0090cdefc45",
-    "syncedAt": "2026-11-21T19:25:50.501Z"
+    "etag": "W/\"f6bb4387169d8f01380fe7ba992e11c7\"",
+    "lastModified": "Mon, 23 Nov 2026 09:57:12 GMT",
+    "sha256": "e62fb672ff6549d6",
+    "syncedAt": "2026-11-23T10:56:13.098Z"
   },
   "filter_123": {
-    "etag": "W/\"0f7d6ddc88891333edeb46cb651c79db\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:51 GMT",
-    "sha256": "a90e61bf77d971ee",
-    "syncedAt": "2026-11-21T19:25:50.115Z"
+    "etag": "W/\"337290b6eedd1a7a32704e29315943e8\"",
+    "lastModified": "Mon, 23 Nov 2026 09:57:09 GMT",
+    "sha256": "45e5cd5177469e00",
+    "syncedAt": "2026-11-23T10:56:12.724Z"
   },
   "filter_124": {
-    "etag": "W/\"da65af32cc8816d46d94d780976ae4f7\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:51 GMT",
-    "sha256": "619e9ed7c178e5c3",
-    "syncedAt": "2026-11-21T19:25:50.056Z"
+    "etag": "W/\"fcefa7be5ae39a14236cea972afd67a2\"",
+    "lastModified": "Mon, 23 Nov 2026 09:57:09 GMT",
+    "sha256": "7a352dd5a49e895b",
+    "syncedAt": "2026-11-23T10:56:12.664Z"
   },
   "filter_201": {
     "etag": "W/\"d788fa1bebd15d2a36244fb8a96fad8d\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:54 GMT",
+    "lastModified": "Mon, 23 Nov 2026 09:57:12 GMT",
     "sha256": "302649d3918e5078",
-    "syncedAt": "2026-11-21T19:25:51.015Z"
+    "syncedAt": "2026-11-23T10:56:12.713Z"
   },
   "filter_202": {
     "etag": "W/\"40a537683814137a1f26a978c96d509c\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:51 GMT",
+    "lastModified": "Mon, 23 Nov 2026 09:57:10 GMT",
     "sha256": "8cbc4435b23c4bfb",
-    "syncedAt": "2026-11-21T19:25:50.271Z"
+    "syncedAt": "2026-11-23T10:56:12.667Z"
   },
   "filter_203": {
     "etag": "W/\"0bdf98b576cf3c2785e7275dd87595c5\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:51 GMT",
+    "lastModified": "Mon, 23 Nov 2026 09:57:09 GMT",
     "sha256": "ae68f325c70e26e3",
-    "syncedAt": "2026-11-21T19:25:50.560Z"
+    "syncedAt": "2026-11-23T10:56:13.173Z"
   },
   "filter_204": {
-    "etag": "W/\"8134477f4da2e7c400f7915da243667e\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:52 GMT",
-    "sha256": "6248a462e5ae7117",
-    "syncedAt": "2026-11-21T19:25:50.674Z"
+    "etag": "W/\"0a989f95f56141dc7b96426452e4f27a\"",
+    "lastModified": "Mon, 23 Nov 2026 09:57:10 GMT",
+    "sha256": "f52e9d2489c52978",
+    "syncedAt": "2026-11-23T10:56:12.905Z"
   },
   "filter_206": {
     "etag": "W/\"230f76919a768b510acdec3a881b255e\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:51 GMT",
+    "lastModified": "Mon, 23 Nov 2026 09:57:09 GMT",
     "sha256": "0994a3fdaab0f04d",
-    "syncedAt": "2026-11-21T19:25:51.569Z"
+    "syncedAt": "2026-11-23T10:56:13.069Z"
   },
   "filter_207": {
-    "etag": "W/\"df7568f01bded7e072af593f9c8aa78f\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:52 GMT",
-    "sha256": "3c8b8f7b8351440c",
-    "syncedAt": "2026-11-21T19:25:51.429Z"
+    "etag": "W/\"d07bf19f415aca83522cf9d94430ba0e\"",
+    "lastModified": "Mon, 23 Nov 2026 09:57:10 GMT",
+    "sha256": "357a8b91578ab3e4",
+    "syncedAt": "2026-11-23T10:56:13.149Z"
   },
   "filter_212": {
-    "etag": "W/\"49b9b26722a5f20d1ed1fa48786fe010\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:52 GMT",
-    "sha256": "846f1a06f0c56264",
-    "syncedAt": "2026-11-21T19:25:51.627Z"
+    "etag": "W/\"b329266f5c745e1ad9862ace5e11dff0\"",
+    "lastModified": "Mon, 23 Nov 2026 09:57:10 GMT",
+    "sha256": "c52e6e811574f364",
+    "syncedAt": "2026-11-23T10:56:13.115Z"
   },
   "filter_214": {
-    "etag": "W/\"75f27488b816ef9789e1c9e227750151\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:51 GMT",
-    "sha256": "8c72fdae9b3d88a4",
-    "syncedAt": "2026-11-21T19:25:51.882Z"
+    "etag": "W/\"c170f2ee92f5e8ef8f385f8ff8e3cfe3\"",
+    "lastModified": "Mon, 23 Nov 2026 09:57:09 GMT",
+    "sha256": "7f57a26b2af962b9",
+    "syncedAt": "2026-11-23T10:56:13.234Z"
   },
   "filter_216": {
-    "etag": "W/\"160a5da57bc19a2ee14764eae17fd1f2\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:52 GMT",
-    "sha256": "b6b5981cd47b9aec",
-    "syncedAt": "2026-11-21T19:25:52.245Z"
+    "etag": "W/\"361842c8813a5ffc034d3316a806df0d\"",
+    "lastModified": "Mon, 23 Nov 2026 09:57:10 GMT",
+    "sha256": "3f555759cef75119",
+    "syncedAt": "2026-11-23T10:56:13.566Z"
   },
   "filter_217": {
     "etag": "W/\"ba1006f13dac52db167335d97f956e6d\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:51 GMT",
+    "lastModified": "Mon, 23 Nov 2026 09:57:10 GMT",
     "sha256": "f3b904fa670cd785",
-    "syncedAt": "2026-11-21T19:25:52.694Z"
+    "syncedAt": "2026-11-23T10:56:13.521Z"
   },
   "filter_218": {
     "etag": "W/\"f28eb993cc646b6c7aea7e2bf576bc09\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:51 GMT",
+    "lastModified": "Mon, 23 Nov 2026 09:57:10 GMT",
     "sha256": "4c54384049be99e7",
-    "syncedAt": "2026-11-21T19:25:52.366Z"
+    "syncedAt": "2026-11-23T10:56:13.782Z"
   },
   "filter_220": {
     "etag": "W/\"14f4a713a4023e6015f5df8242dd5c61\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:51 GMT",
+    "lastModified": "Mon, 23 Nov 2026 09:57:09 GMT",
     "sha256": "b201b35e9d34000a",
-    "syncedAt": "2026-11-21T19:25:52.885Z"
+    "syncedAt": "2026-11-23T10:56:13.571Z"
   },
   "filter_221": {
     "etag": "W/\"85e23957d7ff49bd8e47d1e3a7dde3a1\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:53 GMT",
+    "lastModified": "Mon, 23 Nov 2026 09:57:11 GMT",
     "sha256": "00f15502f9067d2c",
-    "syncedAt": "2026-11-21T19:25:53.798Z"
+    "syncedAt": "2026-11-23T10:56:14.025Z"
   },
   "filter_225": {
-    "etag": "W/\"afafaa8c8a019d03632e28be1818fb56\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:51 GMT",
-    "sha256": "03e77b92295333d5",
-    "syncedAt": "2026-11-21T19:25:53.418Z"
+    "etag": "W/\"1eeff50bac7e70817caf955783a4790b\"",
+    "lastModified": "Mon, 23 Nov 2026 09:57:10 GMT",
+    "sha256": "75affb1731938b0d",
+    "syncedAt": "2026-11-23T10:56:13.573Z"
   },
   "filter_227": {
     "etag": "W/\"3db6817198497ce95d8681015bd01409\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:52 GMT",
+    "lastModified": "Mon, 23 Nov 2026 09:57:10 GMT",
     "sha256": "79e402505216067b",
-    "syncedAt": "2026-11-21T19:25:53.903Z"
+    "syncedAt": "2026-11-23T10:56:13.887Z"
   },
   "filter_228": {
     "etag": "W/\"156667f8c59225bc2b59f1e48688ee06\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:52 GMT",
+    "lastModified": "Mon, 23 Nov 2026 09:57:10 GMT",
     "sha256": "70d5f8a9c58baf0e",
-    "syncedAt": "2026-11-21T19:25:53.793Z"
+    "syncedAt": "2026-11-23T10:56:13.988Z"
   },
   "filter_231": {
-    "etag": "W/\"0d3105ab7a43d0d39dff790a6c43eb11\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:51 GMT",
-    "sha256": "cf0946db86ccc28f",
-    "syncedAt": "2026-11-21T19:25:54.142Z"
+    "etag": "W/\"7ee34d64c1a856e31c44f709ce42d9b9\"",
+    "lastModified": "Mon, 23 Nov 2026 09:57:09 GMT",
+    "sha256": "4c5328bc0b977f2d",
+    "syncedAt": "2026-11-23T10:56:13.894Z"
   },
   "filter_232": {
-    "etag": "W/\"d474b7defb87bd598f77f423e979f902\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:53 GMT",
-    "sha256": "8eb11026996a001e",
-    "syncedAt": "2026-11-21T19:25:54.678Z"
+    "etag": "W/\"d0d23e8a489e506c8226632f6dcf0d50\"",
+    "lastModified": "Mon, 23 Nov 2026 09:57:11 GMT",
+    "sha256": "905c7637fb086bec",
+    "syncedAt": "2026-11-23T10:56:14.209Z"
   },
   "filter_233": {
-    "etag": "W/\"d44b95279488bc99317679b233a0e1a3\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:52 GMT",
-    "sha256": "a0bf2d30cf753891",
-    "syncedAt": "2026-11-21T19:25:54.240Z"
+    "etag": "W/\"6bd18b3503a48c00a4bc4b84bcbf5b84\"",
+    "lastModified": "Mon, 23 Nov 2026 09:57:10 GMT",
+    "sha256": "57a515b4a8e9cf66",
+    "syncedAt": "2026-11-23T10:56:14.104Z"
   },
   "filter_234": {
     "etag": "W/\"04c05954c84f665ddf041d8ad053067b\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:52 GMT",
+    "lastModified": "Mon, 23 Nov 2026 09:57:10 GMT",
     "sha256": "a43c8ff5686f1bf8",
-    "syncedAt": "2026-11-21T19:25:54.850Z"
+    "syncedAt": "2026-11-23T10:56:14.215Z"
   },
   "filter_235": {
     "etag": "W/\"45746350eda63de42a004c5ec0a3b50f\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:52 GMT",
+    "lastModified": "Mon, 23 Nov 2026 09:57:10 GMT",
     "sha256": "ae2d4ffc4a0a0b06",
-    "syncedAt": "2026-11-21T19:25:55.202Z"
+    "syncedAt": "2026-11-23T10:56:14.471Z"
   },
   "filter_236": {
     "etag": "W/\"d39165cdbdb1de5bfcd94697e12ae15e\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:51 GMT",
+    "lastModified": "Mon, 23 Nov 2026 09:57:09 GMT",
     "sha256": "5a02901c4b81c3bc",
-    "syncedAt": "2026-11-21T19:25:55.278Z"
+    "syncedAt": "2026-11-23T10:56:14.310Z"
   },
   "filter_237": {
-    "etag": "W/\"82a70446ff75bc539524d3575fdd07db\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:52 GMT",
-    "sha256": "0733378504c5246f",
-    "syncedAt": "2026-11-21T19:25:56.435Z"
+    "etag": "W/\"78ed860e8548d2853bef1eb455924b6d\"",
+    "lastModified": "Mon, 23 Nov 2026 09:57:11 GMT",
+    "sha256": "984f1587ac48e4e7",
+    "syncedAt": "2026-11-23T10:56:14.381Z"
   },
   "filter_239": {
-    "etag": "W/\"a2edbd21dad92af0afe423b5020f4395\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:51 GMT",
-    "sha256": "cc8421d4c400a804",
-    "syncedAt": "2026-11-21T19:25:55.584Z"
+    "etag": "W/\"85d09009ebf78d2e908f077a7735ac70\"",
+    "lastModified": "Mon, 23 Nov 2026 09:57:09 GMT",
+    "sha256": "f57807d829198469",
+    "syncedAt": "2026-11-23T10:56:14.351Z"
   },
   "filter_241": {
-    "etag": "W/\"ec084b5b0bded80ff3b0675eab2e86bb\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:53 GMT",
-    "sha256": "dc819c343cf76177",
-    "syncedAt": "2026-11-21T19:25:56.739Z"
+    "etag": "W/\"07ff84747bbc79dd802a7a47b42a0e03\"",
+    "lastModified": "Mon, 23 Nov 2026 09:57:11 GMT",
+    "sha256": "466a4b62d5000087",
+    "syncedAt": "2026-11-23T10:56:14.709Z"
   },
   "filter_243": {
-    "etag": "W/\"7fdb0d9be124dd9ccc6f559e4fef7eb6\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:51 GMT",
-    "sha256": "88533074987f732f",
-    "syncedAt": "2026-11-21T19:25:55.927Z"
+    "etag": "W/\"be5f23d46683b07c3d36150e2be12602\"",
+    "lastModified": "Mon, 23 Nov 2026 09:57:09 GMT",
+    "sha256": "1c96caef2b3db283",
+    "syncedAt": "2026-11-23T10:56:14.601Z"
   },
   "filter_244": {
     "etag": "W/\"31275cf2c74af3a30ec42c8482f674fd\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:51 GMT",
+    "lastModified": "Mon, 23 Nov 2026 09:57:10 GMT",
     "sha256": "66368e374d6f6923",
-    "syncedAt": "2026-11-21T19:25:56.509Z"
+    "syncedAt": "2026-11-23T10:56:14.792Z"
   },
   "filter_246": {
-    "etag": "W/\"9fd77e33b92bb9b7c010fba218019942\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:52 GMT",
-    "sha256": "554f5b3769917cb7",
-    "syncedAt": "2026-11-21T19:25:56.550Z"
+    "etag": "W/\"ede47e2fd1d6894e2ea4586805e590e5\"",
+    "lastModified": "Mon, 23 Nov 2026 09:57:11 GMT",
+    "sha256": "abbffa01ec1b1931",
+    "syncedAt": "2026-11-23T10:56:14.557Z"
   },
   "filter_247": {
-    "etag": "W/\"fb560fd27a6a32f7084cf0e4521e9dfc\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:52 GMT",
-    "sha256": "f90d577ec74e1f9b",
-    "syncedAt": "2026-11-21T19:25:56.676Z"
+    "etag": "W/\"cfd347af9632931bc52cf52e4f89e3e8\"",
+    "lastModified": "Mon, 23 Nov 2026 09:57:10 GMT",
+    "sha256": "4af9e9d3858389e1",
+    "syncedAt": "2026-11-23T10:56:14.638Z"
   },
   "filter_249": {
     "etag": "W/\"99c73cf0f4b442accac7b3815141ade7\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:51 GMT",
+    "lastModified": "Mon, 23 Nov 2026 09:57:10 GMT",
     "sha256": "ff416464490e78c2",
-    "syncedAt": "2026-11-21T19:25:56.984Z"
+    "syncedAt": "2026-11-23T10:56:14.717Z"
   },
   "filter_250": {
     "etag": "W/\"ebdc44201795c74d9b7c6e89f9951d6e\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:52 GMT",
+    "lastModified": "Mon, 23 Nov 2026 09:57:11 GMT",
     "sha256": "bb445be521ae11f9",
-    "syncedAt": "2026-11-21T19:25:57.531Z"
+    "syncedAt": "2026-11-23T10:56:14.830Z"
   },
   "filter_251": {
     "etag": "W/\"a600fa134d66d17793948599b1623c64\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:53 GMT",
+    "lastModified": "Mon, 23 Nov 2026 09:57:11 GMT",
     "sha256": "a89375cb870b245d",
-    "syncedAt": "2026-11-21T19:25:57.601Z"
+    "syncedAt": "2026-11-23T10:56:14.896Z"
   },
   "filter_252": {
     "etag": "W/\"8879468efefa63e2f56ac7302735c81c\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:52 GMT",
+    "lastModified": "Mon, 23 Nov 2026 09:57:11 GMT",
     "sha256": "06e75904430b51b3",
-    "syncedAt": "2026-11-21T19:25:57.847Z"
+    "syncedAt": "2026-11-23T10:56:14.899Z"
   },
   "filter_253": {
-    "etag": "W/\"0c695377fd7fbbbf7710debb61573e95\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:52 GMT",
-    "sha256": "388f60ad5466d01d",
-    "syncedAt": "2026-11-21T19:25:58.438Z"
+    "etag": "W/\"036f4b8862ff621109d63acee8c15b13\"",
+    "lastModified": "Mon, 23 Nov 2026 09:57:11 GMT",
+    "sha256": "e4313053a8036951",
+    "syncedAt": "2026-11-23T10:56:15.040Z"
   },
   "filter_254": {
     "etag": "W/\"8db39496eb14e7d403f7d7d75203993d\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:52 GMT",
+    "lastModified": "Mon, 23 Nov 2026 09:57:10 GMT",
     "sha256": "b999e680eb82d27e",
-    "syncedAt": "2026-11-21T19:25:58.009Z"
+    "syncedAt": "2026-11-23T10:56:15.236Z"
   },
   "filter_255": {
-    "etag": "W/\"c9ccfcc183ca2815d50f48735c972708\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:54 GMT",
-    "sha256": "9570162ce1ef3498",
-    "syncedAt": "2026-11-21T19:25:58.997Z"
+    "etag": "W/\"9c2bff8ba5dde4cd161b189eaf168963\"",
+    "lastModified": "Mon, 23 Nov 2026 09:57:12 GMT",
+    "sha256": "de35ac6fb7a261d7",
+    "syncedAt": "2026-11-23T10:56:15.233Z"
   },
   "filter_256": {
-    "etag": "W/\"1ebd752e4e1a9602ab635a57cd2d4e54\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:51 GMT",
-    "sha256": "0dc4f2769d32f6d7",
-    "syncedAt": "2026-11-21T19:25:58.124Z"
+    "etag": "W/\"06cc5bcc9906b59df3cc96c22c134e16\"",
+    "lastModified": "Mon, 23 Nov 2026 09:57:10 GMT",
+    "sha256": "75bf4288abc2c4f8",
+    "syncedAt": "2026-11-23T10:56:15.059Z"
   },
   "filter_257": {
-    "etag": "W/\"a2849bb0229289a0f7f25b8b4746fb04\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:53 GMT",
-    "sha256": "ffa03db9d151bd25",
-    "syncedAt": "2026-11-21T19:25:58.693Z"
+    "etag": "W/\"397f9b10ab9215e95a230a5065a3a2d2\"",
+    "lastModified": "Mon, 23 Nov 2026 09:57:10 GMT",
+    "sha256": "a7b3037ba3dcd009",
+    "syncedAt": "2026-11-23T10:56:15.263Z"
   },
   "filter_259": {
     "etag": "W/\"ff96a122d427a086039edecb807989f9\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:52 GMT",
+    "lastModified": "Mon, 23 Nov 2026 09:57:10 GMT",
     "sha256": "d72f7a3f91fffc7c",
-    "syncedAt": "2026-11-21T19:25:59.181Z"
+    "syncedAt": "2026-11-23T10:56:15.608Z"
   },
   "filter_260": {
-    "etag": "W/\"23f521cd8089c95d6b314329f1419de3\"",
-    "lastModified": "Sat, 21 Nov 2026 18:51:52 GMT",
-    "sha256": "e66ceba7d8a05461",
-    "syncedAt": "2026-11-21T19:25:59.265Z"
+    "etag": "W/\"97af443213f6e74f28fd138c64f471a7\"",
+    "lastModified": "Mon, 23 Nov 2026 09:57:11 GMT",
+    "sha256": "351de2ab9bbb84ea",
+    "syncedAt": "2026-11-23T10:56:15.306Z"
   },
   "meta": {
     "filters": "831a09545d96520f"
