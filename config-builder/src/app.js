@@ -909,6 +909,7 @@ document.addEventListener("click", async (e) => {
     }
   }
 });
+renderEmoji(document.body);
 render();
 // Resolve service.json (if the address was not baked into the bundle) before
 // probing, so the first health check already targets the right backend.

@@ -1,18 +1,61 @@
-// Windows' Segoe UI Emoji intentionally does not render regional-indicator
-// flags: 🇭🇰 degrades into the letters "H" + "K". Twemoji renders every emoji
-// as an inline SVG at display time, so all browsers show the same flag/icon
-// without baking images into the catalog or changing any data structure.
-import twemoji from "@twemoji/api";
+// Render presentation emojis as inline SVG icons styled like the theme
+// toggle, instead of coloured bitmap emoji. The source strings (group names,
+// rule names, share codes) are never changed — only what the browser paints.
+import { EMOJI_ICONS, iconForEmoji, uiIcon } from "./icons.js";
 
-const OPTIONS = {
-  folder: "svg",
-  ext: ".svg",
-  base: "https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.3/assets/",
-  className: "emoji",
-};
+const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const EMOJI_RE = new RegExp(
+  Object.keys(EMOJI_ICONS)
+    .sort((a, b) => b.length - a.length)
+    .map(escapeRegex)
+    .join("|"),
+  "g",
+);
 
-// Only replace emoji inside opted-in containers; leaving <input>/<select>
-// values untouched avoids breaking form state. Twemoji skips those by default.
+const SKIP_SELECTOR = [
+  "script",
+  "style",
+  "svg",
+  "img",
+  "input",
+  "textarea",
+  "select",
+  "option",
+  "[data-no-emoji]",
+].join(",");
+
 export function renderEmoji(root = document) {
-  twemoji.parse(root, OPTIONS);
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+    acceptNode(node) {
+      const parent = node.parentElement;
+      if (!parent || parent.closest(SKIP_SELECTOR))
+        return NodeFilter.FILTER_REJECT;
+      EMOJI_RE.lastIndex = 0;
+      return EMOJI_RE.test(node.nodeValue)
+        ? NodeFilter.FILTER_ACCEPT
+        : NodeFilter.FILTER_SKIP;
+    },
+  });
+
+  const textNodes = [];
+  while (walker.nextNode()) textNodes.push(walker.currentNode);
+
+  for (const node of textNodes) {
+    const value = node.nodeValue;
+    const fragment = document.createDocumentFragment();
+    let last = 0;
+    EMOJI_RE.lastIndex = 0;
+    let match;
+    while ((match = EMOJI_RE.exec(value))) {
+      if (match.index > last) fragment.append(value.slice(last, match.index));
+      const wrap = document.createElement("span");
+      wrap.className = "emoji-icon";
+      wrap.setAttribute("aria-hidden", "true");
+      wrap.innerHTML = uiIcon(iconForEmoji(match[0]));
+      fragment.append(wrap);
+      last = match.index + match[0].length;
+    }
+    fragment.append(value.slice(last));
+    node.parentNode.replaceChild(fragment, node);
+  }
 }

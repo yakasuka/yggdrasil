@@ -15,7 +15,7 @@
   --soft: #252527;
   --input: #161618;
   --ink: #f5f5f7;
-  --muted: #a1a1a7;
+  --muted: #b4b4bb;
   --line: #ffffff17;
   --accent: #80baff;
   --action: #0071e3;
@@ -39,7 +39,7 @@
   --soft: #f5f5f7;
   --input: #fff;
   --ink: #1d1d1f;
-  --muted: #6e6e73;
+  --muted: #5f5f66;
   --line: #00000026;
   --accent: #005bb5;
   --action: #0071e3;
@@ -61,8 +61,9 @@ body {
   min-height: 100svh;
   color: var(--ink);
   background: var(--page);
-  font-size: 0.875rem;
-  -webkit-font-smoothing: antialiased;
+  font-size: 0.9375rem;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: auto;
 }
 button,
 input,
@@ -153,7 +154,7 @@ button:active:not(:disabled),
 .brand small {
   display: block;
   margin-top: 3px;
-  font-size: 0.6875rem;
+  font-size: 0.8125rem;
   font-weight: 450;
   letter-spacing: 0.015em;
   color: var(--muted);
@@ -247,6 +248,55 @@ button:active:not(:disabled),
   opacity: 0;
   transform: rotate(90deg) scale(0.4);
 }
+
+/* All presentation icons share the theme toggle's crisp SVG treatment. */
+.ui-icon {
+  display: inline-block;
+  width: 1.15em;
+  height: 1.15em;
+  flex: none;
+  vertical-align: -0.18em;
+  color: currentColor;
+}
+.ui-icon .icon-accent {
+  color: var(--accent);
+}
+.ui-icon .icon-warm {
+  color: #e9a23b;
+}
+.icon-fill {
+  fill: currentColor;
+}
+.emoji-icon {
+  display: inline-flex;
+  width: 1.2em;
+  height: 1.2em;
+  margin: 0 0.06em;
+  vertical-align: -0.18em;
+  color: var(--accent);
+}
+.emoji-icon .ui-icon {
+  width: 100%;
+  height: 100%;
+  vertical-align: baseline;
+}
+.choice-icon.ui-icon {
+  width: 30px;
+  height: 30px;
+  padding: 4px;
+  border-radius: 9px;
+  background: var(--soft);
+  color: var(--accent);
+  vertical-align: middle;
+}
+.region-flag.ui-icon {
+  width: 24px;
+  height: 24px;
+  padding: 3px;
+  border-radius: 7px;
+  background: var(--soft);
+  color: var(--accent);
+}
 @media (prefers-reduced-motion: reduce) {
   .theme-icon-svg .theme-icon-sun,
   .theme-icon-svg .theme-icon-moon {
@@ -312,7 +362,7 @@ button:active:not(:disabled),
   display: flex;
   justify-content: space-between;
   gap: 20px;
-  font-size: 0.625rem;
+  font-size: 0.75rem;
   letter-spacing: 0.09em;
   color: #e2f4f0bf;
 }
@@ -380,7 +430,7 @@ button:active:not(:disabled),
   z-index: 1;
   top: 51px;
   right: 32px;
-  font-size: 0.625rem;
+  font-size: 0.75rem;
   color: #d0e8e3b3;
 }
 
@@ -427,14 +477,14 @@ button:active:not(:disabled),
   color: var(--muted);
 }
 .parse-step strong {
-  font-size: 0.6875rem;
+  font-size: 0.8125rem;
   font-weight: 450;
 }
 .parse-step small {
   display: block;
   max-width: 120px;
   margin-top: 4px;
-  font-size: 0.625rem;
+  font-size: 0.75rem;
   line-height: 1.5;
 }
 .parse-step[data-phase="error"] {
@@ -461,13 +511,13 @@ button:active:not(:disabled),
   margin-bottom: 22px;
 }
 .eyebrow {
-  font-size: 0.625rem;
+  font-size: 0.75rem;
   font-weight: 550;
   letter-spacing: 0.12em;
   color: var(--muted);
 }
 .chip {
-  font-size: 0.5625rem;
+  font-size: 0.6875rem;
   letter-spacing: 0.1em;
   color: var(--muted);
 }
@@ -534,7 +584,7 @@ button:active:not(:disabled),
   display: block;
   margin-top: 3px;
   color: var(--muted);
-  font-size: 0.6875rem;
+  font-size: 0.8125rem;
 }
 .preview-banner .text-button {
   margin-left: auto;
@@ -579,7 +629,7 @@ button:active:not(:disabled),
   align-items: center;
   justify-content: space-between;
   margin-bottom: 10px;
-  font-size: 0.625rem;
+  font-size: 0.75rem;
   font-weight: 550;
   letter-spacing: 0.09em;
   color: var(--muted);
@@ -713,12 +763,14 @@ textarea {
   border-radius: 12px;
   background: var(--tint);
   color: var(--muted);
-  font-size: 0.6875rem;
+  font-size: 0.8125rem;
   line-height: 1.8;
 }
-.notice > span {
+.notice > .ui-icon {
+  width: 17px;
+  height: 17px;
+  margin-top: 2px;
   color: var(--accent);
-  line-height: 1.8;
 }
 .notice p {
   margin: 0;
@@ -727,7 +779,7 @@ textarea {
   color: var(--warning);
   background: var(--warning-bg);
 }
-.notice.warning > span {
+.notice.warning > .ui-icon {
   color: inherit;
 }
 .notice a {
@@ -758,7 +810,7 @@ site-footer {
 }
 #progress-note {
   margin: auto;
-  font-size: 0.6875rem;
+  font-size: 0.8125rem;
   color: var(--muted);
 }
 .wizard-footer .primary {
@@ -816,7 +868,7 @@ site-footer {
   border: 1px solid var(--line);
   border-radius: 6px;
   color: var(--muted);
-  font-size: 0.625rem;
+  font-size: 0.75rem;
   font-weight: 500;
   vertical-align: 1px;
 }
@@ -835,7 +887,7 @@ site-footer {
 .choice small {
   display: block;
   margin-top: 7px;
-  font-size: 0.6875rem;
+  font-size: 0.8125rem;
   line-height: 1.65;
   color: var(--muted);
 }
@@ -869,7 +921,7 @@ site-footer {
 .inline-field small {
   display: block;
   margin-top: 5px;
-  font-size: 0.6875rem;
+  font-size: 0.8125rem;
   color: var(--muted);
   line-height: 1.6;
 }
@@ -896,7 +948,7 @@ site-footer {
 .default-exit p {
   margin: 8px 0 12px;
   color: var(--muted);
-  font-size: 0.6875rem;
+  font-size: 0.8125rem;
   line-height: 1.7;
 }
 .default-exit-chips {
@@ -910,7 +962,7 @@ site-footer {
   background: var(--surface);
   border: 1px solid var(--line);
   color: var(--muted);
-  font-size: 0.625rem;
+  font-size: 0.75rem;
 }
 .toolbar {
   display: flex;
@@ -936,7 +988,7 @@ site-footer {
 .category-heading {
   grid-column: 1 / -1;
   margin: 18px 0 2px;
-  font-size: 0.6875rem;
+  font-size: 0.8125rem;
   font-weight: 550;
   letter-spacing: 0.04em;
   color: var(--muted);
@@ -975,7 +1027,7 @@ site-footer {
   min-height: 30px;
   margin: 0;
   padding: 5px 8px;
-  font-size: 0.6875rem;
+  font-size: 0.8125rem;
 }
 /* Author-authored switch/entry groups (e.g. Hermes) carry no rule yet, but
    are still shown because the template defines them. Keep the label compact
@@ -989,7 +1041,7 @@ site-footer {
   padding: 1px 6px;
   border: 1px solid var(--line);
   border-radius: 999px;
-  font-size: 0.5625rem;
+  font-size: 0.6875rem;
   line-height: 1.4;
   color: var(--muted);
   white-space: nowrap;
@@ -997,7 +1049,7 @@ site-footer {
 .entry-hint {
   flex: 1 0 100%;
   margin: 2px 0 0;
-  font-size: 0.625rem;
+  font-size: 0.75rem;
   line-height: 1.35;
   color: var(--muted);
 }
@@ -1055,7 +1107,7 @@ site-footer {
   border-radius: 999px;
   background: var(--soft);
   color: var(--muted);
-  font-size: 0.6875rem;
+  font-size: 0.8125rem;
   text-align: center;
 }
 .region-count.is-empty {
@@ -1096,7 +1148,7 @@ img.emoji {
 .usage-card small {
   display: block;
   margin-top: 10px;
-  font-size: 0.6875rem;
+  font-size: 0.8125rem;
   line-height: 1.7;
   color: var(--muted);
 }
@@ -1154,7 +1206,7 @@ details > div {
   border: 1px solid var(--line);
   border-radius: 999px;
   background: var(--soft);
-  font-size: 0.6875rem;
+  font-size: 0.8125rem;
   color: var(--muted);
 }
 .status-dot {
@@ -1231,7 +1283,7 @@ details > div {
   width: 100%;
   border-collapse: collapse;
   text-align: left;
-  font-size: 0.6875rem;
+  font-size: 0.8125rem;
 }
 .node-table td,
 .node-table th {
@@ -1255,7 +1307,7 @@ details > div {
   padding: 3px 9px 3px 7px;
   border: 1px solid transparent;
   border-radius: 999px;
-  font-size: 0.65625rem;
+  font-size: 0.75rem;
   font-weight: 600;
   line-height: 1.3;
   white-space: nowrap;
@@ -1279,7 +1331,7 @@ details > div {
   font-weight: 650;
 }
 .latency-pill small {
-  font-size: 0.59375rem;
+  font-size: 0.6875rem;
   font-weight: 500;
   opacity: 0.8;
 }
@@ -1324,7 +1376,7 @@ details > div {
   align-items: center;
   gap: 6px;
   margin: 4px 0 12px;
-  font-size: 0.6875rem;
+  font-size: 0.8125rem;
   color: var(--muted);
 }
 .latency-legend > span:first-child {
@@ -1356,7 +1408,7 @@ details > div {
 .stat span {
   display: block;
   margin-top: 7px;
-  font-size: 0.6875rem;
+  font-size: 0.8125rem;
   color: var(--muted);
 }
 .review-row {
@@ -1448,7 +1500,7 @@ details > div {
   border-radius: 10px;
   background: var(--tint);
   color: var(--accent);
-  font-size: 0.5625rem;
+  font-size: 0.6875rem;
   font-weight: 600;
 }
 .file-card strong {
@@ -1459,7 +1511,7 @@ details > div {
 .file-card small {
   display: block;
   margin-top: 6px;
-  font-size: 0.6875rem;
+  font-size: 0.8125rem;
   color: var(--muted);
 }
 .file-actions {
@@ -1482,7 +1534,7 @@ details > div {
 }
 .result input {
   font-family: ui-monospace, SFMono-Regular, monospace;
-  font-size: 0.6875rem;
+  font-size: 0.8125rem;
 }
 .result .button {
   width: 100%;
@@ -1503,7 +1555,7 @@ details > div {
   display: block;
   margin-top: 14px;
   color: var(--muted);
-  font-size: 0.6875rem;
+  font-size: 0.8125rem;
   line-height: 1.8;
 }
 /* Glass is reserved for layers above the work, rather than every card. */
@@ -1702,11 +1754,11 @@ noscript {
     height: 34px;
   }
   .brand small {
-    font-size: 0.625rem;
+    font-size: 0.75rem;
   }
   .header-links {
     gap: 12px;
-    font-size: 0.6875rem;
+    font-size: 0.8125rem;
   }
   .theme-toggle.button {
     min-height: 36px;
@@ -1728,7 +1780,7 @@ noscript {
     top: 22px;
     left: 24px;
     right: 24px;
-    font-size: 0.5625rem;
+    font-size: 0.6875rem;
   }
   .caustic-meta > span:last-child {
     display: none;
@@ -1737,7 +1789,7 @@ noscript {
     top: 45px;
     left: 24px;
     right: auto;
-    font-size: 0.5625rem;
+    font-size: 0.6875rem;
   }
   .caustic-copy {
     display: block;
@@ -1747,7 +1799,7 @@ noscript {
   }
   .caustic-copy p {
     margin-bottom: 9px;
-    font-size: 0.6875rem;
+    font-size: 0.8125rem;
   }
   .caustic-copy h2 {
     max-width: 310px;
@@ -1756,7 +1808,7 @@ noscript {
   .caustic-copy a {
     margin-top: 18px;
     padding: 10px 16px;
-    font-size: 0.6875rem;
+    font-size: 0.8125rem;
   }
   .journey {
     position: relative;
@@ -1778,7 +1830,7 @@ noscript {
     text-align: center;
   }
   .step-button strong {
-    font-size: 0.625rem;
+    font-size: 0.75rem;
     white-space: nowrap;
   }
   .workspace {
@@ -1895,7 +1947,7 @@ noscript {
     min-width: 0;
     width: 100%;
     padding-inline: 8px;
-    font-size: 0.6875rem;
+    font-size: 0.8125rem;
   }
   .stats {
     padding: 18px 0;
@@ -1941,7 +1993,7 @@ noscript {
     padding-inline: 16px;
   }
   .step-button strong {
-    font-size: 0.5625rem;
+    font-size: 0.6875rem;
   }
   .app-card label {
     flex-basis: 110px;
@@ -2047,7 +2099,7 @@ noscript {
   display: block;
   margin-top: 3px;
   color: var(--muted);
-  font-size: 0.6875rem;
+  font-size: 0.8125rem;
 }
 .share-box-row {
   display: flex;
@@ -2083,6 +2135,6 @@ noscript {
   display: block;
   margin-top: 8px;
   color: var(--muted);
-  font-size: 0.6875rem;
+  font-size: 0.8125rem;
   overflow-wrap: anywhere;
 }

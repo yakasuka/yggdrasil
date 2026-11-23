@@ -17,6 +17,7 @@ export const STRATEGY_VIEW = [
     label: "节点选择",
     description: "所有规则的统一出口，在这里切换一次即可更换全部节点。",
     icon: "../assets/icons/switch.png",
+    iconName: "switch",
     fixed: true,
   },
   {
@@ -25,6 +26,7 @@ export const STRATEGY_VIEW = [
     label: "手动切换",
     description: "汇集全部节点，手动挑选具体出口。",
     icon: "../assets/icons/proxy.png",
+    iconName: "rocket",
     fixed: true,
   },
   {
@@ -33,6 +35,7 @@ export const STRATEGY_VIEW = [
     label: "自动选择",
     description: "按统一延迟挑选当前最快的节点。",
     icon: "../assets/icons/yggdrasil.png",
+    iconName: "bolt",
   },
   {
     id: "fallback",
@@ -40,6 +43,7 @@ export const STRATEGY_VIEW = [
     label: "故障转移",
     description: "按节点顺序使用下一个可用出口。",
     icon: "../assets/icons/fallback.png",
+    iconName: "shuffle",
   },
   {
     id: "balanced",
@@ -47,6 +51,7 @@ export const STRATEGY_VIEW = [
     label: "一致性哈希",
     description: "同一目标尽量保持相同出口。",
     icon: "../assets/icons/global.png",
+    iconName: "balance",
   },
   {
     id: "download",
@@ -54,6 +59,7 @@ export const STRATEGY_VIEW = [
     label: "轮询分配",
     description: "把不同连接分散到多个节点。",
     icon: "../assets/icons/tracking.png",
+    iconName: "layers",
   },
 ];
 

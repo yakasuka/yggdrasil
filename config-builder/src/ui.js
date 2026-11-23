@@ -1,3 +1,5 @@
+import { uiIcon } from "./icons.js";
+
 export const esc = (value) =>
   String(value ?? "").replace(
     /[&<>"']/g,
@@ -39,7 +41,7 @@ export const latencyLegend = () =>
 export const title = (heading, description) =>
   `<h2 class="panel-title">${heading}</h2><p class="panel-description">${description}</p>`;
 export const notice = (text, warning = false) =>
-  `<div class="notice${warning ? " warning" : ""}"><span aria-hidden="true">${warning ? "◌" : "✳"}</span><p>${text}</p></div>`;
+  `<div class="notice${warning ? " warning" : ""}">${uiIcon(warning ? "warning" : "sparkle")}<p>${text}</p></div>`;
 export function bytes(value) {
   if (value === null || value === undefined) return "未提供";
   let n = value,
