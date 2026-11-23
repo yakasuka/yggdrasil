@@ -1,5 +1,5 @@
 import { catalog, moduleView, ruleModules } from "../../shared/compiler.js";
-import { esc, checked, notice } from "../ui.js";
+import { esc, checked, title, notice } from "../ui.js";
 export function rulesPanel(ctx) {
   const present = ruleModules(catalog);
   const count = (id) => catalog.orderedRules.filter((r) => r.module === id).length;
