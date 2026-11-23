@@ -1,8 +1,8 @@
 {
   "Custom_Direct_Domain.yaml": {
-    "upstream": "a1768ed03a80ad664b9aa876f2c231270a3f0d5e",
+    "upstream": "3565903dbb1518b369d64ec72dfd7fdd308261ec",
     "overlay": "bb5d42d22604a9df",
-    "syncedAt": "2026-11-23T06:56:20.715Z"
+    "syncedAt": "2026-11-23T09:57:45.551Z"
   },
   "Custom_Direct_Classical_IP.yaml": {
     "upstream": "7dc3df345f4e8f68d28ecbf4eec408ac4e69a136",
@@ -23,5 +23,30 @@
     "upstream": "57d081f41ccc4d4be458ea635ab8073719a39e80",
     "overlay": "116b8489855cb58e",
     "syncedAt": "2026-11-06T08:35:56.677Z"
+  },
+  "Custom_Direct_Classical.yaml": {
+    "upstream": "1c3f95557b8a51cf75da7075953f0bf778378b8a",
+    "overlay": "dfb0017df226aa41",
+    "syncedAt": "2026-11-23T09:57:45.011Z"
+  },
+  "Custom_Direct_Classical_Port.yaml": {
+    "upstream": "84733761d0da0fa0bba9a9f744b74fe564c27d01",
+    "overlay": "dfb0017df226aa41",
+    "syncedAt": "2026-11-23T09:57:45.380Z"
+  },
+  "Custom_Direct_IP.yaml": {
+    "upstream": "da200694a2531b9b432dd0541b146b05ba9b51a4",
+    "overlay": "dfb0017df226aa41",
+    "syncedAt": "2026-11-23T09:57:45.689Z"
+  },
+  "Custom_Proxy_Classical.yaml": {
+    "upstream": "6899b9cbf0af8528bf40fa48d76f64189f02be19",
+    "overlay": "dfb0017df226aa41",
+    "syncedAt": "2026-11-23T09:57:46.039Z"
+  },
+  "Custom_Proxy_IP.yaml": {
+    "upstream": "b9e05c4cddd854cf138ac191adf996a9e3743b4c",
+    "overlay": "dfb0017df226aa41",
+    "syncedAt": "2026-11-23T09:57:46.557Z"
   }
 }

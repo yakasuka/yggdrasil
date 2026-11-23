@@ -1,0 +1,23 @@
+# GENERATED - DO NOT EDIT. Add your rules to overlays/Custom_Proxy_Classical.yaml
+# upstream: Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Proxy_Classical.yaml
+# upstream blob: 6899b9cbf0af8528bf40fa48d76f64189f02be19
+# total: 18 (upstream 18, extra 0)
+payload:
+  - 'DOMAIN-SUFFIX,7pzzv.us'
+  - 'DOMAIN-SUFFIX,arduino.cc'
+  - 'DOMAIN-SUFFIX,clientservices.googleapis.com'
+  - 'DOMAIN-SUFFIX,cloudsync-prod.s3.us-east-1.amazonaws.com'
+  - 'DOMAIN-SUFFIX,dmhy.org'
+  - 'DOMAIN-SUFFIX,googleapis.cn'
+  - 'DOMAIN-SUFFIX,gstatic.com'
+  - 'DOMAIN-SUFFIX,hoyolab.com'
+  - 'DOMAIN-SUFFIX,hoyoverse.com'
+  - 'DOMAIN-SUFFIX,ip.sb'
+  - 'DOMAIN-SUFFIX,ipify.org'
+  - 'DOMAIN-SUFFIX,mtalk.google.com'
+  - 'DOMAIN-SUFFIX,onedrive.live.com'
+  - 'DOMAIN-SUFFIX,platformio.org'
+  - 'DOMAIN-SUFFIX,services.googleapis.cn'
+  - 'DOMAIN-SUFFIX,stun.playstation.net'
+  - 'DOMAIN-SUFFIX,xn--ngstr-lra8j.com'
+  - 'IP-CIDR,207.241.224.2/32,no-resolve'

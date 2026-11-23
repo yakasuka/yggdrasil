@@ -1,0 +1,6 @@
+# GENERATED - DO NOT EDIT. Add your rules to overlays/Custom_Proxy_IP.yaml
+# upstream: Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Proxy_IP.yaml
+# upstream blob: b9e05c4cddd854cf138ac191adf996a9e3743b4c
+# total: 1 (upstream 1, extra 0)
+payload:
+  - '207.241.224.2/32'
