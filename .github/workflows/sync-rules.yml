@@ -26,7 +26,9 @@ permissions:
   contents: write
 
 concurrency:
-  group: sync-upstream-rules
+  # Shared with the AdGuard updater: both write resources/rules/ and push main,
+  # so they must run serially to avoid non-fast-forward rejections.
+  group: rule-providers-sync
   cancel-in-progress: false
 
 jobs:

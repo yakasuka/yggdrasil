@@ -24,7 +24,9 @@ permissions:
   contents: write
 
 concurrency:
-  group: adguard-desktop-rules
+  # Shared with the Aethersailor updater: both write resources/rules/ and push main,
+  # so they must run serially to avoid non-fast-forward rejections.
+  group: rule-providers-sync
   cancel-in-progress: false
 
 jobs:
