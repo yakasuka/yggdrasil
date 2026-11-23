@@ -60,7 +60,9 @@ const DASH_ONLY = `
 .header-link{display:inline-flex;align-items:center;gap:5px;padding:0;border:0;background:none;color:var(--muted);font-size:.75rem;cursor:pointer;text-decoration:none;transition:color 180ms var(--ease)}
 .header-link:hover{color:var(--accent)}
 .header-link svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-#steps .step-button>span{display:inline-flex}
+#steps .step-button>span:not(.step-number){display:block}
+#steps .step-button .step-number{display:none}
+#steps .step-button small{display:block;margin-top:4px;color:var(--muted);font-size:.75rem;font-weight:400;line-height:1.5}
 #steps .step-button[aria-current="step"] strong::before{content:"→ ";color:var(--accent)}
 .dash-summary{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 18px}
 .dash-stat{display:inline-flex;align-items:baseline;gap:6px;padding:5px 12px;border:1px solid var(--line);border-radius:99px;background:var(--soft);color:var(--muted);font-size:.6875rem;transition:transform 180ms var(--ease),border-color 180ms var(--ease)}
