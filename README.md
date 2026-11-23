@@ -14,7 +14,7 @@
   <a href="https://yakasuka.github.io/yggdrasil/">项目主页</a>　·　<a href="https://yakasuka.github.io/yggdrasil/config-builder/">配置工坊</a>　·　<a href="docs/DEPLOYMENT.md">部署指南</a>
 </p>
 
-<!-- SEO: keywords, positioning and key facts. Keep in sync with scripts/repo-metadata.mjs and index.html. -->
+<!-- SEO: keywords, positioning and key facts. Keep in sync with resources/scripts/repo-metadata.mjs and index.html. -->
 <details>
 <summary><strong>为什么选择 Yggdrasil / Ratatoskr？</strong></summary>
 
@@ -91,8 +91,7 @@ assets/             站点首页与配置工坊共用的图标、图片
 config-builder/     配置工坊：静态前端 + Node 后端 + 测试 + 部署模板
 docs/               项目级文档：中文 / English / 部署指南 / 实现路径
 functions/          Cloudflare Pages 边缘代理（订阅、流量、管理后台）
-resources/          Ratatoskr 模板与自动生成的规则源
-scripts/            仓库自动化脚本（元数据、规则生成）
+resources/          Ratatoskr 模板、规则源与自动化脚本（元数据、规则生成）
 sponsor/            打赏页静态资源
 index.html          项目主页（GitHub Pages 根）
 service.json        静态站指向后端的地址（必须在仓库根）

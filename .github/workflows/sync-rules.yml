@@ -1,7 +1,7 @@
 name: Sync Aethersailor rule providers
 
 # An external repo cannot trigger this workflow directly, so we poll every 15
-# minutes and let scripts/rules/sync-rule-providers.mjs decide (via per-file blob SHA)
+# minutes and let resources/scripts/rules/sync-rule-providers.mjs decide (via per-file blob SHA)
 # whether a merge is actually needed. Offsets avoid the top-of-hour rush.
 # A push to resources/rules/aethersailor/overlays/ (adding OR removing rules)
 # rebuilds immediately, so the generated files never lag behind the overlay even
@@ -11,7 +11,7 @@ on:
     branches: [main]
     paths:
       - 'resources/rules/aethersailor/**'
-      - 'scripts/rules/sync-rule-providers.mjs'
+      - 'resources/scripts/rules/sync-rule-providers.mjs'
       - '.github/workflows/sync-rules.yml'
   schedule:
     - cron: '7,22,37,52 * * * *'
@@ -44,7 +44,7 @@ jobs:
         id: sync
         env:
           GITHUB_TOKEN: ${{ github.token }}
-        run: node scripts/rules/sync-rule-providers.mjs ${{ inputs.force && '--force' || '' }}
+        run: node resources/scripts/rules/sync-rule-providers.mjs ${{ inputs.force && '--force' || '' }}
       - name: Commit merged rule files
         if: steps.sync.outputs.changed == 'true'
         run: |

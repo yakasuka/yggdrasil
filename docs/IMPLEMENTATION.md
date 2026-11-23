@@ -100,7 +100,7 @@
 | **规则集 / 规则模块** | `rule-providers` 加一项 + 一条 `RULE-SET,<名>,<目标>` 规则 | provider 上 `x-module`、`x-label`、`x-symbol`、`x-description` | 进规则模块面板；未标注则按规则目标（DIRECT→直连 / 含 Port→端口 / 其余→代理）自动归类；`moduleView()` 保证未知模块也有卡片 |
 | **规则行** | `rules:` 加一行，目标填已有组名 | 目标组自带 label 即可 | 进 `orderedRules`，跟随其目标 APP 或模块裁剪 |
 
-**规则集文件来源**（`resources/rules/`）：Aethersailor 上游规则由 `scripts/rules/sync-rule-providers.mjs` **自动发现**所有 `Custom_*.yaml`（每 15 分钟轮询），新增文件无需改代码；要排除某个上游文件，把文件名写进 `resources/rules/aethersailor/overlays/sync-ignore.txt`。AdGuard 规则用 `resources/rules/adguard/adguard-filters.json` 的 `enabled` 开关控制。同步下来的文件要在模板的 `rule-providers` 里加一项引用才会进入配置。
+**规则集文件来源**（`resources/rules/`）：Aethersailor 上游规则由 `resources/scripts/rules/sync-rule-providers.mjs` **自动发现**所有 `Custom_*.yaml`（每 15 分钟轮询），新增文件无需改代码；要排除某个上游文件，把文件名写进 `resources/rules/aethersailor/overlays/sync-ignore.txt`。AdGuard 规则用 `resources/rules/adguard/adguard-filters.json` 的 `enabled` 开关控制。同步下来的文件要在模板的 `rule-providers` 里加一项引用才会进入配置。
 
 **BOM 与编码**：模板带 UTF-8 BOM，保证浏览器直接打开 `.yaml` 时中文不乱码（GitHub Pages 对 `.yaml` 不返回 charset）。所有读写都走 `scripts/template-io.mjs`：读时剥 BOM、写时补回，不要在脚本里直接用 `readFile`/`writeFile` 处理模板。
 

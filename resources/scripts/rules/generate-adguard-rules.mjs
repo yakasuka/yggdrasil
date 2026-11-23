@@ -11,8 +11,8 @@
  *   - if nothing changed, no file is rewritten and no commit is produced
  *
  * Usage:
- *   node scripts/rules/generate-adguard-rules.mjs
- *   node scripts/rules/generate-adguard-rules.mjs --force
+ *   node resources/scripts/rules/generate-adguard-rules.mjs
+ *   node resources/scripts/rules/generate-adguard-rules.mjs --force
  *
  * Which desktop filters are included is controlled by adguard-filters.json.
  * Flip "enabled" to false there to opt a filter out.

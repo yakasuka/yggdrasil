@@ -9,7 +9,7 @@ on:
     branches: [main]
     paths:
       - 'resources/rules/adguard/adguard-filters.json'
-      - 'scripts/rules/generate-adguard-rules.mjs'
+      - 'resources/scripts/rules/generate-adguard-rules.mjs'
       - '.github/workflows/update-adguard-rules.yml'
   schedule:
     - cron: '23 2 * * *'
@@ -42,7 +42,7 @@ jobs:
 
       - name: Check upstream and rebuild only if needed
         id: gen
-        run: node scripts/rules/generate-adguard-rules.mjs ${{ inputs.force && '--force' || '' }}
+        run: node resources/scripts/rules/generate-adguard-rules.mjs ${{ inputs.force && '--force' || '' }}
 
       - name: Commit changed rule files
         if: steps.gen.outputs.changed == 'true'

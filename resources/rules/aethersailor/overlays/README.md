@@ -1,9 +1,9 @@
 # 规则增量维护说明
 
-`resources/rules/aethersailor/Custom_*.yaml` 是**生成文件**，由 `scripts/rules/sync-rule-providers.mjs` 从
+`resources/rules/aethersailor/Custom_*.yaml` 是**生成文件**，由 `resources/scripts/rules/sync-rule-providers.mjs` 从
 `Aethersailor/Custom_OpenClash_Rules@main/rule/` 同步后与本目录的增量合并而成，**不要手改**。
 文件名与上游保持完全一致。本目录只管 Aethersailor 这一组；AdGuard 规则由
-`scripts/rules/generate-adguard-rules.mjs` 独立生成到 `resources/rules/adguard/`，不走 overlay。
+`resources/scripts/rules/generate-adguard-rules.mjs` 独立生成到 `resources/rules/adguard/`，不走 overlay。
 
 ## 添加自己的规则
 
@@ -64,7 +64,7 @@ overlay 变更则是即时触发。用默认 `GITHUB_TOKEN` 产生的 push 不�
 ## 本地验证
 
 ```bash
-node scripts/rules/sync-rule-providers.mjs
+node resources/scripts/rules/sync-rule-providers.mjs
 git diff --stat -- resources/rules/aethersailor
-node scripts/rules/sync-rule-providers.mjs --force   # 强制重建
+node resources/scripts/rules/sync-rule-providers.mjs --force   # 强制重建
 ```

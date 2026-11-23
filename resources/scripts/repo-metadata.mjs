@@ -7,11 +7,11 @@
  *
  * Apply to GitHub (requires a token with `repo` scope):
  *
- *   GH_TOKEN=<token> node scripts/repo-metadata.mjs
+ *   GH_TOKEN=<token> node resources/scripts/repo-metadata.mjs
  *
  * Print the metadata as JSON without writing:
  *
- *   node scripts/repo-metadata.mjs --print
+ *   node resources/scripts/repo-metadata.mjs --print
  */
 
 export const REPO = 'yakasuka/yggdrasil';
@@ -46,7 +46,7 @@ export const TOPICS = [
 async function apply() {
   const token = process.env.GH_TOKEN;
   if (!token) {
-    console.error('GH_TOKEN is required. Run with: GH_TOKEN=<token> node scripts/repo-metadata.mjs');
+    console.error('GH_TOKEN is required. Run with: GH_TOKEN=<token> node resources/scripts/repo-metadata.mjs');
     process.exit(1);
   }
 

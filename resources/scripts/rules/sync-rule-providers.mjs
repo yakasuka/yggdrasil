@@ -11,8 +11,8 @@
  * list its name (one per line) in `overlays/sync-ignore.txt`.
  *
  * Usage:
- *   node scripts/rules/sync-rule-providers.mjs            # rebuild only changed files
- *   node scripts/rules/sync-rule-providers.mjs --force   # rebuild everything
+ *   node resources/scripts/rules/sync-rule-providers.mjs            # rebuild only changed files
+ *   node resources/scripts/rules/sync-rule-providers.mjs --force   # rebuild everything
  *
  * Optional env: GITHUB_TOKEN / GH_TOKEN (raises the GitHub API rate limit).
  * In Actions, GITHUB_OUTPUT receives changed=true|false and the changed file list.
