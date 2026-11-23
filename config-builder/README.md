@@ -65,6 +65,8 @@ config-builder/
 
 [shared/catalog.json](shared/catalog.json) 由 `resources/template/ratatoskr-template.yaml` 自动生成。修改模板后运行 `npm run catalog`（`npm run build` 也会自动触发）再提交，选择器与后端共享同一份目录。
 
+策略步骤的显示文案与图标单独放在 [src/strategy-catalog.js](src/strategy-catalog.js)：这里只描述前端展示，不参与 YAML 生成。改卡片名称、说明或图标时只改这个文件并提交，`.github/workflows/sync-static.yml` 会重建静态产物；后端只根据这里的 `id`（`gateway` / `manual` / `auto` / `fallback` / `balanced` / `download`）转换成模板里的实际代理组名，不需要重新生成模板目录。
+
 ## 命令
 
 ```sh

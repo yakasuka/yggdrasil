@@ -5,7 +5,7 @@
 // saved choices, so it must never be derived from user data. Airport URLs are
 // excluded by default and only included when the sharer explicitly opts in.
 import { LIFETIMES } from "./profile.js";
-import { STRATEGIES, ruleModules } from "./compiler.js";
+import { STRATEGIES, CORE_STRATEGY_IDS, ruleModules } from "./compiler.js";
 
 export const SHARE_CODE_LENGTH = 36;
 export const SHARE_CODE_RE = /^[0-9a-f]{36}$/i;
@@ -116,7 +116,7 @@ export function applyShare(base, shared, model) {
   const next = { ...base };
   const knownRegions = model.regions.map((r) => r.id);
   const knownApps = model.apps.map((a) => a.id);
-  const knownStrategies = STRATEGIES.map((s) => s.id);
+  const knownStrategies = [...CORE_STRATEGY_IDS, ...STRATEGIES.map((s) => s.id)];
   const knownModules = ruleModules(model);
 
   const countries = ids(shared.countries, knownRegions, base.countries);
@@ -131,16 +131,23 @@ export function applyShare(base, shared, model) {
     shared.title.length <= 60
       ? shared.title.trim()
       : base.title;
-  next.strategies = ids(shared.strategies, knownStrategies, base.strategies);
+  next.strategies = [
+    ...new Set([
+      ...ids(shared.strategies, knownStrategies, base.strategies),
+      ...CORE_STRATEGY_IDS,
+    ]),
+  ];
   next.modules = ids(shared.modules, knownModules, base.modules);
   next.appsMode = shared.appsMode === "all" ? "all" : "custom";
   next.apps =
     next.appsMode === "all"
       ? knownApps
       : ids(shared.apps, knownApps, base.apps);
+  const defaultIds = ["manual", ...STRATEGIES.map((s) => s.id)];
   next.defaultStrategy =
-    shared.defaultStrategy === "manual" ||
-    next.strategies.includes(shared.defaultStrategy)
+    defaultIds.includes(shared.defaultStrategy) &&
+    (shared.defaultStrategy === "manual" ||
+      next.strategies.includes(shared.defaultStrategy))
       ? shared.defaultStrategy
       : base.defaultStrategy;
   const allowedPolicies = [

@@ -36,6 +36,10 @@ export const STRATEGIES = [
     strategy: "round-robin",
   },
 ];
+// The two select groups the template always contains. They are shown in the
+// wizard as fixed strategy cards; the backend maps these IDs to the real group
+// names from the template instead of inventing display strings.
+export const CORE_STRATEGY_IDS = ["gateway", "manual"];
 // Rule modules are the template-authored rule groups (private / china / gfw /
 // game / community rule-sets ...). They are presented as toggle blocks in the
 // configurator. IDs come from the catalog so a remote template can add or drop
@@ -106,11 +110,11 @@ export function defaults(model = catalog) {
     title: "",
     providers: [{ name: "", url: "" }],
     countries: [],
-    // Match the example template: all switch groups, all four automatic
-    // strategies, all rule modules, other-region group and LAN access start
-    // enabled. Users can still switch any of them off in the wizard.
+    // Match the example template: both select groups and all four automatic
+    // strategies start enabled. The select groups are fixed in the wizard;
+    // automatic strategies can still be switched off there.
     other: true,
-    strategies: STRATEGIES.map((s) => s.id),
+    strategies: [...CORE_STRATEGY_IDS, ...STRATEGIES.map((s) => s.id)],
     defaultStrategy: "manual",
     appsMode: "all",
     apps: model.apps.map((a) => a.id),
@@ -171,16 +175,19 @@ export function normalize(input, model = catalog, { migrate = false } = {}) {
   if (!p.title || p.title.length > 60 || /[\x00-\x1f]/.test(p.title))
     fail("请填写 1–60 个字符的配置名称。", "title");
   p.providers = normalizeProviders(input.providers);
-  p.strategies = selection(
-    input.strategies,
-    STRATEGIES.map((x) => x.id),
-    "strategies",
-    4,
-  );
+  const knownStrategies = [...CORE_STRATEGY_IDS, ...STRATEGIES.map((x) => x.id)];
+  p.strategies = unique([
+    ...selection(input.strategies, knownStrategies, "strategies", knownStrategies.length),
+    // Old saved profiles predate these IDs; both select groups are always
+    // present in the generated YAML, so keep them enabled regardless.
+    ...CORE_STRATEGY_IDS,
+  ]);
   p.defaultStrategy = input.defaultStrategy;
+  // 节点选择是规则入口组，不能指向自己，因此不参与默认出口下拉。
+  const defaultAllowed = ["manual", ...STRATEGIES.map((x) => x.id)];
   if (
-    p.defaultStrategy !== "manual" &&
-    !p.strategies.includes(p.defaultStrategy)
+    !defaultAllowed.includes(p.defaultStrategy) ||
+    (p.defaultStrategy !== "manual" && !p.strategies.includes(p.defaultStrategy))
   )
     fail("请选择已启用的默认策略。", "strategies");
   const knownCountries = model.regions.map((r) => r.id);
@@ -300,7 +307,9 @@ export async function compile(input, model = catalog, options = {}) {
     (s) => ({ ...s, ...(model.strategies.find((x) => x.id === s.id) || {}) }),
   );
   const preferred =
-    active.find((s) => s.id === p.defaultStrategy)?.name || g.manual;
+    p.defaultStrategy === "manual"
+      ? g.manual
+      : active.find((s) => s.id === p.defaultStrategy)?.name || g.manual;
   const exits = unique([
     preferred,
     g.manual,

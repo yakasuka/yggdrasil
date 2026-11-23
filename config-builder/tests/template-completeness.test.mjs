@@ -1,10 +1,18 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { catalog, compile, defaults } from "../shared/compiler.js";
+import {
+  catalog,
+  compile,
+  defaults,
+  CORE_STRATEGY_IDS,
+} from "../shared/compiler.js";
 
 test("defaults follow the example template with every switch enabled", () => {
   const p = defaults(catalog);
-  assert.deepEqual(p.strategies, catalog.strategies.map((s) => s.id));
+  assert.deepEqual(p.strategies, [
+    ...CORE_STRATEGY_IDS,
+    ...catalog.strategies.map((s) => s.id),
+  ]);
   assert.equal(p.other, true);
   assert.equal(p.allowLan, true);
   assert.equal(p.appsMode, "all");
