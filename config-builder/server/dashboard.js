@@ -288,6 +288,24 @@ button.danger{color:var(--danger);border-color:var(--danger-bg)}
 .dash-widget-bar .widget-sort-button{color:var(--muted)}
 .dash-widget-bar .widget-jiggle-button span{color:var(--accent)}
 @media(max-width:760px){.site-header{padding-inline:14px}.layout{padding:18px 14px 0}.workspace{padding:24px 18px 0}.journey{position:static}}
+/* Unified emoji + display-name field. One rounded emoji button sits in front
+   of the name input; tapping it opens an emoji grid. The chosen emoji becomes
+   a prefix of the YAML name separated by one space; leaving it unset writes
+   a bare name with no leading space. */
+.dash-namefield{position:relative;display:flex;align-items:center;gap:8px}
+.dash-namefield .dash-nf-emoji{flex:0 0 auto;width:44px;height:44px;display:grid;place-items:center;padding:0;border:1px solid var(--line);border-radius:12px;background:var(--soft);color:var(--ink);font-size:1.2rem;line-height:1;cursor:pointer;transition:border-color 160ms var(--ease),background 160ms var(--ease)}
+.dash-namefield .dash-nf-emoji:hover{border-color:var(--selected-line);background:var(--tint)}
+.dash-namefield .dash-nf-emoji.is-empty{font-size:1rem;color:var(--muted)}
+.dash-namefield .dash-nf-input{flex:1;min-width:0;height:44px;padding:0 12px;border:1px solid var(--line);border-radius:12px;background:var(--input);color:var(--ink);font-size:.8125rem;outline:none}
+.dash-namefield .dash-nf-input:focus{border-color:var(--selected-line)}
+.dash-emoji-pop{position:fixed;z-index:120;width:min(330px,calc(100vw - 28px));max-height:320px;overflow:auto;padding:10px;border:1px solid var(--line);border-radius:14px;background:var(--surface);box-shadow:0 16px 40px -12px rgba(0,0,0,.45)}
+.dash-emoji-pop[hidden]{display:none}
+.dash-emoji-pop-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;color:var(--muted);font-size:.75rem}
+.dash-emoji-clear{padding:4px 10px;border:1px solid var(--line);border-radius:99px;background:var(--soft);color:var(--muted);font-size:.7rem;cursor:pointer}
+.dash-emoji-clear:hover{color:var(--accent);border-color:var(--selected-line)}
+.dash-emoji-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:4px}
+.dash-emoji-grid button{width:100%;aspect-ratio:1;display:grid;place-items:center;padding:0;border:1px solid transparent;border-radius:9px;background:var(--soft);font-size:1.05rem;line-height:1;cursor:pointer;transition:border-color 140ms var(--ease),background 140ms var(--ease)}
+.dash-emoji-grid button:hover{border-color:var(--accent);background:var(--tint)}
 `;
 
 export function dashboardHTML({
@@ -555,8 +573,8 @@ var STEP_ORDER=["general","regions","strategies","apps","rules","configs"];
 var STEP_META={
   general:{title:"先打好地基。",desc:"端口、运行模式与控制面板。所有修改都会写回 Ratatoskr 模板，保存后配置工坊立即生效。",note:"一处修改，处处生长。"},
   regions:{title:"节点去哪里，由你决定。",desc:"编辑地区旗帜、显示名称与匹配正则。修改会同步到对应策略组与分流规则。",note:"地区即路线。"},
-  strategies:{title:"让节点，按你的方式连接。",desc:"手动切换、自动测速与核心策略组：名称（含 Emoji）、图标、出口顺序。改名会自动同步所有引用。",note:"节点策略，是默认出口。"},
-  apps:{title:"每个 APP，都有自己的去向。",desc:"应用策略组：名称（含 Emoji）、图标、分类、出口。命中规则写在卡片折叠区，改名会自动同步所有引用。",note:"APP 分流，挂在策略组上。"},
+  strategies:{title:"让节点，按你的方式连接。",desc:"手动切换、自动测速与核心策略组：显示名称（Emoji 可选，点名称前的按钮选）、图标、出口顺序。改名会自动同步所有引用。",note:"节点策略，是默认出口。"},
+  apps:{title:"每个 APP，都有自己的去向。",desc:"应用策略组：显示名称（Emoji 可选，点名称前的按钮选）、图标、分类、出口。命中规则写在卡片折叠区，改名会自动同步所有引用。",note:"APP 分流，挂在策略组上。"},
   rules:{title:"让流量各得其所。",desc:"规则是附加在策略组上的补丁：命中项、出口、命中顺序与规则源。改名的引用同步会在保存时一次性写回。",note:"规则是挂在策略组上的补丁。"},
   configs:{title:"所有订阅，都在这里。",desc:"点击订阅链接可直接查看内容；也可以复制、删除配置。配置由订阅工坊生成。",note:"配置由订阅工坊生成。"}
 };
@@ -654,7 +672,14 @@ var modalRemove=document.getElementById("fi-modal-remove");
 var editCtx=null;
 // Which list each editor kind belongs to. The inline editor is mounted just
 // before that list, so it reads as a second-level panel of the current step.
-var EDITOR_HOST={general:"fi-general","core-group":"fi-strategies",strategy:"fi-strategies",add:"fi-apps","add-provider":"fi-providers",app:"fi-apps",region:"fi-regions",filter:"fi-filters",rule:"fi-rule-list","add-rule":"fi-rule-list",provider:"fi-providers"};
+var EDITOR_HOST={general:"fi-general","core-group":"fi-strategies",strategy:"fi-strategies",add:"fi-apps",
+  // Each "add" editor must mount into the step panel the user is actually in.
+  // The old code mounted every add via "add" -> fi-apps, so opening the
+  // add-region / add-strategy form inside its own (visible) step inserted the
+  // modal into the *hidden* APP panel, making it invisible — the click looked
+  // like a freeze. Route each add kind to the host that lives in its panel.
+  "add-app":"fi-apps","add-region":"fi-regions","add-strategy":"fi-strategies","add-provider":"fi-providers",
+  app:"fi-apps",region:"fi-regions",filter:"fi-filters",rule:"fi-rule-list","add-rule":"fi-rule-list",provider:"fi-providers"};
 function mountEditor(kind,item){
   var hostId=EDITOR_HOST[kind]||"";
   // Every group card opens with kind:"group"; route it to the right step by
@@ -1198,6 +1223,91 @@ function iconInput(value){
   wrap.focus=function(){i.focus()};
   return wrap;
 }
+// Emoji choices for the unified name field. A fixed, dependency-free palette
+// (no remote fetch, no bloated picker) covering the project's own glyphs plus
+// the common categories people actually reach for.
+var NAME_EMOJIS=["⚡","🚀","🧩","✨","🪐","🔮","🔯","🎯","🌟","💎","🔥","🌈","🎨","🎬","🎮","🎵",
+  "📦","📚","💡","🛠️","🔒","🛡️","🌐","☁️","🔔","🏆","❤️","⭐","✳️","♻️","🧠","👀",
+  "🎚️","🌆","🧋","⛩️","🎤","🏙️","🗽","🌌","🖥️","📱","💬","📝","🔍","🧭","🛎️","🎁",
+  "🇨🇦","🇺🇸","🇯🇵","🇰🇷","🇸🇬","🇭🇰","🇹🇼","🇬🇧","🇩🇪","🇫🇷","🇦🇺","🇮🇳","🇧🇷","🏳️"];
+// Same leading-pictograph grammar catalog-from-yaml uses, so splitting a stored
+// name here round-trips exactly with how the YAML name was authored.
+var LEADING_EMOJI_RE=/^((?:\\p{Regional_Indicator}{2}|\\p{Extended_Pictographic})(?:\\uFE0F)?(?:\\u200D(?:\\p{Regional_Indicator}{2}|\\p{Extended_Pictographic})(?:\\uFE0F)?)*)\\s*/u;
+function splitNameEmoji(full){
+  var s=String(full||""),m=s.match(LEADING_EMOJI_RE);
+  return m?{emoji:m[1],text:s.slice(m[0].length).trim()}:{emoji:"",text:s.trim()};
+}
+// Unified "emoji button + display name" control. Replaces the old split of a
+// hand-typed "name (with emoji)" plus a separate "display name" field.
+//   .value -> YAML name:  emoji ? emoji + " " + text : text
+//   .text  -> pure display name (goes to @meta.label)
+//   .emoji -> chosen emoji or "" (goes to @meta.flag / name prefix)
+// Clicking the rounded button opens a fixed-position grid; choosing an emoji
+// applies it, choosing "不使用 Emoji" clears it. No emoji => no leading space.
+// One shared outside-click handler for every field, registered only once so
+// repeatedly opening editors never accumulates listeners.
+var emojiPopRegistry={pop:null,wrap:null,close:null,bound:false};
+function bindEmojiOutsideClick(){
+  if(emojiPopRegistry.bound)return;
+  emojiPopRegistry.bound=true;
+  document.addEventListener("pointerdown",function(e){
+    var r=emojiPopRegistry;
+    if(r.pop&&!r.pop.hidden&&r.wrap&&!r.wrap.contains(e.target)&&!r.pop.contains(e.target))r.close();
+  });
+}
+function nameWithEmojiField(full,label,initialEmoji){
+  // One field at a time: drop any popover left over from a previous editor.
+  [].forEach.call(document.querySelectorAll(".dash-emoji-pop"),function(p){p.parentNode&&p.parentNode.removeChild(p)});
+  var seed=splitNameEmoji(full);
+  var emoji=initialEmoji!=null?String(initialEmoji).trim():seed.emoji;
+  // When an authored @meta.label exists it is the authoritative display text.
+  var text=(label!=null&&String(label).trim())?String(label).trim():seed.text;
+  var wrap=el("div");wrap.className="dash-namefield";
+  var btn=document.createElement("button");btn.type="button";
+  btn.className="dash-nf-emoji"+(emoji?"":" is-empty");
+  btn.setAttribute("aria-label","选择 Emoji");btn.setAttribute("aria-haspopup","dialog");
+  btn.setAttribute("aria-expanded","false");
+  btn.textContent=emoji||"☺";
+  var inputEl=input(text);inputEl.className="dash-nf-input";inputEl.placeholder="显示名称";
+  var pop=el("div");pop.className="dash-emoji-pop";pop.setAttribute("role","dialog");pop.hidden=true;
+  var head=el("div");head.className="dash-emoji-pop-head";
+  head.appendChild(el("span","选一个 Emoji，或不使用"));
+  var clear=el("button","不使用 Emoji");clear.type="button";clear.className="dash-emoji-clear";
+  head.appendChild(clear);pop.appendChild(head);
+  var grid=el("div");grid.className="dash-emoji-grid";
+  NAME_EMOJIS.forEach(function(ch){
+    var b=document.createElement("button");b.type="button";b.textContent=ch;
+    b.setAttribute("aria-label","使用 "+ch);
+    b.addEventListener("click",function(){setEmoji(ch);closePop();inputEl.dispatchEvent(new Event("input",{bubbles:true}))});
+    grid.appendChild(b);
+  });
+  pop.appendChild(grid);
+  function place(){
+    var r=btn.getBoundingClientRect(),h=pop.offsetHeight||300;
+    var top=r.bottom+6;if(top+h>innerHeight-8)top=Math.max(8,r.top-h-6);
+    pop.style.left=Math.max(8,Math.min(r.left,innerWidth-pop.offsetWidth-8))+"px";
+    pop.style.top=top+"px";
+  }
+  function openPop(){pop.hidden=false;btn.setAttribute("aria-expanded","true");place();var f=pop.querySelector("button");if(f)f.focus()}
+  function closePop(){pop.hidden=true;btn.setAttribute("aria-expanded","false")}
+  function setEmoji(ch){emoji=ch||"";btn.textContent=emoji||"☺";btn.classList.toggle("is-empty",!emoji)}
+  btn.addEventListener("click",function(e){e.preventDefault();pop.hidden?openPop():closePop()});
+  clear.addEventListener("click",function(){setEmoji("");closePop();inputEl.dispatchEvent(new Event("input",{bubbles:true}))});
+  // The grid is fixed-positioned and mounted on <body> so the drawer's
+  // overflow/scroll cannot clip it. Register this field with the single
+  // shared outside-click handler instead of adding a listener per field.
+  emojiPopRegistry.pop=pop;emojiPopRegistry.wrap=wrap;emojiPopRegistry.close=closePop;
+  bindEmojiOutsideClick();
+  wrap.appendChild(btn);wrap.appendChild(inputEl);document.body.appendChild(pop);
+  // Expose an input-like surface so all existing save handlers keep reading
+  // f.name.value / f.label.value. The wrapper proxies value/text/emoji.
+  Object.defineProperty(wrap,"value",{get:function(){var t=inputEl.value.trim();return emoji?(emoji+" "+t):t},set:function(v){var p=splitNameEmoji(v);setEmoji(p.emoji);inputEl.value=p.text}});
+  Object.defineProperty(wrap,"text",{get:function(){return inputEl.value.trim()},set:function(v){inputEl.value=v==null?"":v}});
+  Object.defineProperty(wrap,"emoji",{get:function(){return emoji},set:function(v){setEmoji(v)}});
+  wrap.focus=function(){inputEl.focus()};
+  wrap.addEventListener=function(type,fn,opt){if(type==="input")inputEl.addEventListener(type,fn,opt);else EventTarget.prototype.addEventListener.call(this,type,fn,opt)};
+  return wrap;
+}
 function checkbox(value){var i=document.createElement("input");i.type="checkbox";i.checked=!!value;return i}
 function textarea(value){var t=document.createElement("textarea");t.value=value||"";t.spellcheck=false;return t}
 function select(options,value){
@@ -1424,7 +1534,7 @@ function rulesForTarget(name){
   return rules.filter(function(r){return r.target===name&&r.enabled!==false}).map(function(r){return r.rule});
 }
 function disarmBtn(btn){if(!btn)return;delete btn.dataset.armed;clearTimeout(btn._armTimer);if(btn.dataset.origText!=null)btn.textContent=btn.dataset.origText;if(btn.dataset.origTitle!=null)btn.title=btn.dataset.origTitle}
-function closeModal(){modal.hidden=true;editCtx=null;disarmBtn(modalRemove);disarmBtn(fiResetBtn);document.body.style.overflow=""}
+function closeModal(){modal.hidden=true;editCtx=null;if(emojiPopRegistry.close)emojiPopRegistry.close();disarmBtn(modalRemove);disarmBtn(fiResetBtn);document.body.style.overflow=""}
 // Cross-block navigation. Any rule reference / chain label can jump straight
 // to the owning block, highlight it and open its editor — the whole dashboard
 // behaves as one connected graph instead of isolated lists.
@@ -1477,12 +1587,11 @@ function openEditor(ctx){
   var item=ctx.item||{},f={},cat=state.catalog||{},g=groupProps(item.name);
   if(ctx.kind==="group"){
     // One editor for every strategy group. YAML order preserved: name (with
-    // emoji, edited verbatim) → icon → category → proxies → inbound rules.
+    // emoji, composed by the emoji button + display name) → icon → category → proxies → inbound rules.
     var oldName=item.name||"";
     chainNote(chainHTML(oldName));
-    modalSection("① 策略组 · 名称即 Emoji + 文字");
-    f.name=field("名称（含 Emoji，如 ⚡ OpenAI）",input(oldName));appendField(f.name);
-    f.label=field("显示名称",input(item.label));appendField(f.label);
+    modalSection("① 策略组 · 显示名称（Emoji 可选）");
+    f.name=field("显示名称",nameWithEmojiField(oldName,item.label));appendField(f.name);
     f.icon=field("图标 URL",iconInput(item.icon));appendField(f.icon);
     var catNames=[];if(cat.editorModel&&cat.editorModel.groups)cat.editorModel.groups.forEach(function(x){if(x.category&&catNames.indexOf(x.category)<0)catNames.push(x.category)});
     if(item.category&&catNames.indexOf(item.category)<0)catNames.unshift(item.category);
@@ -1529,8 +1638,7 @@ function openEditor(ctx){
     hint("按顺序选择：第一项就是默认出口；把 DIRECT 拖到首位即默认直连。组类型："+esc(g.type||group.type||"select")+"。");
   }else if(ctx.kind==="region"){
     hint("组名："+(item.groupName||item.name));
-    f.label=field("显示名称",input(item.label));appendField(f.label);
-    f.flag=field("旗帜 Emoji",input(item.flag));appendField(f.flag);
+    f.label=field("显示名称",nameWithEmojiField(item.groupName||item.name,item.label,item.flag));appendField(f.label);
     f.icon=field("图标 URL",iconInput(item.icon));appendField(f.icon);
     f.filter=field("地区匹配项（可增删芯片）",regexChips(item.filter));appendField(f.filter);
     hint("每个芯片是一条正则分支；回车添加、× 删除、拖动排序。");
@@ -1639,7 +1747,7 @@ function buildOps(){
     // All field edits target the CURRENT name; the rename (if any) is appended
     // last so it cascades references after those edits have landed.
     ops=ops.concat(ruleChipsOps(f.rules));
-    ops.push({kind:"meta",name:name,fields:{label:f.label.value.trim(),category:f.category.value}});
+    ops.push({kind:"meta",name:name,fields:{label:f.name.text,category:f.category.value}});
     ops.push({kind:"icon",name:name,value:f.icon.value.trim()});
     var gp=proxyList(f.proxies.value);
     if(gp)ops.push({kind:"group-props",name:name,fields:{proxies:gp}});
@@ -1659,7 +1767,7 @@ function buildOps(){
     var proxies=proxyList(f.proxies.value);
     if(proxies)props({proxies:proxies});
   }else if(ctx.kind==="region"){
-    ops.push({kind:"meta",name:name,fields:{label:f.label.value.trim(),flag:f.flag.value.trim()}});
+    ops.push({kind:"meta",name:name,fields:{label:f.label.text,flag:f.label.emoji}});
     ops.push({kind:"icon",name:name,value:f.icon.value.trim()});
     ops.push({kind:"filter",id:item.id,value:f.filter.value.trim()});
   }else if(ctx.kind==="strategy"||ctx.kind==="core-group"){
@@ -1726,29 +1834,40 @@ function openAddEditor(kind){
   var f={};
   if(kind==="region"){
     f.id=field("地区代码（2-8 位字母，如 CA）",input(""));
-    f.label=field("显示名称（如 加拿大）",input(""));
-    f.flag=field("旗帜 Emoji（如 🇨🇦）",input(""));
+    f.label=field("显示名称",nameWithEmojiField("",""));
     f.filter=field("匹配正则（如 (?i)^(?!=>).*(?:🇨🇦|加拿大|Canada)）",input(""));
-    hint("新增地区会在模板的 FilterRegions 段追加一个锚点，地区分组与匹配规则随之生效。");
+    hint("新增地区会在模板的 FilterRegions 段追加一个锚点，地区分组与匹配规则随之生效。Emoji 可选，不选则不写入。");
   }else if(kind==="provider"){
-    f.name=field("规则源名（含 Emoji，如 🧩 Custom）",input("🧩 "));
+    f.name=field("规则源名",nameWithEmojiField("",""));
     f.url=field("规则源 URL",input("https://"));
     f.interval=field("更新间隔（秒）",input(28800,"number"));
     f.behavior=field("行为",pillSelect([["domain","domain"],["classical","classical"],["ipcidr","ipcidr"]],"domain"));
     f.format=field("格式",pillSelect([["yaml","yaml"],["text","text"]],"yaml"));
     f.type=field("类型",pillSelect([["http","http"],["file","file"]],"http"));
     hint("新增规则源会写入 rule-providers，保存后即可在 RULE-SET 分流规则中引用。");
+  }else if(kind==="strategy"){
+    // Automatic strategy group: url-test / fallback / load-balance. These are
+    // the group types the catalog classifies as "strategy", so the new group
+    // actually shows up under 节点策略 after saving.
+    f.name=field("显示名称",nameWithEmojiField("",""));
+    f.description=field("说明",input(""));
+    f.icon=field("图标 URL",iconInput(""));
+    f.type=field("策略类型",pillSelect([["url-test","url-test · 自动测速"],["fallback","fallback · 故障转移"],["load-balance","load-balance · 负载均衡"]],"url-test"));
+    f.url=field("测速 URL",input("https://www.gstatic.com/generate_204"));
+    f.interval=field("测速间隔（秒）",input(300,"number"));
+    f.tolerance=field("延迟容差（毫秒，仅 url-test）",input(50,"number"));
+    f.filter=field("节点筛选锚点（如 *FilterAll，可留空）",input("*FilterAll"));
+    hint("新增的是自动策略组，保存后出现在「节点策略」；它会随机名加入代理池并按类型测速/切换。");
   }else{
     var cats=[];if(state.catalog)state.catalog.apps.forEach(function(a){if(cats.indexOf(a.category)<0)cats.push(a.category)});
     if(!cats.length)cats=["其他服务"];
-    f.name=field("组名（含 Emoji，如 🧩 Notion）",input("🧩 "));
-    f.label=field("显示名称",input(""));
+    f.name=field("显示名称",nameWithEmojiField("",""));
     f.icon=field("图标 URL",iconInput(""));
     f.category=field("分类",pillSelect(cats.map(function(c){return [c,c]}),cats[0]));
     f.rule=field("分流规则（如 GEOSITE,notion,🧩 Notion，可留空）",input(""));
   }
   Object.keys(f).forEach(function(k){appendField(f[k])});
-  editCtx={kind:"add",addKind:kind,fields:f};modalRemove.hidden=true;mountEditor(kind==="provider"?"add-provider":"add",null);modal.hidden=false;
+  editCtx={kind:"add",addKind:kind,fields:f};modalRemove.hidden=true;mountEditor("add-"+kind,null);modal.hidden=false;
   if(matchMedia("(min-width:900px)").matches)document.body.style.overflow="hidden";
 }
 document.getElementById("add-app").addEventListener("click",function(){openAddEditor("app")});
@@ -1762,7 +1881,7 @@ document.getElementById("fi-modal-apply").addEventListener("click",function(){
   if(kind==="region"){
     var id=f.id.value.trim(),filter=f.filter.value.trim();
     if(!id||!filter){fiMsg("请填写地区代码与匹配正则","dash-err");return}
-    sendOps([{kind:"add-region",id:id,filter:filter}]);
+    sendOps([{kind:"add-region",id:id,filter:filter,label:f.label.text,flag:f.label.emoji}]);
     return;
   }
   if(kind==="provider"){
@@ -1772,9 +1891,19 @@ document.getElementById("fi-modal-apply").addEventListener("click",function(){
     sendOps([{kind:"provider-add",name:pname,fields:{type:f.type.value,format:f.format.value,behavior:f.behavior.value,interval:Number(f.interval.value)||28800,url:purl}}]);
     return;
   }
+  if(kind==="strategy"){
+    var sname=f.name.value.trim();
+    if(!sname){fiMsg("请填写策略组名称","dash-err");return}
+    if(((state.catalog.editorModel&&state.catalog.editorModel.groups)||[]).some(function(g){return g.name===sname})){fiMsg("策略组名称已存在","dash-err");return}
+    var stype=f.type.value;
+    sendOps([{kind:"strategy-add",name:sname,label:f.name.text,description:f.description.value.trim(),
+      icon:f.icon.value.trim(),type:stype,url:f.url.value.trim(),interval:Number(f.interval.value)||300,
+      tolerance:Number(f.tolerance.value)||50,filter:f.filter.value.trim()}]);
+    return;
+  }
   var name=f.name.value.trim();
-  if(!name){fiMsg("请填写组名","dash-err");return}
-  sendOps([{kind:"add-app",name:name,label:f.label.value.trim(),category:f.category.value,icon:f.icon.value.trim(),rule:f.rule.value.trim()}]);
+  if(!name){fiMsg("请填写显示名称","dash-err");return}
+  sendOps([{kind:"add-app",name:name,label:f.name.text,category:f.category.value,icon:f.icon.value.trim(),rule:f.rule.value.trim()}]);
 },true);
 
 fiText.addEventListener("input",function(){fiDirty=true});

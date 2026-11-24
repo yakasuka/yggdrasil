@@ -16,6 +16,7 @@
 //   { kind:"rule",    rule, enabled:boolean }// comment/uncomment a rule line
 //   { kind:"rule-remove", rule }             // delete a rule line outright
 //   { kind:"add-app", name, label, category, icon, rule, firstDirect }
+//   { kind:"strategy-add", name, label, description, icon, type, url, interval, tolerance, filter }
 //   { kind:"general", fields:{port?, ...} }  // top-level general settings
 //   { kind:"filter",  id, value }            // FilterAll / FilterOthers / region regex
 //   { kind:"group-props", name, fields }     // type / url / interval / proxies / ...
@@ -275,6 +276,44 @@ function applyAddApp(lines, op) {
   }
 }
 
+// Append a new automatic strategy group (url-test / fallback / load-balance)
+// to proxy-groups. Automatic groups are what the catalog classifies as
+// kind:"strategy" (see catalog-from-yaml.js strategyGroups), so this is the
+// correct op for the dashboard's "添加策略组" button. Authored display text
+// goes into @meta so the generated Clash config stays untouched.
+function applyStrategyAdd(lines, op) {
+  const rulesIdx = lines.findIndex((l) => /^rules:\s*$/.test(l.trim()));
+  if (rulesIdx < 0) throw Error("模板缺少 rules: 段");
+  const name = String(op.name || "").trim();
+  if (!name) throw Error("策略组名称不能为空");
+  if (lines.some((l) => new RegExp("^\\s*-\\s*\\{name:\\s*" + escapeRe(name) + "\\s*[,}]").test(l)))
+    throw Error("策略组已存在：" + name);
+  const type = ["url-test", "fallback", "load-balance"].includes(op.type) ? op.type : "url-test";
+  const fields = { label: op.label || stripIconName(name) };
+  if (op.description) fields.description = op.description;
+  if (op.id) fields.id = op.id;
+  const meta = "# @meta " + fieldLiteral(fields);
+  const parts = ["name: " + name, "type: " + type];
+  parts.push("include-all: true");
+  if (op.filter) parts.push("filter: " + op.filter);
+  if (type === "url-test" || type === "fallback") {
+    parts.push("url: " + yamlValue(op.url || "https://www.gstatic.com/generate_204", "url"));
+    if (op.interval) parts.push("interval: " + Number(op.interval));
+    if (type === "url-test" && op.tolerance) parts.push("tolerance: " + Number(op.tolerance));
+  }
+  if (type === "load-balance" && op.strategy) parts.push("strategy: " + op.strategy);
+  if (op.icon) parts.push("icon: " + yamlValue(op.icon, "icon"));
+  const groupLine = "  - {" + parts.join(", ") + "}";
+  let insertAt = rulesIdx;
+  while (insertAt > 0 && !lines[insertAt - 1].trim()) insertAt--;
+  lines.splice(insertAt, 0, meta, groupLine);
+}
+
+// Strip a leading emoji from a group name to derive a readable default label.
+function stripIconName(name) {
+  return String(name || "").replace(/^\p{Extended_Pictographic}(?:\uFE0F)?\s*/u, "") || name;
+}
+
 // Render a value back into a YAML flow map without losing the author's inline
 // comment or the surrounding one-line style.
 function yamlValue(value, key) {
@@ -328,7 +367,13 @@ function applyAddRegion(lines, op) {
       throw Error("地区代码 " + id + " 已存在");
   }
   const anchor = "&Filter" + id;
-  const line = "  " + id + ": " + anchor + " '" + value + "'";
+  // Optional display metadata from the unified emoji+name field. It is stored
+  // as a human-readable trailing comment on the anchor line: choosing an emoji
+  // writes it into the template, leaving it unset writes no decoration at all.
+  const flag = String(op.flag || "").trim();
+  const label = String(op.label || "").trim();
+  const note = [flag, label].filter(Boolean).join(" ");
+  const line = "  " + id + ": " + anchor + " '" + value + "'" + (note ? "  # " + note : "");
   lines.splice(end, 0, line);
 }
 
@@ -595,6 +640,7 @@ export function applyTemplateOps(text, ops, parse) {
       case "rule-remove": applyRuleRemove(lines, op); break;
       case "add-app": applyAddApp(lines, op); break;
       case "add-region": applyAddRegion(lines, op); break;
+      case "strategy-add": applyStrategyAdd(lines, op); break;
       case "general": applyGeneral(lines, op); break;
       case "filter": applyFilter(lines, op); break;
       case "group-props": applyGroupProps(lines, op); break;

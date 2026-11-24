@@ -453,3 +453,58 @@ test("all four entity lists expose quick add entry points", () => {
   assert.match(main, /kind:"add-region"/);
   assert.match(main, /kind:"add-app"/);
 });
+
+test("add editors mount into their own visible step panel (no invisible modal / fake freeze)", () => {
+  const html = dashboardHTML({ linkBase: "https://x/y" });
+  const main = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)]
+    .map((m) => m[1]).find((s) => s.includes("function openAddEditor"));
+  // Each add kind MUST have its own host id. The old code funnelled every add
+  // through the single "add" key (fi-apps), so add-region / add-strategy modal
+  // was inserted into the hidden APP panel and appeared to freeze on click.
+  for (const host of ['"add-app":"fi-apps"', '"add-region":"fi-regions"',
+                      '"add-strategy":"fi-strategies"', '"add-provider":"fi-providers"'])
+    assert.ok(main.includes(host), "editor host mapping " + host);
+  assert.match(main, /mountEditor\("add-"\+kind,null\)/,
+    "openAddEditor routes by add-{kind} instead of the shared 'add' key");
+  // The strategy button must submit strategy-add, not add-app.
+  assert.match(main, /kind:"strategy-add"/, "strategy add op present");
+});
+
+test("unified emoji + display-name field replaces the split emoji/name inputs", () => {
+  const html = dashboardHTML({ linkBase: "https://x/y" });
+  const main = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)]
+    .map((m) => m[1]).find((s) => s.includes("function nameWithEmojiField"));
+  assert.ok(main, "nameWithEmojiField component present");
+  // Rounded emoji button + popover grid + explicit "no emoji" option.
+  assert.match(html, /\.dash-nf-emoji\{[^}]*border-radius:12px/, "rounded emoji button");
+  assert.match(main, /dash-emoji-grid/, "emoji palette grid");
+  assert.match(main, /不使用 Emoji/, "explicit no-emoji choice");
+  assert.match(main, /emoji\+\" \"\+t/, "name composed with a single space when emoji chosen");
+  // The old split fields are gone from every editor.
+  assert.ok(!html.includes("名称（含 Emoji"), "no hand-typed emoji name field");
+  assert.ok(!html.includes("旗帜 Emoji（如"), "no separate flag emoji field");
+  // Save handlers read the component surface, not a separate label input.
+  assert.match(main, /label:f\.name\.text/, "group save reads pure display name");
+  assert.match(main, /label:f\.label\.text,flag:f\.label\.emoji/, "region save reads text + emoji");
+  assert.match(main, /kind:"add-region",id:id,filter:filter,label:f\.label\.text,flag:f\.label\.emoji/,
+    "add-region forwards the chosen emoji / label");
+});
+
+test("emoji name splitting round-trips authored names including flags", () => {
+  const html = dashboardHTML({ linkBase: "https://x/y" });
+  const main = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)]
+    .map((m) => m[1]).find((s) => s.includes("LEADING_EMOJI_RE"));
+  const reLine = main.match(/var LEADING_EMOJI_RE=[^;]+;/)[0];
+  const fnSrc = main.match(/function splitNameEmoji\(full\)\{[\s\S]*?\n\}/)[0];
+  const ctx = {};
+  (0, eval)("(function(ctx){with(ctx){" + reLine + "\n" + fnSrc + "\nctx.split=splitNameEmoji;}})")(ctx);
+  const compose = (emoji, text) => (emoji ? emoji + " " + text.trim() : text.trim());
+  for (const name of ["⚡ OpenAI", "🪐 Anthropic", "🎚️ 节点选择", "🚀 手动切换",
+                      "OpenAI", "🇭🇰 Hong Kong", "🧩 Custom"]) {
+    const parts = ctx.split(name);
+    assert.equal(compose(parts.emoji, parts.text), name, "round-trip " + name);
+  }
+  // No emoji -> no leading space in the YAML name.
+  assert.deepEqual(ctx.split("OpenAI"), { emoji: "", text: "OpenAI" });
+  assert.equal(compose(ctx.split("OpenAI").emoji, ctx.split("OpenAI").text), "OpenAI");
+});

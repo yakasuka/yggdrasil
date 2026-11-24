@@ -310,3 +310,34 @@ test("add-region rejects duplicate or malformed codes", () => {
   assert.throws(() => patch([{ kind: "add-region", id: "BAD CODE", filter: "x" }]), /2-8 位/);
   assert.throws(() => patch([{ kind: "add-region", id: "ZZ", filter: "" }]), /不能为空/);
 });
+
+test("strategy-add appends an automatic group classified as strategy", async () => {
+  const out = patch([{
+    kind: "strategy-add", name: "🚀 自选测速", label: "自选测速",
+    type: "url-test", url: "https://example.com/test", interval: 300,
+    tolerance: 50, filter: "*FilterAll",
+  }]);
+  assert.match(out, /# @meta \{ label: "自选测速" \}/, "@meta label written");
+  assert.match(out, /- \{name: 🚀 自选测速, type: url-test, include-all: true/, "url-test group appended");
+  const cat = await catalogFromYaml(out);
+  const g = cat.editorModel.groups.find((x) => x.name === "🚀 自选测速");
+  assert.ok(g, "new group present in editorModel");
+  assert.equal(g.kind, "strategy", "classified as strategy, not app");
+  const s = cat.strategies.find((x) => x.name === "🚀 自选测速");
+  assert.ok(s, "present in strategies list");
+  assert.equal(s.type, "url-test");
+  assert.ok(cat.editorModel.groups.some((x) => x.name === "⚡ OpenAI"), "existing groups kept");
+});
+
+test("strategy-add rejects duplicates and invalid names", () => {
+  assert.throws(() => patch([{ kind: "strategy-add", name: "⚡ 自动选择" }]), /已存在/);
+  assert.throws(() => patch([{ kind: "strategy-add", name: "  " }]), /名称不能为空/);
+});
+
+test("add-region writes optional emoji + label as a trailing anchor comment", async () => {
+  const withMeta = patch([{ kind: "add-region", id: "CA", filter: "(?i)^(?!=>).*(?:🇨🇦|加拿大)",
+    flag: "🇨🇦", label: "加拿大" }]);
+  assert.match(withMeta, /CA: &FilterCA '[^']*'  # 🇨🇦 加拿大/, "emoji and label written to the template");
+  const without = patch([{ kind: "add-region", id: "ZZ", filter: "(?i)test" }]);
+  assert.match(without, /ZZ: &FilterZZ '[^']*'\s*$/m, "no emoji => no trailing space or decoration");
+});
