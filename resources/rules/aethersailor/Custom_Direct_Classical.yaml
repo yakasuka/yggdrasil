@@ -1,7 +1,7 @@
 # GENERATED - DO NOT EDIT. Add your rules to overlays/Custom_Direct_Classical.yaml
 # upstream: Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Direct_Classical.yaml
-# upstream blob: 08e7d4d327e0105cf88671215a61042dd1c4e662
-# total: 1315 (upstream 1315, extra 0)
+# upstream blob: a48040fead089246a81790ff28cd0e327660dbd8
+# total: 1318 (upstream 1318, extra 0)
 payload:
   - 'DOMAIN-KEYWORD,m-team'
   - 'DOMAIN-KEYWORD,quickconnect'
@@ -175,6 +175,7 @@ payload:
   - 'DOMAIN-SUFFIX,ax1x.com'
   - 'DOMAIN-SUFFIX,axuex.top'
   - 'DOMAIN-SUFFIX,azpromotion.com'
+  - 'DOMAIN-SUFFIX,azurpromilia.com'
   - 'DOMAIN-SUFFIX,b7f3192.com'
   - 'DOMAIN-SUFFIX,ba-hospital.com'
   - 'DOMAIN-SUFFIX,babawar.com'
@@ -1218,6 +1219,7 @@ payload:
   - 'DOMAIN-SUFFIX,xzsckj.com'
   - 'DOMAIN-SUFFIX,xzzhtc.com'
   - 'DOMAIN-SUFFIX,yayi360.com'
+  - 'DOMAIN-SUFFIX,ychpt.com'
   - 'DOMAIN-SUFFIX,ycjintou.com'
   - 'DOMAIN-SUFFIX,ycoo.net'
   - 'DOMAIN-SUFFIX,ycyct.com'
@@ -1248,6 +1250,7 @@ payload:
   - 'DOMAIN-SUFFIX,youqian.pro'
   - 'DOMAIN-SUFFIX,youzhiyouxing.com'
   - 'DOMAIN-SUFFIX,yrqvlchq5.com'
+  - 'DOMAIN-SUFFIX,ysdps.com'
   - 'DOMAIN-SUFFIX,yshoufa.com'
   - 'DOMAIN-SUFFIX,yuanqidesk3.com'
   - 'DOMAIN-SUFFIX,yueti.vip'
