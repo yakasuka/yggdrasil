@@ -124,6 +124,27 @@ const DASH_ONLY = `
 .icon-input-thumb{flex:0 0 auto;width:42px;height:42px;display:grid;place-items:center;border:1px solid var(--line);border-radius:10px;background:var(--soft);font-size:1.1rem;color:var(--muted)}
 .icon-input-preview{flex:0 0 auto;width:42px;height:42px;display:block;padding:3px;border:1px solid var(--line);border-radius:10px;background:var(--soft);object-fit:contain}
 .icon-input-thumb[hidden],.icon-input-preview[hidden]{display:none}
+/* Config-chain editors: custom controls, no native dropdowns / datalist. */
+.dash-modal-section{margin:20px 0 2px;padding:6px 0 7px;border-bottom:1px solid var(--line);font-size:.75rem;font-weight:650;color:var(--ink)}
+.dash-chain{margin:2px 0 14px;padding:9px 12px;border-left:2px solid var(--accent);border-radius:0 10px 10px 0;background:var(--soft);color:var(--muted);font-size:.6875rem;line-height:1.7}
+.dash-chain b{color:var(--ink);font-weight:600}
+.dash-chain i{font-style:normal;color:var(--accent);padding:0 3px}
+.dash-pills{display:flex;flex-wrap:wrap;gap:6px;padding:8px;border:1px solid var(--line);border-radius:11px;background:var(--input)}
+.dash-pillbox{max-height:138px;overflow:auto}
+.dash-pillbox::-webkit-scrollbar{width:6px}
+.dash-pillbox::-webkit-scrollbar-thumb{background:var(--line);border-radius:99px}
+.dash-pill{padding:5px 11px;border:1px solid var(--line);border-radius:99px;background:var(--soft);color:var(--muted);font-size:.75rem;line-height:1.3;cursor:pointer;transition:color .16s var(--ease),border-color .16s var(--ease),background .16s var(--ease)}
+.dash-pill:hover{border-color:var(--selected-line);color:var(--ink)}
+.dash-pill.on{border-color:var(--accent);background:var(--tint);color:var(--accent);font-weight:600}
+.dash-quick{display:flex;flex-wrap:wrap;gap:5px;flex-basis:100%;margin-top:6px}
+.dash-quick button{padding:3px 9px;border:1px dashed var(--line);border-radius:99px;background:transparent;color:var(--muted);font-size:.6875rem;line-height:1.3;cursor:pointer}
+.dash-quick button:hover{border-color:var(--selected-line);color:var(--accent);background:var(--tint)}
+.dash-chip.default-chip{border-color:var(--accent);background:var(--tint)}
+.dash-chip .default-tag{margin-left:2px;padding:1px 5px;border-radius:99px;background:var(--accent);color:var(--surface);font-size:.5625rem;font-style:normal;font-weight:700;letter-spacing:.02em}
+.dash-chip .promote{flex:none;width:17px;height:17px;display:grid;place-items:center;padding:0;border:0;border-radius:50%;background:transparent;color:var(--muted);font-size:.7rem;line-height:1;cursor:pointer}
+.dash-chip .promote:hover{background:var(--tint);color:var(--accent)}
+.rule-link-chip [contenteditable]{overflow:visible;text-overflow:clip;white-space:nowrap;cursor:text;min-width:74px;border-bottom:1px dashed transparent;outline:none}
+.rule-link-chip [contenteditable]:focus{border-bottom-color:var(--accent)}
 /* Wider, landscape-oriented cards so labels never get cramped. */
 #fi-apps.app-grid{grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}
 #fi-apps .app-card{padding:11px 13px;gap:12px}
@@ -812,7 +833,95 @@ function proxySuggestions(){
   return names;
 }
 function proxyChips(value){
-  return chipControl(splitList(value),function(items){return items.join(", ")},"输入出口名后回车（可从建议中选择）",proxySuggestions());
+  return chipControl(splitList(value),function(items){return items.join(", ")},"输入出口名后回车",null);
+}
+// Pill-style single choice — replaces native <select> so the chain reads as
+// tappable chips instead of a browser dropdown menu.
+function pillSelect(options,value){
+  var root=el("div");root.className="dash-pills";
+  if(options.length>8)root.classList.add("dash-pillbox");
+  var cur=value;
+  function paint(){
+    [].slice.call(root.querySelectorAll(".dash-pill")).forEach(function(n){root.removeChild(n)});
+    options.forEach(function(o){
+      var b=el("button",o[1]);b.type="button";b.className="dash-pill"+(o[0]===cur?" on":"");
+      b.addEventListener("click",function(){cur=o[0];paint();fiDirty=true;notify("已修改，点击「保存并生效」写回模板")});
+      root.appendChild(b);
+    });
+  }
+  paint();
+  Object.defineProperty(root,"value",{get:function(){return cur},configurable:true});
+  return root;
+}
+// Rules that target a given group, as editable chips. The target is fixed to
+// the group being edited (that IS the config relationship: rule -> group).
+// Each chip stores the full original rule line so removing/editing is exact.
+function ruleChips(target,rules){
+  var items=(rules||[]).map(function(r){return {text:String(r),orig:String(r),removed:false}});
+  var root=el("div");root.className="dash-chips";
+  var box=input("");box.className="dash-chip-input";box.placeholder="TYPE,匹配项  如 GEOSITE,openai";
+  var dragIndex=-1;
+  function changed(){fiDirty=true;notify("已修改，点击「保存并生效」写回模板")}
+  function add(){
+    var v=box.value.trim();if(!v)return;
+    v=v.replace(/^-\s*/,"");
+    var parts=v.split(",").map(function(x){return x.trim()});
+    var type=(parts[0]||"GEOSITE").toUpperCase();
+    if(["GEOSITE","RULE-SET","GEOIP","DOMAIN","IP","MATCH"].indexOf(type)<0){fiMsg("规则类型需为 GEOSITE / RULE-SET / GEOIP 等","dash-err");return}
+    var key=parts[1]||"";if(!key){fiMsg("请填写匹配项，如 GEOSITE,openai","dash-err");return}
+    var extra=parts.slice(3).join(",");
+    var full=[type,key,target,extra].filter(function(x){return x!==""}).join(",");
+    if(!items.some(function(it){return !it.removed&&it.text===full})){items.push({text:full,removed:false});paint();changed()}
+    box.value="";box.focus();
+  }
+  function paint(){
+    [].slice.call(root.querySelectorAll(".dash-chip")).forEach(function(n){root.removeChild(n)});
+    items.forEach(function(it,i){
+      if(it.removed)return;
+      var chip=el("span");chip.className="dash-chip rule-link-chip";chip.draggable=true;
+      chip.title="点击文字编辑 · 拖动排序 · × 删除";
+      var txt=el("span",it.text);txt.contentEditable="true";txt.spellcheck=false;
+      txt.addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();txt.blur()}});
+      txt.addEventListener("blur",function(){
+        var v=txt.textContent.trim().replace(/^-\s*/,"");
+        var parts=v.split(",").map(function(x){return x.trim()});
+        var type=(parts[0]||"").toUpperCase(),key=parts[1]||"";
+        if(!key||!parts[2]){txt.textContent=it.text;fiMsg("格式应为 TYPE,匹配项,出口","dash-err");return}
+        var full=[type,key,parts.slice(2).join(",")].join(",");
+        if(full!==it.text){it.text=full;changed()}
+        txt.textContent=it.text;
+      });
+      chip.appendChild(txt);
+      var rm=el("button","×");rm.type="button";rm.title="删除规则";rm.setAttribute("aria-label",rm.title);
+      rm.addEventListener("click",function(e){e.stopPropagation();it.removed=true;paint();changed()});
+      chip.appendChild(rm);
+      chip.addEventListener("dragstart",function(){dragIndex=i;chip.classList.add("dragging")});
+      chip.addEventListener("dragend",function(){chip.classList.remove("dragging");dragIndex=-1});
+      chip.addEventListener("dragover",function(e){e.preventDefault()});
+      chip.addEventListener("drop",function(e){e.preventDefault();if(dragIndex<0||dragIndex===i)return;var m=items.splice(dragIndex,1)[0];items.splice(i,0,m);dragIndex=-1;paint();changed()});
+      root.insertBefore(chip,box);
+    });
+  }
+  box.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===","){e.preventDefault();add()}});
+  box.addEventListener("blur",add);
+  root.appendChild(box);paint();
+  // Expose the full rule list as a comma-joined string for the save handler.
+  Object.defineProperty(root,"value",{get:function(){return items.filter(function(it){return !it.removed}).map(function(it){return it.text}).join("\\n")},configurable:true});
+  root._items=items;root._target=target;
+  return root;
+}
+function chainNote(text){var d=el("div");d.className="dash-chain";d.innerHTML=text;modalBody.appendChild(d)}
+function modalSection(text){var d=el("div");d.className="dash-modal-section";d.textContent=text;modalBody.appendChild(d)}
+// Translate the rule-chip state into surgical ops: removed -> rule-remove,
+// edited -> rule-text (preserves position), new -> rule-add.
+function ruleChipsOps(control){
+  var ops=[];
+  control._items.forEach(function(it){
+    if(it.removed&&it.orig)ops.push({kind:"rule-remove",rule:it.orig});
+    else if(!it.removed&&it.orig&&it.text!==it.orig)ops.push({kind:"rule-text",rule:it.orig,value:it.text});
+    else if(!it.removed&&!it.orig)ops.push({kind:"rule-add",rule:it.text});
+  });
+  return ops;
 }
 // Split a regex on top-level | only, so nested groups such as
 // (?i:🇭🇰|香港|Hong Kong) stay as one editable chip.
@@ -846,6 +955,10 @@ function groupProps(name){
   var groups=(state.catalog&&state.catalog.editor&&state.catalog.editor.groups)||[];
   return groups.find(function(g){return g.name===name})||{};
 }
+function rulesForTarget(name){
+  var rules=(state.catalog&&state.catalog.editor&&state.catalog.editor.rules)||[];
+  return rules.filter(function(r){return r.target===name&&r.enabled!==false}).map(function(r){return r.rule});
+}
 function closeModal(){modal.hidden=true;editCtx=null}
 function openEditor(ctx){
   editCtx=ctx;
@@ -854,16 +967,19 @@ function openEditor(ctx){
   modalBody.textContent="";
   var item=ctx.item||{},f={},cat=state.catalog||{},g=groupProps(item.name);
   if(ctx.kind==="app"){
-    hint("组名："+item.name+" · 改名需到高级 YAML 中操作，以免断开规则引用。");
+    chainNote("<b>配置链路</b><i>→</i>命中规则（哪些域名走它）<i>→</i><b>"+esc(item.name)+"</b> 策略组<i>→</i>出口顺序（第一项为默认出口）");
+    var group=(cat.editor&&cat.editor.groups||[]).find(function(x){return x.name===item.name})||{};
+    f.rules=field("① 命中规则 · 指向本应用的规则（可编辑）",ruleChips(item.name,item.rules));appendField(f.rules);
+    hint("每条规则是「类型,匹配项,"+esc(item.name)+"」，出口已固定为本应用；点文字改匹配项，× 删除，回车新增。");
+    modalSection("② 应用信息");
     f.label=field("显示名称",input(item.label));appendField(f.label);
     f.icon=field("图标 URL",iconInput(item.icon));appendField(f.icon);
     var cats=[];if(cat.apps)cat.apps.forEach(function(a){if(cats.indexOf(a.category)<0)cats.push(a.category)});
     if(cats.indexOf(item.category)<0)cats.unshift(item.category);
-    f.category=field("分类",select(cats.map(function(c){return [c,c]}),item.category));appendField(f.category);
-    f.exit=field("默认出口",select([["proxy","跟随代理 / 节点选择"],["DIRECT","直连 DIRECT"]],item.firstProxyDirect?"DIRECT":"proxy"));appendField(f.exit);
-    f.proxies=field("出口顺序（可增删 / 拖动排序）",proxyChips(g.proxies));appendField(f.proxies);
-    hint("回车添加出口，× 删除，拖动芯片排序。");
-    if(item.rules&&item.rules.length)hint("关联规则："+item.rules.join("｜")+"（可在下方「分流规则」中修改）");
+    f.category=field("分类",pillSelect(cats.map(function(c){return [c,c]}),item.category));appendField(f.category);
+    modalSection("③ 出口顺序 · 第一项即默认出口");
+    f.proxies=field("出口列表（拖动排序 / × 删除）",proxyChips(g.proxies));appendField(f.proxies);
+    hint("按顺序选择：第一项就是默认出口；把 DIRECT 拖到首位即默认直连。组类型："+esc(g.type||group.type||"select")+"。");
   }else if(ctx.kind==="region"){
     hint("组名："+(item.groupName||item.name));
     f.label=field("显示名称",input(item.label));appendField(f.label);
@@ -872,20 +988,30 @@ function openEditor(ctx){
     f.filter=field("地区匹配项（可增删芯片）",regexChips(item.filter));appendField(f.filter);
     hint("每个芯片是一条正则分支；回车添加、× 删除、拖动排序。");
   }else if(ctx.kind==="strategy"){
-    hint("组名："+item.name+" · 类型："+(g.type||item.type));
+    var sTarget=item.name;
+    chainNote("<b>配置链路</b><i>→</i>命中规则（谁指向它）<i>→</i><b>"+esc(sTarget)+"</b> 策略组<i>→</i>出口顺序（第一项为默认）");
+    var sRules=rulesForTarget(sTarget);
+    f.rules=field("① 命中规则 · 指向本策略组的规则（可编辑）",ruleChips(sTarget,sRules));appendField(f.rules);
+    hint("出口已固定为 "+esc(sTarget)+"；点文字改匹配项，× 删除，回车新增。");
+    modalSection("② 策略组信息");
     f.label=field("显示名称",input(item.label));appendField(f.label);
     f.description=field("说明",input(item.description));appendField(f.description);
     f.icon=field("图标 URL",iconInput(item.icon));appendField(f.icon);
     if(g.url){f.url=field("测速 URL",input(g.url));appendField(f.url)}
     if(g.interval!=null&&g.interval!==""){f.interval=field("测速间隔（秒）",input(g.interval,"number"));appendField(f.interval)}
     if(g.tolerance!=null&&g.tolerance!==""){f.tolerance=field("延迟容差（毫秒）",input(g.tolerance,"number"));appendField(f.tolerance)}
-    if(g.strategy){f.strategy=field("均衡策略",select([["consistent-hashing","consistent-hashing"],["round-robin","round-robin"]],g.strategy));appendField(f.strategy)}
+    if(g.strategy){f.strategy=field("均衡策略",pillSelect([["consistent-hashing","consistent-hashing"],["round-robin","round-robin"]],g.strategy));appendField(f.strategy)}
     if(g.proxies){f.proxies=field("出口顺序（可增删 / 拖动排序）",proxyChips(g.proxies));appendField(f.proxies);hint("回车添加出口，× 删除，拖动芯片排序。")}
     if(g.filter){f.filter=field("节点筛选（可增删芯片）",regexChips(g.filter));appendField(f.filter);hint("筛选正则的每个分支都是独立芯片，可增删排序。")}
   }else if(ctx.kind==="core-group"){
-    hint("组名："+g.name+" · 类型："+g.type);
-    f.proxies=field("出口顺序（可增删 / 拖动排序）",proxyChips(g.proxies));appendField(f.proxies);
-    hint("回车添加出口，× 删除，拖动芯片排序。");
+    var cgTarget=g.name;
+    chainNote("<b>配置链路</b><i>→</i>命中规则（谁指向它）<i>→</i><b>"+esc(cgTarget)+"</b> 策略组<i>→</i>出口顺序（第一项为默认）");
+    var cgRules=rulesForTarget(cgTarget);
+    f.rules=field("① 命中规则 · 指向本组的规则（可编辑）",ruleChips(cgTarget,cgRules));appendField(f.rules);
+    hint("出口已固定为 "+esc(cgTarget)+"；点文字改匹配项，× 删除，回车新增。");
+    modalSection("② 出口顺序 · 第一项即默认出口");
+    f.proxies=field("出口列表（拖动排序 / × 删除）",proxyChips(g.proxies));appendField(f.proxies);
+    hint("按顺序选择：第一项就是默认出口；把 DIRECT 拖到首位即默认直连。类型："+esc(g.type||"")+"。");
     if(g.filter){f.filter=field("节点筛选（可增删芯片）",regexChips(g.filter));appendField(f.filter);hint("筛选正则的每个分支都是独立芯片，可增删排序。")}
     if(g.icon){f.icon=field("图标 URL",iconInput(g.icon));appendField(f.icon)}
     if(g.url){f.url=field("测速 URL",input(g.url));appendField(f.url)}
@@ -896,8 +1022,8 @@ function openEditor(ctx){
     f.port=field("HTTP 代理端口",input(cfg.port,"number"));appendField(f.port);
     f.socksPort=field("SOCKS5 端口",input(cfg["socks-port"],"number"));appendField(f.socksPort);
     f.allowLan=field("允许局域网连接",checkbox(cfg["allow-lan"]));appendField(f.allowLan);
-    f.mode=field("代理模式",select([["rule","rule · 规则分流"],["direct","direct · 全局直连"],["global","global · 全局代理"]],cfg.mode));appendField(f.mode);
-    f.logLevel=field("日志级别",select([["debug","debug"],["info","info"],["warning","warning"],["error","error"],["silent","silent"]],cfg["log-level"]));appendField(f.logLevel);
+    f.mode=field("代理模式",pillSelect([["rule","rule · 规则分流"],["direct","direct · 全局直连"],["global","global · 全局代理"]],cfg.mode));appendField(f.mode);
+    f.logLevel=field("日志级别",pillSelect([["debug","debug"],["info","info"],["warning","warning"],["error","error"],["silent","silent"]],cfg["log-level"]));appendField(f.logLevel);
     f.controller=field("REST API 监听地址",input(cfg["external-controller"]));appendField(f.controller);
     f.unifiedDelay=field("统一延迟测速",checkbox(cfg["unified-delay"]));appendField(f.unifiedDelay);
   }else if(ctx.kind==="filter"){
@@ -907,12 +1033,12 @@ function openEditor(ctx){
   }else if(ctx.kind==="rule"||ctx.kind==="add-rule"){
     var p=ctx.kind==="add-rule"?(ctx.preset||{type:"GEOSITE",key:"",target:"",extra:""}):ruleParts(item.rule);
     if(ctx.kind==="rule")hint("原规则："+item.rule);
-    f.type=field("规则类型",select([["GEOSITE","GEOSITE"],["RULE-SET","RULE-SET"],["GEOIP","GEOIP"],["DOMAIN","DOMAIN"],["IP","IP"],["MATCH","MATCH"]],p.type));appendField(f.type);
+    f.type=field("规则类型",pillSelect([["GEOSITE","GEOSITE"],["RULE-SET","RULE-SET"],["GEOIP","GEOIP"],["DOMAIN","DOMAIN"],["IP","IP"],["MATCH","MATCH"]],p.type));appendField(f.type);
     f.key=field("匹配项（如 openai / cn / gfw）",input(p.key));appendField(f.key);
     var targets=["DIRECT","REJECT"],groups=(cat.editor&&cat.editor.groups)||[];
     groups.forEach(function(x){if(targets.indexOf(x.name)<0)targets.push(x.name)});
     if(p.target&&targets.indexOf(p.target)<0)targets.unshift(p.target);
-    f.target=field("出口（策略组）",select(targets.map(function(t){return [t,t]}),p.target));appendField(f.target);
+    f.target=field("出口（策略组）",pillSelect(targets.map(function(t){return [t,t]}),p.target));appendField(f.target);
     f.extra=field("附加参数（如 no-resolve）",input(p.extra));appendField(f.extra);
     if(ctx.kind==="rule"){f.enabled=field("启用该规则",checkbox(item.enabled));appendField(f.enabled)}
   }else if(ctx.kind==="provider"){
@@ -920,9 +1046,9 @@ function openEditor(ctx){
     hint("规则源名："+item.name+" · 修改后下一次拉取即生效。");
     f.url=field("规则源 URL",input(v.url));appendField(f.url);
     f.interval=field("更新间隔（秒）",input(v.interval,"number"));appendField(f.interval);
-    f.behavior=field("行为",select([["domain","domain"],["classical","classical"],["ipcidr","ipcidr"]],v.behavior));appendField(f.behavior);
-    f.format=field("格式",select([["yaml","yaml"],["text","text"]],v.format||"yaml"));appendField(f.format);
-    f.type=field("类型",select([["http","http"],["file","file"]],v.type||"http"));appendField(f.type);
+    f.behavior=field("行为",pillSelect([["domain","domain"],["classical","classical"],["ipcidr","ipcidr"]],v.behavior));appendField(f.behavior);
+    f.format=field("格式",pillSelect([["yaml","yaml"],["text","text"]],v.format||"yaml"));appendField(f.format);
+    f.type=field("类型",pillSelect([["http","http"],["file","file"]],v.type||"http"));appendField(f.type);
   }
   editCtx.fields=f;
   var removable={app:1,region:1,strategy:1,rule:1};
@@ -958,9 +1084,9 @@ function buildOps(){
   var name=ctx.kind==="region"?(item.groupName||item.name):item.name;
   function props(fields){ops.push({kind:"group-props",name:name,fields:fields})}
   if(ctx.kind==="app"){
+    ops=ops.concat(ruleChipsOps(f.rules));
     ops.push({kind:"meta",name:name,fields:{label:f.label.value.trim(),category:f.category.value}});
     ops.push({kind:"icon",name:name,value:f.icon.value.trim()});
-    ops.push({kind:"exit",name:name,value:f.exit.value});
     var proxies=proxyList(f.proxies.value);
     if(proxies)props({proxies:proxies});
   }else if(ctx.kind==="region"){
@@ -968,6 +1094,7 @@ function buildOps(){
     ops.push({kind:"icon",name:name,value:f.icon.value.trim()});
     ops.push({kind:"filter",id:item.id,value:f.filter.value.trim()});
   }else if(ctx.kind==="strategy"||ctx.kind==="core-group"){
+    if(f.rules)ops=ops.concat(ruleChipsOps(f.rules));
     if(f.label)ops.push({kind:"meta",name:name,fields:{label:f.label.value.trim(),description:f.description.value.trim()}});
     if(f.icon)ops.push({kind:"icon",name:name,value:f.icon.value.trim()});
     var fields={};
@@ -1033,7 +1160,7 @@ document.getElementById("add-app").addEventListener("click",function(){
     name:field("组名（含 Emoji，如 🧩 Notion）",input("🧩 ")),
     label:field("显示名称",input("")),
     icon:field("图标 URL",iconInput("")),
-    category:field("分类",select(cats.map(function(c){return [c,c]}),cats[0])),
+    category:field("分类",pillSelect(cats.map(function(c){return [c,c]}),cats[0])),
     rule:field("分流规则（如 GEOSITE,notion,🧩 Notion，可留空）",input(""))
   };
   Object.keys(f).forEach(function(k){appendField(f[k])});
