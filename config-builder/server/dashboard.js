@@ -786,7 +786,7 @@ function splitList(value){
 var chipSeq=0;
 // A chip control behaves like an input (it exposes .value) so every existing
 // save handler keeps working, but the user can add/remove/reorder items.
-function chipControl(initial,serialize,placeholder,suggestions){
+function chipControl(initial,serialize,placeholder,suggestions,markFirst){
   var items=initial.slice(),root=el("div");
   root.className="dash-chips";
   var box=input("");box.className="dash-chip-input";box.placeholder=placeholder||"输入后回车添加";
@@ -805,9 +805,13 @@ function chipControl(initial,serialize,placeholder,suggestions){
   function paint(){
     [].slice.call(root.querySelectorAll(".dash-chip")).forEach(function(n){root.removeChild(n)});
     items.forEach(function(text,i){
-      var chip=el("span");chip.className="dash-chip";chip.draggable=true;
-      chip.title="拖动排序 · 点击 × 删除";
+      var chip=el("span");chip.className="dash-chip"+(markFirst&&i===0?" default-chip":"");chip.draggable=true;
+      chip.title=markFirst&&i===0?"默认出口 · 拖动排序 · 点击 × 删除":"拖动排序 · 点击 × 删除";
       chip.appendChild(el("span",text));
+      if(markFirst){
+        if(i===0)chip.appendChild(el("em","默认")).className="default-tag";
+        else{var promote=el("button","↑");promote.type="button";promote.title="设为默认出口";promote.addEventListener("click",function(e){e.stopPropagation();var m=items.splice(i,1)[0];items.unshift(m);paint();changed()});chip.appendChild(promote)}
+      }
       var rm=el("button","×");rm.type="button";rm.title="删除 "+text;rm.setAttribute("aria-label",rm.title);
       rm.addEventListener("click",function(e){e.stopPropagation();items.splice(i,1);paint();changed()});
       chip.appendChild(rm);
@@ -833,7 +837,7 @@ function proxySuggestions(){
   return names;
 }
 function proxyChips(value){
-  return chipControl(splitList(value),function(items){return items.join(", ")},"输入出口名后回车",null);
+  return chipControl(splitList(value),function(items){return items.join(", ")},"输入出口名后回车",null,true);
 }
 // Pill-style single choice — replaces native <select> so the chain reads as
 // tappable chips instead of a browser dropdown menu.
