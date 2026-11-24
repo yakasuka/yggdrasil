@@ -133,19 +133,20 @@ const DASH_ONLY = `
 @keyframes fi-drawer-in{from{transform:translateX(26px);opacity:.6}to{transform:none;opacity:1}}
 .dash-modal-card .dialog-header{margin-bottom:2px}
 .dash-modal-card .dialog-header h2{font-size:1rem;font-weight:650;color:var(--ink)}
-/* Inline-block rows: unlike flex-wrap, each row's height is decided only by
-   the fixed-height items, so no browser can stretch the gap before a wrapped
-   row (the recurring "last row has a blank line above it" bug). */
-.dash-chips{display:block;font-size:0;line-height:0;padding:6px 8px;border:1px solid var(--line);border-radius:12px;background:var(--input);cursor:text}
+/* Flex rows with explicit gap: the ONLY layout where vertical spacing is
+   decided exclusively by the gap value, never by font baselines or emoji glyph
+   metrics. inline-block + vertical-align:middle let emoji inflate the line box
+   to ~44px, which looked like a blank row between lines. Flex gap is fixed. */
+.dash-chips{display:flex;flex-wrap:wrap;align-content:flex-start;align-items:center;gap:6px 6px;padding:7px 8px;border:1px solid var(--line);border-radius:12px;background:var(--input);cursor:text}
 .dash-chips:focus-within{border-color:var(--selected-line);box-shadow:0 0 0 3px var(--tint)}
 .dash-chips datalist{display:none!important}
-.dash-chip,.dash-chip-input{display:inline-flex;vertical-align:middle;height:24px;min-height:24px;max-height:24px;box-sizing:border-box;margin:0 5px 5px 0;font-size:.75rem;line-height:1}
-.dash-chip{align-items:center;gap:5px;max-width:100%;padding:0 5px 0 10px;border:1px solid var(--selected-line);border-radius:99px;background:var(--tint);color:var(--ink);cursor:grab}
+.dash-chip,.dash-chip-input{flex:0 0 auto;height:24px;min-height:24px;max-height:24px;box-sizing:border-box;margin:0;font-size:.75rem;line-height:1}
+.dash-chip{display:inline-flex;align-items:center;gap:5px;max-width:100%;padding:0 5px 0 10px;border:1px solid var(--selected-line);border-radius:99px;background:var(--tint);color:var(--ink);cursor:grab}
 .dash-chip.dragging{opacity:.4}
-.dash-chip>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:240px;line-height:1}
+.dash-chip>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:240px;line-height:24px;height:24px;display:inline-flex;align-items:center}
 .dash-chip button{flex:none;width:17px;height:17px;display:grid;place-items:center;padding:0;border:0;border-radius:50%;background:transparent;color:var(--muted);font-size:.75rem;line-height:1;cursor:pointer}
 .dash-chip button:hover{background:var(--danger-bg);color:var(--danger)}
-.dash-modal-card .dash-chip-input,.dash-chip-input{width:130px;min-width:90px;max-width:100%;padding:0 3px;border:0!important;border-radius:0;background:transparent!important;box-shadow:none!important;outline:none;color:var(--ink)}
+.dash-modal-card .dash-chip-input,.dash-chip-input{flex:0 1 130px;width:130px;min-width:90px;max-width:100%;padding:0 3px;border:0!important;border-radius:0;background:transparent!important;box-shadow:none!important;outline:none;color:var(--ink)}
 .dash-chip-input::placeholder{color:var(--muted)}
 .dash-chips .dash-chip-input:focus{border:0;box-shadow:none;background:transparent}
 .dash-modal-card .dialog-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
@@ -309,7 +310,7 @@ export function dashboardHTML({
     <div class="panel-top">
       <span id="step-caption" class="eyebrow">STEP 01 / 06</span>
       <span class="chip">RATATOSKR</span>
-      <span class="chip chip-build" title="界面构建版本 · 无阻塞弹窗 · 芯片布局 v2">UI v2.2</span>
+      <span class="chip chip-build" title="界面构建版本 · 无阻塞弹窗 · 芯片行距 v3">UI v2.3</span>
       <div class="panel-actions">
         <button class="icon-text-button" id="fi-reload" type="button" title="重新载入"><span aria-hidden="true">↻</span> 重新载入</button>
         <button class="icon-text-button" id="fi-reset" type="button"><span aria-hidden="true">✕</span> 放弃草稿</button>

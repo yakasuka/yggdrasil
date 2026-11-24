@@ -349,12 +349,15 @@ test("chip inputs: even row spacing and Backspace deletes last chip", () => {
   const html = dashboardHTML({ linkBase: "https://x/y" });
   const main = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)]
     .map((m) => m[1]).find((s) => s.includes("chipControl"));
-  // inline-block rows avoid flex-wrap's line-box stretching entirely: every
-  // chip has a fixed height and a fixed bottom margin, so no wrapped row can
-  // gain a blank line above it (the recurring "last row spacing" bug).
-  assert.match(html, /\.dash-chips\{[^}]*display:block;[^}]*font-size:0/);
-  assert.match(html, /\.dash-chip,\.dash-chip-input\{[^}]*display:inline-flex;[^}]*height:24px/);
-  assert.match(html, /\.dash-chip,\.dash-chip-input\{[^}]*margin:0 5px 5px 0/);
+  // Flex rows with an explicit gap are the only layout whose vertical spacing
+  // cannot be inflated by emoji glyph line-height. inline-block +
+  // vertical-align:middle let 🏙️/🗽/🌌 stretch the line box to ~44px, which
+  // read as a phantom blank row. Fixed-height chips + gap lock it at 6px.
+  assert.match(html, /\.dash-chips\{[^}]*display:flex;[^}]*flex-wrap:wrap[^}]*gap:6px 6px/);
+  assert.match(html, /\.dash-chips\{[^}]*align-content:flex-start/);
+  assert.match(html, /\.dash-chip,\.dash-chip-input\{[^}]*height:24px[^}]*max-height:24px/);
+  // chip label must not inherit emoji-driven line box height
+  assert.match(html, /\.dash-chip>span\{[^}]*line-height:24px;[^}]*height:24px/);
   // Backspace removes the trailing chip when the input is empty, in both the
   // generic chip control and the rule-chip control.
   assert.match(main, /e\.key==="Backspace"&&!box\.value&&items\.length/);
