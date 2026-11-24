@@ -56,6 +56,7 @@ function footerScript() {
 // Only dashboard-specific glue is defined here. Every other rule — cards,
 // pills, grids, headers, hero, footer — comes from the builder stylesheet.
 const DASH_ONLY = `
+.panel-top .chip-build{margin-left:2px;border-color:var(--accent);background:var(--tint);color:var(--accent);font-weight:650;letter-spacing:.02em}
 .site-header .brand{text-decoration:none}
 .header-link{display:inline-flex;align-items:center;gap:5px;padding:0;border:0;background:none;color:var(--muted);font-size:.75rem;cursor:pointer;text-decoration:none;transition:color 180ms var(--ease)}
 .header-link:hover{color:var(--accent)}
@@ -308,6 +309,7 @@ export function dashboardHTML({
     <div class="panel-top">
       <span id="step-caption" class="eyebrow">STEP 01 / 06</span>
       <span class="chip">RATATOSKR</span>
+      <span class="chip chip-build" title="界面构建版本 · 芯片布局 v2">UI v2.1</span>
       <div class="panel-actions">
         <button class="icon-text-button" id="fi-reload" type="button" title="重新载入"><span aria-hidden="true">↻</span> 重新载入</button>
         <button class="icon-text-button" id="fi-reset" type="button"><span aria-hidden="true">✕</span> 放弃草稿</button>
