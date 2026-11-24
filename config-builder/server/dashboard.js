@@ -140,14 +140,14 @@ const DASH_ONLY = `
 .dash-chips{display:flex;flex-wrap:wrap;align-content:flex-start;align-items:center;gap:6px 6px;padding:7px 8px;border:1px solid var(--line);border-radius:12px;background:var(--input);cursor:text}
 .dash-chips:focus-within{border-color:var(--selected-line);box-shadow:0 0 0 3px var(--tint)}
 .dash-chips datalist{display:none!important}
-.dash-chip,.dash-chip-input{flex:0 0 auto;height:24px;min-height:24px;max-height:24px;box-sizing:border-box;margin:0;font-size:.75rem;line-height:1}
+.dash-chip,.dash-chips .dash-chip-input{flex:0 0 auto;height:24px;min-height:24px;max-height:24px;box-sizing:border-box;margin:0;font-size:.75rem;line-height:24px}
 .dash-chip{display:inline-flex;align-items:center;gap:5px;max-width:100%;padding:0 5px 0 10px;border:1px solid var(--selected-line);border-radius:99px;background:var(--tint);color:var(--ink);cursor:grab}
 .dash-chip.dragging{opacity:.4}
 .dash-chip>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:240px;line-height:24px;height:24px;display:inline-flex;align-items:center}
 .dash-chip button{flex:none;width:17px;height:17px;display:grid;place-items:center;padding:0;border:0;border-radius:50%;background:transparent;color:var(--muted);font-size:.75rem;line-height:1;cursor:pointer}
 .dash-chip button:hover{background:var(--danger-bg);color:var(--danger)}
-.dash-modal-card .dash-chip-input,.dash-chip-input{flex:0 1 130px;width:130px;min-width:90px;max-width:100%;padding:0 3px;border:0!important;border-radius:0;background:transparent!important;box-shadow:none!important;outline:none;color:var(--ink)}
-.dash-chip-input::placeholder{color:var(--muted)}
+.dash-chips .dash-chip-input,.dash-modal-card .dash-chips .dash-chip-input{flex:0 1 130px;width:130px;min-width:90px;max-width:100%;height:24px;min-height:24px;max-height:24px;margin:0;padding:0 3px;border:0!important;border-radius:0;background:transparent!important;box-shadow:none!important;outline:none;color:var(--ink);box-sizing:border-box;line-height:24px;font-size:.75rem}
+.dash-chips .dash-chip-input::placeholder{color:var(--muted)}
 .dash-chips .dash-chip-input:focus{border:0;box-shadow:none;background:transparent}
 .dash-modal-card .dialog-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
 .dash-modal-card .field{margin:16px 0}

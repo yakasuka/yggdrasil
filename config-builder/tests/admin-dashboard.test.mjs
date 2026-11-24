@@ -355,7 +355,11 @@ test("chip inputs: even row spacing and Backspace deletes last chip", () => {
   // read as a phantom blank row. Fixed-height chips + gap lock it at 6px.
   assert.match(html, /\.dash-chips\{[^}]*display:flex;[^}]*flex-wrap:wrap[^}]*gap:6px 6px/);
   assert.match(html, /\.dash-chips\{[^}]*align-content:flex-start/);
-  assert.match(html, /\.dash-chip,\.dash-chip-input\{[^}]*height:24px[^}]*max-height:24px/);
+  assert.match(html, /\.dash-chip,\.dash-chips \.dash-chip-input\{[^}]*height:24px[^}]*max-height:24px/);
+  // The builder's global input[type=text] rule (min-height:44px; margin-top:8px)
+  // is more specific than a bare .dash-chip-input selector. Reset it with a
+  // two-class selector or the input inflates its flex line and leaves a blank row.
+  assert.match(html, /\.dash-chips \.dash-chip-input\{[^}]*height:24px;min-height:24px;max-height:24px;margin:0/);
   // chip label must not inherit emoji-driven line box height
   assert.match(html, /\.dash-chip>span\{[^}]*line-height:24px;[^}]*height:24px/);
   // Backspace removes the trailing chip when the input is empty, in both the
