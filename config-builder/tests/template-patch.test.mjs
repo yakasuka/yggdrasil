@@ -180,3 +180,62 @@ test("PATCH rejects a malformed op set without corrupting the draft", async () =
   }))).json();
   assert.equal(get.source, "repository", "no draft created on failure");
 });
+
+test("group-rename cascades to rule targets and every proxies list", async () => {
+  const from = "⚡ OpenAI";
+  const to = "🧪 OpenAI2";
+  const out = patch([{ kind: "group-rename", from, to }]);
+  const cat = await catalogFromYaml(out);
+  // group renamed
+  assert.ok(cat.editor.groups.some((g) => g.name === to), "group line renamed");
+  assert.ok(!cat.editor.groups.some((g) => g.name === from), "old group gone");
+  // rule target cascaded: the app now flows to the new name
+  const renamedApp = cat.apps.find((a) => a.name === to);
+  assert.ok(renamedApp && renamedApp.rules.length > 0, "inbound rules retargeted");
+  assert.ok(renamedApp.rules.every((r) => r.includes(to)), "rules reference new name");
+  // other groups' proxies cascaded (e.g. core switch may include this group)
+  assert.ok(!out.includes(from), "no dangling reference to old name remains");
+});
+
+test("group-rename keeps YAML line count and CRLF/BOM structure", () => {
+  const before = bundled.templateText.split(/\r?\n/).length;
+  const out = patch([{ kind: "group-rename", from: "🪐 Anthropic", to: "🪐 AnthropicX" }]);
+  assert.equal(out.split(/\r?\n/).length, before, "line count preserved");
+  assert.ok(out.includes("🪐 AnthropicX"), "new name present");
+});
+
+test("group-remove deletes the group, its rules and all references", async () => {
+  const name = "👾 Steam";
+  const out = patch([{ kind: "group-remove", name }]);
+  const cat = await catalogFromYaml(out);
+  assert.ok(!cat.editor.groups.some((g) => g.name === name), "group removed");
+  assert.ok(!out.includes(name), "no dangling rule/proxy reference remains");
+});
+
+test("editorModel exposes one unified row per group", async () => {
+  const cat = await catalogFromYaml(bundled.templateText);
+  assert.ok(cat.editorModel && Array.isArray(cat.editorModel.groups), "editorModel.groups exists");
+  assert.equal(cat.editorModel.groups.length, cat.editor.groups.length, "one row per group");
+  const steam = cat.editorModel.groups.find((g) => g.name === "👾 Steam");
+  assert.ok(steam, "Steam present");
+  assert.equal(steam.kind, "app", "classified as app");
+  assert.ok(steam.inbound.some((r) => r.includes("steam")), "inbound rules attached");
+  assert.ok(Array.isArray(steam.proxies) && steam.proxies.length > 0, "proxies present");
+  const hk = cat.editorModel.groups.find((g) => g.kind === "region");
+  assert.ok(hk && hk.regionId, "region groups carry regionId");
+});
+
+test("add-region appends a FilterRegions anchor and shows up as a region", async () => {
+  const out = patch([{ kind: "add-region", id: "CA", filter: "(?i)^(?!=>).*(?:🇨🇦|加拿大|Canada)" }]);
+  assert.match(out, /CA: &FilterCA '\(\?i\)\^\(\?!=>\)\.\*\(\?:🇨🇦\|加拿大\|Canada\)'/);
+  const cat = await catalogFromYaml(out);
+  assert.ok(cat.regions.some((r) => r.id === "CA"), "new region in catalog");
+  // The rest of the template is untouched.
+  assert.ok(cat.regions.some((r) => r.id === "HK"), "existing regions kept");
+});
+
+test("add-region rejects duplicate or malformed codes", () => {
+  assert.throws(() => patch([{ kind: "add-region", id: "HK", filter: "x" }]), /已存在/);
+  assert.throws(() => patch([{ kind: "add-region", id: "BAD CODE", filter: "x" }]), /2-8 位/);
+  assert.throws(() => patch([{ kind: "add-region", id: "ZZ", filter: "" }]), /不能为空/);
+});

@@ -23,6 +23,83 @@
 //   { kind:"rule-move", rule, to:"up"|"down" }
 //   { kind:"rule-add", rule }                // insert before MATCH
 //   { kind:"provider", name, fields }        // rule-providers entry
+//   { kind:"group-rename", from, to }        // rename group + cascade every reference
+//   { kind:"group-remove", name }            // remove group + cascade every reference
+
+// Replace a whole group name token inside a proxies flow list, preserving the
+// surrounding whitespace/alignment of the author's line.
+function replaceRef(value, from, to) {
+  const escaped = escapeRe(from);
+  return String(value ?? "").replace(
+    new RegExp("(^|,\\s*)" + escaped + "(?=\\s*(?:,|$))", "g"),
+    (_m, lead) => lead + to,
+  );
+}
+
+// A group's name is referenced from three places: every other group's
+// `proxies:` list, every rule's third field, and the group's own line. Renaming
+// only the group line breaks all flows, so this op rewrites all references in
+// one atomic pass. Rule lines (including commented-out ones) and flow lists
+// are matched structurally; comments, anchors and CRLF survive untouched.
+function applyGroupRename(lines, op) {
+  const from = String(op.from || "");
+  const to = String(op.to || "").trim();
+  if (!from || !to) throw Error("改名需要旧名与新名");
+  if (from === to) return;
+  const idx = groupLineIndex(lines, from);
+  if (idx < 0) throw Error("找不到策略组：" + from);
+
+  // 1. Every group's proxies flow list.
+  for (let i = 0; i < lines.length; i++) {
+    if (!GROUP_FLOW_RE.test(lines[i])) continue;
+    lines[i] = lines[i].replace(/proxies:\s*\[([^\]]*)\]/, (_m, inner) =>
+      "proxies: [" + replaceRef(inner, from, to) + "]");
+  }
+  // 2. Every rule line's TARGET (third comma field). Handles commented rules.
+  for (let i = 0; i < lines.length; i++) {
+    const m = lines[i].match(/^(\s*)(\#\s*)?(-\s*)(GEOSITE|RULE-SET|GEOIP|DOMAIN|IP|MATCH)(,[^,]*,)(\s*)([^,]+)(.*)$/i);
+    if (!m) continue;
+    if (m[7].trim() === from) {
+      lines[i] = m[1] + (m[2] || "") + m[3] + m[4] + m[5] + m[6] + to + m[8];
+    }
+  }
+  // 3. The group's own name field (do this last: groupLineIndex already found it).
+  lines[idx] = lines[idx].replace(
+    /^(\s*-\s*\{name:\s*)([^,}]+)/,
+    (_m, prefix) => prefix + to,
+  );
+}
+
+// Remove a group outright and clear every reference to it: rules that target
+// it are removed, proxies lists drop it. Unlike `remove` (comment-out), this
+// is a real delete used when the user confirms permanent removal.
+function applyGroupRemove(lines, op) {
+  const name = String(op.name || "");
+  const idx = groupLineIndex(lines, name);
+  if (idx < 0) throw Error("找不到策略组：" + name);
+  // Drop the @meta comment directly above, then the group line.
+  const mIdx = metaLineIndex(lines, idx);
+  if (mIdx >= 0) lines[mIdx] = null;
+  lines[idx] = null;
+  // Remove rules targeting this group (whole line).
+  for (let i = 0; i < lines.length; i++) {
+    if (lines[i] == null) continue;
+    const m = lines[i].match(/^\s*(\#\s*)?-\s*(?:GEOSITE|RULE-SET|GEOIP|DOMAIN|IP|MATCH),[^,]*,(\s*)([^,]+)(,.*)?$/i);
+    if (m && m[3].trim() === name) lines[i] = null;
+  }
+  // Drop the reference from every other proxies list.
+  for (let i = 0; i < lines.length; i++) {
+    if (lines[i] == null || !GROUP_FLOW_RE.test(lines[i])) continue;
+    lines[i] = lines[i].replace(/proxies:\s*\[([^\]]*)\]/, (_m, inner) => {
+      const items = inner.split(",").map((s) => s.trim()).filter((s) => s && s !== name);
+      return "proxies: [" + items.join(", ") + "]";
+    });
+  }
+  // Compact away removed lines only after all index-based work is done.
+  for (let i = lines.length - 1; i >= 0; i--) if (lines[i] === null) lines.splice(i, 1);
+}
+
+const GROUP_FLOW_RE = /^\s*-\s*\{/;
 
 const escapeRe = (s) => String(s).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
@@ -231,6 +308,27 @@ function applyGeneral(lines, op) {
   }
 }
 
+function applyAddRegion(lines, op) {
+  const id = String(op.id || "").trim().toUpperCase();
+  if (!/^[A-Z0-9]{2,8}$/.test(id)) throw Error("地区代码需为 2-8 位字母或数字");
+  const value = String(op.filter || "").replace(/'/g, "''");
+  if (!value) throw Error("地区匹配正则不能为空");
+  // FilterRegions is a top-level map of `CODE: &FilterCODE 'regex'`. Append the
+  // new anchor just before the next top-level key after FilterRegions.
+  const start = lines.findIndex((l) => /^FilterRegions\s*:/.test(l));
+  if (start < 0) throw Error("模板缺少 FilterRegions 段");
+  let end = start + 1;
+  while (end < lines.length && !/^\S/.test(lines[end])) end++;
+  // Avoid inserting a duplicate code.
+  for (let i = start + 1; i < end; i++) {
+    if (new RegExp("^\\s*" + id + "\\s*:").test(lines[i]))
+      throw Error("地区代码 " + id + " 已存在");
+  }
+  const anchor = "&Filter" + id;
+  const line = "  " + id + ": " + anchor + " '" + value + "'";
+  lines.splice(end, 0, line);
+}
+
 function applyFilter(lines, op) {
   const id = String(op.id || "");
   const key = id === "all" ? "FilterAll" : id === "others" ? "FilterOthers" : id;
@@ -363,6 +461,7 @@ export function applyTemplateOps(text, ops, parse) {
       case "rule": applyRule(lines, op); break;
       case "rule-remove": applyRuleRemove(lines, op); break;
       case "add-app": applyAddApp(lines, op); break;
+      case "add-region": applyAddRegion(lines, op); break;
       case "general": applyGeneral(lines, op); break;
       case "filter": applyFilter(lines, op); break;
       case "group-props": applyGroupProps(lines, op); break;
@@ -370,6 +469,8 @@ export function applyTemplateOps(text, ops, parse) {
       case "rule-move": applyRuleMove(lines, op); break;
       case "rule-add": applyRuleAdd(lines, op); break;
       case "provider": applyProvider(lines, op); break;
+      case "group-rename": applyGroupRename(lines, op); break;
+      case "group-remove": applyGroupRemove(lines, op); break;
       default: throw Error("未知编辑操作：" + op.kind);
     }
   }

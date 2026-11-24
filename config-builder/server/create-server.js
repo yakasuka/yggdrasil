@@ -1,4 +1,7 @@
 import { timingSafeEqual } from "node:crypto";
+import { readFile } from "node:fs/promises";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { SERVICE_ROUTES } from "../shared/service-routes.js";
 import { SHARE_CODE_RE, shareIncludesProviders } from "../shared/share.js";
 import {
@@ -39,6 +42,15 @@ const KEY_RE = /^[A-Za-z0-9_-]{43}$/;
 const ADMIN_PATH = "/api/admin/configs";
 const FRONTINFO_PATH = "/api/admin/frontinfo";
 const DASHBOARD_PATH = CONFIG_PATH + "/dashboard";
+// Local self-hosted serving of the shared static assets. On Cloudflare Pages
+// these are served natively and this route is never reached, so it is inert
+// in production. It only makes `node server/index.js` render a complete page.
+const ASSET_DIR = resolve(dirname(fileURLToPath(import.meta.url)), "../../assets");
+const ASSET_TYPES = {
+  ".png": "image/png", ".svg": "image/svg+xml", ".ico": "image/x-icon",
+  ".css": "text/css; charset=utf-8", ".js": "text/javascript; charset=utf-8",
+  ".webp": "image/webp", ".jpg": "image/jpeg", ".woff2": "font/woff2",
+};
 
 function aliasFromFilename(filename) {
   // New format: "ratatoskr · <name>.yaml"; legacy: "<name>-ratatoskr.yaml".
@@ -246,6 +258,25 @@ export function createService({
       });
 
     try {
+      // Static assets for local self-hosting (inert behind Cloudflare Pages).
+      if (path.startsWith("/assets/") && ["GET", "HEAD"].includes(method)) {
+        const name = path.slice("/assets/".length);
+        if (/^[A-Za-z0-9._-]+$/.test(name)) {
+          try {
+            const body = await readFile(resolve(ASSET_DIR, name));
+            const ext = name.slice(name.lastIndexOf(".")).toLowerCase();
+            return new Response(body, {
+              status: 200,
+              headers: {
+                "Content-Type": ASSET_TYPES[ext] || "application/octet-stream",
+                "Cache-Control": "public, max-age=3600",
+              },
+            });
+          } catch {
+            // fall through to the normal 404 below
+          }
+        }
+      }
       // Owner-only web dashboard. Same Basic credential as the management API;
       // it is a static shell that fetches data from the admin API itself.
       if (path === DASHBOARD_PATH && ["GET", "HEAD"].includes(method)) {

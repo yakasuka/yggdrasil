@@ -88,10 +88,21 @@ const DASH_ONLY = `
 .dash-rule-list{max-height:460px;overflow:auto;padding-right:4px}
 .dash-rule-list::-webkit-scrollbar{width:6px}
 .dash-rule-list::-webkit-scrollbar-thumb{background:var(--line);border-radius:99px}
-.dash-rule-row{display:flex;align-items:center;gap:8px;padding:9px 12px;margin-bottom:6px;border:1px solid var(--line);border-radius:11px;background:var(--soft);font-size:.75rem}
+.dash-rule-row{display:flex;align-items:center;gap:8px;padding:9px 12px;margin-bottom:6px;border:1px solid var(--line);border-radius:11px;background:var(--soft);font-size:.75rem;transition:border-color .16s var(--ease),background .16s var(--ease)}
+.dash-rule-row:hover{border-color:var(--selected-line)}
 .dash-rule-row.off{opacity:.5}
 .dash-rule-row code{font:12px ui-monospace,SFMono-Regular,Consolas,monospace;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .dash-rule-row .dash-rule-type{flex:0 0 auto;padding:2px 7px;border-radius:6px;background:var(--tint);color:var(--accent);font-size:.625rem;font-weight:600}
+/* Rule parts rendered as tappable references into other blocks. */
+.dash-rule-flow{display:flex;align-items:center;gap:6px;flex:1 1 auto;min-width:0;overflow:hidden}
+.dash-rule-key{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink);font:12px ui-monospace,SFMono-Regular,Consolas,monospace}
+.dash-rule-arrow{flex:0 0 auto;color:var(--muted);font-size:.7rem}
+.dash-ref{flex:0 0 auto;display:inline-flex;align-items:center;gap:4px;max-width:170px;padding:2px 9px;border:1px solid var(--selected-line);border-radius:99px;background:var(--tint);color:var(--accent);font-size:.6875rem;font-weight:600;line-height:1.4;white-space:nowrap;cursor:pointer;transition:background .16s var(--ease)}
+.dash-ref:hover{background:var(--accent);color:var(--surface)}
+.dash-ref span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dash-ref--direct{border-color:var(--line);background:var(--soft);color:var(--muted)}
+.dash-flash{animation:fi-flash 1.5s var(--ease)}
+@keyframes fi-flash{0%,100%{box-shadow:0 0 0 0 transparent}25%,75%{box-shadow:0 0 0 3px var(--tint);border-color:var(--accent)}}
 .dash-spacer{flex:1}
 .dash-modal-card textarea{width:100%;min-height:96px;resize:vertical;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--input);color:var(--ink);font:12px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace;outline:none}
 .dash-modal-card textarea:focus{border-color:var(--selected-line)}
@@ -102,17 +113,33 @@ const DASH_ONLY = `
 .dash-source summary{cursor:pointer;font-size:.8125rem;color:var(--muted)}
 .dash-source textarea{display:block;width:100%;min-height:320px;resize:vertical;margin-top:12px;padding:14px 16px;border:1px solid var(--line);border-radius:14px;background:var(--input);color:var(--ink);font:12px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace;outline:none;tab-size:2}
 .dash-source textarea:focus{border-color:var(--selected-line);box-shadow:0 0 0 3px var(--tint)}
-.dash-modal{position:fixed;inset:0;z-index:20;display:grid;place-items:center;padding:20px;background:#0009;backdrop-filter:blur(6px)}
+/* Secondary editor. Mobile keeps the inline panel above the list; on desktop
+   it becomes a right-side drawer so the list stays visible while editing. */
+.dash-modal{display:block;margin:2px 0 18px}
 .dash-modal[hidden]{display:none}
-.dash-modal-card{width:min(680px,100%);max-height:88vh;overflow:auto;padding:28px 30px;border:1px solid var(--glass-edge);border-radius:22px;background:var(--glass);box-shadow:var(--shadow)}
-.dash-chips{display:flex;flex-wrap:wrap;align-items:center;gap:6px;min-height:44px;padding:7px 9px;border:1px solid var(--line);border-radius:12px;background:var(--input);cursor:text}
+.dash-modal-card{width:100%;padding:22px 24px;border:1px solid var(--selected-line);border-left:3px solid var(--accent);border-radius:14px;background:var(--tint);box-shadow:none;animation:fi-panel-in .22s var(--ease)}
+@keyframes fi-panel-in{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+@media(min-width:900px){
+  .dash-modal{position:fixed;inset:0;z-index:40;display:flex;justify-content:flex-end;margin:0;padding:0;background:rgba(6,8,14,.46);backdrop-filter:blur(3px);animation:fi-scrim-in .2s var(--ease)}
+  .dash-modal[hidden]{display:none}
+  .dash-modal-card{width:min(480px,46vw);height:100%;max-height:none;overflow-y:auto;overscroll-behavior:contain;padding:26px 28px 40px;border:0;border-left:1px solid var(--glass-edge);border-radius:18px 0 0 18px;background:var(--surface);box-shadow:-24px 0 70px -18px #0009;animation:fi-drawer-in .26s var(--ease)}
+  .dash-modal-card::-webkit-scrollbar{width:7px}
+  .dash-modal-card::-webkit-scrollbar-thumb{background:var(--line);border-radius:99px}
+  .dash-modal-card .dialog-header{position:sticky;top:-26px;z-index:2;margin:-26px -28px 6px;padding:22px 28px 14px;background:linear-gradient(var(--surface) 78%,transparent)}
+  .dash-modal-actions{position:sticky;bottom:-40px;margin:26px -28px -40px;padding:14px 28px 20px;background:linear-gradient(transparent,var(--surface) 24%);border-top:1px solid var(--line)}
+}
+@keyframes fi-scrim-in{from{opacity:0}to{opacity:1}}
+@keyframes fi-drawer-in{from{transform:translateX(26px);opacity:.6}to{transform:none;opacity:1}}
+.dash-modal-card .dialog-header{margin-bottom:2px}
+.dash-modal-card .dialog-header h2{font-size:1rem;font-weight:650;color:var(--ink)}
+.dash-chips{display:flex;flex-wrap:wrap;align-content:flex-start;align-items:center;gap:6px;min-height:44px;padding:7px 9px;border:1px solid var(--line);border-radius:12px;background:var(--input);cursor:text}
 .dash-chips:focus-within{border-color:var(--selected-line);box-shadow:0 0 0 3px var(--tint)}
 .dash-chip{display:inline-flex;align-items:center;gap:5px;max-width:100%;height:26px;box-sizing:border-box;padding:4px 5px 4px 10px;border:1px solid var(--selected-line);border-radius:99px;background:var(--tint);color:var(--ink);font-size:.75rem;line-height:1;cursor:grab}
 .dash-chip.dragging{opacity:.4}
 .dash-chip>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:240px}
 .dash-chip button{flex:none;width:17px;height:17px;display:grid;place-items:center;padding:0;border:0;border-radius:50%;background:transparent;color:var(--muted);font-size:.75rem;line-height:1;cursor:pointer}
 .dash-chip button:hover{background:var(--danger-bg);color:var(--danger)}
-.dash-modal-card .dash-chip-input,.dash-chip-input{flex:1 1 90px;width:auto!important;min-width:80px;height:26px;box-sizing:border-box;padding:4px 3px;line-height:1.3;border:0!important;border-radius:0;background:transparent!important;box-shadow:none!important;outline:none;color:var(--ink);font-size:.75rem}
+.dash-modal-card .dash-chip-input,.dash-chip-input{flex:0 1 130px;width:130px!important;min-width:90px;max-width:100%;height:26px;box-sizing:border-box;padding:4px 3px;line-height:1.3;border:0!important;border-radius:0;background:transparent!important;box-shadow:none!important;outline:none;color:var(--ink);font-size:.75rem}
 .dash-chip-input::placeholder{color:var(--muted)}
 .dash-chips .dash-chip-input:focus{border:0;box-shadow:none;background:transparent}
 .dash-modal-card .dialog-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
@@ -129,7 +156,11 @@ const DASH_ONLY = `
 .dash-modal-section{margin:20px 0 2px;padding:6px 0 7px;border-bottom:1px solid var(--line);font-size:.75rem;font-weight:650;color:var(--ink)}
 .dash-chain{margin:2px 0 14px;padding:9px 12px;border-left:2px solid var(--accent);border-radius:0 10px 10px 0;background:var(--soft);color:var(--muted);font-size:.6875rem;line-height:1.7}
 .dash-chain b{color:var(--ink);font-weight:600}
+.dash-chain-label{color:var(--muted);font-weight:600}
 .dash-chain i{font-style:normal;color:var(--accent);padding:0 3px}
+.chain-link{display:inline-flex;align-items:center;padding:1px 7px;border:1px solid var(--line);border-radius:99px;background:var(--surface);color:var(--accent);font-size:.6875rem;line-height:1.5;cursor:pointer;transition:background .16s var(--ease)}
+.chain-link:hover{background:var(--tint);border-color:var(--selected-line)}
+.chain-link--group{font-weight:600}
 .dash-pills{display:flex;flex-wrap:wrap;gap:6px;padding:8px;border:1px solid var(--line);border-radius:11px;background:var(--input)}
 .dash-pillbox{max-height:138px;overflow:auto}
 .dash-pillbox::-webkit-scrollbar{width:6px}
@@ -146,11 +177,25 @@ const DASH_ONLY = `
 .dash-chip .promote:hover{background:var(--tint);color:var(--accent)}
 .rule-link-chip [contenteditable]{overflow:visible;text-overflow:clip;white-space:nowrap;cursor:text;min-width:74px;border-bottom:1px dashed transparent;outline:none}
 .rule-link-chip [contenteditable]:focus{border-bottom-color:var(--accent)}
-/* Wider, landscape-oriented cards so labels never get cramped. */
-#fi-apps.app-grid{grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}
-#fi-apps .app-card{padding:11px 13px;gap:12px}
-#fi-apps .app-card-label{flex:1 1 auto;min-width:0;white-space:normal;overflow:visible;text-overflow:clip;font-size:.8125rem;line-height:1.3}
-#fi-apps .policy-current{max-width:none;flex:0 0 auto}
+/* ---- strategy/app cards: single-line pills, mirroring config-builder ---- */
+#fi-strategies.app-grid,#fi-apps.app-grid{grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:8px}
+
+.dash-group-card{display:flex;align-items:center;gap:9px;padding:7px 11px;min-height:46px;box-sizing:border-box;border:1px solid var(--line);border-radius:999px;background:var(--surface);cursor:pointer;min-width:0;transition:border-color .18s var(--ease),background .18s var(--ease),box-shadow .18s var(--ease)}
+.dash-group-card:hover{border-color:var(--selected-line);background:var(--tint);box-shadow:0 5px 14px -10px #0006}
+.dash-group-order{flex:0 0 auto;width:16px;color:var(--muted);font:11px/1 ui-monospace,SFMono-Regular,Consolas,monospace;text-align:right;opacity:.55}
+.dash-group-card .app-card-icon{flex:0 0 auto;width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;border-radius:9px;background:color-mix(in srgb,var(--surface) 70%,var(--tint));overflow:hidden}
+.dash-group-card .app-card-icon img{width:100%;height:100%;object-fit:contain}
+.dash-group-card .app-card-icon-fallback{font-size:.9rem;font-weight:650;color:var(--accent)}
+.dash-group-title{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.8125rem;font-weight:600;color:var(--ink)}
+.dash-group-tag{flex:0 0 auto;padding:2px 7px;border:1px solid var(--line);border-radius:999px;background:var(--soft);color:var(--muted);font-size:.625rem;line-height:1.4;white-space:nowrap}
+.dash-group-rule-badge{flex:0 0 auto;padding:2px 7px;border-radius:999px;background:var(--soft);color:var(--muted);font-size:.625rem;line-height:1.4;white-space:nowrap}
+.dash-group-exit-value{flex:0 0 auto;display:inline-flex;align-items:center;gap:5px;max-width:42%;padding:3px 9px 3px 6px;border:1px solid color-mix(in srgb,var(--accent) 22%,var(--line));border-radius:999px;background:color-mix(in srgb,var(--accent) 10%,var(--surface));color:color-mix(in srgb,var(--accent) 65%,var(--ink));font-size:.6875rem;font-weight:550;line-height:1.2;pointer-events:none}
+.dash-group-exit-value--type{border-color:var(--line);background:var(--soft);color:var(--muted)}
+.dash-group-exit-glyph{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;width:13px;height:13px;color:var(--accent)}
+.dash-group-exit-value--type .dash-group-exit-glyph{color:var(--muted)}
+.dash-group-exit-glyph svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.dash-group-exit-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dash-group-card .dash-edit-act{flex:0 0 auto;margin-left:1px}
 .dash-choice-grid{grid-template-columns:repeat(auto-fill,minmax(285px,1fr))}
 .dash-modal-actions{display:flex;gap:8px;margin-top:22px;flex-wrap:wrap}
 .dash-modal-actions .spacer{flex:1}
@@ -244,10 +289,10 @@ export function dashboardHTML({
     <p class="intro">配置工坊由一份模板生长而来。<br/>每一处修改，都有自己的去向。</p>
     <nav id="steps" aria-label="前端配置步骤">
       <button class="step-button" data-step="general" aria-current="step" type="button"><span class="step-number">1</span><span><strong>基础设置</strong><small>端口 · 模式 · 控制</small></span></button>
-      <button class="step-button" data-step="apps" type="button"><span class="step-number">2</span><span><strong>应用分流</strong><small>分类 · 图标 · 出口</small></span></button>
-      <button class="step-button" data-step="regions" type="button"><span class="step-number">3</span><span><strong>地区节点</strong><small>旗帜 · 匹配规则</small></span></button>
-      <button class="step-button" data-step="strategy" type="button"><span class="step-number">4</span><span><strong>出口策略</strong><small>测速 · 核心策略组</small></span></button>
-      <button class="step-button" data-step="rules" type="button"><span class="step-number">5</span><span><strong>规则与规则源</strong><small>筛选 · 分流 · 更新</small></span></button>
+      <button class="step-button" data-step="regions" type="button"><span class="step-number">2</span><span><strong>地区节点</strong><small>旗帜 · 匹配规则</small></span></button>
+      <button class="step-button" data-step="strategies" type="button"><span class="step-number">3</span><span><strong>节点策略</strong><small>默认出口 · 自动测速</small></span></button>
+      <button class="step-button" data-step="apps" type="button"><span class="step-number">4</span><span><strong>APP 分流</strong><small>应用出口 · 命中规则</small></span></button>
+      <button class="step-button" data-step="rules" type="button"><span class="step-number">5</span><span><strong>规则补丁</strong><small>命中 · 顺序 · 规则源</small></span></button>
       <button class="step-button" data-step="configs" type="button"><span class="step-number">6</span><span><strong>订阅链接</strong><small>生成与访问权限</small></span></button>
       <span class="step-cursor" aria-hidden="true"><svg viewBox="0 0 20 20" fill="none"><path d="M3 10h12m-5-5 5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
     </nav>
@@ -286,33 +331,31 @@ export function dashboardHTML({
       </details>
     </section>
 
-    <section class="step-panel" data-panel="apps" hidden>
-      <div class="section-label"><span>应用分流</span><small>每个分类一次看清 · 点击卡片编辑</small></div>
-      <div class="toolbar"><input type="search" id="app-search" placeholder="搜索 APP" aria-label="搜索 APP"><span class="muted" id="fi-count">载入中…</span><div class="toolbar-actions"><button class="text-button" id="add-app" type="button">＋ 添加应用</button></div></div>
-      <div class="app-grid dash-editor" id="fi-apps"><span class="muted">载入中…</span></div>
-    </section>
-
     <section class="step-panel" data-panel="regions" hidden>
       <div class="section-label"><span>地区节点</span><small>旗帜 · 显示名 · 匹配规则</small></div>
+      <div class="toolbar"><span class="muted" id="fi-region-count">载入中…</span><div class="toolbar-actions"><button class="text-button" id="add-region" type="button">＋ 添加地区</button></div></div>
       <div class="region-bars dash-editor" id="fi-regions"><span class="muted">载入中…</span></div>
     </section>
 
-    <section class="step-panel" data-panel="strategy" hidden>
-      <div class="section-label"><span>出口策略</span><small>测速 URL · 间隔 · 容差 · 出口顺序</small></div>
-      <div class="choice-grid dash-editor" id="fi-strategies"><span class="muted">载入中…</span></div>
-      <div class="section-label"><span>核心策略组</span><small>入口 · 兜底 · 国内 · 特殊端口</small></div>
-      <div class="dash-choice-grid dash-editor" id="fi-core"><span class="muted">载入中…</span></div>
+    <section class="step-panel" data-panel="strategies" hidden>
+      <div class="section-label"><span>节点策略</span><small>手动切换 · 自动测速 · 核心组 · 按配置顺序</small></div>
+      <div class="toolbar"><input type="search" id="strategy-search" placeholder="搜索策略组" aria-label="搜索策略组"><span class="muted" id="fi-strategy-count">载入中…</span><div class="toolbar-actions"><button class="text-button" id="add-strategy" type="button">＋ 添加策略组</button></div></div>
+      <div class="app-grid dash-editor" id="fi-strategies"><span class="muted">载入中…</span></div>
+    </section>
+
+    <section class="step-panel" data-panel="apps" hidden>
+      <div class="section-label"><span>APP 分流</span><small>应用出口 · 命中规则 · 按配置顺序</small></div>
+      <div class="toolbar"><input type="search" id="app-search" placeholder="搜索应用" aria-label="搜索应用"><span class="muted" id="fi-app-count">载入中…</span><div class="toolbar-actions"><button class="text-button" id="add-app" type="button">＋ 添加应用</button></div></div>
+      <div class="app-grid dash-editor" id="fi-apps"><span class="muted">载入中…</span></div>
     </section>
 
     <section class="step-panel" data-panel="rules" hidden>
       <div class="section-label"><span>节点筛选</span><small>净化 · 其他地区 · 地区正则</small></div>
       <div class="dash-choice-grid dash-editor" id="fi-filters"><span class="muted">载入中…</span></div>
-      <div class="section-label"><span>规则模块</span><small>来自模板声明</small></div>
-      <div class="choice-grid dash-editor" id="fi-rules"><span class="muted">载入中…</span></div>
-      <div class="section-label"><span>分流规则</span><small>顺序决定出口 · 可编辑 / 启停 / 移动</small></div>
-      <div class="toolbar"><span class="muted" id="fi-rule-count">载入中…</span><div class="toolbar-actions"><button class="text-button" id="add-rule" type="button">＋ 添加规则</button></div></div>
+      <div class="section-label"><span>分流规则</span><small>顺序决定出口 · 命中即停 · 可编辑 / 启停 / 移动</small></div>
+      <div class="toolbar"><input type="search" id="rule-target-filter" placeholder="按出口/匹配项筛选规则" aria-label="筛选规则"><span class="muted" id="fi-rule-count">载入中…</span><div class="toolbar-actions"><button class="text-button" id="add-rule" type="button">＋ 添加规则</button></div></div>
       <div class="dash-rule-list" id="fi-rule-list"><span class="muted">载入中…</span></div>
-      <div class="section-label"><span>规则源</span><small>URL · 更新间隔 · 行为</small></div>
+      <div class="section-label"><span>规则源</span><small>规则集 URL · 更新间隔 · 分类 · 点击编辑</small></div>
       <div class="dash-choice-grid dash-editor" id="fi-providers"><span class="muted">载入中…</span></div>
     </section>
 
@@ -324,7 +367,7 @@ export function dashboardHTML({
     <footer class="wizard-footer">
       <button class="button secondary" id="back" type="button">上一步</button>
       <span id="progress-note" class="muted">一处修改，处处生长。</span>
-      <button class="button primary" id="next" type="button" data-target="apps">下一步 <span aria-hidden="true">→</span></button>
+      <button class="button primary" id="next" type="button" data-target="regions">下一步 <span aria-hidden="true">→</span></button>
     </footer>
   </section>
 </main>
@@ -414,6 +457,8 @@ function fallbackCopy(text,done,fail){
 function stamp(value){if(!value)return "—";var d=new Date(value);return isNaN(d.getTime())?String(value):d.toLocaleString("zh-CN",{hour12:false})}
 function esc(value){return String(value==null?"":value).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
 var EDIT_SVG='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4l10-10-4-4L4 16v4Z"/><path d="m13.5 6.5 4 4"/></svg>';
+var ARROW_SVG='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15"/><path d="m13 6 6 6-6 6"/></svg>';
+var TYPE_SVG='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h11M4 17h7"/></svg>';
 
 /* ---- step navigation: same one-category-at-a-time flow as the builder ---- */
 var stepPanels=[].slice.call(document.querySelectorAll(".step-panel"));
@@ -427,13 +472,13 @@ var stepButtons=[].slice.call(document.querySelectorAll(".step-button"));
 var stepActions=document.querySelector(".panel-top .panel-actions");
 var serviceSettings=document.getElementById("service-settings");
 var summaryStrip=document.getElementById("fi-summary");
-var STEP_ORDER=["general","apps","regions","strategy","rules","configs"];
+var STEP_ORDER=["general","regions","strategies","apps","rules","configs"];
 var STEP_META={
   general:{title:"先打好地基。",desc:"端口、运行模式与控制面板。所有修改都会写回 Ratatoskr 模板，保存后配置工坊立即生效。",note:"一处修改，处处生长。"},
-  apps:{title:"每个 APP，都有自己的去向。",desc:"应用按模板分类展示。点击任意卡片即可修改名称、图标、默认出口与关联规则。",note:"分类清晰，去向明确。"},
   regions:{title:"节点去哪里，由你决定。",desc:"编辑地区旗帜、显示名称与匹配正则。修改会同步到对应策略组与分流规则。",note:"地区即路线。"},
-  strategy:{title:"出口，决定每一次连接。",desc:"配置测速 URL、间隔、容差与出口顺序；核心策略组决定入口与兜底。",note:"策略是配置的心脏。"},
-  rules:{title:"让流量各得其所。",desc:"节点筛选、规则模块、分流顺序与规则源都在这里，编辑后立即参与配置生成。",note:"顺序决定出口。"},
+  strategies:{title:"让节点，按你的方式连接。",desc:"手动切换、自动测速与核心策略组：名称（含 Emoji）、图标、出口顺序。改名会自动同步所有引用。",note:"节点策略，是默认出口。"},
+  apps:{title:"每个 APP，都有自己的去向。",desc:"应用策略组：名称（含 Emoji）、图标、分类、出口。命中规则写在卡片折叠区，改名会自动同步所有引用。",note:"APP 分流，挂在策略组上。"},
+  rules:{title:"让流量各得其所。",desc:"规则是附加在策略组上的补丁：命中项、出口、命中顺序与规则源。改名的引用同步会在保存时一次性写回。",note:"规则是挂在策略组上的补丁。"},
   configs:{title:"所有订阅，都在这里。",desc:"点击订阅链接可直接查看内容；也可以复制、删除配置。配置由订阅工坊生成。",note:"配置由订阅工坊生成。"}
 };
 // Same spring cursor as the builder (motion.js), so the pointer before each
@@ -476,6 +521,7 @@ function progressCursor(nav){
 }
 var pointToStep=progressCursor(document.getElementById("steps"));
 function showStep(which){
+  closeModal();
   var i=STEP_ORDER.indexOf(which);
   if(i<0)i=0;
   which=STEP_ORDER[i];
@@ -527,6 +573,27 @@ var modalTitle=document.getElementById("fi-modal-title");
 var modalBody=document.getElementById("fi-modal-body");
 var modalRemove=document.getElementById("fi-modal-remove");
 var editCtx=null;
+// Which list each editor kind belongs to. The inline editor is mounted just
+// before that list, so it reads as a second-level panel of the current step.
+var EDITOR_HOST={general:"fi-general","core-group":"fi-strategies",strategy:"fi-strategies",add:"fi-apps",app:"fi-apps",region:"fi-regions",filter:"fi-filters",rule:"fi-rule-list","add-rule":"fi-rule-list",provider:"fi-providers"};
+function mountEditor(kind,item){
+  var hostId=EDITOR_HOST[kind]||"";
+  // Every group card opens with kind:"group"; route it to the right step by
+  // its classification — apps to APP 分流, everything else to 节点策略.
+  if(kind==="group")hostId=(item&&item.kind==="app")?"fi-apps":"fi-strategies";
+  var host=document.getElementById(hostId||"");
+  if(host&&host.parentNode){
+    host.parentNode.insertBefore(modal,host);
+    // Mobile inline: bring the panel into view. Desktop drawer: it is fixed,
+    // so instead reset its own scroll to the top for each newly opened editor.
+    if(matchMedia("(min-width:900px)").matches){
+      var card=modal.querySelector(".dash-modal-card");
+      if(card)card.scrollTop=0;
+    }else{
+      try{modal.scrollIntoView({behavior:"smooth",block:"center"})}catch(e){}
+    }
+  }
+}
 function fiMsg(text,cls){fiStatus.className="dash-status"+(cls?" "+cls:"");fiStatus.textContent=text||""}
 function summaryStats(s){
   fiSummary.textContent="";
@@ -542,47 +609,71 @@ function iconImg(url,cls,fallback){
   if(url)return '<img class="'+cls+'" src="'+esc(url)+'" alt="" decoding="async" onerror="this.hidden=true">';
   return '<span class="flag" aria-hidden="true">'+esc(fallback||"✳")+'</span>';
 }
-function renderApps(cat){
-  var host=document.getElementById("fi-apps");host.textContent="";
-  var apps=cat.apps||[];
-  var count=document.getElementById("fi-count");
-  if(count)count.textContent=apps.length+" 个应用 · 点击编辑";
-  var groups={};
-  apps.forEach(function(a){(groups[a.category||"其他服务"]=groups[a.category||"其他服务"]||[]).push(a)});
-  Object.keys(groups).forEach(function(catName){
-    var heading=el("div",catName);heading.className="category-heading";heading.setAttribute("data-category",catName);
-    host.appendChild(heading);
-    groups[catName].forEach(function(a){
-      var card=document.createElement("div");
-      card.className="app-card app-card--policy"+(a.entry?" app-card--entry":"");
-      card.setAttribute("role","button");card.tabIndex=0;
-      card.setAttribute("data-app-label",String(a.label||"").toLowerCase());
-      card.setAttribute("aria-label","编辑 "+a.label);
-      var icon=a.icon
-        ? '<img src="'+esc(a.icon)+'" alt="" decoding="async" onerror="this.hidden=true">'
-        : '<span class="app-card-icon-fallback">'+esc(String(a.label||"✳").slice(0,1))+'</span>';
-      card.innerHTML='<span class="app-card-main"><span class="app-card-icon">'+icon+'</span>'+
-        '<span class="app-card-label">'+esc(a.label)+'</span>'+
-        '<span class="policy-current"><span class="policy-current-glyph" aria-hidden="true">⇢</span>'+
-        '<span class="policy-current-label">'+esc(a.firstProxyDirect?"DIRECT":"节点选择")+'</span></span></span>'+
-        (a.entry?'<span class="entry-tag">入口</span>':'')+
-        '<span class="dash-edit-act">'+EDIT_SVG+'</span>';
-      function open(){openEditor({kind:"app",item:a})}
-      card.addEventListener("click",open);
-      card.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();open()}});
-      host.appendChild(card);
+// Unified strategy-group view. Every group is the same entity; kind and
+// category are just labels. Field order on the card matches the editor:
+// name (with emoji) → icon → category → default exit. Inbound rules live in a
+// collapsible details element at the bottom so they never crowd the main fields.
+function renderGroupSet(cat,hostId,countId,kinds,countLabel){
+  var host=document.getElementById(hostId);host.textContent="";
+  var groups=((cat.editorModel&&cat.editorModel.groups)||[]).filter(function(g){return kinds.indexOf(g.kind)>=0});
+  var count=document.getElementById(countId);
+  if(count)count.textContent=groups.length+" "+countLabel+" · 按配置顺序 · 点击编辑";
+  var KIND_LABEL={core:"核心",strategy:"策略",app:"应用",region:"地区"};
+  // Strict YAML order: editorModel.groups is already in template order.
+  // Render as-is top-to-bottom; category/kind shown as a small tag on each card.
+  groups.forEach(function(g,idx){
+    var card=document.createElement("div");
+    card.className="dash-group-card";
+    card.setAttribute("role","button");card.tabIndex=0;
+    card.setAttribute("data-app-label",String(g.name+" "+g.label).toLowerCase());
+    card.setAttribute("aria-label","编辑策略组 "+g.name);
+    var icon=g.icon
+      ? '<img src="'+esc(g.icon)+'" alt="" decoding="async" onerror="this.hidden=true">'
+      : '<span class="app-card-icon-fallback">'+esc(String(g.label||g.name||"✳").slice(0,1))+'</span>';
+    var first=g.proxies&&g.proxies[0];
+    var rules=g.inbound||[];
+    var tag=g.category||KIND_LABEL[g.kind]||"";
+    var tagHtml=tag?'<span class="dash-group-tag">'+esc(tag)+'</span>':'';
+    // Single-line pill: icon + name + category + rule count + exit. Every group
+    // gets one identical exit pill (SVG glyph + value); rule editing lives in
+    // the drawer, so the card just carries a lightweight count badge.
+    var exitValue=first||g.type||"select";
+    var exitGlyph=first?ARROW_SVG:TYPE_SVG;
+    var exit='<span class="dash-group-exit-value'+(first?"":" dash-group-exit-value--type")+'">'+
+      '<span class="dash-group-exit-glyph" aria-hidden="true">'+exitGlyph+'</span>'+
+      '<span class="dash-group-exit-text">'+esc(exitValue)+'</span></span>';
+    var ruleBadge=rules.length?'<span class="dash-group-rule-badge" title="'+rules.length+' 条关联规则">规则 '+rules.length+'</span>':'';
+    card.innerHTML='<span class="dash-group-order">'+(idx+1)+'</span>'+
+      '<span class="app-card-icon">'+icon+'</span>'+
+      '<span class="dash-group-title">'+esc(g.name)+'</span>'+
+      tagHtml+ruleBadge+exit+
+      '<span class="dash-edit-act">'+EDIT_SVG+'</span>';
+    function open(){openEditor({kind:"group",item:g})}
+    card.addEventListener("click",open);
+    card.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();open()}});
+    host.appendChild(card);
+  });
+}
+// Two steps mirror the builder: node strategies (manual/auto/core) and APP
+// routing. Both render the same YAML-ordered group cards, split by kind.
+function renderStrategies(cat){renderGroupSet(cat,"fi-strategies","fi-strategy-count",["core","strategy","region"],"个策略组")}
+function renderApps(cat){renderGroupSet(cat,"fi-apps","fi-app-count",["app"],"个应用")}
+function bindGroupSearch(inputId,hostId){
+  var input=document.getElementById(inputId);
+  if(!input)return;
+  input.addEventListener("input",function(){
+    var q=input.value.trim().toLowerCase();
+    [].forEach.call(document.querySelectorAll("#"+hostId+" .dash-group-card"),function(card){
+      card.hidden=!!q&&(card.getAttribute("data-app-label")||"").indexOf(q)<0;
     });
   });
 }
-var appSearch=document.getElementById("app-search");
-appSearch.addEventListener("input",function(){
-  var q=appSearch.value.trim().toLowerCase();
-  [].forEach.call(document.querySelectorAll("#fi-apps .app-card"),function(card){
-    card.hidden=!!q&&(card.getAttribute("data-app-label")||"").indexOf(q)<0;
-  });
-});
+bindGroupSearch("strategy-search","fi-strategies");
+bindGroupSearch("app-search","fi-apps");
 function renderRegions(cat){
   var host=document.getElementById("fi-regions");host.textContent="";
+  var rc=document.getElementById("fi-region-count");
+  if(rc)rc.textContent=(cat.regions||[]).length+" 个地区 · 按配置顺序 · 点击编辑";
   (cat.regions||[]).forEach(function(r){
     var bar=document.createElement("div");bar.className="region-bar";bar.setAttribute("role","button");bar.tabIndex=0;
     bar.setAttribute("aria-label","编辑地区 "+r.label);
@@ -591,35 +682,6 @@ function renderRegions(cat){
     bar.addEventListener("click",open);
     bar.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();open()}});
     host.appendChild(bar);
-  });
-}
-function renderStrategies(cat){
-  var host=document.getElementById("fi-strategies");host.textContent="";
-  (cat.strategies||[]).forEach(function(s){
-    var c=document.createElement("div");c.className="choice";c.setAttribute("role","button");c.tabIndex=0;
-    c.setAttribute("aria-label","编辑出口策略 "+s.label);
-    c.innerHTML=(s.icon?'<img class="choice-icon" src="'+esc(s.icon)+'" alt="" decoding="async" onerror="this.hidden=true">':'')+
-      '<span><strong>'+esc(s.label)+'</strong><small>'+esc(s.description||s.name)+'</small></span>';
-    var open=function(){openEditor({kind:"strategy",item:s})};
-    c.addEventListener("click",open);
-    c.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();open()}});
-    host.appendChild(c);
-  });
-}
-function renderRules(cat){
-  var host=document.getElementById("fi-rules");host.textContent="";
-  var mods=cat.providerModules||[];
-  if(!mods.length){host.appendChild(el("span","muted","模板未声明规则模块（可在源码中查看）"));return}
-  mods.forEach(function(m){
-    var count=(cat.orderedRules||[]).filter(function(r){return r.module===m.module}).length;
-    var c=document.createElement("div");c.className="choice";
-    c.setAttribute("role","button");c.tabIndex=0;
-    c.setAttribute("aria-label","从 "+m.name+" 添加规则");
-    c.innerHTML='<span><strong>'+esc(m.name)+'</strong><small>'+esc(m.module)+' · '+count+' 条规则 · 点击新增</small></span>';
-    var add=function(){openEditor({kind:"add-rule",preset:{type:"RULE-SET",key:m.module,target:"REJECT",extra:""}})};
-    c.addEventListener("click",add);
-    c.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();add()}});
-    host.appendChild(c);
   });
 }
 function rowCard(title,subtitle,onOpen){
@@ -673,6 +735,22 @@ function renderFilters(cat){
     }));
   });
 }
+// Human-friendly formatting so ordinary users never have to read raw seconds
+// or internal module ids. 28800 -> "8 小时", "proxy-extra" -> "增强代理规则集".
+function humanInterval(sec){
+  var n=Number(sec);
+  if(!n||n<=0)return "不自动更新";
+  if(n%86400===0)return (n/86400)+" 天";
+  if(n%3600===0)return (n/3600)+" 小时";
+  if(n%60===0)return (n/60)+" 分钟";
+  return n+" 秒";
+}
+var MODULE_LABEL={
+  "direct-extra":"增强直连规则集","proxy-extra":"增强代理规则集",
+  "ports":"特殊端口直连","cn":"国内域名","global":"全球域名",
+  "gfw":"受限制域名","game-direct":"国服游戏直连","adguard":"广告拦截"
+};
+function moduleLabel(id){return MODULE_LABEL[id]||id||"—"}
 function ruleParts(rule){
   var parts=String(rule||"").split(",");
   return {type:parts[0]||"GEOSITE",key:parts[1]||"",target:parts[2]||"",extra:parts.slice(3).join(",")};
@@ -685,6 +763,25 @@ function iconButton(symbol,title,onClick,disabled){
   b.textContent=symbol;b.title=title;b.setAttribute("aria-label",title);b.disabled=!!disabled;
   b.addEventListener("click",function(e){e.stopPropagation();onClick()});return b;
 }
+function refChip(text,onClick,clickable){
+  var c=document.createElement("button");c.type="button";
+  c.className="dash-ref"+(clickable?"":" dash-ref--direct");
+  var label=document.createElement("span");label.textContent=text;c.appendChild(label);
+  c.title=clickable?("跳转到 "+text):text;
+  if(clickable)c.addEventListener("click",function(e){e.stopPropagation();onClick()});
+  else c.disabled=true;
+  return c;
+}
+function bindRuleFilter(){
+  var input=document.getElementById("rule-target-filter");if(!input)return;
+  input.addEventListener("input",function(){
+    var q=input.value.trim().toLowerCase();
+    [].slice.call(document.querySelectorAll("#fi-rule-list .dash-rule-row")).forEach(function(row){
+      row.hidden=!!q&&(row.getAttribute("data-rule-text")||"").toLowerCase().indexOf(q)<0;
+    });
+  });
+}
+bindRuleFilter();
 function renderRuleList(cat){
   var host=document.getElementById("fi-rule-list");host.textContent="";
   var rules=(cat.editor&&cat.editor.rules)||[];
@@ -693,8 +790,18 @@ function renderRuleList(cat){
   if(count)count.textContent=enabled+" / "+rules.length+" 条启用 · 自上而下匹配";
   rules.forEach(function(r,index){
     var row=document.createElement("div");row.className="dash-rule-row"+(r.enabled?"":" off");
+    row.setAttribute("data-rule-text",r.rule);
     var type=document.createElement("span");type.className="dash-rule-type";type.textContent=r.type;row.appendChild(type);
-    var code=document.createElement("code");code.textContent=r.rule;code.title=r.rule;row.appendChild(code);
+    // Flow: GEOSITE [openai] → [⚡ OpenAI]. Both ends are references into other blocks.
+    var flow=document.createElement("span");flow.className="dash-rule-flow";
+    var key=document.createElement("span");key.className="dash-rule-key";key.textContent=r.key;flow.appendChild(key);
+    // RULE-SET matchers point at a rule provider; jump there.
+    if(r.type==="RULE-SET"&&r.key)flow.appendChild(refChip(r.key,function(){jumpToProvider(r.key)},false));
+    var arrow=document.createElement("span");arrow.className="dash-rule-arrow";arrow.textContent="→";flow.appendChild(arrow);
+    var isSpecial=(r.target==="DIRECT"||r.target==="REJECT");
+    flow.appendChild(refChip(r.target,function(){if(!isSpecial)jumpToGroup(r.target)},!isSpecial));
+    row.appendChild(flow);
+    row.title=r.rule;
     row.appendChild(iconButton(r.enabled?"◉":"○",r.enabled?"停用":"启用",function(){
       sendOps([{kind:"rule",rule:r.rule,enabled:!r.enabled}]);
     }));
@@ -713,7 +820,10 @@ function renderProviders(cat){
   var host=document.getElementById("fi-providers");host.textContent="";
   (cat.providerModules||[]).forEach(function(m){
     var v=m.value||{};
-    host.appendChild(rowCard(m.name,[v.behavior||"—",(v.interval||"—")+"s",m.module||""].join(" · "),function(){
+    var count=(cat.orderedRules||[]).filter(function(r){return r.module===m.module}).length;
+    // Human-readable subtitle: category label + interval in plain words.
+    var sub=moduleLabel(m.module)+" · 每 "+humanInterval(v.interval)+"更新"+(count?" · "+count+" 条规则":"");
+    host.appendChild(rowCard(m.name,sub,function(){
       openEditor({kind:"provider",item:m});
     }));
   });
@@ -722,8 +832,8 @@ function renderCatalog(cat,summary){
   if(!cat)return;
   state.catalog=cat;
   summaryStats(summary);
-  renderGeneral(cat);renderApps(cat);renderRegions(cat);renderStrategies(cat);renderCore(cat);
-  renderFilters(cat);renderRules(cat);renderRuleList(cat);renderProviders(cat);
+  renderGeneral(cat);renderRegions(cat);renderStrategies(cat);renderApps(cat);
+  renderFilters(cat);renderRuleList(cat);renderProviders(cat);
 }
 function loadFront(){
   fiMsg("读取中…");
@@ -826,7 +936,10 @@ function chipControl(initial,serialize,placeholder,suggestions,markFirst){
       root.insertBefore(chip,box);
     });
   }
-  box.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===","){e.preventDefault();add()}});
+  box.addEventListener("keydown",function(e){
+    if(e.key==="Enter"||e.key===","){e.preventDefault();add()}
+    else if(e.key==="Backspace"&&!box.value&&items.length){e.preventDefault();items.pop();paint();changed()}
+  });
   box.addEventListener("blur",add);
   root.appendChild(box);paint();
   Object.defineProperty(root,"value",{get:function(){return serialize(items)},configurable:true});
@@ -907,15 +1020,46 @@ function ruleChips(target,rules){
       root.insertBefore(chip,box);
     });
   }
-  box.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===","){e.preventDefault();add()}});
+  box.addEventListener("keydown",function(e){
+    if(e.key==="Enter"||e.key===","){e.preventDefault();add()}
+    else if(e.key==="Backspace"&&!box.value){
+      var last=-1;items.forEach(function(it,i){if(!it.removed)last=i});
+      if(last>=0){e.preventDefault();items[last].removed=true;paint();changed()}
+    }
+  });
   box.addEventListener("blur",add);
   root.appendChild(box);paint();
   // Expose the full rule list as a comma-joined string for the save handler.
   Object.defineProperty(root,"value",{get:function(){return items.filter(function(it){return !it.removed}).map(function(it){return it.text}).join("\\n")},configurable:true});
   root._items=items;root._target=target;
+  // Live rename: retarget every rule chip to the new group name. Used by the
+  // group editor so references update in the modal the moment the name changes
+  // (the YAML itself is only written on save, via the cascading group-rename).
+  root._setTarget=function(newTarget){
+    root._target=newTarget;
+    items.forEach(function(it){
+      var parts=it.text.split(",");
+      if(parts.length>=3)parts[2]=newTarget;
+      it.text=parts.join(",");
+    });
+    paint();
+  };
   return root;
 }
-function chainNote(text){var d=el("div");d.className="dash-chain";d.innerHTML=text;modalBody.appendChild(d)}
+function chainHTML(name){
+  return '<span class="dash-chain-label">配置链路</span><i>→</i>'+
+    '<button type="button" class="chain-link" data-jump="rules" data-name="'+esc(name)+'">命中规则</button><i>→</i>'+
+    '<button type="button" class="chain-link chain-link--group" data-jump="group" data-name="'+esc(name)+'">'+esc(name)+' 策略组</button><i>→</i>'+
+    '<button type="button" class="chain-link" data-jump="group" data-name="'+esc(name)+'">出口顺序</button>';
+}
+// One delegated handler for every chain reference inside the editor drawer.
+document.addEventListener("click",function(e){
+  var link=e.target.closest&&e.target.closest(".chain-link");if(!link)return;
+  var kind=link.getAttribute("data-jump");
+  if(kind==="rules"){jumpToRules(link.getAttribute("data-name")||null)}
+  else if(kind==="group"){jumpToGroup(link.getAttribute("data-name")||"")}
+});
+function chainNote(text){var d=el("div");d.className="dash-chain";d.innerHTML=text;modalBody.appendChild(d);return d}
 function modalSection(text){var d=el("div");d.className="dash-modal-section";d.textContent=text;modalBody.appendChild(d)}
 // Translate the rule-chip state into surgical ops: removed -> rule-remove,
 // edited -> rule-text (preserves position), new -> rule-add.
@@ -955,7 +1099,7 @@ function regexChips(value){
   var parts=regexParts(value);
   return chipControl(parts.items,function(items){return parts.prefix+items.join("|")+parts.suffix},"输入关键词或正则片段后回车");
 }
-function hint(text){var p=document.createElement("p");p.className="dash-hint";p.textContent=text;modalBody.appendChild(p)}
+function hint(text){var p=document.createElement("p");p.className="dash-hint";p.textContent=text;modalBody.appendChild(p);return p}
 function groupProps(name){
   var groups=(state.catalog&&state.catalog.editor&&state.catalog.editor.groups)||[];
   return groups.find(function(g){return g.name===name})||{};
@@ -964,15 +1108,97 @@ function rulesForTarget(name){
   var rules=(state.catalog&&state.catalog.editor&&state.catalog.editor.rules)||[];
   return rules.filter(function(r){return r.target===name&&r.enabled!==false}).map(function(r){return r.rule});
 }
-function closeModal(){modal.hidden=true;editCtx=null}
+function closeModal(){modal.hidden=true;editCtx=null;document.body.style.overflow=""}
+// Cross-block navigation. Any rule reference / chain label can jump straight
+// to the owning block, highlight it and open its editor — the whole dashboard
+// behaves as one connected graph instead of isolated lists.
+function flashCard(card){
+  if(!card)return;
+  card.scrollIntoView({behavior:"smooth",block:"center"});
+  card.classList.remove("dash-flash");void card.offsetWidth;card.classList.add("dash-flash");
+}
+function groupStep(name){
+  var g=(state.catalog&&state.catalog.editorModel&&state.catalog.editorModel.groups||[])
+    .find(function(x){return x.name===name});
+  if(!g)return null;
+  return (g.kind==="region")?"regions":(g.kind==="app")?"apps":"strategies";
+}
+function jumpToGroup(name){
+  var step=groupStep(name);if(!step){fiMsg("找不到策略组 "+name,"dash-err");return}
+  showStep(step);
+  var card=[].slice.call(document.querySelectorAll("#"+(step==="regions"?"fi-regions":step==="apps"?"fi-apps":"fi-strategies")+" [aria-label]"))
+    .find(function(c){return (c.getAttribute("aria-label")||"").indexOf(name)>=0});
+  if(card){
+    var self=card;
+    setTimeout(function(){flashCard(self);openEditor({kind:"group",item:(state.catalog.editorModel.groups||[]).find(function(g){return g.name===name})||{name:name}})},60);
+  }
+}
+function jumpToProvider(name){
+  showStep("rules");
+  setTimeout(function(){
+    var card=[].slice.call(document.querySelectorAll("#fi-providers .dash-row-card"))
+      .find(function(c){return (c.textContent||"").indexOf(name)>=0});
+    if(card){flashCard(card);openEditor({kind:"provider",item:(state.catalog.providerModules||[]).find(function(m){return m.name===name})||{name:name,value:{}}})}
+  },60);
+}
+function jumpToRules(target){
+  showStep("rules");
+  var search=document.getElementById("rule-target-filter");
+  if(search){
+    search.value=target||"";search.dispatchEvent(new Event("input"));
+    var card=document.getElementById("fi-rule-list");
+    if(card)setTimeout(function(){flashCard(card)},60);
+  }
+}
+document.addEventListener("keydown",function(e){
+  if(e.key==="Escape"&&!modal.hidden)closeModal();
+});
 function openEditor(ctx){
   editCtx=ctx;
-  var titles={app:"编辑应用",region:"编辑地区",strategy:"编辑出口策略","core-group":"编辑策略组",general:"基础设置",filter:"编辑节点筛选",rule:"编辑分流规则","add-rule":"添加分流规则",provider:"编辑规则源"};
+  var titles={app:"编辑应用",region:"编辑地区",strategy:"编辑出口策略","core-group":"编辑策略组",group:"编辑策略组",general:"基础设置",filter:"编辑节点筛选",rule:"编辑分流规则","add-rule":"添加分流规则",provider:"编辑规则源"};
   modalTitle.textContent=titles[ctx.kind]||"编辑";
   modalBody.textContent="";
   var item=ctx.item||{},f={},cat=state.catalog||{},g=groupProps(item.name);
-  if(ctx.kind==="app"){
-    chainNote("<b>配置链路</b><i>→</i>命中规则（哪些域名走它）<i>→</i><b>"+esc(item.name)+"</b> 策略组<i>→</i>出口顺序（第一项为默认出口）");
+  if(ctx.kind==="group"){
+    // One editor for every strategy group. YAML order preserved: name (with
+    // emoji, edited verbatim) → icon → category → proxies → inbound rules.
+    var oldName=item.name||"";
+    chainNote(chainHTML(oldName));
+    modalSection("① 策略组 · 名称即 Emoji + 文字");
+    f.name=field("名称（含 Emoji，如 ⚡ OpenAI）",input(oldName));appendField(f.name);
+    f.label=field("显示名称",input(item.label));appendField(f.label);
+    f.icon=field("图标 URL",iconInput(item.icon));appendField(f.icon);
+    var catNames=[];if(cat.editorModel&&cat.editorModel.groups)cat.editorModel.groups.forEach(function(x){if(x.category&&catNames.indexOf(x.category)<0)catNames.push(x.category)});
+    if(item.category&&catNames.indexOf(item.category)<0)catNames.unshift(item.category);
+    if(!catNames.length)catNames=["其他服务"];
+    f.category=field("分类",pillSelect(catNames.map(function(c){return [c,c]}),item.category||catNames[0]));appendField(f.category);
+    modalSection("② 出口顺序 · 第一项即默认出口");
+    f.proxies=field("出口列表（拖动排序 / × 删除 / 回车新增）",proxyChips(g.proxies));appendField(f.proxies);
+    hint("第一项就是默认出口；改名时所有指向本组的规则与出口引用会自动同步。");
+    // Advanced knobs kept for auto/core groups so nothing is lost from YAML.
+    if(item.kind==="strategy"||item.kind==="core"){
+      modalSection("③ 高级 · 测速与筛选");
+      if(g.url){f.url=field("测速 URL",input(g.url));appendField(f.url)}
+      if(g.interval!=null&&g.interval!==""){f.interval=field("测速间隔（秒）",input(g.interval,"number"));appendField(f.interval)}
+      if(g.tolerance!=null&&g.tolerance!==""){f.tolerance=field("延迟容差（毫秒）",input(g.tolerance,"number"));appendField(f.tolerance)}
+      if(g.strategy){f.strategy=field("均衡策略",pillSelect([["consistent-hashing","consistent-hashing"],["round-robin","round-robin"]],g.strategy));appendField(f.strategy)}
+      if(g.filter){f.filter=field("节点筛选（可增删芯片）",regexChips(g.filter));appendField(f.filter)}
+    }
+    modalSection((item.kind==="strategy"||item.kind==="core"?"④":"③")+" 关联规则 · 附加在本组上的补丁");
+    f.rules=field("命中规则（点文字改匹配项 / × 删除 / 回车新增）",ruleChips(oldName,item.inbound||[]));appendField(f.rules);
+    var ruleHint=hint("规则是「类型,匹配项,"+esc(oldName)+"」，出口固定为本组；保存时随改名一起级联写回。");
+    var chainEl=modalBody.querySelector(".dash-chain");
+    // Real-time link: renaming the group retargets its rule chips and chain
+    // note in the modal immediately. Nothing is sent until "保存并生效".
+    f.name.addEventListener("input",function(){
+      var nn=f.name.value.trim()||oldName;
+      if(f.rules._setTarget)f.rules._setTarget(nn);
+      if(chainEl)chainEl.innerHTML=chainHTML(nn);
+      if(ruleHint)ruleHint.textContent="规则是「类型,匹配项,"+nn+"」，出口固定为本组；保存时随改名一起级联写回。";
+    });
+    editCtx.meta={oldName:oldName,kind:item.kind};
+  }else if(ctx.kind==="app"){
+    chainNote(chainHTML(item.name));
     var group=(cat.editor&&cat.editor.groups||[]).find(function(x){return x.name===item.name})||{};
     f.rules=field("① 命中规则 · 指向本应用的规则（可编辑）",ruleChips(item.name,item.rules));appendField(f.rules);
     hint("每条规则是「类型,匹配项,"+esc(item.name)+"」，出口已固定为本应用；点文字改匹配项，× 删除，回车新增。");
@@ -994,7 +1220,7 @@ function openEditor(ctx){
     hint("每个芯片是一条正则分支；回车添加、× 删除、拖动排序。");
   }else if(ctx.kind==="strategy"){
     var sTarget=item.name;
-    chainNote("<b>配置链路</b><i>→</i>命中规则（谁指向它）<i>→</i><b>"+esc(sTarget)+"</b> 策略组<i>→</i>出口顺序（第一项为默认）");
+    chainNote(chainHTML(sTarget));
     var sRules=rulesForTarget(sTarget);
     f.rules=field("① 命中规则 · 指向本策略组的规则（可编辑）",ruleChips(sTarget,sRules));appendField(f.rules);
     hint("出口已固定为 "+esc(sTarget)+"；点文字改匹配项，× 删除，回车新增。");
@@ -1010,7 +1236,7 @@ function openEditor(ctx){
     if(g.filter){f.filter=field("节点筛选（可增删芯片）",regexChips(g.filter));appendField(f.filter);hint("筛选正则的每个分支都是独立芯片，可增删排序。")}
   }else if(ctx.kind==="core-group"){
     var cgTarget=g.name;
-    chainNote("<b>配置链路</b><i>→</i>命中规则（谁指向它）<i>→</i><b>"+esc(cgTarget)+"</b> 策略组<i>→</i>出口顺序（第一项为默认）");
+    chainNote(chainHTML(cgTarget));
     var cgRules=rulesForTarget(cgTarget);
     f.rules=field("① 命中规则 · 指向本组的规则（可编辑）",ruleChips(cgTarget,cgRules));appendField(f.rules);
     hint("出口已固定为 "+esc(cgTarget)+"；点文字改匹配项，× 删除，回车新增。");
@@ -1050,16 +1276,21 @@ function openEditor(ctx){
     var v=item.value||{};
     hint("规则源名："+item.name+" · 修改后下一次拉取即生效。");
     f.url=field("规则源 URL",input(v.url));appendField(f.url);
-    f.interval=field("更新间隔（秒）",input(v.interval,"number"));appendField(f.interval);
+    var intervalWrap=input(v.interval,"number");
+    f.interval=field("更新间隔（秒）",intervalWrap);appendField(f.interval);
+    var intervalHint=hint("当前："+humanInterval(v.interval)+"。常用值：5 分钟 = 300 · 1 小时 = 3600 · 8 小时 = 28800 · 1 天 = 86400");
+    intervalWrap.addEventListener("input",function(){intervalHint.textContent="当前：每 "+humanInterval(intervalWrap.value)+"更新一次。常用值：5 分钟 = 300 · 1 小时 = 3600 · 8 小时 = 28800 · 1 天 = 86400"});
     f.behavior=field("行为",pillSelect([["domain","domain"],["classical","classical"],["ipcidr","ipcidr"]],v.behavior));appendField(f.behavior);
     f.format=field("格式",pillSelect([["yaml","yaml"],["text","text"]],v.format||"yaml"));appendField(f.format);
     f.type=field("类型",pillSelect([["http","http"],["file","file"]],v.type||"http"));appendField(f.type);
   }
   editCtx.fields=f;
-  var removable={app:1,region:1,strategy:1,rule:1};
+  var removable={app:1,region:1,strategy:1,group:1,rule:1};
   modalRemove.hidden=!removable[ctx.kind];
   modalRemove.textContent=ctx.kind==="rule"?"删除规则":"移除";
+  mountEditor(ctx.kind,item);
   modal.hidden=false;
+  if(matchMedia("(min-width:900px)").matches)document.body.style.overflow="hidden";
 }
 document.getElementById("fi-modal-close").addEventListener("click",closeModal);
 document.getElementById("fi-modal-cancel").addEventListener("click",closeModal);
@@ -1088,7 +1319,24 @@ function buildOps(){
   var ctx=editCtx,f=ctx.fields,ops=[],item=ctx.item||{};
   var name=ctx.kind==="region"?(item.groupName||item.name):item.name;
   function props(fields){ops.push({kind:"group-props",name:name,fields:fields})}
-  if(ctx.kind==="app"){
+  if(ctx.kind==="group"){
+    // All field edits target the CURRENT name; the rename (if any) is appended
+    // last so it cascades references after those edits have landed.
+    ops=ops.concat(ruleChipsOps(f.rules));
+    ops.push({kind:"meta",name:name,fields:{label:f.label.value.trim(),category:f.category.value}});
+    ops.push({kind:"icon",name:name,value:f.icon.value.trim()});
+    var gp=proxyList(f.proxies.value);
+    if(gp)ops.push({kind:"group-props",name:name,fields:{proxies:gp}});
+    var fields3={};
+    if(f.url&&f.url.value.trim())fields3.url=f.url.value.trim();
+    if(f.interval&&Number(f.interval.value)>0)fields3.interval=Number(f.interval.value);
+    if(f.tolerance&&Number(f.tolerance.value)>0)fields3.tolerance=Number(f.tolerance.value);
+    if(f.strategy)fields3.strategy=f.strategy.value;
+    if(f.filter&&f.filter.value.trim())fields3.filter=f.filter.value.trim();
+    if(Object.keys(fields3).length)ops.push({kind:"group-props",name:name,fields:fields3});
+    var newName=f.name.value.trim();
+    if(newName&&newName!==name)ops.push({kind:"group-rename",from:name,to:newName});
+  }else if(ctx.kind==="app"){
     ops=ops.concat(ruleChipsOps(f.rules));
     ops.push({kind:"meta",name:name,fields:{label:f.label.value.trim(),category:f.category.value}});
     ops.push({kind:"icon",name:name,value:f.icon.value.trim()});
@@ -1151,30 +1399,52 @@ modalRemove.addEventListener("click",function(){
     sendOps([{kind:"rule-remove",rule:editCtx.item.rule}]);return;
   }
   var name=editCtx.kind==="region"?(editCtx.item.groupName||editCtx.item.name):editCtx.item.name;
+  if(editCtx.kind==="group"){
+    if(!window.confirm("从模板中删除策略组 “"+name+"”？所有指向它的规则与出口引用会一起清除。"))return;
+    sendOps([{kind:"group-remove",name:name}]);return;
+  }
   if(!window.confirm("从模板中移除 “"+name+"”？相关规则会一并注释掉。"))return;
   sendOps([{kind:"remove",name:name}]);
 });
 document.getElementById("add-rule").addEventListener("click",function(){
   openEditor({kind:"add-rule"});
 });
-document.getElementById("add-app").addEventListener("click",function(){
-  modalTitle.textContent="添加应用";modalBody.textContent="";
-  var cats=[];if(state.catalog)state.catalog.apps.forEach(function(a){if(cats.indexOf(a.category)<0)cats.push(a.category)});
-  if(!cats.length)cats=["其他服务"];
-  var f={
-    name:field("组名（含 Emoji，如 🧩 Notion）",input("🧩 ")),
-    label:field("显示名称",input("")),
-    icon:field("图标 URL",iconInput("")),
-    category:field("分类",pillSelect(cats.map(function(c){return [c,c]}),cats[0])),
-    rule:field("分流规则（如 GEOSITE,notion,🧩 Notion，可留空）",input(""))
-  };
+function openAddEditor(kind){
+  modalTitle.textContent=kind==="region"?"添加地区":kind==="strategy"?"添加策略组":"添加应用";
+  modalBody.textContent="";
+  var f={};
+  if(kind==="region"){
+    f.id=field("地区代码（2-8 位字母，如 CA）",input(""));
+    f.label=field("显示名称（如 加拿大）",input(""));
+    f.flag=field("旗帜 Emoji（如 🇨🇦）",input(""));
+    f.filter=field("匹配正则（如 (?i)^(?!=>).*(?:🇨🇦|加拿大|Canada)）",input(""));
+    hint("新增地区会在模板的 FilterRegions 段追加一个锚点，地区分组与匹配规则随之生效。");
+  }else{
+    var cats=[];if(state.catalog)state.catalog.apps.forEach(function(a){if(cats.indexOf(a.category)<0)cats.push(a.category)});
+    if(!cats.length)cats=["其他服务"];
+    f.name=field("组名（含 Emoji，如 🧩 Notion）",input("🧩 "));
+    f.label=field("显示名称",input(""));
+    f.icon=field("图标 URL",iconInput(""));
+    f.category=field("分类",pillSelect(cats.map(function(c){return [c,c]}),cats[0]));
+    f.rule=field("分流规则（如 GEOSITE,notion,🧩 Notion，可留空）",input(""));
+  }
   Object.keys(f).forEach(function(k){appendField(f[k])});
-  editCtx={kind:"add",fields:f};modalRemove.hidden=true;modal.hidden=false;
-});
-// The generic apply handler above handles app/region/strategy; add-app needs its own op.
+  editCtx={kind:"add",addKind:kind,fields:f};modalRemove.hidden=true;mountEditor("add",null);modal.hidden=false;
+  if(matchMedia("(min-width:900px)").matches)document.body.style.overflow="hidden";
+}
+document.getElementById("add-app").addEventListener("click",function(){openAddEditor("app")});
+document.getElementById("add-strategy").addEventListener("click",function(){openAddEditor("strategy")});
+document.getElementById("add-region").addEventListener("click",function(){openAddEditor("region")});
+// The generic apply handler above handles app/region/strategy; add-* needs its own ops.
 document.getElementById("fi-modal-apply").addEventListener("click",function(){
   if(!editCtx||editCtx.kind!=="add")return;
-  var f=editCtx.fields;
+  var f=editCtx.fields,kind=editCtx.addKind;
+  if(kind==="region"){
+    var id=f.id.value.trim(),filter=f.filter.value.trim();
+    if(!id||!filter){fiMsg("请填写地区代码与匹配正则","dash-err");return}
+    sendOps([{kind:"add-region",id:id,filter:filter}]);
+    return;
+  }
   var name=f.name.value.trim();
   if(!name){fiMsg("请填写组名","dash-err");return}
   sendOps([{kind:"add-app",name:name,label:f.label.value.trim(),category:f.category.value,icon:f.icon.value.trim(),rule:f.rule.value.trim()}]);

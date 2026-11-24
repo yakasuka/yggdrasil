@@ -400,6 +400,57 @@ export async function catalogFromYaml(text) {
     rules: editorRules,
   };
 
+  // ── Unified editor model ───────────────────────────────────────────────
+  // The dashboard edits ONE entity: the proxy group. "App / region / auto
+  // strategy / core switch" are classifications of a group, not separate
+  // entities. This view flattens every source of truth (group line, @meta,
+  // region filter, inbound rules) into a single row per group so the UI can
+  // render one consistent editor and keep references in sync. Nothing here is
+  // a second source of truth: it is derived from t / groups / editorRules.
+  const regionByGroup = new Map(regionGroups.map((g) => [g.name, (regions.find((r) => r.groupName === g.name) || {})]));
+  const appByGroup = new Map(apps.map((a) => [a.name, a]));
+  const strategyByGroup = new Map(strategies.map((s) => [s.name, s]));
+  const coreNames = new Set(Object.values(core).filter((v) => typeof v === "string"));
+  const inboundByGroup = new Map();
+  for (const r of editorRules) {
+    if (!r.enabled || !r.target) continue;
+    if (!inboundByGroup.has(r.target)) inboundByGroup.set(r.target, []);
+    inboundByGroup.get(r.target).push(r.rule);
+  }
+  const editorModel = {
+    groups: groups.map((g) => {
+      const meta = metaOf(g);
+      const app = appByGroup.get(g.name);
+      const region = regionByGroup.get(g.name);
+      const strategy = strategyByGroup.get(g.name);
+      // One stable classification per group. Order matters: region/core are
+      // structural roles, apps are rule-driven, strategies are auto groups.
+      let kind = "app";
+      if (region && region.filter) kind = "region";
+      else if (coreNames.has(g.name)) kind = "core";
+      else if (strategy) kind = "strategy";
+      return {
+        name: g.name,                    // full name including emoji
+        kind,
+        type: g.type || "select",
+        icon: g.icon || "",
+        label: meta.label || app?.label || region?.label || strategy?.label || stripIcon(g.name),
+        category: meta.category || app?.category || "",
+        flag: meta.flag || region?.flag || "",
+        description: meta.description || strategy?.description || "",
+        proxies: Array.isArray(g.proxies) ? g.proxies.slice() : [],
+        filter: g.filter == null ? "" : String(g.filter),
+        includeAll: !!g["include-all"],
+        url: g.url || "",
+        interval: g.interval ?? "",
+        tolerance: g.tolerance ?? "",
+        strategyValue: g.strategy || "",
+        regionId: region?.id || "",
+        inbound: inboundByGroup.get(g.name) || [],
+      };
+    }),
+  };
+
   const model = {
     schema: 2,
     source: "ratatoskr-template.yaml (derived)",
@@ -420,6 +471,7 @@ export async function catalogFromYaml(text) {
     providerModules,
     moduleMeta,
     editor,
+    editorModel,
   };
   model.version = await hash(JSON.stringify(model));
   return model;

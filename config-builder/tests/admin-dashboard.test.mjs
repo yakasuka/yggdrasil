@@ -99,9 +99,12 @@ test("dashboard uses the builder stylesheet and renders stats as styled chips", 
   assert.match(html, /--glass:/);
   assert.match(html, /class="caustic-hero"/);
   // Every editable part of the template has its own graphical section.
-  ["fi-general", "fi-apps", "fi-regions", "fi-strategies", "fi-core",
-   "fi-filters", "fi-rules", "fi-rule-list", "fi-providers"].forEach((id) =>
+  ["fi-general", "fi-regions", "fi-strategies", "fi-apps",
+   "fi-filters", "fi-rule-list", "fi-providers", "rule-target-filter",
+   "add-region", "add-strategy"].forEach((id) =>
     assert.ok(html.includes('id="' + id + '"'), "dashboard section " + id));
+  // The duplicate "rule modules" block was merged into "rule providers".
+  assert.ok(!html.includes('id="fi-rules"'), "rule modules block removed");
   assert.match(html, /function buildOps/);
   assert.match(html, /kind:"group-props"/);
   assert.match(html, /kind:"provider"/);
@@ -114,14 +117,14 @@ test("dashboard uses the builder stylesheet and renders stats as styled chips", 
 
 test("dashboard groups editable sections into builder-style steps", () => {
   const html = dashboardHTML({ linkBase: "https://x/y" });
-  ["general", "apps", "regions", "strategy", "rules", "configs"].forEach((step) => {
+  ["general", "regions", "strategies", "apps", "rules", "configs"].forEach((step) => {
     assert.ok(html.includes('data-step="' + step + '"'), "step rail: " + step);
     assert.ok(html.includes('data-panel="' + step + '"'), "step panel: " + step);
   });
   assert.match(html, /STEP 01 \/ 06/);
   const main = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)]
     .map((m) => m[1]).find((s) => s.includes("fiText"));
-  assert.match(main, /var STEP_ORDER=\["general","apps","regions","strategy","rules","configs"\]/);
+  assert.match(main, /var STEP_ORDER=\["general","regions","strategies","apps","rules","configs"\]/);
   // Only the active category is on screen, instead of one endless flat list.
   assert.match(main, /p\.hidden=p\.dataset\.panel!==which/);
   assert.match(main, /showStep\("general"\)/);
@@ -143,6 +146,34 @@ test("dashboard uses builder step cursor and modular chip editors", () => {
   // The old step id fell back to "general" and made +添加应用 / +添加规则
   // jump back to the first category. It must never come back.
   assert.ok(!main.includes('showStep("front")'), "no stale step id");
+});
+
+test("dashboard splits node strategies and APP routing into separate steps", () => {
+  const html = dashboardHTML({ linkBase: "https://x/y" });
+  assert.ok(html.includes('id="fi-strategies"'), "strategy grid host present");
+  assert.ok(html.includes('id="fi-apps"'), "app grid host present");
+  assert.ok(html.includes('id="strategy-search"'), "strategy search present");
+  assert.ok(html.includes('id="app-search"'), "app search present");
+  const main = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)]
+    .map((m) => m[1]).find((s) => s.includes("fiText"));
+  assert.match(main, /renderGroupSet\(cat,"fi-strategies","fi-strategy-count",\["core","strategy","region"\]/);
+  assert.match(main, /renderGroupSet\(cat,"fi-apps","fi-app-count",\["app"\]/);
+  assert.match(main, /hostId=\(item&&item\.kind==="app"\)\?"fi-apps":"fi-strategies"/);
+});
+
+test("dashboard editor is a desktop drawer but stays inline on mobile", () => {
+  const html = dashboardHTML({ linkBase: "https://x/y" });
+  // Base rule is the inline panel (mobile); a desktop media query overrides it
+  // into a fixed right-side drawer with a scrim and slide-in animation.
+  assert.match(html, /\.dash-modal\{display:block;margin:2px 0 18px\}/);
+  assert.match(html, /@media\(min-width:900px\)\{[\s\S]*?\.dash-modal\{position:fixed;inset:0/);
+  assert.match(html, /justify-content:flex-end/);
+  assert.match(html, /@keyframes fi-drawer-in/);
+  const main = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)]
+    .map((m) => m[1]).find((s) => s.includes("fiText"));
+  assert.match(main, /matchMedia\("\(min-width:900px\)"\)\.matches/);
+  assert.match(main, /e\.key==="Escape"&&!modal\.hidden/);
+  assert.match(main, /document\.body\.style\.overflow="hidden"/);
 });
 
 test("regex chip parser preserves negative-lookahead wrappers and nested groups", () => {
@@ -308,4 +339,55 @@ test("legacy name+password deletion still works alongside id deletion", async ()
   }));
   assert.equal(legacy.status, 200);
   assert.equal((await (await adminGet(s)).json()).configs.length, 0);
+});
+
+test("chip inputs: even row spacing and Backspace deletes last chip", () => {
+  const html = dashboardHTML({ linkBase: "https://x/y" });
+  const main = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)]
+    .map((m) => m[1]).find((s) => s.includes("chipControl"));
+  // align-content:flex-start stops the browser distributing extra height
+  // between wrapped rows (the "last row spacing" bug) — lives in <style>.
+  assert.match(html, /\.dash-chips\{[^}]*align-content:flex-start/);
+  // Backspace removes the trailing chip when the input is empty, in both the
+  // generic chip control and the rule-chip control.
+  assert.match(main, /e\.key==="Backspace"&&!box\.value&&items\.length/);
+  assert.match(main, /e\.key==="Backspace"&&!box\.value/);
+});
+
+test("intervals read as plain language and module ids are humanised", () => {
+  const html = dashboardHTML({ linkBase: "https://x/y" });
+  const main = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)]
+    .map((m) => m[1]).find((s) => s.includes("humanInterval"));
+  assert.match(main, /function humanInterval/);
+  assert.ok(main.includes('" 小时"') && main.includes('" 分钟"') && main.includes('" 天"'), "friendly units present");
+  assert.match(main, /"proxy-extra":"增强代理规则集"/);
+  // Provider subtitle uses the human interval, never raw "<n>s".
+  assert.ok(main.includes('每 "+humanInterval(v.interval)+"更新'), "subtitle humanised");
+  assert.ok(!main.includes('(v.interval||"—")+"s"'), "raw seconds suffix gone");
+});
+
+test("rule rows are cross-linked references, not dead code text", () => {
+  const html = dashboardHTML({ linkBase: "https://x/y" });
+  const main = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)]
+    .map((m) => m[1]).find((s) => s.includes("renderRuleList"));
+  // Rule targets and RULE-SET matchers render as tappable refs.
+  assert.match(main, /function refChip/);
+  assert.match(main, /appendChild\(refChip\(r\.target/);
+  assert.match(main, /RULE-SET.*jumpToProvider/);
+  // Chain labels in the drawer are clickable and navigate across blocks.
+  assert.match(main, /function chainHTML/);
+  assert.match(main, /data-jump="rules"/);
+  assert.match(main, /function jumpToGroup/);
+  assert.match(main, /function jumpToProvider/);
+  assert.match(main, /function jumpToRules/);
+});
+
+test("all four entity lists expose quick add entry points", () => {
+  const html = dashboardHTML({ linkBase: "https://x/y" });
+  for (const id of ["add-region", "add-strategy", "add-app", "add-rule"])
+    assert.ok(html.includes('id="' + id + '"'), "quick add " + id);
+  const main = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)]
+    .map((m) => m[1]).find((s) => s.includes("openAddEditor"));
+  assert.match(main, /kind:"add-region"/);
+  assert.match(main, /kind:"add-app"/);
 });
