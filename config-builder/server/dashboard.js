@@ -119,6 +119,17 @@ const DASH_ONLY = `
 .dash-modal-card .field label{display:block;margin-bottom:6px;font-size:.75rem;font-weight:550;color:var(--muted)}
 .dash-modal-card input,.dash-modal-card select{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--input);color:var(--ink);font-size:.8125rem;outline:none}
 .dash-modal-card input:focus,.dash-modal-card select:focus{border-color:var(--selected-line)}
+.icon-input{display:flex;align-items:center;gap:10px}
+.icon-input input{flex:1 1 auto;width:auto;min-width:0}
+.icon-input-thumb{flex:0 0 auto;width:42px;height:42px;display:grid;place-items:center;border:1px solid var(--line);border-radius:10px;background:var(--soft);font-size:1.1rem;color:var(--muted)}
+.icon-input-preview{flex:0 0 auto;width:42px;height:42px;display:block;padding:3px;border:1px solid var(--line);border-radius:10px;background:var(--soft);object-fit:contain}
+.icon-input-thumb[hidden],.icon-input-preview[hidden]{display:none}
+/* Wider, landscape-oriented cards so labels never get cramped. */
+#fi-apps.app-grid{grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}
+#fi-apps .app-card{padding:11px 13px;gap:12px}
+#fi-apps .app-card-label{flex:1 1 auto;min-width:0;white-space:normal;overflow:visible;text-overflow:clip;font-size:.8125rem;line-height:1.3}
+#fi-apps .policy-current{max-width:none;flex:0 0 auto}
+.dash-choice-grid{grid-template-columns:repeat(auto-fill,minmax(285px,1fr))}
 .dash-modal-actions{display:flex;gap:8px;margin-top:22px;flex-wrap:wrap}
 .dash-modal-actions .spacer{flex:1}
 .dash-copy{flex:0 0 auto;border:1px solid var(--line);background:var(--soft);color:var(--muted);border-radius:8px;padding:4px 8px;font-size:.6875rem;line-height:1.2;cursor:pointer;display:inline-flex;align-items:center;gap:4px;transition:color 160ms var(--ease),border-color 160ms var(--ease),background 160ms var(--ease)}
@@ -720,6 +731,26 @@ function field(label,control){
 }
 function appendField(control){modalBody.appendChild(control._wrapper||control)}
 function input(value,type){var i=document.createElement("input");i.type=type||"text";i.value=value==null?"":value;return i}
+// Icon URL input with a live thumbnail preview. Returns a wrapper that proxies
+// .value so every existing save handler keeps reading f.icon.value unchanged.
+function iconInput(value){
+  var wrap=el("div");wrap.className="icon-input";
+  var i=input(value);i.placeholder="https://… 图标地址";
+  var thumb=el("span","🖼");thumb.className="icon-input-thumb";
+  var preview=document.createElement("img");preview.className="icon-input-preview";preview.alt="图标预览";
+  function sync(){
+    var url=i.value.trim();
+    if(!url){preview.hidden=true;preview.removeAttribute("src");thumb.hidden=false;return}
+    thumb.hidden=true;preview.hidden=false;preview.src=url;
+  }
+  i.addEventListener("input",sync);sync();
+  preview.addEventListener("error",function(){preview.hidden=true;thumb.hidden=false});
+  preview.addEventListener("load",function(){if(i.value.trim()){preview.hidden=false;thumb.hidden=true}});
+  wrap.appendChild(i);wrap.appendChild(thumb);wrap.appendChild(preview);
+  Object.defineProperty(wrap,"value",{get:function(){return i.value},set:function(v){i.value=v;sync()}});
+  wrap.focus=function(){i.focus()};
+  return wrap;
+}
 function checkbox(value){var i=document.createElement("input");i.type="checkbox";i.checked=!!value;return i}
 function textarea(value){var t=document.createElement("textarea");t.value=value||"";t.spellcheck=false;return t}
 function select(options,value){
@@ -825,7 +856,7 @@ function openEditor(ctx){
   if(ctx.kind==="app"){
     hint("组名："+item.name+" · 改名需到高级 YAML 中操作，以免断开规则引用。");
     f.label=field("显示名称",input(item.label));appendField(f.label);
-    f.icon=field("图标 URL",input(item.icon));appendField(f.icon);
+    f.icon=field("图标 URL",iconInput(item.icon));appendField(f.icon);
     var cats=[];if(cat.apps)cat.apps.forEach(function(a){if(cats.indexOf(a.category)<0)cats.push(a.category)});
     if(cats.indexOf(item.category)<0)cats.unshift(item.category);
     f.category=field("分类",select(cats.map(function(c){return [c,c]}),item.category));appendField(f.category);
@@ -837,14 +868,14 @@ function openEditor(ctx){
     hint("组名："+(item.groupName||item.name));
     f.label=field("显示名称",input(item.label));appendField(f.label);
     f.flag=field("旗帜 Emoji",input(item.flag));appendField(f.flag);
-    f.icon=field("图标 URL",input(item.icon));appendField(f.icon);
+    f.icon=field("图标 URL",iconInput(item.icon));appendField(f.icon);
     f.filter=field("地区匹配项（可增删芯片）",regexChips(item.filter));appendField(f.filter);
     hint("每个芯片是一条正则分支；回车添加、× 删除、拖动排序。");
   }else if(ctx.kind==="strategy"){
     hint("组名："+item.name+" · 类型："+(g.type||item.type));
     f.label=field("显示名称",input(item.label));appendField(f.label);
     f.description=field("说明",input(item.description));appendField(f.description);
-    f.icon=field("图标 URL",input(item.icon));appendField(f.icon);
+    f.icon=field("图标 URL",iconInput(item.icon));appendField(f.icon);
     if(g.url){f.url=field("测速 URL",input(g.url));appendField(f.url)}
     if(g.interval!=null&&g.interval!==""){f.interval=field("测速间隔（秒）",input(g.interval,"number"));appendField(f.interval)}
     if(g.tolerance!=null&&g.tolerance!==""){f.tolerance=field("延迟容差（毫秒）",input(g.tolerance,"number"));appendField(f.tolerance)}
@@ -856,7 +887,7 @@ function openEditor(ctx){
     f.proxies=field("出口顺序（可增删 / 拖动排序）",proxyChips(g.proxies));appendField(f.proxies);
     hint("回车添加出口，× 删除，拖动芯片排序。");
     if(g.filter){f.filter=field("节点筛选（可增删芯片）",regexChips(g.filter));appendField(f.filter);hint("筛选正则的每个分支都是独立芯片，可增删排序。")}
-    if(g.icon){f.icon=field("图标 URL",input(g.icon));appendField(f.icon)}
+    if(g.icon){f.icon=field("图标 URL",iconInput(g.icon));appendField(f.icon)}
     if(g.url){f.url=field("测速 URL",input(g.url));appendField(f.url)}
     if(g.interval!=null&&g.interval!==""){f.interval=field("间隔（秒）",input(g.interval,"number"));appendField(f.interval)}
     if(g.tolerance!=null&&g.tolerance!==""){f.tolerance=field("容差（毫秒）",input(g.tolerance,"number"));appendField(f.tolerance)}
@@ -1001,7 +1032,7 @@ document.getElementById("add-app").addEventListener("click",function(){
   var f={
     name:field("组名（含 Emoji，如 🧩 Notion）",input("🧩 ")),
     label:field("显示名称",input("")),
-    icon:field("图标 URL",input("")),
+    icon:field("图标 URL",iconInput("")),
     category:field("分类",select(cats.map(function(c){return [c,c]}),cats[0])),
     rule:field("分流规则（如 GEOSITE,notion,🧩 Notion，可留空）",input(""))
   };
