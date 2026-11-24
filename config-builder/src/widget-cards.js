@@ -39,7 +39,12 @@ function strategyCard(id, ctx) {
   const s = strategyView().find((x) => x.id === id);
   if (!s) return "";
   const on = s.fixed || ctx.profile.strategies.includes(id);
-  return `<div class="choice${s.fixed ? " fixed" : ""}${on ? " is-on" : ""}"${widgetAttrs("strategy", id, { fixed: !!s.fixed })} data-strategy="${esc(id)}">${s.icon ? `<img class="choice-icon" src="${esc(s.icon)}" alt="" decoding="async" onerror="this.hidden=true">` : ""}<span><strong>${esc(s.name)}</strong>${s.fixed ? `<span class="choice-badge">始终保留</span>` : ""}<small>${esc(s.description)}</small></span>${removeBadge("strategy", id, !!s.fixed)}</div>`;
+  // A broken icon URL falls back to the strategy's leading glyph (like region
+  // flags do) instead of leaving an empty icon slot.
+  const icon = s.icon
+    ? `<img class="choice-icon" src="${esc(s.icon)}" alt="" decoding="async" data-fallback-text="${esc(String(s.name || "✳").slice(0, 1))}" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'choice-icon-fallback',textContent:this.dataset.fallbackText}))">`
+    : "";
+  return `<div class="choice${s.fixed ? " fixed" : ""}${on ? " is-on" : ""}"${widgetAttrs("strategy", id, { fixed: !!s.fixed })} data-strategy="${esc(id)}">${icon}<span><strong>${esc(s.name)}</strong>${s.fixed ? `<span class="choice-badge">始终保留</span>` : ""}<small>${esc(s.description)}</small></span>${removeBadge("strategy", id, !!s.fixed)}</div>`;
 }
 
 // Policy option glyphs, all in the project's crisp inline-SVG icon language.
@@ -88,7 +93,7 @@ function appCard(id, ctx) {
   // current exit as a small persistent pill (glyph + short name), so the
   // routing is visible at a glance without opening the menu. The hidden
   // <select> stays the single data source for the compiler/share pipeline.
-  return `<div class="app-card app-card--policy${a.entry ? " app-card--entry" : ""}" data-app-card="${esc(a.label.toLowerCase())}" data-category-item="${esc(a.category)}"${widgetAttrs("app", id)} data-app="${esc(id)}" data-policy-picker data-policy-trigger role="button" tabindex="0" aria-haspopup="listbox" aria-expanded="false" aria-label="${esc(a.label)} · 默认出口 ${esc(active[1])}"><span class="app-card-main"><span class="app-card-icon">${a.icon ? `<img src="${esc(a.icon)}" alt="" decoding="async" onerror="this.hidden=true">` : `<span class="app-card-icon-fallback" aria-hidden="true">${esc(a.label.slice(0, 1))}</span>`}</span><span class="app-card-label">${esc(a.label)}</span><span class="policy-current" data-policy-current><span class="policy-current-glyph" aria-hidden="true">${active[2]}</span><span class="policy-current-label">${esc(active[1])}</span></span></span><div class="policy-menu" data-policy-menu role="listbox" hidden>${pills}</div><select class="policy-native" data-policy="${esc(id)}" aria-label="${esc(a.label)} 默认出口" tabindex="-1" aria-hidden="true">${options.map(([value, label]) => `<option value="${esc(value)}"${selected(current === value)}>${esc(label)}</option>`).join("")}</select>${removeBadge("app", id)}</div>`;
+  return `<div class="app-card app-card--policy${a.entry ? " app-card--entry" : ""}" data-app-card="${esc(a.label.toLowerCase())}" data-category-item="${esc(a.category)}"${widgetAttrs("app", id)} data-app="${esc(id)}" data-policy-picker data-policy-trigger role="button" tabindex="0" aria-haspopup="listbox" aria-expanded="false" aria-label="${esc(a.label)} · 默认出口 ${esc(active[1])}"><span class="app-card-main"><span class="app-card-icon">${a.icon ? `<img src="${esc(a.icon)}" alt="" decoding="async" data-fallback-text="${esc(a.label.slice(0, 1))}" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'app-card-icon-fallback',textContent:this.dataset.fallbackText}))">` : `<span class="app-card-icon-fallback" aria-hidden="true">${esc(a.label.slice(0, 1))}</span>`}</span><span class="app-card-label">${esc(a.label)}</span><span class="policy-current" data-policy-current><span class="policy-current-glyph" aria-hidden="true">${active[2]}</span><span class="policy-current-label">${esc(active[1])}</span></span></span><div class="policy-menu" data-policy-menu role="listbox" hidden>${pills}</div><select class="policy-native" data-policy="${esc(id)}" aria-label="${esc(a.label)} 默认出口" tabindex="-1" aria-hidden="true">${options.map(([value, label]) => `<option value="${esc(value)}"${selected(current === value)}>${esc(label)}</option>`).join("")}</select>${removeBadge("app", id)}</div>`;
 }
 
 function moduleCard(id, ctx) {

@@ -33,12 +33,20 @@ function visibleCards() {
 }
 
 function isMulti() {
-  return !!panel()?.classList.contains("is-app-multi");
+  // The DOM class alone is not enough: render() replaces #panel.innerHTML but
+  // never the panel element's own classes, so a stale class can outlive the
+  // mode. Require the internal flag too, and self-heal a stale class.
+  if (!state.active && panel()?.classList.contains("is-app-multi")) {
+    panel().classList.remove("is-app-multi");
+  }
+  return !!state.active && !!panel()?.classList.contains("is-app-multi");
 }
 
 function setCardSelected(card, on) {
   card.classList.toggle("is-multi-selected", on);
-  card.setAttribute("aria-selected", String(on));
+  // Cards are role="button": aria-selected is invalid there and screen readers
+  // ignore it. aria-pressed is the correct "toggle button" state.
+  card.setAttribute("aria-pressed", String(on));
 }
 
 function selectedCards() {
@@ -111,12 +119,14 @@ function paintTo(target) {
 function applyExit(value) {
   const selected = selectedCards();
   let first = null;
+  let applied = 0;
   for (const card of selected) {
     const select = card.querySelector("select[data-policy]");
     if (!select || select.value === value) continue;
     select.value = value;
     select.dispatchEvent(new Event("change", { bubbles: true }));
     first = first || card;
+    applied++;
     // Mirror the single-card picker's visual update without opening it.
     const pill = card.querySelector(`[data-policy-option="${CSS.escape(value)}"]`);
     const current = card.querySelector("[data-policy-current]");
@@ -136,7 +146,9 @@ function applyExit(value) {
     }
   }
   refreshCount();
-  return { count: selected.length, changed: !!first };
+  // Report the number actually changed, not the whole selection (which may
+  // already have had this exit set on some cards).
+  return { count: applied, changed: !!first };
 }
 
 // Remove every selected APP from the grid via the widget editor's own removal
@@ -162,13 +174,18 @@ function removeSelected() {
 
 // Bind all document-level delegates once. `api` supplies the host callbacks.
 export function bindMultiSelect(api = {}) {
-  const { onChanged, toast } = api;
+  const { onChanged, toast, onEnter } = api;
 
   document.addEventListener("click", (e) => {
     const toggle = e.target.closest("[data-app-multi]");
     if (toggle) {
       if (isMulti()) exit();
       else {
+        // Batch mode is mutually exclusive with the widget editor's jiggle
+        // mode. Let the host drop edit mode first so the two never coexist
+        // (which caused a single Escape to close both, and cards to keep
+        // wobbling while brushing).
+        onEnter?.();
         enter();
         toast?.("批量选择：拖过 APP 即选中，Ctrl/Cmd+A 全选");
       }
@@ -221,14 +238,21 @@ export function bindMultiSelect(api = {}) {
 
   // Brush selection via pointer. Capture phase so we can pre-empt the card's
   // own click-to-open-menu and the widget editor's long-press timer.
+  // IMPORTANT: a plain click must still toggle one card. If we paintTo() on
+  // pointerdown, the subsequent click handler toggles the same card right back
+  // off (the user sees nothing happen). So the origin card is only added once
+  // the pointer has genuinely moved past the threshold — a real brush stroke.
   document.addEventListener("pointerdown", (e) => {
     if (!isMulti() || e.button !== 0) return;
     const card = e.target.closest("[data-widget][data-app]");
     if (!card || e.target.closest("[data-widget-remove]")) return;
     e.stopPropagation();
+    // Clear any stale suppression left by a prior stroke that ended over a
+    // common ancestor (its synthetic click never reached the card handler).
+    state.suppressClick = false;
     state.painting = true;
     state.stroke.clear();
-    paintTo(card);
+    state.startCard = card;
     state.moved = false;
     state.startX = e.clientX;
     state.startY = e.clientY;
@@ -236,8 +260,11 @@ export function bindMultiSelect(api = {}) {
 
   document.addEventListener("pointermove", (e) => {
     if (!isMulti() || !state.painting) return;
-    if (Math.abs(e.clientX - state.startX) > 6 || Math.abs(e.clientY - state.startY) > 6)
+    if (!state.moved &&
+        (Math.abs(e.clientX - state.startX) > 6 || Math.abs(e.clientY - state.startY) > 6)) {
       state.moved = true;
+      paintTo(state.startCard); // first real movement includes the origin card
+    }
     if (!state.moved) return;
     e.preventDefault();
     paintTo(document.elementFromPoint(e.clientX, e.clientY));
@@ -247,8 +274,13 @@ export function bindMultiSelect(api = {}) {
     if (!state.painting) return;
     state.painting = false;
     // A real brush stroke already selected the touched cards; suppress the
-    // synthetic click so it doesn't toggle the card we started on.
-    if (state.moved) state.suppressClick = true;
+    // synthetic click so it doesn't toggle the card we started on. The flag is
+    // consumed by the click handler below (or cleared on the next pointerdown),
+    // with a same-task timeout as a safety net for clicks landing on ancestors.
+    if (state.moved) {
+      state.suppressClick = true;
+      setTimeout(() => { state.suppressClick = false; }, 0);
+    }
   };
   document.addEventListener("pointerup", endPaint, true);
   document.addEventListener("pointercancel", endPaint, true);
@@ -256,7 +288,16 @@ export function bindMultiSelect(api = {}) {
   document.addEventListener("keydown", (e) => {
     if (!isMulti()) return;
     const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName);
-    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "a" && !typing) {
+    // Keyboard users can toggle the focused APP card with Enter / Space. The
+    // global card-activation handler deliberately bails out in multi mode, so
+    // this is the only keyboard path to select a single card.
+    const focusedCard = e.target.closest?.("[data-widget][data-app]");
+    if (!typing && focusedCard && (e.key === "Enter" || e.key === " ")) {
+      e.preventDefault();
+      const on = !focusedCard.classList.contains("is-multi-selected");
+      setCardSelected(focusedCard, on);
+      refreshCount();
+    } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "a" && !typing) {
       e.preventDefault();
       selectAll();
     } else if (e.key === "Escape") {
@@ -265,14 +306,20 @@ export function bindMultiSelect(api = {}) {
     }
   }, true);
 
-  // Full reset used when navigating away / re-rendering the panel. The panel
-  // innerHTML rebuild already drops the class; this clears the internal flags
-  // so a half-finished brush stroke can't leak into another step.
+  // Full reset used when navigating away / re-rendering the panel. render()
+  // only swaps #panel.innerHTML — it does NOT touch the panel element's own
+  // class list — so we must strip .is-app-multi here or every widget handler
+  // (long-press / remove / library / drag) bails out for the rest of the session
+  // after visiting the APP step in batch mode.
   function reset() {
     state.active = false;
     state.painting = false;
     state.suppressClick = false;
     state.stroke.clear();
+    panel()?.classList.remove("is-app-multi");
+    const b = bar();
+    if (b) b.hidden = true;
+    for (const c of cards()) c.setAttribute("draggable", "true");
   }
 
   return { enter, exit, clearSelection, selectAll, isMulti, applyExit, reset };

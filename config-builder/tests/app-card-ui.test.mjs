@@ -74,3 +74,30 @@ test("batch multi-select module loads and exports its controller", async () => {
   const mod = await import("../src/app-multiselect.js");
   assert.equal(typeof mod.bindMultiSelect, "function");
 });
+
+test("batch mode cannot leak across steps and stays exclusive with the widget editor", async () => {
+  const { readFileSync } = await import("node:fs");
+  const src = readFileSync(new URL("../src/app-multiselect.js", import.meta.url), "utf8");
+  const app = readFileSync(new URL("../src/app.js", import.meta.url), "utf8");
+  // C1: render() only swaps #panel.innerHTML, so reset() must strip the class.
+  assert.match(src, /function reset\(\)[\s\S]*?classList\.remove\("is-app-multi"\)/);
+  // isMulti() double-checks the internal flag so a stale class self-heals.
+  assert.match(src, /if \(!state\.active && panel\(\)\?\.classList\.contains\("is-app-multi"\)\)/);
+  // M1/M2: origin card is painted only after a real move; suppression is reset
+  // on pointerdown and cleared with a timeout safety net.
+  assert.match(src, /paintTo\(state\.startCard\)/);
+  assert.match(src, /state\.suppressClick = false;[\s\S]*?state\.painting = true/);
+  assert.match(src, /setTimeout\(\(\) => \{ state\.suppressClick = false; \}, 0\)/);
+  // M3: entering batch mode asks the host to drop the jiggle editor first.
+  assert.match(src, /onEnter\?\.\(\);/);
+  assert.match(app, /onEnter\(\)[\s\S]*?ctx\.widgetEditing = false/);
+  // M4: keyboard users can toggle the focused card; aria-pressed is used.
+  assert.match(src, /focusedCard[\s\S]*?aria-pressed|setCardSelected\(focusedCard, on\)/);
+  assert.match(src, /setAttribute\("aria-pressed", String\(on\)\)/);
+});
+
+test("broken app/strategy icons fall back to a leading glyph instead of a blank slot", () => {
+  const html = appsPanel(ctx());
+  assert.match(html, /data-fallback-text=/, "icon carries a fallback glyph");
+  assert.match(html, /className:'app-card-icon-fallback'/, "onerror swaps in the fallback span");
+});

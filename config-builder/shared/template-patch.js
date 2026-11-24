@@ -23,8 +23,11 @@
 //   { kind:"rule-move", rule, to:"up"|"down" }
 //   { kind:"rule-add", rule }                // insert before MATCH
 //   { kind:"provider", name, fields }        // rule-providers entry
+//   { kind:"provider-add", name, fields }    // append a new rule source
 //   { kind:"group-rename", from, to }        // rename group + cascade every reference
 //   { kind:"group-remove", name }            // remove group + cascade every reference
+//   { kind:"group-move",   name, to:"up"|"down" } // reorder group + its @meta block
+//   { kind:"group-reorder", order:[name,...] }    // reorder groups to an explicit order
 
 // Replace a whole group name token inside a proxies flow list, preserving the
 // surrounding whitespace/alignment of the author's line.
@@ -425,6 +428,24 @@ function sectionRange(lines, heading) {
   return [start, end];
 }
 
+function applyProviderAdd(lines, op) {
+  const [start, end] = sectionRange(lines, "rule-providers");
+  const name = String(op.name || "").trim();
+  if (!name) throw Error("规则源名不能为空");
+  const exists = lines.some((line, i) =>
+    i > start && i < end && new RegExp("^\\s*" + escapeRe(name) + "\\s*:").test(line));
+  if (exists) throw Error("规则源已存在：" + name);
+  const fields = op.fields || {};
+  if (!fields.url) throw Error("规则源 URL 不能为空");
+  const order = ["type", "format", "behavior", "interval", "url"];
+  const parts = [];
+  for (const key of order) {
+    if (key in fields) parts.push(key + ": " + yamlValue(fields[key], key));
+  }
+  const key = /[:#{}\[\],]/.test(name) ? JSON.stringify(name) : name;
+  lines.splice(end, 0, "  " + key + ": { " + parts.join(", ") + " }");
+}
+
 function applyProvider(lines, op) {
   const [start, end] = sectionRange(lines, "rule-providers");
   const idx = lines.findIndex((line, i) =>
@@ -441,6 +462,118 @@ function applyProvider(lines, op) {
       lines[idx] = lines[idx].replace(/(\{\s*)/, "$1" + key + ": " + yamlValue(value, key) + ", ");
     }
   }
+}
+
+// Move a proxy-group (and its attached @meta comment) one slot up/down in the
+// YAML. The group's flow-map line and its nearest preceding @meta block travel
+// together, so display order — which the dashboard renders straight from YAML
+// — is the single source of truth. Blank lines / section comments between the
+// group and its neighbour are left where they are, i.e. only the group block
+// is swapped with the previous/next group block.
+function applyGroupMove(lines, op) {
+  const name = String(op.name || "");
+  const idx = groupLineIndex(lines, name);
+  if (idx < 0) throw Error("找不到策略组：" + name);
+  const up = op.to !== "down";
+  const dir = up ? -1 : 1;
+
+  // A "block" is the optional @meta comment plus the group line itself.
+  const blockStart = (i) => {
+    const m = metaLineIndex(lines, i);
+    return m >= 0 ? m : i;
+  };
+  const nextGroupLine = (i) => {
+    for (let k = i + dir; k >= 0 && k < lines.length; k += dir) {
+      if (/^\s*-\s*\{/.test(lines[k])) return k;
+    }
+    return -1;
+  };
+
+  const aStart = blockStart(idx);
+  const aEnd = idx; // inclusive
+  const otherLine = nextGroupLine(idx);
+  if (otherLine < 0) return; // already at the boundary of the section
+  const bStart = blockStart(otherLine);
+  const bEnd = otherLine;
+
+  const aBlock = lines.slice(aStart, aEnd + 1);
+  const bBlock = lines.slice(bStart, bEnd + 1);
+  // Move the two contiguous blocks past each other. Work from the higher
+  // index down so the first splice never shifts the second one's indexes.
+  if (up) {
+    // B sits above A; lift A out, then insert it before B.
+    lines.splice(aStart, aBlock.length);
+    lines.splice(bStart, 0, ...aBlock);
+  } else {
+    // A sits above B; lift B out, then insert it before A.
+    lines.splice(bStart, bBlock.length);
+    lines.splice(aStart, 0, ...bBlock);
+  }
+}
+
+// Reorder a SUBSET of proxy-groups into an explicit name order. `op.order` is
+// the target order for the named groups; only the line slots those groups
+// currently occupy are reshuffled. Every other group (and every blank line /
+// section comment) stays exactly where it is — essential because the dashboard
+// sorts one panel at a time while kinds are interleaved in the YAML.
+//
+// Each group line plus its attached @meta comment is one movable "block". We
+// collect the blocks whose names are in `op.order`, and rewrite them into the
+// same set of physical slots in the requested order.
+function applyGroupReorder(lines, op) {
+  const order = Array.isArray(op.order) ? op.order.map(String) : [];
+  if (order.length < 2) return;
+
+  // Identify each group line and the start of its block (@meta included).
+  const groups = [];
+  for (let i = 0; i < lines.length; i++) {
+    if (/^\s*-\s*\{/.test(lines[i])) {
+      const m = metaLineIndex(lines, i);
+      groups.push({ start: m >= 0 ? m : i, end: i, name: groupNameOf(lines[i]) });
+    }
+  }
+  if (!groups.length) return;
+
+  const byName = new Map();
+  groups.forEach((g) => byName.set(g.name, g));
+  // The slots we are allowed to reshuffle = the current positions of the named
+  // groups, in document order. Groups not named are never touched.
+  const wanted = new Set(order);
+  const slots = groups.filter((g) => wanted.has(g.name));
+  if (slots.length < 2) return;
+
+  // Target block sequence: named groups in the requested order (only those
+  // that actually exist), each used once.
+  const seen = new Set();
+  const target = [];
+  order.forEach((n) => {
+    const g = byName.get(n);
+    if (g && wanted.has(n) && !seen.has(n)) { target.push(g); seen.add(n); }
+  });
+  if (target.length !== slots.length) return; // names/slots mismatch: no-op
+
+  const blockOf = new Map();
+  slots.forEach((g) => blockOf.set(g.name, lines.slice(g.start, g.end + 1)));
+  const slotStarts = slots.map((g) => g.start);
+  slots.forEach((g) => { for (let i = g.start; i <= g.end; i++) lines[i] = null; });
+  const out = [];
+  let slotIdx = 0;
+  for (let i = 0; i < lines.length; i++) {
+    if (slotIdx < slotStarts.length && i === slotStarts[slotIdx]) {
+      out.push(...blockOf.get(target[slotIdx].name));
+      slotIdx++;
+      continue;
+    }
+    if (lines[i] !== null) out.push(lines[i]);
+  }
+  lines.length = 0;
+  lines.push(...out);
+}
+
+// Extract the `name:` value from a flow-style group line.
+function groupNameOf(line) {
+  const m = String(line).match(/^\s*-\s*\{name:\s*([^,}]+?)\s*[,}]/);
+  return m ? m[1].trim() : "";
 }
 
 /**
@@ -469,8 +602,11 @@ export function applyTemplateOps(text, ops, parse) {
       case "rule-move": applyRuleMove(lines, op); break;
       case "rule-add": applyRuleAdd(lines, op); break;
       case "provider": applyProvider(lines, op); break;
+      case "provider-add": applyProviderAdd(lines, op); break;
       case "group-rename": applyGroupRename(lines, op); break;
       case "group-remove": applyGroupRemove(lines, op); break;
+      case "group-move": applyGroupMove(lines, op); break;
+      case "group-reorder": applyGroupReorder(lines, op); break;
       default: throw Error("未知编辑操作：" + op.kind);
     }
   }

@@ -133,6 +133,61 @@ test("rule ops edit / move / add / disable a rule in place", async () => {
   assert.equal(removed.editor.rules.length, bundled.editor.rules.length - 1);
 });
 
+test("group-move reorders groups in template order and carries @meta with them", async () => {
+  const names = (cat) => (cat.editorModel.groups || []).map((g) => g.name);
+  const before = names(bundled);
+  const a = "🪐 Anthropic", b = "⚡ OpenAI"; // OpenAI is immediately above Anthropic
+  assert.ok(before.indexOf(a) === before.indexOf(b) + 1, "fixture: Anthropic follows OpenAI");
+
+  // Move Anthropic up one slot -> it should now precede OpenAI.
+  const up = await catalogFromYaml(patch([{ kind: "group-move", name: a, to: "up" }]));
+  const afterUp = names(up);
+  assert.equal(afterUp.indexOf(a) + 1, afterUp.indexOf(b), "Anthropic should now precede OpenAI");
+
+  // Move it back down -> original order restored.
+  const down = await catalogFromYaml(patch([
+    { kind: "group-move", name: a, to: "up" },
+    { kind: "group-move", name: a, to: "down" },
+  ]));
+  assert.deepEqual(names(down), before, "up then down restores the original order");
+
+  // @meta must travel with its group: Anthropic's category stays intact.
+  const anthropic = up.editorModel.groups.find((g) => g.name === a);
+  assert.equal(anthropic.category, "AI 与开发");
+  assert.ok(anthropic.label, "moved group keeps its authored label");
+
+  // Line-level fidelity: no config line is silently dropped.
+  const src = bundled.templateText.split(/\r?\n/).filter((l) => l.trim());
+  const dst = patch([{ kind: "group-move", name: a, to: "up" }]).split(/\r?\n/).filter((l) => l.trim());
+  assert.equal(dst.length, src.length, "group-move must not lose lines");
+});
+
+test("group-reorder reorders a subset in place, leaving other groups and lines untouched", async () => {
+  const groups = (c) => c.editorModel.groups || [];
+  const names = (c) => groups(c).map((g) => g.name);
+  const before = names(bundled);
+  const appNames = groups(bundled).filter((g) => g.kind === "app").map((g) => g.name);
+  assert.ok(appNames.length > 2);
+
+  const out = patch([{ kind: "group-reorder", order: [...appNames].reverse() }]);
+  const after = names(await catalogFromYaml(out));
+
+  // Non-app groups keep their exact index; app groups reverse within their slots.
+  const slots = before.map((n, i) => [n, i]).filter(([n]) => appNames.includes(n)).map(([, i]) => i);
+  const nonAppBefore = before.map((n, i) => [n, i]).filter(([n]) => !appNames.includes(n));
+  const nonAppAfter = after.map((n, i) => [n, i]).filter(([n]) => !appNames.includes(n));
+  assert.deepEqual(nonAppAfter, nonAppBefore, "non-app groups must not move");
+  assert.deepEqual(slots.map((i) => after[i]), [...appNames].reverse(), "apps reverse within their own slots");
+
+  // Line-level fidelity: no line dropped, and @meta travels with its group.
+  const s = bundled.templateText.split(/\r?\n/).filter((l) => l.trim()).length;
+  const d = out.split(/\r?\n/).filter((l) => l.trim()).length;
+  assert.equal(d, s, "reorder must not lose lines");
+  const cat = await catalogFromYaml(out);
+  const oa = cat.editorModel.groups.find((g) => g.name === "⚡ OpenAI");
+  assert.equal(oa.category, "AI 与开发");
+});
+
 test("provider op updates a rule-provider URL and interval", async () => {
   const out = patch([{ kind: "provider", name: "❎ AdGuard", fields: {
     url: "https://example.com/adguard.yaml", interval: 7200,
@@ -142,6 +197,22 @@ test("provider op updates a rule-provider URL and interval", async () => {
   const provider = cat.providerModules.find((p) => p.name === "❎ AdGuard");
   assert.equal(provider.value.url, "https://example.com/adguard.yaml");
   assert.equal(provider.value.interval, 7200);
+});
+
+test("provider-add appends a new rule source", async () => {
+  const out = patch([{ kind: "provider-add", name: "🧩 Custom", fields: {
+    type: "http", format: "yaml", behavior: "domain", interval: 3600,
+    url: "https://example.com/custom.yaml",
+  } }]);
+  const cat = await catalogFromYaml(out);
+  const provider = cat.providerModules.find((p) => p.name === "🧩 Custom");
+  assert.ok(provider, "new provider should be in the catalog");
+  assert.equal(provider.value.url, "https://example.com/custom.yaml");
+  assert.equal(provider.value.interval, 3600);
+  assert.equal(provider.value.behavior, "domain");
+  assert.throws(() => applyTemplateOps(out, [{ kind: "provider-add", name: "🧩 Custom", fields: {
+    url: "https://example.com/custom.yaml",
+  } }], parse), /已存在/);
 });
 
 test("PATCH /api/admin/frontinfo applies ops, persists and returns catalog", async () => {

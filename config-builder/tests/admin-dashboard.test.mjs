@@ -368,6 +368,54 @@ test("chip inputs: even row spacing and Backspace deletes last chip", () => {
   assert.match(main, /e\.key==="Backspace"&&!box\.value/);
 });
 
+test("rule rows use one compact action cluster and drag sorting", () => {
+  const html = dashboardHTML({ linkBase: "https://x/y" });
+  const main = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)]
+    .map((m) => m[1]).find((s) => s.includes("renderRuleList"));
+  // Five scattered controls (◉ ✎ ✕ … ↑ ↓) became one uniform toolbar plus a
+  // drag handle. Reordering still emits rule-move ops, just without extra buttons.
+  assert.match(main, /className="dash-rule-handle"/);
+  assert.match(main, /className="dash-rule-actions"/);
+  assert.doesNotMatch(main, /iconButton\("↑","上移"/);
+  assert.doesNotMatch(main, /iconButton\("↓","下移"/);
+  assert.match(main, /kind:"rule-move"/);
+  assert.match(html, /\.dash-rule-actions\{[^}]*margin-left:auto/);
+  assert.match(html, /长按 ⠿ 进入排序 · 点击整行编辑 · 徽章可跳转/);
+  assert.match(main, /pointerdown/);
+  assert.match(main, /dash-rule-sorting/);
+  // Rule sources can now be created from the dashboard, not only edited.
+  assert.match(html, /id="add-provider"/);
+  assert.match(main, /kind:"provider-add"/);
+  assert.match(main, /"add-provider":"fi-providers"/);
+});
+
+test("iOS Widget board: glass cards, jiggle edit mode, minus badge and drag reorder", () => {
+  const html = dashboardHTML({ linkBase: "https://x/y" });
+  const main = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)]
+    .map((m) => m[1]).find((s) => s.includes("renderGroupSet"));
+  // Reused builder toolbar + re-scoped jiggle/badge signals so the dashboard
+  // card board gets the same Apple look the configurator ships with.
+  assert.match(html, /class="dash-widget-bar widget-editor-bar widget-editor-bar--idle" data-widget-bar/);
+  assert.match(html, /\.dash-widget-board\.is-widget-editing \[data-widget\]\{animation:widget-jiggle/);
+  assert.match(html, /\.widget-badge--remove\.is-armed\{background:#ff9500/);
+  assert.match(html, /\.dash-group-card\{position:relative;isolation:isolate/);
+  // Cards carry the widget contract: enabled-by-presence, draggable, minus badge.
+  assert.match(main, /card\.setAttribute\("data-widget"/);
+  assert.match(main, /card\.setAttribute\("draggable","true"\)/);
+  assert.match(main, /widget-badge widget-badge--remove/);
+  // Long press / 编辑 toggles edit mode; two-tap graphic-badge confirm; sorting
+  // and dragging emit group-move ops so YAML order stays authoritative.
+  assert.match(main, /var LONG_PRESS_MS=420/);
+  assert.match(main, /function setWidgetEditing\(board,on\)/);
+  assert.match(main, /data-widget-enter/);
+  assert.match(main, /data-widget-done/);
+  assert.match(main, /kind:"group-remove",name:rm/);
+  assert.match(main, /kind:"group-reorder",order:order/);
+  assert.match(main, /kind:"group-move",name:ids\[i\],to:"up"/);
+  assert.match(main, /e\.dataTransfer\.setDragImage\(ghost/);
+  assert.match(html, /id="fi-modal"/);
+});
+
 test("intervals read as plain language and module ids are humanised", () => {
   const html = dashboardHTML({ linkBase: "https://x/y" });
   const main = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)]

@@ -86,25 +86,37 @@ const DASH_ONLY = `
 .dash-icon-btn{flex:0 0 auto;width:24px;height:24px;display:grid;place-items:center;padding:0;border:1px solid var(--line);border-radius:7px;background:var(--surface);color:var(--muted);font-size:.75rem;line-height:1;cursor:pointer;transition:color 160ms var(--ease),border-color 160ms var(--ease)}
 .dash-icon-btn:hover{color:var(--accent);border-color:var(--selected-line)}
 .dash-icon-btn:disabled{opacity:.35;cursor:default}
+/* One unified action cluster per rule: drag handle + 3 identical buttons.
+   The old layout scattered 5 controls across the row (3 mid + 2 far right),
+   which read as noise instead of a single toolbar. */
+.dash-rule-handle{flex:0 0 auto;width:18px;height:22px;display:grid;place-items:center;border:1px solid var(--line);border-radius:99px;background:var(--surface);color:var(--muted);font-size:.75rem;line-height:1;opacity:.7;cursor:grab;user-select:none}
+.dash-rule-row.dragging{opacity:.35}
+.dash-rule-row.drop-target{border-color:var(--accent);background:var(--tint)}
+.dash-rule-row.dash-rule-sorting{border-style:dashed;border-color:var(--accent)}
+.dash-rule-actions{display:flex;align-items:center;gap:6px;flex:0 0 auto;margin-left:auto}
+.dash-rule-actions .dash-icon-btn{width:28px;height:22px;border-radius:99px}
+.dash-rule-row:not(.off) .dash-rule-actions .dash-rule-toggle{color:var(--accent);border-color:var(--selected-line)}
+.dash-rule-actions .dash-rule-delete:hover{color:var(--danger);border-color:var(--danger-bg)}
 .dash-rule-list{max-height:460px;overflow:auto;padding-right:4px}
 .dash-rule-list::-webkit-scrollbar{width:6px}
 .dash-rule-list::-webkit-scrollbar-thumb{background:var(--line);border-radius:99px}
-.dash-rule-row{display:flex;align-items:center;gap:8px;padding:9px 12px;margin-bottom:6px;border:1px solid var(--line);border-radius:11px;background:var(--soft);font-size:.75rem;transition:border-color .16s var(--ease),background .16s var(--ease)}
-.dash-rule-row:hover{border-color:var(--selected-line)}
+.dash-rule-row{display:flex;align-items:center;gap:8px;padding:9px 12px;margin-bottom:6px;border:1px solid var(--line);border-radius:11px;background:var(--soft);font-size:.75rem;cursor:pointer;transition:border-color .16s var(--ease),background .16s var(--ease)}
+.dash-rule-row:hover{border-color:var(--selected-line);background:var(--tint)}
 .dash-rule-row.off{opacity:.5}
 .dash-rule-row code{font:12px ui-monospace,SFMono-Regular,Consolas,monospace;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.dash-rule-row .dash-rule-type{flex:0 0 auto;padding:2px 7px;border-radius:6px;background:var(--tint);color:var(--accent);font-size:.625rem;font-weight:600}
+.dash-rule-row .dash-rule-type{flex:0 0 auto;padding:2px 9px;border:1px solid var(--selected-line);border-radius:99px;background:var(--tint);color:var(--accent);font-size:.625rem;font-weight:600}
 /* Rule parts rendered as tappable references into other blocks. */
 .dash-rule-flow{display:flex;align-items:center;gap:6px;flex:1 1 auto;min-width:0;overflow:hidden}
-.dash-rule-key{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink);font:12px ui-monospace,SFMono-Regular,Consolas,monospace}
+.dash-rule-key{flex:0 1 auto;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:2px 8px;border:1px solid var(--line);border-radius:99px;background:var(--surface);color:var(--ink);font:12px ui-monospace,SFMono-Regular,Consolas,monospace}
 .dash-rule-arrow{flex:0 0 auto;color:var(--muted);font-size:.7rem}
 .dash-ref{flex:0 0 auto;display:inline-flex;align-items:center;gap:4px;max-width:170px;padding:2px 9px;border:1px solid var(--selected-line);border-radius:99px;background:var(--tint);color:var(--accent);font-size:.6875rem;font-weight:600;line-height:1.4;white-space:nowrap;cursor:pointer;transition:background .16s var(--ease)}
 .dash-ref:hover{background:var(--accent);color:var(--surface)}
 .dash-ref span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .dash-ref--direct{border-color:var(--line);background:var(--soft);color:var(--muted)}
+.dash-ref-key{max-width:220px;border-color:var(--line);background:var(--surface);color:var(--ink);font:12px ui-monospace,SFMono-Regular,Consolas,monospace;font-weight:400}
+.dash-ref-key:hover{background:var(--tint);border-color:var(--selected-line);color:var(--accent)}
 .dash-flash{animation:fi-flash 1.5s var(--ease)}
 @keyframes fi-flash{0%,100%{box-shadow:0 0 0 0 transparent}25%,75%{box-shadow:0 0 0 3px var(--tint);border-color:var(--accent)}}
-.dash-spacer{flex:1}
 .dash-modal-card textarea{width:100%;min-height:96px;resize:vertical;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--input);color:var(--ink);font:12px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace;outline:none}
 .dash-modal-card textarea:focus{border-color:var(--selected-line)}
 .dash-modal-card .dash-hint{margin:-6px 0 4px;font-size:.6875rem;line-height:1.6;color:var(--muted)}
@@ -179,7 +191,7 @@ const DASH_ONLY = `
 .dash-quick button{padding:3px 9px;border:1px dashed var(--line);border-radius:99px;background:transparent;color:var(--muted);font-size:.6875rem;line-height:1.3;cursor:pointer}
 .dash-quick button:hover{border-color:var(--selected-line);color:var(--accent);background:var(--tint)}
 .dash-chip.default-chip{border-color:var(--accent);background:var(--tint)}
-.dash-chip .default-tag{margin-left:2px;padding:1px 5px;border-radius:99px;background:var(--accent);color:var(--surface);font-size:.5625rem;font-style:normal;font-weight:700;letter-spacing:.02em}
+.dash-chip .default-tag{flex:0 0 auto;display:inline-flex;align-items:center;height:14px;min-height:14px;max-height:14px;margin-left:2px;padding:0 5px;border-radius:99px;background:var(--accent);color:var(--surface);font-size:.5625rem;font-style:normal;font-weight:700;line-height:14px;letter-spacing:.02em}
 .dash-chip .promote{flex:none;width:17px;height:17px;display:grid;place-items:center;padding:0;border:0;border-radius:50%;background:transparent;color:var(--muted);font-size:.7rem;line-height:1;cursor:pointer}
 .dash-chip .promote:hover{background:var(--tint);color:var(--accent)}
 .rule-link-chip [contenteditable]{overflow:visible;text-overflow:clip;white-space:nowrap;cursor:text;min-width:74px;border-bottom:1px dashed transparent;outline:none}
@@ -241,6 +253,40 @@ const DASH_ONLY = `
 .dash-err{color:var(--danger)}
 .dash-ok{color:var(--ok)}
 button.danger{color:var(--danger);border-color:var(--danger-bg)}
+
+/* ---- iOS Widget board, ported from config-builder --------------------------
+   builder ships the Liquid Glass / jiggle / delete-badge CSS in app.css, but
+   scopes the interactive selectors to "#panel". The dashboard's board lives in
+   a different container, so re-scope those signals here and give the group
+   cards the same glass material. The toolbar classes are reused verbatim. */
+.dash-widget-root{position:relative;isolation:isolate;border-radius:24px;padding:2px 0}
+.dash-widget-root::before{content:"";position:absolute;inset:-18px -16px;z-index:-1;pointer-events:none;border-radius:30px;background:radial-gradient(38% 60% at 12% 8%,color-mix(in srgb,var(--glass-wash-1) calc(var(--glass-wash-a) * 100%),transparent),transparent 70%),radial-gradient(42% 66% at 92% 22%,color-mix(in srgb,var(--glass-wash-2) calc(var(--glass-wash-a) * 100%),transparent),transparent 72%),radial-gradient(46% 58% at 62% 96%,color-mix(in srgb,var(--glass-wash-3) calc(var(--glass-wash-a) * 100%),transparent),transparent 74%);filter:blur(6px);opacity:.95}
+.dash-group-card{position:relative;isolation:isolate;border-color:var(--glass-rim);background:linear-gradient(155deg,var(--glass-body),var(--glass-body-2));box-shadow:inset 0 1px 0 #ffffff66,inset 0 -1px 0 #00000010,var(--glass-shadow);overflow:visible}
+.dash-group-card::after{content:"";position:absolute;inset:0;border-radius:inherit;-webkit-backdrop-filter:blur(18px) saturate(170%);backdrop-filter:blur(18px) saturate(170%);background:linear-gradient(118deg,transparent 32%,#ffffff12 48%,transparent 62%);pointer-events:none;z-index:-1}
+:root[data-theme="light"] .dash-group-card{border-color:var(--glass-rim);box-shadow:inset 0 1px 0 #ffffff8f,inset 0 -1px 0 #1d1d1f08,0 1px 2px #1d1d1f0a,var(--glass-shadow)}
+.dash-group-card:hover{border-color:color-mix(in srgb,var(--accent) 45%,var(--glass-rim));box-shadow:inset 0 1px 0 #ffffff88,0 18px 38px -18px #0007}
+/* Jiggle + corner badges: re-scoped from builder's #panel to .dash-widget-board. */
+.dash-widget-board:not(.is-widget-editing) .widget-badge{display:none!important}
+.dash-widget-board.is-widget-editing .widget-badge{display:flex!important}
+.widget-badge--remove.is-armed{background:#ff9500;animation:badge-arm .7s ease-in-out infinite;z-index:6}
+@keyframes badge-arm{0%,100%{transform:scale(1)}50%{transform:scale(1.22)}}
+.dash-widget-board.is-widget-editing [data-widget]{animation:widget-jiggle 260ms ease-in-out infinite!important;will-change:transform}
+.dash-widget-board.is-widget-editing [data-widget]:nth-child(4n+1){animation-delay:-65ms!important}
+.dash-widget-board.is-widget-editing [data-widget]:nth-child(4n+2){animation-delay:-130ms!important}
+.dash-widget-board.is-widget-editing [data-widget]:nth-child(4n+3){animation-delay:-195ms!important}
+.dash-widget-board.is-widget-editing [data-widget]:nth-child(4n){animation-delay:-25ms!important}
+.dash-widget-board.is-widget-editing [data-widget]:hover{animation-play-state:paused!important}
+.dash-widget-board.is-widget-editing [data-widget]{border-style:dashed;border-color:var(--accent)}
+[data-widget][draggable="true"]{cursor:grab}
+[data-widget].is-dragging{opacity:.4;animation:none!important;box-shadow:none}
+.drag-ghost{pointer-events:none!important;z-index:-1!important;box-shadow:0 10px 30px -12px #0006!important}
+.drag-ghost::before,.drag-ghost::after{display:none!important}
+.dash-widget-bar.widget-editor-bar--idle{justify-content:flex-start;gap:10px;background:transparent;border-color:transparent;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;padding:4px 2px 8px;margin:0 0 2px}
+.dash-widget-bar .widget-enter-edit{min-height:32px;padding:0 14px;border-radius:999px;font-size:.8125rem;font-weight:550;cursor:pointer;color:var(--ink);border:1px solid var(--glass-rim);background:linear-gradient(150deg,var(--glass-body),var(--glass-body-2));-webkit-backdrop-filter:blur(12px) saturate(160%);backdrop-filter:blur(12px) saturate(160%)}
+.dash-widget-bar .widget-enter-edit::before{content:"✎";margin-right:6px;color:var(--accent)}
+.dash-widget-bar .widget-sort-button,.dash-widget-bar .widget-jiggle-button{min-height:32px;padding:0 12px;border-radius:999px;font-size:.8125rem;font-weight:550;cursor:pointer;border:1px solid var(--glass-rim);background:color-mix(in srgb,var(--soft) 60%,transparent);color:var(--ink)}
+.dash-widget-bar .widget-sort-button{color:var(--muted)}
+.dash-widget-bar .widget-jiggle-button span{color:var(--accent)}
 @media(max-width:760px){.site-header{padding-inline:14px}.layout{padding:18px 14px 0}.workspace{padding:24px 18px 0}.journey{position:static}}
 `;
 
@@ -339,31 +385,44 @@ export function dashboardHTML({
       </details>
     </section>
 
-    <section class="step-panel" data-panel="regions" hidden>
+    <section class="step-panel dash-widget-board" data-panel="regions" hidden>
       <div class="section-label"><span>地区节点</span><small>旗帜 · 显示名 · 匹配规则</small></div>
+      <div class="dash-widget-bar widget-editor-bar widget-editor-bar--idle" data-widget-bar>
+        <span class="widget-editor-hint">长按卡片，或点“编辑”整理布局</span>
+        <div class="widget-editor-actions"></div>
+      </div>
       <div class="toolbar"><span class="muted" id="fi-region-count">载入中…</span><div class="toolbar-actions"><button class="text-button" id="add-region" type="button">＋ 添加地区</button></div></div>
-      <div class="region-bars dash-editor" id="fi-regions"><span class="muted">载入中…</span></div>
+      <div class="region-bars dash-editor dash-widget-root" id="fi-regions"><span class="muted">载入中…</span></div>
     </section>
 
-    <section class="step-panel" data-panel="strategies" hidden>
+    <section class="step-panel dash-widget-board" data-panel="strategies" hidden>
       <div class="section-label"><span>节点策略</span><small>手动切换 · 自动测速 · 核心组 · 按配置顺序</small></div>
+      <div class="dash-widget-bar widget-editor-bar widget-editor-bar--idle" data-widget-bar>
+        <span class="widget-editor-hint">长按卡片，或点“编辑”整理布局</span>
+        <div class="widget-editor-actions"></div>
+      </div>
       <div class="toolbar"><input type="search" id="strategy-search" placeholder="搜索策略组" aria-label="搜索策略组"><span class="muted" id="fi-strategy-count">载入中…</span><div class="toolbar-actions"><button class="text-button" id="add-strategy" type="button">＋ 添加策略组</button></div></div>
-      <div class="app-grid dash-editor" id="fi-strategies"><span class="muted">载入中…</span></div>
+      <div class="app-grid dash-editor dash-widget-root" id="fi-strategies"><span class="muted">载入中…</span></div>
     </section>
 
-    <section class="step-panel" data-panel="apps" hidden>
+    <section class="step-panel dash-widget-board" data-panel="apps" hidden>
       <div class="section-label"><span>APP 分流</span><small>应用出口 · 命中规则 · 按配置顺序</small></div>
+      <div class="dash-widget-bar widget-editor-bar widget-editor-bar--idle" data-widget-bar>
+        <span class="widget-editor-hint">长按卡片，或点“编辑”整理布局</span>
+        <div class="widget-editor-actions"></div>
+      </div>
       <div class="toolbar"><input type="search" id="app-search" placeholder="搜索应用" aria-label="搜索应用"><span class="muted" id="fi-app-count">载入中…</span><div class="toolbar-actions"><button class="text-button" id="add-app" type="button">＋ 添加应用</button></div></div>
-      <div class="app-grid dash-editor" id="fi-apps"><span class="muted">载入中…</span></div>
+      <div class="app-grid dash-editor dash-widget-root" id="fi-apps"><span class="muted">载入中…</span></div>
     </section>
 
     <section class="step-panel" data-panel="rules" hidden>
       <div class="section-label"><span>节点筛选</span><small>净化 · 其他地区 · 地区正则</small></div>
       <div class="dash-choice-grid dash-editor" id="fi-filters"><span class="muted">载入中…</span></div>
-      <div class="section-label"><span>分流规则</span><small>顺序决定出口 · 命中即停 · 可编辑 / 启停 / 移动</small></div>
+      <div class="section-label"><span>分流规则</span><small>长按 ⠿ 进入排序 · 点击整行编辑 · 徽章可跳转</small></div>
       <div class="toolbar"><input type="search" id="rule-target-filter" placeholder="按出口/匹配项筛选规则" aria-label="筛选规则"><span class="muted" id="fi-rule-count">载入中…</span><div class="toolbar-actions"><button class="text-button" id="add-rule" type="button">＋ 添加规则</button></div></div>
       <div class="dash-rule-list" id="fi-rule-list"><span class="muted">载入中…</span></div>
       <div class="section-label"><span>规则源</span><small>规则集 URL · 更新间隔 · 分类 · 点击编辑</small></div>
+      <div class="toolbar"><span class="muted" id="fi-provider-count">载入中…</span><div class="toolbar-actions"><button class="text-button" id="add-provider" type="button">＋ 添加规则源</button></div></div>
       <div class="dash-choice-grid dash-editor" id="fi-providers"><span class="muted">载入中…</span></div>
     </section>
 
@@ -582,7 +641,7 @@ backButton.addEventListener("click",function(){
 nextButton.addEventListener("click",function(){guardedStep(nextButton.dataset.target)});
 
 /* ---- front-end graphical editor ---- */
-var state={text:"",catalog:null,source:"repository",updatedAt:null};
+var state={text:"",catalog:null,source:"repository",updatedAt:null,originalOrder:null};
 var fiDirty=false;
 var fiSource=document.getElementById("fi-source");
 var fiText=document.getElementById("fi-text");
@@ -595,7 +654,7 @@ var modalRemove=document.getElementById("fi-modal-remove");
 var editCtx=null;
 // Which list each editor kind belongs to. The inline editor is mounted just
 // before that list, so it reads as a second-level panel of the current step.
-var EDITOR_HOST={general:"fi-general","core-group":"fi-strategies",strategy:"fi-strategies",add:"fi-apps",app:"fi-apps",region:"fi-regions",filter:"fi-filters",rule:"fi-rule-list","add-rule":"fi-rule-list",provider:"fi-providers"};
+var EDITOR_HOST={general:"fi-general","core-group":"fi-strategies",strategy:"fi-strategies",add:"fi-apps","add-provider":"fi-providers",app:"fi-apps",region:"fi-regions",filter:"fi-filters",rule:"fi-rule-list","add-rule":"fi-rule-list",provider:"fi-providers"};
 function mountEditor(kind,item){
   var hostId=EDITOR_HOST[kind]||"";
   // Every group card opens with kind:"group"; route it to the right step by
@@ -644,6 +703,10 @@ function renderGroupSet(cat,hostId,countId,kinds,countLabel){
   groups.forEach(function(g,idx){
     var card=document.createElement("div");
     card.className="dash-group-card";
+    // iOS Widget semantics: presence on the board, draggable, minus badge.
+    card.setAttribute("data-widget",g.kind==="app"?"app":"strategy");
+    card.setAttribute("data-id",g.name);
+    card.setAttribute("draggable","true");
     card.setAttribute("role","button");card.tabIndex=0;
     card.setAttribute("data-app-label",String(g.name+" "+g.label).toLowerCase());
     card.setAttribute("aria-label","编辑策略组 "+g.name);
@@ -663,12 +726,14 @@ function renderGroupSet(cat,hostId,countId,kinds,countLabel){
       '<span class="dash-group-exit-glyph" aria-hidden="true">'+exitGlyph+'</span>'+
       '<span class="dash-group-exit-text">'+esc(exitValue)+'</span></span>';
     var ruleBadge=rules.length?'<span class="dash-group-rule-badge" title="'+rules.length+' 条关联规则">规则 '+rules.length+'</span>':'';
-    card.innerHTML='<span class="dash-group-order">'+(idx+1)+'</span>'+
+    var badge='<button type="button" class="widget-badge widget-badge--remove" data-widget-remove="'+esc(g.name)+'" aria-label="移除 '+esc(g.name)+'" tabindex="-1"><span aria-hidden="true"></span></button>';
+    card.innerHTML=badge+
+      '<span class="dash-group-order">'+(idx+1)+'</span>'+
       '<span class="app-card-icon">'+icon+'</span>'+
       '<span class="dash-group-title">'+esc(g.name)+'</span>'+
       tagHtml+ruleBadge+exit+
       '<span class="dash-edit-act">'+EDIT_SVG+'</span>';
-    function open(){openEditor({kind:"group",item:g})}
+    function open(){if(!card.closest(".dash-widget-board").classList.contains("is-widget-editing"))openEditor({kind:"group",item:g})}
     card.addEventListener("click",open);
     card.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();open()}});
     host.appendChild(card);
@@ -678,6 +743,153 @@ function renderGroupSet(cat,hostId,countId,kinds,countLabel){
 // routing. Both render the same YAML-ordered group cards, split by kind.
 function renderStrategies(cat){renderGroupSet(cat,"fi-strategies","fi-strategy-count",["core","strategy","region"],"个策略组")}
 function renderApps(cat){renderGroupSet(cat,"fi-apps","fi-app-count",["app"],"个应用")}
+
+/* ---- iOS Widget edit mode (ported from config-builder) ---------------------
+   Long-press a card (or tap 编辑) toggles a board into its jiggle state: cards
+   wobble, reveal the red minus badge, and can be dragged to reorder. Exiting
+   with 完成 keeps the resulting YAML order. All gestures are delegated on
+   document so they survive the occasional full re-render after a patch. */
+var LONG_PRESS_MS=420,widgetPress=0,widgetPressStart=null,dragName=null,dragFromOrder=null;
+function widgetBoardOf(node){return node&&node.closest?node.closest(".dash-widget-board"):null}
+function renderWidgetBar(board){
+  var bar=board.querySelector("[data-widget-bar]");if(!bar)return;
+  var actions=bar.querySelector(".widget-editor-actions");if(!actions)return;
+  var hint=bar.querySelector(".widget-editor-hint");
+  if(board.classList.contains("is-widget-editing")){
+    bar.classList.remove("widget-editor-bar--idle");
+    if(hint)hint.innerHTML="拖动卡片排序 · 点 <b>−</b> 移除 · 点“完成”结束";
+    actions.innerHTML='<button type="button" class="widget-sort-button" data-widget-sort="alpha" title="按名称排序">A→Z</button>'+
+      '<button type="button" class="widget-sort-button" data-widget-sort="default" title="恢复配置原顺序">原序</button>'+
+      '<button type="button" class="widget-jiggle-button" data-widget-done><span aria-hidden="true">✓</span> 完成</button>';
+  }else{
+    bar.classList.add("widget-editor-bar--idle");
+    if(hint)hint.textContent="长按卡片，或点“编辑”整理布局";
+    actions.innerHTML='<button type="button" class="widget-enter-edit" data-widget-enter>编辑</button>';
+  }
+}
+function setWidgetEditing(board,on){
+  if(!board)return;
+  board.classList.toggle("is-widget-editing",on);
+  [].forEach.call(board.querySelectorAll("[data-widget]"),function(c){if(on)c.setAttribute("draggable","true")});
+  renderWidgetBar(board);
+}
+[].forEach.call(document.querySelectorAll(".dash-widget-board"),renderWidgetBar);
+document.addEventListener("pointerdown",function(e){
+  if(e.button!==0)return;
+  if(e.target.closest("button,input,select,a,.dash-modal"))return;
+  var card=e.target.closest("[data-widget]"),board=widgetBoardOf(card);
+  if(!card||!board||board.classList.contains("is-widget-editing"))return;
+  widgetPressStart={x:e.clientX,y:e.clientY,board:board};
+  clearTimeout(widgetPress);
+  widgetPress=setTimeout(function(){
+    widgetPress=0;if(!widgetPressStart)return;
+    setWidgetEditing(widgetPressStart.board,true);
+    notify("已进入编辑模式：可抖动整理、拖拽排序、点 − 移除");
+  },LONG_PRESS_MS);
+});
+document.addEventListener("pointermove",function(e){
+  if(widgetPressStart&&(Math.abs(e.clientX-widgetPressStart.x)>10||Math.abs(e.clientY-widgetPressStart.y)>10)){
+    clearTimeout(widgetPress);widgetPress=0;widgetPressStart=null;
+  }
+});
+["pointerup","pointercancel"].forEach(function(t){document.addEventListener(t,function(){clearTimeout(widgetPress);widgetPress=0;widgetPressStart=null})});
+document.addEventListener("click",function(e){
+  var btn=e.target.closest("button");if(!btn)return;
+  if(btn.hasAttribute("data-widget-enter")){setWidgetEditing(widgetBoardOf(btn),true);return}
+  if(btn.hasAttribute("data-widget-done")){setWidgetEditing(widgetBoardOf(btn),false);notify("已退出编辑模式");return}
+  var sortBtn=btn.getAttribute("data-widget-sort");
+  if(sortBtn){sortWidgetBoard(widgetBoardOf(btn),sortBtn);return}
+  var rm=btn.getAttribute("data-widget-remove");
+  if(rm){
+    // The minus is a graphic badge, not a text button: armConfirm would replace
+    // its drawn dash with a label and wreck the iOS look. Use a class-based
+    // two-tap confirm that keeps the glyph intact and just recolours the disc.
+    e.preventDefault();e.stopPropagation();
+    if(btn.dataset.armed==="1"){
+      delete btn.dataset.armed;btn.classList.remove("is-armed");
+      sendOps([{kind:"group-remove",name:rm}]);return;
+    }
+    btn.dataset.armed="1";btn.classList.add("is-armed");
+    btn.title="再次点击确认移除";
+    notify("再次点击红色减号以确认移除");
+    clearTimeout(btn._armTimer);
+    btn._armTimer=setTimeout(function(){delete btn.dataset.armed;btn.classList.remove("is-armed");btn.removeAttribute("title")},4000);
+  }
+});
+document.addEventListener("keydown",function(e){
+  if(e.key==="Escape"){
+    [].forEach.call(document.querySelectorAll(".dash-widget-board.is-widget-editing"),function(b){setWidgetEditing(b,false)});
+  }
+});
+function sortWidgetBoard(board,mode){
+  if(!board)return;
+  var grid=board.querySelector(".dash-widget-root");if(!grid)return;
+  var cards=[].slice.call(grid.querySelectorAll("[data-widget]"));if(cards.length<2)return;
+  var order=cards.map(function(c){return c.getAttribute("data-id")});
+  if(mode==="alpha"){
+    var coll=new Intl.Collator("zh-CN",{numeric:true,sensitivity:"base"});
+    order.sort(function(a,b){return coll.compare(a,b)});
+  }else{
+    // "原序": use the snapshot taken at first load. state.catalog is replaced
+    // by every patch, so sorting against it would only restore the last sort.
+    var base=state.originalOrder||[];
+    var rank={};base.forEach(function(n,i){rank[n]=i});
+    order.sort(function(a,b){return (rank[a]!=null?rank[a]:1e9)-(rank[b]!=null?rank[b]:1e9)});
+  }
+  // One atomic reorder op: only this panel's card slots are reshuffled, so
+  // other panels' groups keep their exact positions even though kinds are
+  // interleaved in the YAML. group-reorder is deterministic and lossless.
+  var changed=order.some(function(n,i){return n!==cards[i].getAttribute("data-id")});
+  if(changed)sendOps([{kind:"group-reorder",order:order}]);
+}
+function swap(a,i,j){var t=a[i];a[i]=a[j];a[j]=t}
+// Drag-to-reorder: HTML5 DnD with a clean rounded ghost, like builder.
+document.addEventListener("dragstart",function(e){
+  var card=e.target.closest&&e.target.closest("[data-widget]");if(!card)return;
+  var board=widgetBoardOf(card);
+  if(!board||!board.classList.contains("is-widget-editing")){e.preventDefault();return}
+  dragName=card.getAttribute("data-id");
+  // Snapshot the pre-drag DOM order (the dragover handler mutates the DOM
+  // live), so drop can compute a minimal run of group-move ops from it.
+  dragFromOrder=[].slice.call(card.parentNode.querySelectorAll("[data-widget]"))
+    .map(function(c){return c.getAttribute("data-id")});
+  e.dataTransfer.effectAllowed="move";e.dataTransfer.setData("text/plain",dragName);
+  card.classList.add("is-dragging");
+  var ghost=card.cloneNode(true);ghost.classList.remove("is-dragging");ghost.classList.add("drag-ghost");
+  ghost.removeAttribute("id");ghost.style.position="fixed";ghost.style.top="-10000px";ghost.style.left="-10000px";
+  ghost.style.width=card.offsetWidth+"px";ghost.style.margin="0";
+  document.body.appendChild(ghost);
+  e.dataTransfer.setDragImage(ghost,card.offsetWidth/2,card.offsetHeight/2);
+  setTimeout(function(){ghost.remove()},0);
+});
+document.addEventListener("dragover",function(e){
+  if(!dragName)return;
+  var hovered=e.target.closest&&e.target.closest("[data-widget]");if(!hovered)return;
+  e.preventDefault();
+  var dragEl=document.querySelector("[data-widget].is-dragging");
+  if(!dragEl||dragEl===hovered)return;
+  var rect=hovered.getBoundingClientRect();
+  var after=e.clientX>rect.left+rect.width/2||e.clientY>rect.top+rect.height/2;
+  hovered.parentNode.insertBefore(dragEl,after?hovered.nextSibling:hovered);
+});
+document.addEventListener("drop",function(e){
+  if(!dragName)return;e.preventDefault();
+  var grid=e.target.closest&&e.target.closest(".dash-widget-root");if(!grid)return;
+  var ids=[].slice.call(grid.querySelectorAll("[data-widget]")).map(function(c){return c.getAttribute("data-id")});
+  // Start from the exact pre-drag order so the ops describe only this gesture.
+  var cur=(dragFromOrder||ids).slice();
+  var ops=[];
+  for(var i=0;i<ids.length;i++){
+    var at=cur.indexOf(ids[i]);if(at<0)continue;
+    while(at>i){ops.push({kind:"group-move",name:ids[i],to:"up"});swap(cur,at,at-1);at--}
+  }
+  dragName=null;dragFromOrder=null;
+  if(ops.length)sendOps(ops);else renderCatalog(state.catalog,null);
+});
+document.addEventListener("dragend",function(){
+  [].forEach.call(document.querySelectorAll("[data-widget].is-dragging"),function(c){c.classList.remove("is-dragging")});
+  dragName=null;
+});
 function bindGroupSearch(inputId,hostId){
   var input=document.getElementById(inputId);
   if(!input)return;
@@ -695,10 +907,16 @@ function renderRegions(cat){
   var rc=document.getElementById("fi-region-count");
   if(rc)rc.textContent=(cat.regions||[]).length+" 个地区 · 按配置顺序 · 点击编辑";
   (cat.regions||[]).forEach(function(r){
-    var bar=document.createElement("div");bar.className="region-bar";bar.setAttribute("role","button");bar.tabIndex=0;
+    var bar=document.createElement("div");bar.className="region-bar";
+    bar.setAttribute("data-widget","region");bar.setAttribute("data-id",r.groupName||r.name);
+    bar.setAttribute("draggable","true");
+    bar.setAttribute("role","button");bar.tabIndex=0;
     bar.setAttribute("aria-label","编辑地区 "+r.label);
-    bar.innerHTML=iconImg(r.icon,"region-flag",r.flag)+'<span class="region-name">'+esc(r.label)+'</span>';
-    var open=function(){openEditor({kind:"region",item:r})};
+    // Regions are anchored FilterRegions params; removing one is not a safe
+    // cascade, so they get a neutral lock badge instead of a delete minus.
+    var badge='<span class="widget-badge widget-badge--fixed" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.4"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span>';
+    bar.innerHTML=badge+iconImg(r.icon,"region-flag",r.flag)+'<span class="region-name">'+esc(r.label)+'</span>';
+    var open=function(){if(!bar.closest(".dash-widget-board").classList.contains("is-widget-editing"))openEditor({kind:"region",item:r})};
     bar.addEventListener("click",open);
     bar.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();open()}});
     host.appendChild(bar);
@@ -808,37 +1026,108 @@ function renderRuleList(cat){
   var enabled=rules.filter(function(r){return r.enabled}).length;
   var count=document.getElementById("fi-rule-count");
   if(count)count.textContent=enabled+" / "+rules.length+" 条启用 · 自上而下匹配";
+  // Builder-style long press arms sorting; a plain click still opens the editor.
+  var pressTimer=null,pressPoint=null;
+  function cancelPress(){clearTimeout(pressTimer);pressTimer=null;pressPoint=null}
   rules.forEach(function(r,index){
     var row=document.createElement("div");row.className="dash-rule-row"+(r.enabled?"":" off");
     row.setAttribute("data-rule-text",r.rule);
+    row.tabIndex=0;
+    row.title=r.rule+" · 点击编辑 · 拖动排序";
+    // One small handle replaces the old ↑/↓ pair; the whole row is draggable.
+    var handle=document.createElement("span");handle.className="dash-rule-handle";handle.textContent="⠿";handle.title="拖动排序";row.appendChild(handle);
     var type=document.createElement("span");type.className="dash-rule-type";type.textContent=r.type;row.appendChild(type);
     // Flow: GEOSITE [openai] → [⚡ OpenAI]. Both ends are references into other blocks.
     var flow=document.createElement("span");flow.className="dash-rule-flow";
-    var key=document.createElement("span");key.className="dash-rule-key";key.textContent=r.key;flow.appendChild(key);
-    // RULE-SET matchers point at a rule provider; jump there.
-    if(r.type==="RULE-SET"&&r.key)flow.appendChild(refChip(r.key,function(){jumpToProvider(r.key)},false));
+    // One badge per part. Matcher is clickable: RULE-SET jumps to its rule
+    // source, every other type jumps into the rule list filtered by that key.
+    var keyRef=refChip(r.key,function(){
+      if(r.type==="RULE-SET")jumpToProvider(r.key);else jumpToRules(r.key);
+    },!!r.key);
+    keyRef.classList.add("dash-ref-key");
+    keyRef.title=(r.type==="RULE-SET"?"跳转到规则源 ":"筛选匹配项 ")+r.key;
+    flow.appendChild(keyRef);
     var arrow=document.createElement("span");arrow.className="dash-rule-arrow";arrow.textContent="→";flow.appendChild(arrow);
     var isSpecial=(r.target==="DIRECT"||r.target==="REJECT");
     flow.appendChild(refChip(r.target,function(){if(!isSpecial)jumpToGroup(r.target)},!isSpecial));
     row.appendChild(flow);
-    row.title=r.rule;
-    row.appendChild(iconButton(r.enabled?"◉":"○",r.enabled?"停用":"启用",function(){
+    // All controls share one cluster and one visual language: enable / edit / delete.
+    var actions=document.createElement("span");actions.className="dash-rule-actions";
+    var toggle=iconButton(r.enabled?"◉":"○",r.enabled?"停用":"启用",function(){
       sendOps([{kind:"rule",rule:r.rule,enabled:!r.enabled}]);
-    }));
-    row.appendChild(iconButton("✎","编辑规则",function(){openEditor({kind:"rule",item:r,index:index})}));
+    });
+    toggle.classList.add("dash-rule-toggle");actions.appendChild(toggle);
+    actions.appendChild(iconButton("✎","编辑规则",function(){openEditor({kind:"rule",item:r,index:index})}));
     var delRule=iconButton("✕","删除规则",function(){
       if(!armConfirm(delRule,"确认删除?"))return;
       sendOps([{kind:"rule-remove",rule:r.rule}]);
     });
-    row.appendChild(delRule);
-    var spacer=document.createElement("span");spacer.className="dash-spacer";row.appendChild(spacer);
-    row.appendChild(iconButton("↑","上移",function(){sendOps([{kind:"rule-move",rule:r.rule,to:"up"}])}));
-    row.appendChild(iconButton("↓","下移",function(){sendOps([{kind:"rule-move",rule:r.rule,to:"down"}])}));
+    delRule.classList.add("dash-rule-delete");actions.appendChild(delRule);
+    row.appendChild(actions);
+    row.addEventListener("pointerdown",function(e){
+      if(e.button!==0||e.target.closest("button"))return;
+      cancelPress();pressPoint={x:e.clientX,y:e.clientY};
+      pressTimer=setTimeout(function(){
+        pressTimer=null;pressPoint=null;
+        row.draggable=true;row.classList.add("dash-rule-sorting");
+        fiMsg("已进入排序模式 · 拖动调整顺序","dash-ok");
+      },420);
+    });
+    row.addEventListener("pointermove",function(e){
+      if(!pressPoint)return;
+      if(Math.abs(e.clientX-pressPoint.x)>10||Math.abs(e.clientY-pressPoint.y)>10)cancelPress();
+    });
+    row.addEventListener("pointerup",cancelPress);
+    row.addEventListener("pointercancel",cancelPress);
+    row.addEventListener("click",function(){
+      if(row.classList.contains("dash-rule-sorting")){
+        row.classList.remove("dash-rule-sorting");row.draggable=false;return;
+      }
+      openEditor({kind:"rule",item:r,index:index});
+    });
+    row.addEventListener("keydown",function(e){
+      if(e.target!==row)return;
+      if(e.key==="Enter"||e.key===" "){e.preventDefault();openEditor({kind:"rule",item:r,index:index})}
+      else if(e.altKey&&(e.key==="ArrowUp"||e.key==="ArrowDown")){
+        e.preventDefault();
+        sendOps([{kind:"rule-move",rule:r.rule,to:e.key==="ArrowUp"?"up":"down"}]);
+      }
+    });
+    row.addEventListener("dragstart",function(e){
+      e.dataTransfer.effectAllowed="move";
+      e.dataTransfer.setData("text/plain",String(index));
+      row.classList.add("dragging");
+      // Builder-style clean rounded drag image instead of the browser's square frame.
+      var ghost=row.cloneNode(true);
+      ghost.classList.remove("dragging","dash-rule-sorting");ghost.removeAttribute("tabindex");
+      ghost.style.position="fixed";ghost.style.top="-10000px";ghost.style.left="-10000px";
+      ghost.style.width=row.offsetWidth+"px";ghost.style.margin="0";
+      document.body.appendChild(ghost);
+      e.dataTransfer.setDragImage(ghost,row.offsetWidth/2,row.offsetHeight/2);
+      setTimeout(function(){ghost.remove()},0);
+    });
+    row.addEventListener("dragend",function(){
+      row.classList.remove("dragging","dash-rule-sorting");row.draggable=false;
+      [].slice.call(host.querySelectorAll(".dash-rule-row")).forEach(function(n){n.classList.remove("drop-target","dash-rule-sorting");n.draggable=false});
+    });
+    row.addEventListener("dragover",function(e){e.preventDefault();row.classList.add("drop-target")});
+    row.addEventListener("dragleave",function(){row.classList.remove("drop-target")});
+    row.addEventListener("drop",function(e){
+      e.preventDefault();
+      var from=parseInt(e.dataTransfer.getData("text/plain"),10);
+      [].slice.call(host.querySelectorAll(".dash-rule-row")).forEach(function(n){n.classList.remove("drop-target","dash-rule-sorting");n.draggable=false});
+      if(isNaN(from)||from===index||!rules[from])return;
+      var moving=rules[from],dir=from<index?"down":"up",ops=[];
+      for(var k=0;k<Math.abs(index-from);k++)ops.push({kind:"rule-move",rule:moving.rule,to:dir});
+      if(ops.length)sendOps(ops);
+    });
     host.appendChild(row);
   });
 }
 function renderProviders(cat){
   var host=document.getElementById("fi-providers");host.textContent="";
+  var pc=document.getElementById("fi-provider-count");
+  if(pc)pc.textContent=(cat.providerModules||[]).length+" 个规则源 · 点击编辑";
   (cat.providerModules||[]).forEach(function(m){
     var v=m.value||{};
     var count=(cat.orderedRules||[]).filter(function(r){return r.module===m.module}).length;
@@ -862,6 +1151,11 @@ function loadFront(){
   .then(function(r){if(r.status===401)throw Error("登录已过期，请重新登录。");if(!r.ok)throw Error("读取失败 ("+r.status+")");return r.json()})
   .then(function(d){
     state.text=d.text||"";state.source=d.source;state.updatedAt=d.updatedAt||null;
+    // Snapshot the group order once, on first load, so Widget "原序" can always
+    // restore it even after state.catalog is replaced by successive patches.
+    if(!state.originalOrder&&d.catalog&&d.catalog.editorModel){
+      state.originalOrder=(d.catalog.editorModel.groups||[]).map(function(g){return g.name});
+    }
     fiText.value=state.text;fiDirty=false;
     var draft=d.source==="draft";
     fiSource.textContent=draft?("草稿 · "+(d.updatedAt?stamp(d.updatedAt):"")):"仓库版本";
@@ -1427,7 +1721,7 @@ document.getElementById("add-rule").addEventListener("click",function(){
   openEditor({kind:"add-rule"});
 });
 function openAddEditor(kind){
-  modalTitle.textContent=kind==="region"?"添加地区":kind==="strategy"?"添加策略组":"添加应用";
+  modalTitle.textContent=kind==="region"?"添加地区":kind==="strategy"?"添加策略组":kind==="provider"?"添加规则源":"添加应用";
   modalBody.textContent="";
   var f={};
   if(kind==="region"){
@@ -1436,6 +1730,14 @@ function openAddEditor(kind){
     f.flag=field("旗帜 Emoji（如 🇨🇦）",input(""));
     f.filter=field("匹配正则（如 (?i)^(?!=>).*(?:🇨🇦|加拿大|Canada)）",input(""));
     hint("新增地区会在模板的 FilterRegions 段追加一个锚点，地区分组与匹配规则随之生效。");
+  }else if(kind==="provider"){
+    f.name=field("规则源名（含 Emoji，如 🧩 Custom）",input("🧩 "));
+    f.url=field("规则源 URL",input("https://"));
+    f.interval=field("更新间隔（秒）",input(28800,"number"));
+    f.behavior=field("行为",pillSelect([["domain","domain"],["classical","classical"],["ipcidr","ipcidr"]],"domain"));
+    f.format=field("格式",pillSelect([["yaml","yaml"],["text","text"]],"yaml"));
+    f.type=field("类型",pillSelect([["http","http"],["file","file"]],"http"));
+    hint("新增规则源会写入 rule-providers，保存后即可在 RULE-SET 分流规则中引用。");
   }else{
     var cats=[];if(state.catalog)state.catalog.apps.forEach(function(a){if(cats.indexOf(a.category)<0)cats.push(a.category)});
     if(!cats.length)cats=["其他服务"];
@@ -1446,12 +1748,13 @@ function openAddEditor(kind){
     f.rule=field("分流规则（如 GEOSITE,notion,🧩 Notion，可留空）",input(""));
   }
   Object.keys(f).forEach(function(k){appendField(f[k])});
-  editCtx={kind:"add",addKind:kind,fields:f};modalRemove.hidden=true;mountEditor("add",null);modal.hidden=false;
+  editCtx={kind:"add",addKind:kind,fields:f};modalRemove.hidden=true;mountEditor(kind==="provider"?"add-provider":"add",null);modal.hidden=false;
   if(matchMedia("(min-width:900px)").matches)document.body.style.overflow="hidden";
 }
 document.getElementById("add-app").addEventListener("click",function(){openAddEditor("app")});
 document.getElementById("add-strategy").addEventListener("click",function(){openAddEditor("strategy")});
 document.getElementById("add-region").addEventListener("click",function(){openAddEditor("region")});
+document.getElementById("add-provider").addEventListener("click",function(){openAddEditor("provider")});
 // The generic apply handler above handles app/region/strategy; add-* needs its own ops.
 document.getElementById("fi-modal-apply").addEventListener("click",function(){
   if(!editCtx||editCtx.kind!=="add")return;
@@ -1460,6 +1763,13 @@ document.getElementById("fi-modal-apply").addEventListener("click",function(){
     var id=f.id.value.trim(),filter=f.filter.value.trim();
     if(!id||!filter){fiMsg("请填写地区代码与匹配正则","dash-err");return}
     sendOps([{kind:"add-region",id:id,filter:filter}]);
+    return;
+  }
+  if(kind==="provider"){
+    var pname=f.name.value.trim(),purl=f.url.value.trim();
+    if(!pname||!purl){fiMsg("请填写规则源名与 URL","dash-err");return}
+    if((state.catalog.providerModules||[]).some(function(m){return m.name===pname})){fiMsg("规则源名已存在","dash-err");return}
+    sendOps([{kind:"provider-add",name:pname,fields:{type:f.type.value,format:f.format.value,behavior:f.behavior.value,interval:Number(f.interval.value)||28800,url:purl}}]);
     return;
   }
   var name=f.name.value.trim();

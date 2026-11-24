@@ -1045,6 +1045,13 @@ renderEmoji(document.body);
 multiSelect = bindMultiSelect({
   onChanged: changed,
   toast,
+  // Batch brush and the widget jiggle editor are mutually exclusive.
+  onEnter() {
+    if (ctx.widgetEditing) {
+      ctx.widgetEditing = false;
+      render();
+    }
+  },
 });
 bindWidgetEditor({
   ctx,
