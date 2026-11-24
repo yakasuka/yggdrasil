@@ -345,9 +345,14 @@ test("chip inputs: even row spacing and Backspace deletes last chip", () => {
   const html = dashboardHTML({ linkBase: "https://x/y" });
   const main = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)]
     .map((m) => m[1]).find((s) => s.includes("chipControl"));
-  // align-content:flex-start stops the browser distributing extra height
-  // between wrapped rows (the "last row spacing" bug) — lives in <style>.
+  // align-content:flex-start + explicit row-gap stops the browser
+  // distributing extra height between wrapped rows (the "last row spacing"
+  // bug), and fixed chip height stops <input> line-height from stretching a
+  // row — all live in <style>.
   assert.match(html, /\.dash-chips\{[^}]*align-content:flex-start/);
+  assert.match(html, /\.dash-chips\{[^}]*row-gap:5px/);
+  assert.match(html, /\.dash-chips\{[^}]*min-height:0/);
+  assert.match(html, /\.dash-chip,\.dash-chip-input\{[^}]*height:24px[^}]*max-height:24px/);
   // Backspace removes the trailing chip when the input is empty, in both the
   // generic chip control and the rule-chip control.
   assert.match(main, /e\.key==="Backspace"&&!box\.value&&items\.length/);
