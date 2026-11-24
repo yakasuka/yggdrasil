@@ -666,6 +666,10 @@ function renderRuleList(cat){
       sendOps([{kind:"rule",rule:r.rule,enabled:!r.enabled}]);
     }));
     row.appendChild(iconButton("✎","编辑规则",function(){openEditor({kind:"rule",item:r,index:index})}));
+    row.appendChild(iconButton("✕","删除规则",function(){
+      if(!window.confirm("从模板中删除规则 “"+r.rule+"”？此操作不可撤销。"))return;
+      sendOps([{kind:"rule-remove",rule:r.rule}]);
+    }));
     var spacer=document.createElement("span");spacer.className="dash-spacer";row.appendChild(spacer);
     row.appendChild(iconButton("↑","上移",function(){sendOps([{kind:"rule-move",rule:r.rule,to:"up"}])}));
     row.appendChild(iconButton("↓","下移",function(){sendOps([{kind:"rule-move",rule:r.rule,to:"down"}])}));
@@ -892,7 +896,7 @@ function openEditor(ctx){
   editCtx.fields=f;
   var removable={app:1,region:1,strategy:1,rule:1};
   modalRemove.hidden=!removable[ctx.kind];
-  modalRemove.textContent=ctx.kind==="rule"?"移除规则":"移除";
+  modalRemove.textContent=ctx.kind==="rule"?"删除规则":"移除";
   modal.hidden=false;
 }
 document.getElementById("fi-modal-close").addEventListener("click",closeModal);
@@ -980,8 +984,8 @@ modalRemove.addEventListener("click",function(){
   if(!editCtx)return;
   if(editCtx.kind==="add"){closeModal();return}
   if(editCtx.kind==="rule"){
-    if(!window.confirm("停用规则 “"+editCtx.item.rule+"”？"))return;
-    sendOps([{kind:"rule",rule:editCtx.item.rule,enabled:false}]);return;
+    if(!window.confirm("从模板中删除规则 “"+editCtx.item.rule+"”？此操作不可撤销。"))return;
+    sendOps([{kind:"rule-remove",rule:editCtx.item.rule}]);return;
   }
   var name=editCtx.kind==="region"?(editCtx.item.groupName||editCtx.item.name):editCtx.item.name;
   if(!window.confirm("从模板中移除 “"+name+"”？相关规则会一并注释掉。"))return;

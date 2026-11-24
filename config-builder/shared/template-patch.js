@@ -14,6 +14,7 @@
 //   { kind:"exit",    name, value }          // "DIRECT" | "proxy"
 //   { kind:"remove",  name }                 // comment out group + its rules
 //   { kind:"rule",    rule, enabled:boolean }// comment/uncomment a rule line
+//   { kind:"rule-remove", rule }             // delete a rule line outright
 //   { kind:"add-app", name, label, category, icon, rule, firstDirect }
 //   { kind:"general", fields:{port?, ...} }  // top-level general settings
 //   { kind:"filter",  id, value }            // FilterAll / FilterOthers / region regex
@@ -139,6 +140,16 @@ function applyRule(lines, op) {
   const indent = (t.match(/^\s*/) || [""])[0];
   if (op.enabled) lines[idx] = t.replace(/^(\s*)#\s*/, "$1");
   else lines[idx] = indent + "# " + t.replace(/^\s*#\s*/, "");
+}
+
+function applyRuleRemove(lines, op) {
+  const needle = String(op.rule || "");
+  const idx = lines.findIndex((line) => {
+    const bare = line.trim().replace(/^#\s*/, "");
+    return bare === "- " + needle || bare === needle;
+  });
+  if (idx < 0) throw Error("找不到规则：" + needle);
+  lines.splice(idx, 1);
 }
 
 function applyAddApp(lines, op) {
@@ -350,6 +361,7 @@ export function applyTemplateOps(text, ops, parse) {
       case "exit": applyExit(lines, op); break;
       case "remove": applyRemove(lines, op); break;
       case "rule": applyRule(lines, op); break;
+      case "rule-remove": applyRuleRemove(lines, op); break;
       case "add-app": applyAddApp(lines, op); break;
       case "general": applyGeneral(lines, op); break;
       case "filter": applyFilter(lines, op); break;

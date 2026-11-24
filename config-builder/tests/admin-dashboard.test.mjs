@@ -137,6 +137,8 @@ test("dashboard uses builder step cursor and modular chip editors", () => {
   assert.match(main, /proxyChips\(g\.proxies\)/);
   assert.match(main, /regexChips\(item\.value\)/);
   assert.match(main, /fields\.filter=f\.filter\.value\.trim\(\)/);
+  assert.match(main, /kind:"rule-remove"/);
+  assert.match(main, /iconButton\("✕","删除规则"/);
   assert.match(main, /fi-reload-mini"\)\.addEventListener/);
   // The old step id fell back to "general" and made +添加应用 / +添加规则
   // jump back to the first category. It must never come back.

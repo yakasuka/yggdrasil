@@ -38,7 +38,10 @@ test("meta op renames an app label and category without touching other lines", a
   ]);
   const before = bundled.templateText.split(/\r?\n/);
   const after = out.split(/\r?\n/);
-  assert.equal(after.length, before.length + 1, "one @meta line inserted before the group");
+  // If the template already carries an @meta for this group it is updated in
+  // place; otherwise one line is inserted. Both are correct, format-preserving
+  // behaviour (the draft written back by the sync Action may add that line).
+  assert.ok(after.length === before.length || after.length === before.length + 1, "one @meta line at most");
   const added = after.filter((l) => l.includes("@meta") && l.includes("OpenAI 中文"));
   assert.equal(added.length, 1, "exactly one @meta line added");
   const cat = await catalogFromYaml(out);
@@ -125,6 +128,9 @@ test("rule ops edit / move / add / disable a rule in place", async () => {
   assert.equal(added.editor.rules.filter((r) => r.rule === "GEOSITE,notion,🏁 Final").length, 1);
   const disabled = await catalogFromYaml(patch([{ kind: "rule", rule, enabled: false }]));
   assert.equal(disabled.editor.rules.find((r) => r.rule === rule).enabled, false);
+  const removed = await catalogFromYaml(patch([{ kind: "rule-remove", rule }]));
+  assert.equal(removed.editor.rules.filter((r) => r.rule === rule).length, 0);
+  assert.equal(removed.editor.rules.length, bundled.editor.rules.length - 1);
 });
 
 test("provider op updates a rule-provider URL and interval", async () => {
