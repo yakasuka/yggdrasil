@@ -127,6 +127,45 @@ test("dashboard groups editable sections into builder-style steps", () => {
   assert.match(main, /showStep\("general"\)/);
 });
 
+test("dashboard uses builder step cursor and modular chip editors", () => {
+  const html = dashboardHTML({ linkBase: "https://x/y" });
+  assert.match(html, /class="step-cursor"/);
+  const main = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)]
+    .map((m) => m[1]).find((s) => s.includes("fiText"));
+  assert.match(main, /var pointToStep=progressCursor/);
+  assert.match(main, /function chipControl/);
+  assert.match(main, /proxyChips\(g\.proxies\)/);
+  assert.match(main, /regexChips\(item\.value\)/);
+  assert.match(main, /fields\.filter=f\.filter\.value\.trim\(\)/);
+  assert.match(main, /fi-reload-mini"\)\.addEventListener/);
+  // The old step id fell back to "general" and made +添加应用 / +添加规则
+  // jump back to the first category. It must never come back.
+  assert.ok(!main.includes('showStep("front")'), "no stale step id");
+});
+
+test("regex chip parser preserves negative-lookahead wrappers and nested groups", () => {
+  const html = dashboardHTML({ linkBase: "https://x/y" });
+  const main = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)]
+    .map((m) => m[1]).find((s) => s.includes("fiText"));
+  const start = main.indexOf("function splitAlternatives");
+  const end = main.indexOf("function regexChips");
+  assert.ok(start > 0 && end > start, "pure parser helpers present");
+  const { splitAlternatives, regexParts } = new Function(
+    main.slice(start, end) + ";return {splitAlternatives,regexParts}",
+  )();
+  const all = "^(?!.*(?:(?i)=>|群|邀请|\\d{4}-\\d{2}-\\d{2}|\\d+G)).*$";
+  const parts = regexParts(all);
+  assert.equal(parts.prefix, "^(?!.*(?:(?i)");
+  assert.equal(parts.suffix, ")).*$");
+  assert.deepEqual(parts.items, ["=>", "群", "邀请", "\\d{4}-\\d{2}-\\d{2}", "\\d+G"]);
+  assert.equal(parts.prefix + parts.items.join("|") + parts.suffix, all);
+  const region = "(?i)^(?!=>).*(?:🇭🇰|香港|Hong\\s?Kong|\\b(?:HK|HKG)\\d*\\b)";
+  const rp = regexParts(region);
+  assert.equal(rp.items.length, 4, "nested (?:HK|HKG) stays in one chip");
+  assert.equal(rp.prefix + rp.items.join("|") + rp.suffix, region);
+  assert.deepEqual(splitAlternatives("A|B|\\b(?:C|D)\\b"), ["A", "B", "\\b(?:C|D)\\b"]);
+});
+
 test("dashboard edit fields expose controls, not wrappers, to patch handlers", () => {
   const html = dashboardHTML({ linkBase: "https://x/y" });
   const main = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)]

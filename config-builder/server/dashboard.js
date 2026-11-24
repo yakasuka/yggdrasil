@@ -63,7 +63,6 @@ const DASH_ONLY = `
 #steps .step-button>span:not(.step-number){display:block}
 #steps .step-button .step-number{display:none}
 #steps .step-button small{display:block;margin-top:4px;color:var(--muted);font-size:.75rem;font-weight:400;line-height:1.5}
-#steps .step-button[aria-current="step"] strong::before{content:"→ ";color:var(--accent)}
 .dash-summary{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 18px}
 .dash-stat{display:inline-flex;align-items:baseline;gap:6px;padding:5px 12px;border:1px solid var(--line);border-radius:99px;background:var(--soft);color:var(--muted);font-size:.6875rem;transition:transform 180ms var(--ease),border-color 180ms var(--ease)}
 .dash-stat:hover{transform:translateY(-2px);border-color:var(--selected-line)}
@@ -105,7 +104,16 @@ const DASH_ONLY = `
 .dash-source textarea:focus{border-color:var(--selected-line);box-shadow:0 0 0 3px var(--tint)}
 .dash-modal{position:fixed;inset:0;z-index:20;display:grid;place-items:center;padding:20px;background:#0009;backdrop-filter:blur(6px)}
 .dash-modal[hidden]{display:none}
-.dash-modal-card{width:min(460px,100%);max-height:88vh;overflow:auto;padding:26px;border:1px solid var(--glass-edge);border-radius:22px;background:var(--glass);box-shadow:var(--shadow)}
+.dash-modal-card{width:min(680px,100%);max-height:88vh;overflow:auto;padding:28px 30px;border:1px solid var(--glass-edge);border-radius:22px;background:var(--glass);box-shadow:var(--shadow)}
+.dash-chips{display:flex;flex-wrap:wrap;align-items:center;gap:6px;min-height:46px;padding:7px 8px;border:1px solid var(--line);border-radius:11px;background:var(--input)}
+.dash-chips:focus-within{border-color:var(--selected-line);box-shadow:0 0 0 3px var(--tint)}
+.dash-chip{display:inline-flex;align-items:center;gap:5px;max-width:100%;padding:4px 5px 4px 10px;border:1px solid var(--selected-line);border-radius:99px;background:var(--tint);color:var(--ink);font-size:.75rem;line-height:1.3;cursor:grab}
+.dash-chip.dragging{opacity:.4}
+.dash-chip>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:240px}
+.dash-chip button{flex:none;width:17px;height:17px;display:grid;place-items:center;padding:0;border:0;border-radius:50%;background:transparent;color:var(--muted);font-size:.75rem;line-height:1;cursor:pointer}
+.dash-chip button:hover{background:var(--danger-bg);color:var(--danger)}
+.dash-chip-input{flex:1 1 150px;min-width:120px;padding:4px;border:0;outline:none;background:transparent;color:var(--ink);font-size:.75rem}
+.dash-chip-input::placeholder{color:var(--muted)}
 .dash-modal-card .dialog-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
 .dash-modal-card .field{margin:16px 0}
 .dash-modal-card .field label{display:block;margin-bottom:6px;font-size:.75rem;font-weight:550;color:var(--muted)}
@@ -208,6 +216,7 @@ export function dashboardHTML({
       <button class="step-button" data-step="strategy" type="button"><span class="step-number">4</span><span><strong>出口策略</strong><small>测速 · 核心策略组</small></span></button>
       <button class="step-button" data-step="rules" type="button"><span class="step-number">5</span><span><strong>规则与规则源</strong><small>筛选 · 分流 · 更新</small></span></button>
       <button class="step-button" data-step="configs" type="button"><span class="step-number">6</span><span><strong>订阅链接</strong><small>生成与访问权限</small></span></button>
+      <span class="step-cursor" aria-hidden="true"><svg viewBox="0 0 20 20" fill="none"><path d="M3 10h12m-5-5 5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
     </nav>
     <div class="journey-note"><span aria-hidden="true">✳</span><div><strong>一处修改，处处生长。</strong><p>保存后立即生效，并由定时任务写回仓库。</p></div></div>
   </aside>
@@ -394,6 +403,45 @@ var STEP_META={
   rules:{title:"让流量各得其所。",desc:"节点筛选、规则模块、分流顺序与规则源都在这里，编辑后立即参与配置生成。",note:"顺序决定出口。"},
   configs:{title:"所有订阅，都在这里。",desc:"点击订阅链接可直接查看内容；也可以复制、删除配置。配置由订阅工坊生成。",note:"配置由订阅工坊生成。"}
 };
+// Same spring cursor as the builder (motion.js), so the pointer before each
+// category behaves and animates identically instead of being a text glyph.
+function reducedMotion(){return matchMedia("(prefers-reduced-motion: reduce)").matches}
+function springStep(value,velocity,target,dt,response){
+  var omega=(2*Math.PI)/(response||0.42),offset=value-target;
+  var impulse=(velocity+omega*offset)*dt,decay=Math.exp(-omega*dt);
+  return [target+(offset+impulse)*decay,(velocity-omega*impulse)*decay];
+}
+function springPosition(update){
+  var x=0,y=0,vx=0,vy=0,tx=0,ty=0,frame=0,last=0,initialized=false;
+  function tick(now){
+    var dt=Math.min((now-last)/1000||1/60,0.064);last=now;
+    var a=springStep(x,vx,tx,dt),b=springStep(y,vy,ty,dt);
+    x=a[0];vx=a[1];y=b[0];vy=b[1];
+    var resting=Math.abs(tx-x)+Math.abs(ty-y)<0.05&&Math.abs(vx)+Math.abs(vy)<0.2;
+    if(resting){x=tx;y=ty}
+    update(x,y);frame=resting?0:requestAnimationFrame(tick);
+  }
+  return function(nextX,nextY){
+    tx=nextX;ty=nextY;
+    if(!initialized||reducedMotion()){initialized=true;cancelAnimationFrame(frame);frame=0;vx=vy=0;x=tx;y=ty;update(x,y)}
+    else if(!frame){last=performance.now();frame=requestAnimationFrame(tick)}
+  };
+}
+function progressCursor(nav){
+  var cursor=nav.querySelector(".step-cursor");if(!cursor)return function(){};
+  var target;
+  var move=springPosition(function(x,y){cursor.style.transform="translate3d("+x+"px,"+y+"px,0)"});
+  function position(){
+    if(!target)return;
+    var parent=nav.getBoundingClientRect(),child=target.getBoundingClientRect();
+    var horizontal=matchMedia("(max-width: 680px)").matches;
+    move(horizontal?child.left-parent.left+child.width/2-9:0,
+      horizontal?0:child.top-parent.top+child.height/2-9);
+  }
+  if(window.ResizeObserver)new ResizeObserver(position).observe(nav);
+  return function(element){target=element;position()};
+}
+var pointToStep=progressCursor(document.getElementById("steps"));
 function showStep(which){
   var i=STEP_ORDER.indexOf(which);
   if(i<0)i=0;
@@ -401,6 +449,7 @@ function showStep(which){
   var front=which!=="configs",meta=STEP_META[which];
   stepPanels.forEach(function(p){p.hidden=p.dataset.panel!==which});
   stepButtons.forEach(function(b){if(b.dataset.step===which)b.setAttribute("aria-current","step");else b.removeAttribute("aria-current")});
+  pointToStep(document.querySelector('.step-button[aria-current="step"]'));
   caption.textContent="STEP "+String(i+1).padStart(2,"0")+" / "+String(STEP_ORDER.length).padStart(2,"0");
   stepTitle.textContent=meta.title;
   stepDesc.textContent=meta.desc;
@@ -531,7 +580,12 @@ function renderRules(cat){
   mods.forEach(function(m){
     var count=(cat.orderedRules||[]).filter(function(r){return r.module===m.module}).length;
     var c=document.createElement("div");c.className="choice";
-    c.innerHTML='<span><strong>'+esc(m.name)+'</strong><small>'+esc(m.module)+' · '+count+' 条规则</small></span>';
+    c.setAttribute("role","button");c.tabIndex=0;
+    c.setAttribute("aria-label","从 "+m.name+" 添加规则");
+    c.innerHTML='<span><strong>'+esc(m.name)+'</strong><small>'+esc(m.module)+' · '+count+' 条规则 · 点击新增</small></span>';
+    var add=function(){openEditor({kind:"add-rule",preset:{type:"RULE-SET",key:m.module,target:"REJECT",extra:""}})};
+    c.addEventListener("click",add);
+    c.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();add()}});
     host.appendChild(c);
   });
 }
@@ -669,6 +723,89 @@ function select(options,value){
   options.forEach(function(o){var op=document.createElement("option");op.value=o[0];op.textContent=o[1];if(o[0]===value)op.selected=true;s.appendChild(op)});
   return s;
 }
+/* ---- reusable, genuinely modular list editors ---- */
+function splitList(value){
+  return String(value||"").split(",").map(function(x){return x.trim()}).filter(function(x){return x!==""});
+}
+var chipSeq=0;
+// A chip control behaves like an input (it exposes .value) so every existing
+// save handler keeps working, but the user can add/remove/reorder items.
+function chipControl(initial,serialize,placeholder,suggestions){
+  var items=initial.slice(),root=el("div");
+  root.className="dash-chips";
+  var box=input("");box.className="dash-chip-input";box.placeholder=placeholder||"输入后回车添加";
+  if(suggestions&&suggestions.length){
+    var dl=el("datalist");dl.id="chip-suggest-"+(++chipSeq);
+    suggestions.forEach(function(s){var op=el("option");op.value=s;dl.appendChild(op)});
+    box.setAttribute("list",dl.id);root.appendChild(dl);
+  }
+  var dragIndex=-1;
+  function changed(){fiDirty=true;notify("已修改，点击「保存并生效」写回模板")}
+  function add(){
+    var v=box.value.trim();if(!v)return;
+    if(items.indexOf(v)<0){items.push(v);paint();changed()}
+    box.value="";box.focus();
+  }
+  function paint(){
+    [].slice.call(root.querySelectorAll(".dash-chip")).forEach(function(n){root.removeChild(n)});
+    items.forEach(function(text,i){
+      var chip=el("span");chip.className="dash-chip";chip.draggable=true;
+      chip.title="拖动排序 · 点击 × 删除";
+      chip.appendChild(el("span",text));
+      var rm=el("button","×");rm.type="button";rm.title="删除 "+text;rm.setAttribute("aria-label",rm.title);
+      rm.addEventListener("click",function(e){e.stopPropagation();items.splice(i,1);paint();changed()});
+      chip.appendChild(rm);
+      chip.addEventListener("dragstart",function(){dragIndex=i;chip.classList.add("dragging")});
+      chip.addEventListener("dragend",function(){chip.classList.remove("dragging");dragIndex=-1});
+      chip.addEventListener("dragover",function(e){e.preventDefault()});
+      chip.addEventListener("drop",function(e){
+        e.preventDefault();if(dragIndex<0||dragIndex===i)return;
+        var moved=items.splice(dragIndex,1)[0];items.splice(i,0,moved);dragIndex=-1;paint();changed();
+      });
+      root.insertBefore(chip,box);
+    });
+  }
+  box.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===","){e.preventDefault();add()}});
+  box.addEventListener("blur",add);
+  root.appendChild(box);paint();
+  Object.defineProperty(root,"value",{get:function(){return serialize(items)},configurable:true});
+  return root;
+}
+function proxySuggestions(){
+  var names=["DIRECT","REJECT"],groups=(state.catalog&&state.catalog.editor&&state.catalog.editor.groups)||[];
+  groups.forEach(function(g){if(names.indexOf(g.name)<0)names.push(g.name)});
+  return names;
+}
+function proxyChips(value){
+  return chipControl(splitList(value),function(items){return items.join(", ")},"输入出口名后回车（可从建议中选择）",proxySuggestions());
+}
+// Split a regex on top-level | only, so nested groups such as
+// (?i:🇭🇰|香港|Hong Kong) stay as one editable chip.
+function splitAlternatives(value){
+  var s=String(value||""),out=[],start=0,depth=0;
+  for(var i=0;i<s.length;i++){
+    var ch=s.charAt(i);
+    if(ch==="("||ch==="["||ch==="{")depth++;
+    else if(ch===")"||ch==="]"||ch==="}")depth=Math.max(0,depth-1);
+    else if(ch==="|"&&depth===0){out.push(s.slice(start,i));start=i+1}
+  }
+  out.push(s.slice(start));
+  return out.map(function(x){return x.trim()}).filter(function(x){return x!==""});
+}
+function regexParts(value){
+  var s=String(value||"").trim();
+  var negPrefix="^(?!.*(?:(?i)",negSuffix=")).*$";
+  var regionPrefix="(?i)^(?!=>).*(?:",regionSuffix=")";
+  if(s.indexOf(negPrefix)===0&&s.slice(-negSuffix.length)===negSuffix)
+    return {prefix:negPrefix,suffix:negSuffix,items:splitAlternatives(s.slice(negPrefix.length,s.length-negSuffix.length))};
+  if(s.indexOf(regionPrefix)===0&&s.slice(-regionSuffix.length)===regionSuffix)
+    return {prefix:regionPrefix,suffix:regionSuffix,items:splitAlternatives(s.slice(regionPrefix.length,s.length-regionSuffix.length))};
+  return {prefix:"",suffix:"",items:splitAlternatives(s)};
+}
+function regexChips(value){
+  var parts=regexParts(value);
+  return chipControl(parts.items,function(items){return parts.prefix+items.join("|")+parts.suffix},"输入关键词或正则片段后回车");
+}
 function hint(text){var p=document.createElement("p");p.className="dash-hint";p.textContent=text;modalBody.appendChild(p)}
 function groupProps(name){
   var groups=(state.catalog&&state.catalog.editor&&state.catalog.editor.groups)||[];
@@ -689,14 +826,16 @@ function openEditor(ctx){
     if(cats.indexOf(item.category)<0)cats.unshift(item.category);
     f.category=field("分类",select(cats.map(function(c){return [c,c]}),item.category));appendField(f.category);
     f.exit=field("默认出口",select([["proxy","跟随代理 / 节点选择"],["DIRECT","直连 DIRECT"]],item.firstProxyDirect?"DIRECT":"proxy"));appendField(f.exit);
-    f.proxies=field("出口顺序（逗号分隔）",textarea(g.proxies));appendField(f.proxies);
+    f.proxies=field("出口顺序（可增删 / 拖动排序）",proxyChips(g.proxies));appendField(f.proxies);
+    hint("回车添加出口，× 删除，拖动芯片排序。");
     if(item.rules&&item.rules.length)hint("关联规则："+item.rules.join("｜")+"（可在下方「分流规则」中修改）");
   }else if(ctx.kind==="region"){
     hint("组名："+(item.groupName||item.name));
     f.label=field("显示名称",input(item.label));appendField(f.label);
     f.flag=field("旗帜 Emoji",input(item.flag));appendField(f.flag);
     f.icon=field("图标 URL",input(item.icon));appendField(f.icon);
-    f.filter=field("节点匹配正则",textarea(item.filter));appendField(f.filter);
+    f.filter=field("地区匹配项（可增删芯片）",regexChips(item.filter));appendField(f.filter);
+    hint("每个芯片是一条正则分支；回车添加、× 删除、拖动排序。");
   }else if(ctx.kind==="strategy"){
     hint("组名："+item.name+" · 类型："+(g.type||item.type));
     f.label=field("显示名称",input(item.label));appendField(f.label);
@@ -706,10 +845,13 @@ function openEditor(ctx){
     if(g.interval!=null&&g.interval!==""){f.interval=field("测速间隔（秒）",input(g.interval,"number"));appendField(f.interval)}
     if(g.tolerance!=null&&g.tolerance!==""){f.tolerance=field("延迟容差（毫秒）",input(g.tolerance,"number"));appendField(f.tolerance)}
     if(g.strategy){f.strategy=field("均衡策略",select([["consistent-hashing","consistent-hashing"],["round-robin","round-robin"]],g.strategy));appendField(f.strategy)}
-    if(g.proxies){f.proxies=field("出口顺序（逗号分隔）",textarea(g.proxies));appendField(f.proxies)}
+    if(g.proxies){f.proxies=field("出口顺序（可增删 / 拖动排序）",proxyChips(g.proxies));appendField(f.proxies);hint("回车添加出口，× 删除，拖动芯片排序。")}
+    if(g.filter){f.filter=field("节点筛选（可增删芯片）",regexChips(g.filter));appendField(f.filter);hint("筛选正则的每个分支都是独立芯片，可增删排序。")}
   }else if(ctx.kind==="core-group"){
     hint("组名："+g.name+" · 类型："+g.type);
-    f.proxies=field("出口顺序（逗号分隔）",textarea(g.proxies));appendField(f.proxies);
+    f.proxies=field("出口顺序（可增删 / 拖动排序）",proxyChips(g.proxies));appendField(f.proxies);
+    hint("回车添加出口，× 删除，拖动芯片排序。");
+    if(g.filter){f.filter=field("节点筛选（可增删芯片）",regexChips(g.filter));appendField(f.filter);hint("筛选正则的每个分支都是独立芯片，可增删排序。")}
     if(g.icon){f.icon=field("图标 URL",input(g.icon));appendField(f.icon)}
     if(g.url){f.url=field("测速 URL",input(g.url));appendField(f.url)}
     if(g.interval!=null&&g.interval!==""){f.interval=field("间隔（秒）",input(g.interval,"number"));appendField(f.interval)}
@@ -725,9 +867,10 @@ function openEditor(ctx){
     f.unifiedDelay=field("统一延迟测速",checkbox(cfg["unified-delay"]));appendField(f.unifiedDelay);
   }else if(ctx.kind==="filter"){
     hint(item.id==="all"?"FilterAll 用于节点净化；改动后请确认策略组 filter 是否仍符合预期。":item.id==="others"?"FilterOthers 排除六大地区与广告关键词，改动后建议同步重生成规则。":"该正则决定哪些节点进入对应地区组。");
-    f.value=field("正则表达式",textarea(item.value));appendField(f.value);
+    f.value=field("筛选关键词 / 正则分支（可增删芯片）",regexChips(item.value));appendField(f.value);
+    hint("每个芯片都是可增删的匹配项；回车添加、× 删除、拖动排序，外层正则结构自动保留。");
   }else if(ctx.kind==="rule"||ctx.kind==="add-rule"){
-    var p=ctx.kind==="add-rule"?{type:"GEOSITE",key:"",target:"",extra:""}:ruleParts(item.rule);
+    var p=ctx.kind==="add-rule"?(ctx.preset||{type:"GEOSITE",key:"",target:"",extra:""}):ruleParts(item.rule);
     if(ctx.kind==="rule")hint("原规则："+item.rule);
     f.type=field("规则类型",select([["GEOSITE","GEOSITE"],["RULE-SET","RULE-SET"],["GEOIP","GEOIP"],["DOMAIN","DOMAIN"],["IP","IP"],["MATCH","MATCH"]],p.type));appendField(f.type);
     f.key=field("匹配项（如 openai / cn / gfw）",input(p.key));appendField(f.key);
@@ -798,6 +941,7 @@ function buildOps(){
     if(f.interval&&Number(f.interval.value)>0)fields.interval=Number(f.interval.value);
     if(f.tolerance&&Number(f.tolerance.value)>0)fields.tolerance=Number(f.tolerance.value);
     if(f.strategy)fields.strategy=f.strategy.value;
+    if(f.filter&&f.filter.value.trim())fields.filter=f.filter.value.trim();
     if(Object.keys(fields).length)props(fields);
   }else if(ctx.kind==="general"){
     var port=Number(f.port.value),socks=Number(f.socksPort.value);
@@ -844,10 +988,9 @@ modalRemove.addEventListener("click",function(){
   sendOps([{kind:"remove",name:name}]);
 });
 document.getElementById("add-rule").addEventListener("click",function(){
-  showStep("front");openEditor({kind:"add-rule"});
+  openEditor({kind:"add-rule"});
 });
 document.getElementById("add-app").addEventListener("click",function(){
-  showStep("front");
   modalTitle.textContent="添加应用";modalBody.textContent="";
   var cats=[];if(state.catalog)state.catalog.apps.forEach(function(a){if(cats.indexOf(a.category)<0)cats.push(a.category)});
   if(!cats.length)cats=["其他服务"];
@@ -872,6 +1015,7 @@ document.getElementById("fi-modal-apply").addEventListener("click",function(){
 
 fiText.addEventListener("input",function(){fiDirty=true});
 document.getElementById("fi-reload").addEventListener("click",function(){loadFront()});
+document.getElementById("fi-reload-mini").addEventListener("click",function(){loadFront()});
 document.getElementById("fi-reset").addEventListener("click",function(){
   if(!window.confirm("放弃当前草稿，恢复为仓库中的版本？"))return;
   fiMsg("正在放弃…");
