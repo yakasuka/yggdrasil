@@ -4,7 +4,7 @@
 # ═══════════════════════════════════════════════════════
 
 # proxy-providers:
-#   xyang:
+#   Ratatoskr:
 #     url: "https://example.com/sub?token=xxxxx"
 #     type: http
 #     interval: 86400
@@ -19,13 +19,13 @@
 # 2 · 基础设置 / General
 # ═══════════════════════════════════════════════════════
 
-port: 7890                           # HTTP 代理端口
-socks-port: 7891                     # SOCKS5 端口
-allow-lan: true                      # 允许局域网访问
-mode: rule                           # 规则分流
-log-level: info                      # 日志级别
-external-controller: 127.0.0.1:9090  # REST API，仅本机
-unified-delay: true                  # 统一延迟测速
+port: 7890          # HTTP 代理端口
+socks-port: 7891          # SOCKS5 端口
+allow-lan: true          # 允许局域网访问
+mode: "rule"          # 规则分流
+log-level: "info"          # 日志级别
+external-controller: 127.0.0.1:9090          # REST API，仅本机
+unified-delay: true          # 统一延迟测速
 
 # ═══════════════════════════════════════════════════════
 # 3 · 手动节点 / Proxies
@@ -93,6 +93,7 @@ proxy-groups:
   - {name: 📦 下载均衡,    type: load-balance, include-all: true, filter: *FilterAll, strategy: round-robin, icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/tracking.png"}   # 下载多连接轮询均衡
 
   # ── 应用分流 / Proxy App ──
+  # @meta { label: "OpenAI", category: "AI 与开发" }
   - {name: ⚡ OpenAI,      type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/chatgpt.png"}     # OpenAI / ChatGPT
   - {name: 🪐 Anthropic,   type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/claude.png"}      # Anthropic / Claude
   # @meta {id: hermes, label: Hermes, category: AI 与开发}
@@ -170,7 +171,6 @@ rules:
   - GEOSITE,adobe,🎨 Adobe
 
   # ── 广告拦截 / AdGuard（随 ❎ 广告拦截 组；默认不拦截，手动切 REJECT 生效）──
-  # 已剔除误伤 AdSense 的 category-ads-all / google@ads，@@ 例外在生成阶段处理。
   - RULE-SET,❎ AdGuard,❎ 广告拦截
   # ── 私网直连 ──
   - GEOSITE,private,DIRECT
@@ -259,11 +259,11 @@ rule-anchor:
   classical: &RP-classical {type: http, behavior: classical, format: yaml, interval: 28800}
 
 rule-providers:
-  🪐 Astra Domain:         {<<: *RP-domain,    url: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/resources/rules/aethersailor/Custom_Direct_Domain.yaml"}
+  🪐 Astra Domain:         {type: "http", format: "yaml", behavior: "domain", interval: 28800, <<: *RP-domain,    url: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/resources/rules/aethersailor/Custom_Direct_Domain.yaml"}
   🔮 Prism IP:           {<<: *RP-classical, url: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/resources/rules/aethersailor/Custom_Direct_Classical_IP.yaml"}
   🪐 Orbit Domain:         {<<: *RP-domain,    url: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/resources/rules/aethersailor/Custom_Proxy_Domain.yaml"}
   🚀 Voyager IP:          {<<: *RP-classical, url: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/resources/rules/aethersailor/Custom_Proxy_Classical_IP.yaml"}
   ⚡ Matrix Port:     {<<: *RP-classical, url: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/resources/rules/aethersailor/Custom_Port_Direct.yaml"}
   📦 Cargo Downloads:          {<<: *RP-domain, url: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/resources/rules/download/MultiThread_Download_Domain.yaml"}
   ❎ AdGuard:           {<<: *RP-domain, url: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/resources/rules/adguard/Custom_AdGuard_Domain.yaml"}
-# =======================================================
+# =======================================================
