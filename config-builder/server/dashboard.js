@@ -107,12 +107,12 @@ const DASH_ONLY = `
 .dash-modal-card{width:min(680px,100%);max-height:88vh;overflow:auto;padding:28px 30px;border:1px solid var(--glass-edge);border-radius:22px;background:var(--glass);box-shadow:var(--shadow)}
 .dash-chips{display:flex;flex-wrap:wrap;align-items:center;gap:6px;min-height:44px;padding:7px 9px;border:1px solid var(--line);border-radius:12px;background:var(--input);cursor:text}
 .dash-chips:focus-within{border-color:var(--selected-line);box-shadow:0 0 0 3px var(--tint)}
-.dash-chip{display:inline-flex;align-items:center;gap:5px;max-width:100%;padding:4px 5px 4px 10px;border:1px solid var(--selected-line);border-radius:99px;background:var(--tint);color:var(--ink);font-size:.75rem;line-height:1.3;cursor:grab}
+.dash-chip{display:inline-flex;align-items:center;gap:5px;max-width:100%;height:26px;box-sizing:border-box;padding:4px 5px 4px 10px;border:1px solid var(--selected-line);border-radius:99px;background:var(--tint);color:var(--ink);font-size:.75rem;line-height:1;cursor:grab}
 .dash-chip.dragging{opacity:.4}
 .dash-chip>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:240px}
 .dash-chip button{flex:none;width:17px;height:17px;display:grid;place-items:center;padding:0;border:0;border-radius:50%;background:transparent;color:var(--muted);font-size:.75rem;line-height:1;cursor:pointer}
 .dash-chip button:hover{background:var(--danger-bg);color:var(--danger)}
-.dash-modal-card .dash-chip-input,.dash-chip-input{flex:1 1 90px;width:auto!important;min-width:80px;padding:5px 3px;border:0!important;border-radius:0;background:transparent!important;box-shadow:none!important;outline:none;color:var(--ink);font-size:.75rem}
+.dash-modal-card .dash-chip-input,.dash-chip-input{flex:1 1 90px;width:auto!important;min-width:80px;height:26px;box-sizing:border-box;padding:4px 3px;line-height:1.3;border:0!important;border-radius:0;background:transparent!important;box-shadow:none!important;outline:none;color:var(--ink);font-size:.75rem}
 .dash-chip-input::placeholder{color:var(--muted)}
 .dash-chips .dash-chip-input:focus{border:0;box-shadow:none;background:transparent}
 .dash-modal-card .dialog-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
