@@ -229,9 +229,13 @@ test("dashboard offers one-click copy for links and guards drafts", () => {
   assert.match(main, /document\.execCommand\("copy"\)/);
   assert.match(main, /notify\(/);
   assert.ok(html.includes('id="toast"'), "toast feedback region present");
-  // Unsaved template edits must be warned about on unload and tab switch.
-  assert.match(main, /addEventListener\("beforeunload"/);
-  assert.match(main, /if\(fiDirty&&!window\.confirm\(/);
+  // No native blocking dialogs — they freeze browser automation. All confirms
+  // are non-blocking (two-click armConfirm + toast), and unload is not guarded.
+  assert.doesNotMatch(main, /window\.confirm\(/);
+  assert.doesNotMatch(main, /addEventListener\(["']beforeunload["']/);
+  assert.match(main, /function armConfirm/);
+  assert.match(main, /dataset\.armed==="1"/);
+  assert.match(main, /if\(fiDirty\)notify\(/);
   // Empty state points back to the builder.
   assert.match(main, /打开配置工坊/);
 });

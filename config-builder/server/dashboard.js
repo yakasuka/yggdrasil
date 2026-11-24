@@ -309,7 +309,7 @@ export function dashboardHTML({
     <div class="panel-top">
       <span id="step-caption" class="eyebrow">STEP 01 / 06</span>
       <span class="chip">RATATOSKR</span>
-      <span class="chip chip-build" title="界面构建版本 · 芯片布局 v2">UI v2.1</span>
+      <span class="chip chip-build" title="界面构建版本 · 无阻塞弹窗 · 芯片布局 v2">UI v2.2</span>
       <div class="panel-actions">
         <button class="icon-text-button" id="fi-reload" type="button" title="重新载入"><span aria-hidden="true">↻</span> 重新载入</button>
         <button class="icon-text-button" id="fi-reset" type="button"><span aria-hidden="true">✕</span> 放弃草稿</button>
@@ -427,6 +427,18 @@ function notify(text,isErr){
   toast.className="dash-toast show"+(isErr?" err":"");
   clearTimeout(toastTimer);
   toastTimer=setTimeout(function(){toast.className="dash-toast"},2400);
+}
+// Non-blocking confirmation: never uses window.confirm (which halts browser
+// automation). The triggering button turns into "确认?" and must be clicked a
+// second time within 4s; otherwise it resets. Returns true on the 2nd click.
+function armConfirm(btn,label){
+  if(btn.dataset.armed==="1"){delete btn.dataset.armed;if(btn.dataset.origTitle!=null)btn.title=btn.dataset.origTitle;if(btn.dataset.origText!=null)btn.textContent=btn.dataset.origText;return true}
+  btn.dataset.armed="1";btn.dataset.origText=btn.textContent;btn.dataset.origTitle=btn.title||"";
+  btn.textContent=label||"确认?";btn.title="再次点击以确认";
+  clearTimeout(btn._armTimer);
+  btn._armTimer=setTimeout(function(){delete btn.dataset.armed;btn.textContent=btn.dataset.origText;btn.title=btn.dataset.origTitle},4000);
+  notify(label||"再次点击以确认");
+  return false;
 }
 function copyIcon(){
   var s=document.createElementNS("http://www.w3.org/2000/svg","svg");
@@ -551,14 +563,14 @@ function showStep(which){
   var ws=document.getElementById("workspace");
   if(ws&&window.scrollY>ws.offsetTop-140)ws.scrollIntoView({behavior:"smooth",block:"start"});
 }
-window.addEventListener("beforeunload",function(e){
-  if(!fiDirty)return;
-  e.preventDefault();e.returnValue="";
-});
 function guardedStep(which){
   var current=document.querySelector('.step-button[aria-current="step"]');
   if(current&&current.dataset.step===which)return;
-  if(fiDirty&&!window.confirm("前端模板有未保存的修改，切换后将丢失。确定继续？"))return;
+  // Non-blocking: never call window.confirm or beforeunload dialogs — they
+  // freeze browser automation. Draft edits are already persisted via sendOps;
+  // unsaved in-panel edits are simply dropped with an inline notice.
+  if(fiDirty)notify("已切换步骤（未保存的面板内编辑已丢弃）");
+  fiDirty=false;
   showStep(which);
 }
 stepButtons.forEach(function(b){b.addEventListener("click",function(){guardedStep(b.dataset.step)})});
@@ -813,10 +825,11 @@ function renderRuleList(cat){
       sendOps([{kind:"rule",rule:r.rule,enabled:!r.enabled}]);
     }));
     row.appendChild(iconButton("✎","编辑规则",function(){openEditor({kind:"rule",item:r,index:index})}));
-    row.appendChild(iconButton("✕","删除规则",function(){
-      if(!window.confirm("从模板中删除规则 “"+r.rule+"”？此操作不可撤销。"))return;
+    var delRule=iconButton("✕","删除规则",function(){
+      if(!armConfirm(delRule,"确认删除?"))return;
       sendOps([{kind:"rule-remove",rule:r.rule}]);
-    }));
+    });
+    row.appendChild(delRule);
     var spacer=document.createElement("span");spacer.className="dash-spacer";row.appendChild(spacer);
     row.appendChild(iconButton("↑","上移",function(){sendOps([{kind:"rule-move",rule:r.rule,to:"up"}])}));
     row.appendChild(iconButton("↓","下移",function(){sendOps([{kind:"rule-move",rule:r.rule,to:"down"}])}));
@@ -1115,7 +1128,8 @@ function rulesForTarget(name){
   var rules=(state.catalog&&state.catalog.editor&&state.catalog.editor.rules)||[];
   return rules.filter(function(r){return r.target===name&&r.enabled!==false}).map(function(r){return r.rule});
 }
-function closeModal(){modal.hidden=true;editCtx=null;document.body.style.overflow=""}
+function disarmBtn(btn){if(!btn)return;delete btn.dataset.armed;clearTimeout(btn._armTimer);if(btn.dataset.origText!=null)btn.textContent=btn.dataset.origText;if(btn.dataset.origTitle!=null)btn.title=btn.dataset.origTitle}
+function closeModal(){modal.hidden=true;editCtx=null;disarmBtn(modalRemove);disarmBtn(fiResetBtn);document.body.style.overflow=""}
 // Cross-block navigation. Any rule reference / chain label can jump straight
 // to the owning block, highlight it and open its editor — the whole dashboard
 // behaves as one connected graph instead of isolated lists.
@@ -1401,16 +1415,11 @@ document.getElementById("fi-modal-apply").addEventListener("click",function(){
 modalRemove.addEventListener("click",function(){
   if(!editCtx)return;
   if(editCtx.kind==="add"){closeModal();return}
-  if(editCtx.kind==="rule"){
-    if(!window.confirm("从模板中删除规则 “"+editCtx.item.rule+"”？此操作不可撤销。"))return;
-    sendOps([{kind:"rule-remove",rule:editCtx.item.rule}]);return;
-  }
   var name=editCtx.kind==="region"?(editCtx.item.groupName||editCtx.item.name):editCtx.item.name;
-  if(editCtx.kind==="group"){
-    if(!window.confirm("从模板中删除策略组 “"+name+"”？所有指向它的规则与出口引用会一起清除。"))return;
-    sendOps([{kind:"group-remove",name:name}]);return;
-  }
-  if(!window.confirm("从模板中移除 “"+name+"”？相关规则会一并注释掉。"))return;
+  var label=editCtx.kind==="rule"?"确认删除?":(editCtx.kind==="group"?"确认删除组?":"确认移除?");
+  if(!armConfirm(modalRemove,label))return;
+  if(editCtx.kind==="rule"){sendOps([{kind:"rule-remove",rule:editCtx.item.rule}]);return}
+  if(editCtx.kind==="group"){sendOps([{kind:"group-remove",name:name}]);return}
   sendOps([{kind:"remove",name:name}]);
 });
 document.getElementById("add-rule").addEventListener("click",function(){
@@ -1460,8 +1469,9 @@ document.getElementById("fi-modal-apply").addEventListener("click",function(){
 fiText.addEventListener("input",function(){fiDirty=true});
 document.getElementById("fi-reload").addEventListener("click",function(){loadFront()});
 document.getElementById("fi-reload-mini").addEventListener("click",function(){loadFront()});
-document.getElementById("fi-reset").addEventListener("click",function(){
-  if(!window.confirm("放弃当前草稿，恢复为仓库中的版本？"))return;
+var fiResetBtn=document.getElementById("fi-reset");
+fiResetBtn.addEventListener("click",function(){
+  if(!armConfirm(fiResetBtn,"确认放弃?"))return;
   fiMsg("正在放弃…");
   fetch(CFG.frontInfoPath,{method:"DELETE"})
   .then(function(r){if(!r.ok)throw Error("操作失败 ("+r.status+")");return loadFront()})
@@ -1546,7 +1556,7 @@ function render(rows){
     var act=el("td");act.className="actions";
     var del=el("button","删除");del.className="danger button secondary";del.type="button";
     del.addEventListener("click",function(){
-      if(!window.confirm("确定删除配置 “"+row.token+"”？此操作不可撤销。"))return;
+      if(!armConfirm(del,"确认删除?"))return;
       del.disabled=true;
       fetch(CFG.adminPath,{method:"DELETE",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:row.id})})
       .then(function(r){if(!r.ok)throw Error("删除失败 ("+r.status+")");return r.json()})
