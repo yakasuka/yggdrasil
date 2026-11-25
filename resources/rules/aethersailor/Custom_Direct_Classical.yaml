@@ -1,7 +1,7 @@
 # GENERATED - DO NOT EDIT. Add your rules to overlays/Custom_Direct_Classical.yaml
 # upstream: Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Direct_Classical.yaml
-# upstream blob: a48040fead089246a81790ff28cd0e327660dbd8
-# total: 1318 (upstream 1318, extra 0)
+# upstream blob: fb9220e197f6cdf6fa2a115ab76827dbc3f0049f
+# total: 1320 (upstream 1320, extra 0)
 payload:
   - 'DOMAIN-KEYWORD,m-team'
   - 'DOMAIN-KEYWORD,quickconnect'
@@ -879,6 +879,7 @@ payload:
   - 'DOMAIN-SUFFIX,ppqrrs.com'
   - 'DOMAIN-SUFFIX,ppt28.com'
   - 'DOMAIN-SUFFIX,privateapi.xyz'
+  - 'DOMAIN-SUFFIX,proqianwen.com'
   - 'DOMAIN-SUFFIX,psf0404.shop'
   - 'DOMAIN-SUFFIX,pthqzpc100.com'
   - 'DOMAIN-SUFFIX,ptlgs.org'
@@ -1297,6 +1298,7 @@ payload:
   - 'DOMAIN-SUFFIX,zudanje.com'
   - 'DOMAIN-SUFFIX,zuidazym3u8.com'
   - 'DOMAIN-SUFFIX,zuobiao.press'
+  - 'DOMAIN-SUFFIX,zxgjw.com'
   - 'DOMAIN-SUFFIX,zxp7.cc'
   - 'DOMAIN-SUFFIX,zxstech.com'
   - 'DOMAIN-SUFFIX,zysou.com'
