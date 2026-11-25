@@ -150,12 +150,12 @@ proxy-groups:
 
   # ── 地区节点 / Regions ──
   # 只应用各自地区正则，不叠加 FilterAll；地区组均使用地图类图标。
-  - {name: 🌆 Hong Kong,          type: select, include-all: true, filter: *FilterHK, icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/hk.png"}                                                # 香港节点
   - {name: 🧋 Taiwan,          type: select, include-all: true, filter: *FilterTW, icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/tw.png"}                                                # 台湾节点
+  - {name: 🌆 Hong Kong,          type: select, include-all: true, filter: *FilterHK, icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/hk.png"}                                                # 香港节点
+  - {name: 🗽 United States,          type: select, include-all: true, filter: *FilterUS, icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/us.png"}                                                # 美国节点
   - {name: ⛩️ Japan,          type: select, include-all: true, filter: *FilterJP, icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/jp.png"}                                                # 日本节点
   - {name: 🎤 South Korea,          type: select, include-all: true, filter: *FilterKR, icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/kr.png"}                                                # 韩国节点
   - {name: 🏙️ Singapore,          type: select, include-all: true, filter: *FilterSG, icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/sg.png"}                                                # 新加坡节点
-  - {name: 🗽 United States,          type: select, include-all: true, filter: *FilterUS, icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/us.png"}                                                # 美国节点
   - {name: 🌌 Others,          type: select, include-all: true, filter: *FilterOthers, icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/others.png"}                                        # 其他节点 A
 
 
