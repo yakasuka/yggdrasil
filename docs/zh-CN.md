@@ -36,13 +36,15 @@
 
 **Yggdrasil 负责组织、生成与交付；Ratatoskr 是抵达使用者手中的配置本体。**
 
+维护边界：`resources/` 的模板与规则是仓库主线，由规则同步与 Release 驱动；`config-builder/` 是独立更新的子项目（前端、自建后端、CF 代理与专属文档），受 Pages 目录约定必须留在仓库根的 `functions/`、`service.json`、`_redirects`、`_routes.json` 归它维护。
+
 ## 一站式订阅
 
 Yggdrasil 面向一站式的使用体验：使用者通过 config-builder 模块选择自己需要的配置内容，获得加工后生成的配置文件或订阅链接，再交给客户端使用。
 
 <p align="center"><strong>选择所需内容 → 组装个人配置 → 获取文件或订阅 → 导入客户端</strong></p>
 
-打开部署后的 **Ratatoskr 配置工坊**（`https://<项目名>.pages.dev/config-builder/`，[部署方式](DEPLOYMENT.md)），依次完成五步：
+打开部署后的 **Ratatoskr 配置工坊**（`https://<项目名>.pages.dev/config-builder/`，[部署方式](../config-builder/docs/DEPLOYMENT.md)），依次完成五步：
 
 1. **订阅来源。** 填写订阅名称与 YAML、Base64 或常见节点链接订阅，随后解析节点和机场报告的流量信息。
 2. **地区节点。** 只展示订阅中确实拥有的地区，选择需要保留的节点范围。
@@ -50,11 +52,11 @@ Yggdrasil 面向一站式的使用体验：使用者通过 config-builder 模块
 4. **APP 分流。** 默认全部启用并跟随代理，也可指定已保留的地区、Direct 或 Reject。规则和最终出口由模板统一维护。
 5. **最终确认。** 预览配置，下载 `名字-ratatoskr.yaml`，或生成持久订阅链接；也可生成一串 36 位分享码，别人在第一步粘贴即可导入同样的地区、策略与规则选择。分享码默认不含机场地址，可按需勾选包含。
 
-**[shared/catalog.json](../config-builder/shared/catalog.json)** 是从 `resources/template/ratatoskr-template.yaml` 自动生成的 APP、地区与规则目录。修改模板后运行 `npm run catalog`（`npm run build` 也会自动触发）再提交，两个静态站与后端就会读取同一份目录。完整的数据流与每项功能的位置见 **[实现路径](IMPLEMENTATION.md)**。
+**[shared/catalog.json](../config-builder/shared/catalog.json)** 是从 `resources/template/ratatoskr-template.yaml` 自动生成的 APP、地区与规则目录。修改模板后运行 `npm run catalog`（`npm run build` 也会自动触发）再提交，两个静态站与后端就会读取同一份目录。完整的数据流与每项功能的位置见 **[实现路径](../config-builder/docs/IMPLEMENTATION.md)**。
 
 持久订阅链接形如 `https://<后端域名>/config-builder?token=<配置名称>[&pwd=<访问口令>]`，不带 `.yaml` 后缀，浏览器打开即可查看 YAML；配置名称就是访问凭据，可另填 1–64 位访问口令来区分同名配置（同名同口令仍冲突）。口令以摘要参与存储键、明文出现在链接里，不是私密密码，请用不易猜到的组合并私密传递。持续时间可选 **3 小时 / 7 天 / 30 天 / 永久**。配置标题下的 catalog 指纹只标识模板版本，不用作访问凭据。生成的配置不内联节点，机场订阅地址以 `proxy-providers` 形式远程调用，节点更新即时生效。
 
-配置工坊采用**纯静态前端 + 自建 Node 后端**：GitHub Pages 与 Cloudflare Pages 只托管页面，机场订阅由后端拉取并保存加密记录；订阅链接通过 Cloudflare Pages 边缘函数在 CF 域名下就地代理，不跳后端、不暴露后端地址。生成配置不内联节点，节点由客户端通过 `proxy-providers` 拉取。后端部署模板、CF 代理与管理后台配置见 **[部署指南与故障复盘](DEPLOYMENT.md)**。
+配置工坊采用**纯静态前端 + 自建 Node 后端**：GitHub Pages 与 Cloudflare Pages 只托管页面，机场订阅由后端拉取并保存加密记录；订阅链接通过 Cloudflare Pages 边缘函数在 CF 域名下就地代理，不跳后端、不暴露后端地址。生成配置不内联节点，节点由客户端通过 `proxy-providers` 拉取。后端部署模板、CF 代理与管理后台配置见 **[部署指南与故障复盘](../config-builder/docs/DEPLOYMENT.md)**。
 
 没有独立的本地模式，也没有手动填写服务地址的入口：服务未就绪时向导会停止并提示重试；GitHub Pages 上的静态副本不提供可用功能。
 
@@ -184,7 +186,7 @@ Ratatoskr 将庞大的分类数据交给 Geo 数据库，将清晰的分流意�
 | `/api/presets`、`/api/presets/<code>` | 生成与读取分享码（36 位十六进制），默认不含机场地址，可选加密包含 |
 | `/api/endpoints` | 由后端直接吐出上述链接模板，不含任何凭据 |
 
-环境变量写在 `config-builder/server/.env`：`PUBLIC_BASE_URL` 决定生成链接的对外域名，`ALLOWED_ORIGINS` 限定可调用的前端，`TEMPLATE_URL=bundled` 表示使用仓库示例模板 `resources/template/ratatoskr-template.yaml` 的同源快照。没有共享 TOKEN，也不读取私有仓库——访问能力完全由订阅链接自身的随机 ID 与密钥承载。详见 [部署指南](DEPLOYMENT.md)。
+环境变量写在 `config-builder/server/.env`：`PUBLIC_BASE_URL` 决定生成链接的对外域名，`ALLOWED_ORIGINS` 限定可调用的前端，`TEMPLATE_URL=bundled` 表示使用仓库示例模板 `resources/template/ratatoskr-template.yaml` 的同源快照。没有共享 TOKEN，也不读取私有仓库——访问能力完全由订阅链接自身的随机 ID 与密钥承载。详见 [部署指南](../config-builder/docs/DEPLOYMENT.md)。
 
 后端地址统一写在构建变量 `SERVICE_BASE_URL` 或仓库根 `service.json` 中。[call-service.yml](../.github/workflows/call-service.yml) 从 Actions 做只读冒烟测试，只输出状态码与链接模板。旧的 `/merge`、`/sub` 私有仓库链路与静态跳转页已完全移除。
 

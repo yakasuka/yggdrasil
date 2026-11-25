@@ -57,7 +57,7 @@ cp server/.env.example server/.env
 
 **管理后台：** 设置 `ADMIN_USERS` 后，推荐打开 `https://yggdrasil-afx.pages.dev/config-builder/dashboard`——CF Pages 边缘函数就地代理到后端，地址栏不跳后端；未登录时返回独立登录页，提交账号密码后由 `functions/config-builder/dashboard/login.js` 校验并写入 HttpOnly Cookie，之后的页面与 `GET/DELETE /api/admin/configs` 都由 `functions/api/admin/configs.js` 在同源代理。也可直连 `https://<后端域名>/config-builder/dashboard`（Nginx 常规路径反代已覆盖该路径，此时使用浏览器 Basic 弹窗）。用同一组 Basic 账号密码登录，即可列出全部配置（名称、真实口令、生成时间、到期时间、有效期、可复制的**真实**订阅链接）并删除任意配置——带口令的配置也能删（按内部 id 定位，无需明文口令）。列表里展示的口令与链接来自服务端明文映射记录，仅供管理员调试，公开接口不返回；不配置 `ADMIN_USERS` 时后台与接口都返回 401，且不在前端或 `/api/endpoints` 中暴露。
 
-**在后台编辑前端信息（YAML 模板）：** 管理后台的「前端配置」标签页可直接编辑驱动整个配置工坊的 `ratatoskr-template.yaml`。后端提供 `GET/PUT/DELETE /api/admin/frontinfo`（与订阅管理同一套管理员鉴权，经 `functions/api/admin/frontinfo.js` 在 CF 同源代理）：GET 读当前草稿、PUT 校验并保存、DELETE 放弃草稿恢复仓库版本。保存时服务端用与构建相同的 `catalogFromYaml` 校验模板，别名/规则/区块缺失会被拒绝；通过后立即影响公开 `GET /api/catalog`，配置工坊下次打开即读到新内容，无需重新部署前端。草稿通过公开只读的 `GET /api/frontinfo` 暴露（模板本身是仓库里的公开数据，不含任何凭据）。[sync-frontinfo.yml](../.github/workflows/sync-frontinfo.yml) 每 15 分钟（也可手动 `workflow_dispatch`）用普通 HTTPS 拉取草稿、写入 `resources/template/ratatoskr-template.yaml`、重建 `catalog.json` 并用内置 `GITHUB_TOKEN` 提交，因此**后端无需持有任何 GitHub token**。要让该 Action 工作，需设置仓库变量 `SERVICE_BASE_URL`（与静态前端同源的那个后端地址）；未设置时 Action 会安全跳过。要让此功能上线，需先在 VPS 上 pull 最新代码并重启后端服务（systemd: `sudo systemctl restart yggdrasil`）。
+**在后台编辑前端信息（YAML 模板）：** 管理后台的「前端配置」标签页可直接编辑驱动整个配置工坊的 `ratatoskr-template.yaml`。后端提供 `GET/PUT/DELETE /api/admin/frontinfo`（与订阅管理同一套管理员鉴权，经 `functions/api/admin/frontinfo.js` 在 CF 同源代理）：GET 读当前草稿、PUT 校验并保存、DELETE 放弃草稿恢复仓库版本。保存时服务端用与构建相同的 `catalogFromYaml` 校验模板，别名/规则/区块缺失会被拒绝；通过后立即影响公开 `GET /api/catalog`，配置工坊下次打开即读到新内容，无需重新部署前端。草稿通过公开只读的 `GET /api/frontinfo` 暴露（模板本身是仓库里的公开数据，不含任何凭据）。[sync-frontinfo.yml](../../.github/workflows/sync-frontinfo.yml) 每 15 分钟（也可手动 `workflow_dispatch`）用普通 HTTPS 拉取草稿、写入 `resources/template/ratatoskr-template.yaml`、重建 `catalog.json` 并用内置 `GITHUB_TOKEN` 提交，因此**后端无需持有任何 GitHub token**。要让该 Action 工作，需设置仓库变量 `SERVICE_BASE_URL`（与静态前端同源的那个后端地址）；未设置时 Action 会安全跳过。要让此功能上线，需先在 VPS 上 pull 最新代码并重启后端服务（systemd: `sudo systemctl restart yggdrasil`）。
 
 若从旧的私有仓库链路迁移：删除 CF 项目里的 `TOKEN`、`GH_TOKEN`、`SERVICE_TOKEN` 变量，下线旧的独立 Worker（`worker/wrangler.jsonc` 含 KV 绑定，已弃用，不要执行 `worker:deploy`），也不要保留任何读取节点正文的旧 Pages Functions。当前需要的是仓库根 `functions/` 下的透明代理与登录函数；CF Git 集成部署会自动识别它们，无需手动配置 KV 或环境变量。两个静态站的 `service.json` / `SERVICE_BASE_URL` 都指向同一个后端域名。
 
@@ -90,7 +90,7 @@ docker run -d --name yggdrasil -p 8788:8788 \
   yggdrasil-service
 ```
 
-TLS 建议放在前面，见 [config-builder/deploy/nginx.conf.example](../config-builder/deploy/nginx.conf.example)。反代后设置 `PUBLIC_BASE_URL=https://api.example.com` 与 `TRUST_PROXY=true`，后端只监听 8788。
+TLS 建议放在前面，见 [config-builder/deploy/nginx.conf.example](../deploy/nginx.conf.example)。反代后设置 `PUBLIC_BASE_URL=https://api.example.com` 与 `TRUST_PROXY=true`，后端只监听 8788。
 
 ## 3. 部署两个静态前端
 
@@ -117,7 +117,7 @@ GitHub Pages 发布的是仓库根目录，不是 `worker/gateway/dist`。仓库
 - `config-builder/index.html` + `config-builder/assets/app.js|css`：向导（与 CF 同一份 bundle）；
 - `service.json`：`{"service":"https://api.example.com"}`，前端在 meta 为空时读取它。
 
-在 GitHub 仓库设置 repository variable `SERVICE_BASE_URL=https://api.example.com`。之后 [sync-static.yml](../.github/workflows/sync-static.yml) 会在源码变更时重新构建、测试并提交上述静态文件；也可手动 `workflow_dispatch`。本地等价操作：
+在 GitHub 仓库设置 repository variable `SERVICE_BASE_URL=https://api.example.com`。之后 [sync-static.yml](../../.github/workflows/sync-static.yml) 会在源码变更时重新构建、测试并提交上述静态文件；也可手动 `workflow_dispatch`。本地等价操作：
 
 ```sh
 cd config-builder
@@ -166,7 +166,7 @@ cd .. && git add config-builder/index.html config-builder/assets/app.js config-b
 
 分享码只携带选择，不携带节点或订阅 YAML，也不会替换订阅链接。含机场地址的分享码等于把节点访问能力交出去，应通过私下渠道传递。
 
-GitHub 侧的 [call-service.yml](../.github/workflows/call-service.yml) 仅做只读冒烟测试：读取 `/api/status` 与 `/api/endpoints`，只输出状态码与链接模板，不保存任何节点内容到仓库或日志。
+GitHub 侧的 [call-service.yml](../../.github/workflows/call-service.yml) 仅做只读冒烟测试：读取 `/api/status` 与 `/api/endpoints`，只输出状态码与链接模板，不保存任何节点内容到仓库或日志。
 
 ## 5. 发布后验收
 
@@ -230,8 +230,8 @@ mihomo -t -d /path/to/mihomo-data -f /path/to/Example-ratatoskr.yaml
 
 ## 8. 维护资料
 
-- [项目 README](../README.md) · [完整实现路径](IMPLEMENTATION.md) · [服务文件说明](../config-builder/worker/README.md)
-- [server/.env.example](../config-builder/server/.env.example) · [deploy/yggdrasil.service](../config-builder/deploy/yggdrasil.service) · [deploy/Dockerfile](../config-builder/deploy/Dockerfile) · [deploy/nginx.conf.example](../config-builder/deploy/nginx.conf.example)
-- [sync-static.yml](../.github/workflows/sync-static.yml) · [call-service.yml](../.github/workflows/call-service.yml)
+- [项目 README](../../README.md) · [完整实现路径](IMPLEMENTATION.md) · [服务文件说明](../worker/README.md)
+- [server/.env.example](../server/.env.example) · [deploy/yggdrasil.service](../deploy/yggdrasil.service) · [deploy/Dockerfile](../deploy/Dockerfile) · [deploy/nginx.conf.example](../deploy/nginx.conf.example)
+- [sync-static.yml](../../.github/workflows/sync-static.yml) · [call-service.yml](../../.github/workflows/call-service.yml)
 
 平台界面、权限与限制可能变化，后续以官方文档与实际配置为准，并同步更新本指南。

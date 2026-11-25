@@ -1,5 +1,26 @@
 name: Validate config-builder
-on: [push, pull_request]
+
+# Only builder-owned paths trigger this workflow. YAML/rule updates on the
+# main line must not rebuild or retest the frontend, and vice versa.
+on:
+  push:
+    paths:
+      - "config-builder/**"
+      - "!config-builder/docs/**"
+      - "functions/**"
+      - "service.json"
+      - "_redirects"
+      - "_routes.json"
+      - ".github/workflows/check.yml"
+  pull_request:
+    paths:
+      - "config-builder/**"
+      - "!config-builder/docs/**"
+      - "functions/**"
+      - "service.json"
+      - "_redirects"
+      - "_routes.json"
+      - ".github/workflows/check.yml"
 permissions:
   contents: read
 jobs:

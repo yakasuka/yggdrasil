@@ -1,6 +1,6 @@
 # Yggdrasil · config-builder
 
-**配置工坊** · [部署指南与复盘](../docs/DEPLOYMENT.md) · [项目介绍](../README.md) · [完整实现路径](../docs/IMPLEMENTATION.md) · [服务准备](worker/README.md)
+**配置工坊** · [部署指南与复盘](docs/DEPLOYMENT.md) · [项目介绍](../README.md) · [完整实现路径](docs/IMPLEMENTATION.md) · [服务准备](worker/README.md)
 
 五步配置：机场订阅 → 解析节点 → 地区节点 → 节点策略 → APP 分流 → 最终确认。“解析节点”是第 1、2 步之间的状态项，不可选择。
 
@@ -58,10 +58,13 @@ config-builder/
 ├── deploy/                    # systemd / Docker / Nginx 部署模板
 ├── scripts/                   # 构建与目录生成脚本
 ├── tests/                     # 测试与测试订阅样例
+├── docs/                      # 本子项目专属文档（部署 / 实现路径）
 └── wrangler.jsonc             # CF Pages 纯静态项目配置（无 KV）
 ```
 
-项目级文档统一放在仓库根 [docs/](../docs/)：[部署指南](../docs/DEPLOYMENT.md)、[实现路径](../docs/IMPLEMENTATION.md)、[中文说明](../docs/zh-CN.md)、[English](../docs/en.md)。仓库根的 `functions/` 与 `_routes.json` 是 CF Pages 的透明代理，`assets/`、`sponsor/`、`service.json` 供两个静态站直接使用。
+**维护边界：** 本目录是一个可独立更新的子项目。改前端、后端、测试或专属文档时只动 `config-builder/`；YAML 模板与规则源属于仓库主线 `resources/`。受 Cloudflare Pages 目录约定限制，边缘代理 `functions/`、`service.json`、`_redirects`、`_routes.json` 必须留在仓库根，但归本子项目维护；对应 workflow 是 `check.yml`、`sync-static.yml`、`deploy-cloudflare.yml`、`call-service.yml`。`sync-frontinfo.yml` 是跨边界链路：从本子项目后端拉取草稿，写回主线的 `resources/template/ratatoskr-template.yaml`。
+
+项目级文档仍在仓库根 [docs/](../docs/)：[中文说明](../docs/zh-CN.md)、[English](../docs/en.md)；本子项目的 [部署指南](docs/DEPLOYMENT.md) 与 [实现路径](docs/IMPLEMENTATION.md) 已收进 `config-builder/docs/`。
 
 [shared/catalog.json](shared/catalog.json) 由 `resources/template/ratatoskr-template.yaml` 自动生成。修改模板后运行 `npm run catalog`（`npm run build` 也会自动触发）再提交，选择器与后端共享同一份目录。
 
@@ -90,4 +93,4 @@ SERVICE_BASE_URL=https://api.example.com npm run build
 
 KV v3 的 AES-GCM 加密记录改存 `server/data/`（每记录一个文件，按有效期清理）。服务端为每条订阅保留随机 128 位 ID 与独立 256 位密钥，并把「配置名称 + 可选口令」的 SHA-256 摘要映射到这对凭据；配制时填入的口令明文另存进该映射记录，仅供管理员后台调试展示真实链接使用，公开接口不返回它——没有共享 TOKEN、不读私有仓库。后端 `/api/endpoints` 只返回链接模板，不返回任何凭据。
 
-完整订阅链接与生成的 YAML 都包含敏感访问能力，分享问题时应移除凭据。平台界面与额度可能变化，部署与验收细节见 [部署指南](../docs/DEPLOYMENT.md)。
+完整订阅链接与生成的 YAML 都包含敏感访问能力，分享问题时应移除凭据。平台界面与额度可能变化，部署与验收细节见 [部署指南](docs/DEPLOYMENT.md)。

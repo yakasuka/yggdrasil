@@ -11,7 +11,7 @@
 
 <p align="center">
   <a href="docs/zh-CN.md">简体中文</a>　·　<a href="docs/en.md">English</a><br />
-  <a href="https://yakasuka.github.io/yggdrasil/">项目主页</a>　·　<a href="https://yakasuka.github.io/yggdrasil/config-builder/">配置工坊</a>　·　<a href="docs/DEPLOYMENT.md">部署指南</a>
+  <a href="https://yakasuka.github.io/yggdrasil/">项目主页</a>　·　<a href="https://yakasuka.github.io/yggdrasil/config-builder/">配置工坊</a>　·　<a href="config-builder/docs/DEPLOYMENT.md">部署指南</a>
 </p>
 
 <!-- SEO: keywords, positioning and key facts. Keep in sync with resources/scripts/repo-metadata.mjs and index.html. -->
@@ -81,25 +81,43 @@ Yggdrasil 是一套面向 **Mihomo / Clash / OpenClash / Clash Verge** 的配置
 
 - [中文指南：架构、规则、配置选择与使用说明](docs/zh-CN.md)　·　[English guide](docs/en.md)
 - [Ratatoskr 主配置](resources/template/ratatoskr-template.yaml) · [Release 下载](https://github.com/yakasuka/yggdrasil/releases/latest/download/ratatoskr-template.yaml)
-- [部署指南](docs/DEPLOYMENT.md) · [实现路径](docs/IMPLEMENTATION.md) · [图标来源](assets/icons/macosicons/README.md) · [配置工坊 README](config-builder/README.md)
+- [部署指南](config-builder/docs/DEPLOYMENT.md) · [实现路径](config-builder/docs/IMPLEMENTATION.md) · [图标来源](assets/icons/macosicons/README.md) · [配置工坊 README](config-builder/README.md)
 
 ### 目录结构
 
+主线：**YAML 资源 + 落地页**，由规则同步与 Release 驱动。
+
 ```text
-.github/workflows/   CI：规则同步、静态站构建、Release、后端冒烟测试
-assets/             站点首页与配置工坊共用的图标、图片
-config-builder/     配置工坊：静态前端 + Node 后端 + 测试 + 部署模板
-docs/               项目级文档：中文 / English / 部署指南 / 实现路径
-functions/          Cloudflare Pages 边缘代理（订阅、流量、管理后台）
-resources/          Ratatoskr 模板、规则源与自动化脚本（元数据、规则生成）
-sponsor/            打赏页静态资源
+resources/          Ratatoskr 模板、规则源与同步脚本（唯一数据真相源）
+  template/         ratatoskr-template.yaml
+  rules/            Aethersailor / AdGuard / 手工规则与 overlays
+  scripts/          规则同步与仓库元数据脚本
 index.html          项目主页（GitHub Pages 根）
-service.json        静态站指向后端的地址（必须在仓库根）
-_redirects / _routes.json / robots.txt / sitemap.xml
-                    Cloudflare Pages 路由与 SEO 文件（必须在仓库根）
+sponsor/            打赏页
+assets/             图标、品牌图与共享页脚（落地页与工坊共用）
+docs/               项目级文档：中文 / English
+sitemap.xml / robots.txt                    SEO
+.github/workflows/sync-rules.yml            规则源同步
+.github/workflows/update-adguard-rules.yml  AdGuard 规则更新
+.github/workflows/publish-release.yml       模板 Release
 ```
 
-`index.html`、`assets/`、`config-builder/`、`sponsor/`、`functions/` 与根级路由文件由 GitHub Pages / Cloudflare Pages 直接读取，路径不可更改；其他内容按用途归类，后端部署模板已收进 `config-builder/deploy/`。
+子项目：**config-builder**，前端、自建后端与边缘代理单独更新，后续可整体拆仓。
+
+```text
+config-builder/     静态前端 + Node 后端 + 测试 + 部署模板
+  docs/             专属文档：部署指南 / 实现路径
+functions/          CF Pages 透明代理（Pages 约定要求留在仓库根）
+service.json        静态站指向后端的地址（根级，构建器写入）
+_redirects / _routes.json                   CF 路由（根级，构建器配套）
+.github/workflows/check.yml                 构建与测试（仅构建器路径触发）
+.github/workflows/sync-static.yml           静态产物同步到 GitHub Pages
+.github/workflows/deploy-cloudflare.yml     手动发布 CF Pages
+.github/workflows/call-service.yml          后端只读冒烟测试
+.github/workflows/sync-frontinfo.yml        桥接：管理后台草稿 → 主线 YAML
+```
+
+`index.html`、`assets/`、`config-builder/`、`sponsor/`、`functions/` 与根级路由文件由 GitHub Pages / Cloudflare Pages 直接读取，路径不可更改。`sync-frontinfo.yml` 是唯一跨边界链路：草稿来自构建器后端，但写入的是主线模板。
 
 ### 赞助支持
 

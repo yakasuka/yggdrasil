@@ -37,6 +37,8 @@ The builder reads the same Ratatoskr template used as the configuration source. 
 Subscription / node file → Config Builder → Ratatoskr template → Personal Mihomo YAML
 ```
 
+Maintenance boundary: `resources/` (template and rules) is the repository main line, driven by rule sync and releases. `config-builder/` is an independently updated subproject with its own front end, self-hosted service, CF proxies and docs. Pages conventions keep `functions/`, `service.json`, `_redirects` and `_routes.json` at the repository root, but they are maintained by that subproject.
+
 ## Configuration options
 
 - **Application routing:** Choose separate outbound groups for AI, messaging, social, streaming, gaming, and other services.
@@ -55,7 +57,7 @@ Open the **[Config Builder](https://yakasuka.github.io/yggdrasil/config-builder/
 
 The builder accepts subscription YAML, Base64 content, and common node links. Subscription traffic information comes from the provider. Optional delay checks measure TCP connection setup time; they are not ICMP ping or full proxy latency measurements.
 
-Without a deployed service, local node-file import, preview, and download remain available. Subscription fetching through a cross-origin proxy and persistent subscription links require the corresponding service to be deployed. See the [deployment guide](DEPLOYMENT.md).
+Without a deployed service, local node-file import, preview, and download remain available. Subscription fetching through a cross-origin proxy and persistent subscription links require the corresponding service to be deployed. See the [deployment guide](../config-builder/docs/DEPLOYMENT.md).
 
 ## Configuration files
 
@@ -67,7 +69,7 @@ Network takeover features such as DNS, TUN, and sniffing are configured per clie
 
 The static front end lives in `config-builder/` and is published identically on Cloudflare Pages and GitHub Pages. The self-hosted Node service in `config-builder/server/` is a public API: users submit their own subscription URLs, choose regions, strategies, apps and rule modules in the wizard, and receive a friendly link like `/config-builder?token=guagua` based on the configuration name they typed. An optional 1–64 character password can be appended as `&pwd=...` so two people can keep the same memorable name; it is hashed into the storage key but appears in the link in plain text, so treat the whole link as the credential. The name and password map to an internal random ID/key pair, the YAML is served inline (no download) and can be opened directly in a browser. The config is rendered by editing `ratatoskr-template.yaml` in place, preserving its comments, flow style, anchors and client-side `GEOSITE`/`GEOIP` rules; nodes are referenced as remote `proxy-providers` using the airport URL and are never inlined. Legacy `/subscription/<id>/<key>.yaml` links have been removed. No shared token and no private repository are involved. No Cloudflare Worker, Function business logic or KV namespace is used.
 
-The review step can also issue a 36-character hex share code (`/api/presets`). Pasting that code on the first step restores the same regions, strategies, apps and rule modules. Airport URLs are excluded by default and only stored when the sharer explicitly opts in; a code containing them is a credential and should be shared privately. See the [implementation map](IMPLEMENTATION.md) and the [deployment guide](DEPLOYMENT.md).
+The review step can also issue a 36-character hex share code (`/api/presets`). Pasting that code on the first step restores the same regions, strategies, apps and rule modules. Airport URLs are excluded by default and only stored when the sharer explicitly opts in; a code containing them is a credential and should be shared privately. See the [implementation map](../config-builder/docs/IMPLEMENTATION.md) and the [deployment guide](../config-builder/docs/DEPLOYMENT.md).
 
 ```sh
 npm --prefix config-builder ci
