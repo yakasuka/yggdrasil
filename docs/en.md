@@ -8,7 +8,7 @@
 
 Yggdrasil is the application and tooling around **Ratatoskr**, its core Mihomo configuration and shared builder template.
 
-[中文指南](zh-CN.md)　·　[Open Config Builder](https://yakasuka.github.io/yggdrasil/config-builder/)　·　[Back to project cover](../README.md)
+[中文指南](zh-CN.md)　·　[Open Config Builder](https://yggdrasil-afx.pages.dev/config-builder)　·　[Back to project cover](../README.md)
 
 </div>
 
@@ -53,7 +53,7 @@ The main repository cover includes a visual preview of app, region, and strategy
 
 ## Getting started
 
-Open the **[Config Builder](https://yakasuka.github.io/yggdrasil/config-builder/)**, import a subscription or node file, select regions and strategies, choose application routes, then review and download the generated YAML.
+Open the **[Config Builder](https://yggdrasil-afx.pages.dev/config-builder)**, import a subscription or node file, select regions and strategies, choose application routes, then review and download the generated YAML.
 
 The builder accepts subscription YAML, Base64 content, and common node links. Subscription traffic information comes from the provider. Optional delay checks measure TCP connection setup time; they are not ICMP ping or full proxy latency measurements.
 

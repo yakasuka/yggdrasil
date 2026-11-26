@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://yakasuka.github.io/yggdrasil/sitemap.xml
+Sitemap: https://yggdrasil-afx.pages.dev/sitemap.xml

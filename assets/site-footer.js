@@ -90,7 +90,7 @@ const TEMPLATE = `
   <nav class="foot-links" aria-label="页脚导航">
     <a href="https://github.com/yakasuka/yggdrasil/blob/main/docs/zh-CN.md">中文指南</a>
     <a href="https://github.com/yakasuka/yggdrasil/blob/main/docs/en.md">English</a>
-    <a href="__BASE__config-builder/">配置工坊</a>
+    <a href="https://yggdrasil-afx.pages.dev/config-builder">配置工坊</a>
     <a href="__BASE__resources/template/ratatoskr-template.yaml">Ratatoskr</a>
     <a href="https://github.com/yakasuka/yggdrasil#致谢--上游项目">致谢</a>
     <a href="__BASE__LICENSE">授权协议</a>

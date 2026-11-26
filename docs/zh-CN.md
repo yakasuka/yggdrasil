@@ -142,7 +142,7 @@ Ratatoskr 将庞大的分类数据交给 Geo 数据库，将清晰的分流意�
 
 ## 快速开始
 
-推荐从 [配置工坊](https://yakasuka.github.io/yggdrasil/config-builder/) 开始；也可以手动使用模板：
+推荐从 [配置工坊](https://yggdrasil-afx.pages.dev/config-builder) 开始；也可以手动使用模板：
 
 1. **确认授权。** 取得相应原作者或权利人的书面许可，条款见 [LICENSE](../LICENSE)。
 2. **选择配置。** 使用 `resources/template/ratatoskr-template.yaml`，或从 Release 获取固定直链。

@@ -11,7 +11,7 @@
 
 <p align="center">
   <a href="docs/zh-CN.md">简体中文</a>　·　<a href="docs/en.md">English</a><br />
-  <a href="https://yakasuka.github.io/yggdrasil/">项目主页</a>　·　<a href="https://yakasuka.github.io/yggdrasil/config-builder/">配置工坊</a>　·　<a href="config-builder/docs/DEPLOYMENT.md">部署指南</a>
+  <a href="https://yggdrasil-afx.pages.dev/">项目主页</a>　·　<a href="https://yggdrasil-afx.pages.dev/config-builder">配置工坊</a>　·　<a href="config-builder/docs/DEPLOYMENT.md">部署指南</a>
 </p>
 
 <!-- SEO: keywords, positioning and key facts. Keep in sync with resources/scripts/repo-metadata.mjs and index.html. -->
@@ -123,7 +123,7 @@ _redirects / _routes.json                   CF 路由（根级，构建器配套
 
 如果 Yggdrasil 帮到了你，可以用一杯咖啡支持后续维护。点击下方链接，选择 **微信 / 支付宝 / PayPal** 任意方式打赏：
 
-<pre><code><a href="https://yakasuka.github.io/yggdrasil/sponsor/">https://yakasuka.github.io/yggdrasil/sponsor/</a>  →  打开打赏页面</code></pre>
+<pre><code><a href="https://yggdrasil-afx.pages.dev/sponsor/">https://yggdrasil-afx.pages.dev/sponsor/</a>  →  打开打赏页面</code></pre>
 
 ### 贡献者
 
