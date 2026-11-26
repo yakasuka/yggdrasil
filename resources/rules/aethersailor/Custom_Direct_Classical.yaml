@@ -1,7 +1,7 @@
 # GENERATED - DO NOT EDIT. Add your rules to overlays/Custom_Direct_Classical.yaml
 # upstream: Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Direct_Classical.yaml
-# upstream blob: 3eaf8dee483d384d34d22f97240de08a7e4598f2
-# total: 1324 (upstream 1324, extra 0)
+# upstream blob: 9e734105c4b239423e95642a3e0c1c1d86239274
+# total: 1332 (upstream 1332, extra 0)
 payload:
   - 'DOMAIN-KEYWORD,m-team'
   - 'DOMAIN-KEYWORD,quickconnect'
@@ -24,6 +24,7 @@ payload:
   - 'DOMAIN-SUFFIX,1254225.com'
   - 'DOMAIN-SUFFIX,12zayb.com'
   - 'DOMAIN-SUFFIX,1335273.com'
+  - 'DOMAIN-SUFFIX,14590562.com'
   - 'DOMAIN-SUFFIX,153532.com'
   - 'DOMAIN-SUFFIX,17van.com'
   - 'DOMAIN-SUFFIX,1996999.xyz'
@@ -33,6 +34,7 @@ payload:
   - 'DOMAIN-SUFFIX,225284.xyz'
   - 'DOMAIN-SUFFIX,25mao.com'
   - 'DOMAIN-SUFFIX,264788.xyz'
+  - 'DOMAIN-SUFFIX,26531313.com'
   - 'DOMAIN-SUFFIX,2mcnxs.cc'
   - 'DOMAIN-SUFFIX,33442805.com'
   - 'DOMAIN-SUFFIX,34619481.com'
@@ -47,6 +49,7 @@ payload:
   - 'DOMAIN-SUFFIX,3d-apollo.com'
   - 'DOMAIN-SUFFIX,3dwhere.com'
   - 'DOMAIN-SUFFIX,3gxk.net'
+  - 'DOMAIN-SUFFIX,41563901.com'
   - 'DOMAIN-SUFFIX,419g.com'
   - 'DOMAIN-SUFFIX,43645202.com'
   - 'DOMAIN-SUFFIX,4399zmxy.com'
@@ -69,6 +72,7 @@ payload:
   - 'DOMAIN-SUFFIX,55555.ink'
   - 'DOMAIN-SUFFIX,56tvc.com'
   - 'DOMAIN-SUFFIX,580ai.net'
+  - 'DOMAIN-SUFFIX,60601826.com'
   - 'DOMAIN-SUFFIX,618208.xyz'
   - 'DOMAIN-SUFFIX,657192.com'
   - 'DOMAIN-SUFFIX,66298845.com'
@@ -248,6 +252,7 @@ payload:
   - 'DOMAIN-SUFFIX,chatlabs.net'
   - 'DOMAIN-SUFFIX,chaxunjiao.com'
   - 'DOMAIN-SUFFIX,chaz.fun'
+  - 'DOMAIN-SUFFIX,chengguo4.com'
   - 'DOMAIN-SUFFIX,chengguodj.com'
   - 'DOMAIN-SUFFIX,chenyuxia.com'
   - 'DOMAIN-SUFFIX,cheriexsky.love'
@@ -483,6 +488,7 @@ payload:
   - 'DOMAIN-SUFFIX,guangyapan.com'
   - 'DOMAIN-SUFFIX,guazi.fun'
   - 'DOMAIN-SUFFIX,guiguiya.com'
+  - 'DOMAIN-SUFFIX,gulufenfa.com'
   - 'DOMAIN-SUFFIX,guyuns.asia'
   - 'DOMAIN-SUFFIX,gvgoo.com'
   - 'DOMAIN-SUFFIX,gwmapp-w.com'
@@ -786,6 +792,7 @@ payload:
   - 'DOMAIN-SUFFIX,msftncsi.com'
   - 'DOMAIN-SUFFIX,mslmc.net'
   - 'DOMAIN-SUFFIX,mssdag.com'
+  - 'DOMAIN-SUFFIX,mssxapp.com'
   - 'DOMAIN-SUFFIX,mtaokj.com'
   - 'DOMAIN-SUFFIX,muhemob.com'
   - 'DOMAIN-SUFFIX,mulingyuer.com'
@@ -1242,6 +1249,7 @@ payload:
   - 'DOMAIN-SUFFIX,yiso.fun'
   - 'DOMAIN-SUFFIX,yixc.com'
   - 'DOMAIN-SUFFIX,yixlab.com'
+  - 'DOMAIN-SUFFIX,yjshai.com'
   - 'DOMAIN-SUFFIX,yldw.net'
   - 'DOMAIN-SUFFIX,ymm56-cdn.com'
   - 'DOMAIN-SUFFIX,ymwfy.com'
