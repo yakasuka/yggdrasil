@@ -1,532 +1,532 @@
 {
-  "note": "AdGuard Windows filters. Set enabled=false to skip. Edit freely; workflow reads this file.",
+  "note": "AdGuard Chromium browser-extension filters. Set enabled=false to skip. Edit freely; workflow reads this file.",
   "filters": [
     {
       "id": 1,
       "name": "AdGuard Russian filter",
-      "url": "https://filters.adtidy.org/windows/filters/1.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/1.txt",
       "enabled": true
     },
     {
       "id": 2,
       "name": "AdGuard Base filter",
-      "url": "https://filters.adtidy.org/windows/filters/2.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/2.txt",
       "enabled": true
     },
     {
       "id": 3,
       "name": "AdGuard Tracking Protection filter",
-      "url": "https://filters.adtidy.org/windows/filters/3.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/3.txt",
       "enabled": true
     },
     {
       "id": 4,
       "name": "AdGuard Social Media filter",
-      "url": "https://filters.adtidy.org/windows/filters/4.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/4.txt",
       "enabled": true
     },
     {
       "id": 5,
       "name": "AdGuard Experimental filter",
-      "url": "https://filters.adtidy.org/windows/filters/5.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/5.txt",
       "enabled": true
     },
     {
       "id": 6,
       "name": "AdGuard German filter",
-      "url": "https://filters.adtidy.org/windows/filters/6.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/6.txt",
       "enabled": true
     },
     {
       "id": 7,
       "name": "AdGuard Japanese filter",
-      "url": "https://filters.adtidy.org/windows/filters/7.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/7.txt",
       "enabled": true
     },
     {
       "id": 8,
       "name": "AdGuard Dutch filter",
-      "url": "https://filters.adtidy.org/windows/filters/8.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/8.txt",
       "enabled": true
     },
     {
       "id": 9,
       "name": "AdGuard Spanish/Portuguese filter",
-      "url": "https://filters.adtidy.org/windows/filters/9.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/9.txt",
       "enabled": true
     },
     {
       "id": 10,
       "name": "Filter unblocking search ads and self-promotion",
-      "url": "https://filters.adtidy.org/windows/filters/10.txt",
-      "enabled": true
+      "url": "https://filters.adtidy.org/extension/chromium/filters/10.txt",
+      "enabled": false
     },
     {
       "id": 11,
       "name": "AdGuard Mobile Ads filter",
-      "url": "https://filters.adtidy.org/windows/filters/11.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/11.txt",
       "enabled": true
     },
     {
       "id": 13,
       "name": "AdGuard Turkish filter",
-      "url": "https://filters.adtidy.org/windows/filters/13.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/13.txt",
       "enabled": true
     },
     {
       "id": 14,
       "name": "AdGuard Annoyances filter",
-      "url": "https://filters.adtidy.org/windows/filters/14.txt",
-      "enabled": true
+      "url": "https://filters.adtidy.org/extension/chromium/filters/14.txt",
+      "enabled": false
     },
     {
       "id": 15,
       "name": "AdGuard DNS filter",
-      "url": "https://filters.adtidy.org/windows/filters/15.txt",
-      "enabled": true
+      "url": "https://filters.adtidy.org/extension/chromium/filters/15.txt",
+      "enabled": false
     },
     {
       "id": 16,
       "name": "AdGuard French filter",
-      "url": "https://filters.adtidy.org/windows/filters/16.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/16.txt",
       "enabled": true
     },
     {
       "id": 17,
       "name": "AdGuard URL Tracking filter",
-      "url": "https://filters.adtidy.org/windows/filters/17.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/17.txt",
       "enabled": true
     },
     {
       "id": 18,
       "name": "AdGuard Cookie Notices filter",
-      "url": "https://filters.adtidy.org/windows/filters/18.txt",
-      "enabled": true
+      "url": "https://filters.adtidy.org/extension/chromium/filters/18.txt",
+      "enabled": false
     },
     {
       "id": 19,
       "name": "AdGuard Popups filter",
-      "url": "https://filters.adtidy.org/windows/filters/19.txt",
-      "enabled": true
+      "url": "https://filters.adtidy.org/extension/chromium/filters/19.txt",
+      "enabled": false
     },
     {
       "id": 20,
       "name": "AdGuard Mobile App Banners filter",
-      "url": "https://filters.adtidy.org/windows/filters/20.txt",
-      "enabled": true
+      "url": "https://filters.adtidy.org/extension/chromium/filters/20.txt",
+      "enabled": false
     },
     {
       "id": 21,
       "name": "AdGuard Other Annoyances filter",
-      "url": "https://filters.adtidy.org/windows/filters/21.txt",
-      "enabled": true
+      "url": "https://filters.adtidy.org/extension/chromium/filters/21.txt",
+      "enabled": false
     },
     {
       "id": 22,
       "name": "AdGuard Widgets filter",
-      "url": "https://filters.adtidy.org/windows/filters/22.txt",
-      "enabled": true
+      "url": "https://filters.adtidy.org/extension/chromium/filters/22.txt",
+      "enabled": false
     },
     {
       "id": 23,
       "name": "AdGuard Ukrainian filter",
-      "url": "https://filters.adtidy.org/windows/filters/23.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/23.txt",
       "enabled": true
     },
     {
       "id": 25,
       "name": "AdGuard Mail Tracking Protection filter",
-      "url": "https://filters.adtidy.org/windows/filters/25.txt",
-      "enabled": true
+      "url": "https://filters.adtidy.org/extension/chromium/filters/25.txt",
+      "enabled": false
     },
     {
       "id": 26,
       "name": "AdGuard Italian filter",
-      "url": "https://filters.adtidy.org/windows/filters/26.txt",
-      "enabled": true
+      "url": "https://filters.adtidy.org/extension/chromium/filters/26.txt",
+      "enabled": false
     },
     {
       "id": 27,
       "name": "AdGuard Polish filter",
-      "url": "https://filters.adtidy.org/windows/filters/27.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/27.txt",
       "enabled": true
     },
     {
       "id": 101,
       "name": "EasyList",
-      "url": "https://filters.adtidy.org/windows/filters/101.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/101.txt",
       "enabled": true
     },
     {
       "id": 102,
       "name": "ABPindo",
-      "url": "https://filters.adtidy.org/windows/filters/102.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/102.txt",
       "enabled": true
     },
     {
       "id": 103,
       "name": "Bulgarian list",
-      "url": "https://filters.adtidy.org/windows/filters/103.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/103.txt",
       "enabled": true
     },
     {
       "id": 104,
       "name": "EasyList China",
-      "url": "https://filters.adtidy.org/windows/filters/104.txt",
-      "enabled": true
+      "url": "https://filters.adtidy.org/extension/chromium/filters/104.txt",
+      "enabled": false
     },
     {
       "id": 105,
       "name": "EasyList Czech and Slovak",
-      "url": "https://filters.adtidy.org/windows/filters/105.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/105.txt",
       "enabled": true
     },
     {
       "id": 106,
       "name": "EasyList Dutch",
-      "url": "https://filters.adtidy.org/windows/filters/106.txt",
-      "enabled": true
+      "url": "https://filters.adtidy.org/extension/chromium/filters/106.txt",
+      "enabled": false
     },
     {
       "id": 107,
       "name": "EasyList Germany",
-      "url": "https://filters.adtidy.org/windows/filters/107.txt",
-      "enabled": true
+      "url": "https://filters.adtidy.org/extension/chromium/filters/107.txt",
+      "enabled": false
     },
     {
       "id": 108,
       "name": "EasyList Hebrew",
-      "url": "https://filters.adtidy.org/windows/filters/108.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/108.txt",
       "enabled": true
     },
     {
       "id": 109,
       "name": "EasyList Italy",
-      "url": "https://filters.adtidy.org/windows/filters/109.txt",
-      "enabled": true
+      "url": "https://filters.adtidy.org/extension/chromium/filters/109.txt",
+      "enabled": false
     },
     {
       "id": 110,
       "name": "EasyList Lithuania",
-      "url": "https://filters.adtidy.org/windows/filters/110.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/110.txt",
       "enabled": true
     },
     {
       "id": 111,
       "name": "Latvian List",
-      "url": "https://filters.adtidy.org/windows/filters/111.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/111.txt",
       "enabled": true
     },
     {
       "id": 112,
       "name": "Liste AR",
-      "url": "https://filters.adtidy.org/windows/filters/112.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/112.txt",
       "enabled": true
     },
     {
       "id": 113,
       "name": "Liste FR",
-      "url": "https://filters.adtidy.org/windows/filters/113.txt",
-      "enabled": true
+      "url": "https://filters.adtidy.org/extension/chromium/filters/113.txt",
+      "enabled": false
     },
     {
       "id": 114,
       "name": "ROList",
-      "url": "https://filters.adtidy.org/windows/filters/114.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/114.txt",
       "enabled": true
     },
     {
       "id": 118,
       "name": "EasyPrivacy",
-      "url": "https://filters.adtidy.org/windows/filters/118.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/118.txt",
       "enabled": true
     },
     {
       "id": 119,
       "name": "Icelandic ABP List",
-      "url": "https://filters.adtidy.org/windows/filters/119.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/119.txt",
       "enabled": true
     },
     {
       "id": 120,
       "name": "AdBlockID",
-      "url": "https://filters.adtidy.org/windows/filters/120.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/120.txt",
       "enabled": true
     },
     {
       "id": 121,
       "name": "Greek AdBlock Filter",
-      "url": "https://filters.adtidy.org/windows/filters/121.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/121.txt",
       "enabled": true
     },
     {
       "id": 122,
       "name": "Fanboy's Annoyances",
-      "url": "https://filters.adtidy.org/windows/filters/122.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/122.txt",
       "enabled": true
     },
     {
       "id": 123,
       "name": "Fanboy's Social Blocking List",
-      "url": "https://filters.adtidy.org/windows/filters/123.txt",
-      "enabled": true
+      "url": "https://filters.adtidy.org/extension/chromium/filters/123.txt",
+      "enabled": false
     },
     {
       "id": 124,
       "name": "EasyList Portuguese",
-      "url": "https://filters.adtidy.org/windows/filters/124.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/124.txt",
       "enabled": true
     },
     {
       "id": 201,
       "name": "Web Annoyances Ultralist",
-      "url": "https://filters.adtidy.org/windows/filters/201.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/201.txt",
       "enabled": true
     },
     {
       "id": 202,
       "name": "EasyList Thailand",
-      "url": "https://filters.adtidy.org/windows/filters/202.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/202.txt",
       "enabled": true
     },
     {
       "id": 203,
       "name": "Hungarian filter",
-      "url": "https://filters.adtidy.org/windows/filters/203.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/203.txt",
       "enabled": true
     },
     {
       "id": 204,
       "name": "Peter Lowe's Blocklist",
-      "url": "https://filters.adtidy.org/windows/filters/204.txt",
-      "enabled": true
+      "url": "https://filters.adtidy.org/extension/chromium/filters/204.txt",
+      "enabled": false
     },
     {
       "id": 206,
       "name": "Xfiles",
-      "url": "https://filters.adtidy.org/windows/filters/206.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/206.txt",
       "enabled": true
     },
     {
       "id": 207,
       "name": "Adblock Warning Removal List",
-      "url": "https://filters.adtidy.org/windows/filters/207.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/207.txt",
       "enabled": true
     },
     {
       "id": 208,
       "name": "Online Malicious URL Blocklist",
-      "url": "https://filters.adtidy.org/windows/filters/208.txt",
-      "enabled": true
+      "url": "https://filters.adtidy.org/extension/chromium/filters/208.txt",
+      "enabled": false
     },
     {
       "id": 212,
       "name": "RU AdList: Counters",
-      "url": "https://filters.adtidy.org/windows/filters/212.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/212.txt",
       "enabled": true
     },
     {
       "id": 214,
       "name": "ABPVN List",
-      "url": "https://filters.adtidy.org/windows/filters/214.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/214.txt",
       "enabled": true
     },
     {
       "id": 216,
       "name": "Official Polish filters for AdBlock, uBlock Origin & AdGuard",
-      "url": "https://filters.adtidy.org/windows/filters/216.txt",
-      "enabled": true
+      "url": "https://filters.adtidy.org/extension/chromium/filters/216.txt",
+      "enabled": false
     },
     {
       "id": 217,
       "name": "Polish GDPR-Cookies Filters",
-      "url": "https://filters.adtidy.org/windows/filters/217.txt",
-      "enabled": true
+      "url": "https://filters.adtidy.org/extension/chromium/filters/217.txt",
+      "enabled": false
     },
     {
       "id": 218,
       "name": "Estonian List",
-      "url": "https://filters.adtidy.org/windows/filters/218.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/218.txt",
       "enabled": true
     },
     {
       "id": 220,
       "name": "CJX's Annoyances List",
-      "url": "https://filters.adtidy.org/windows/filters/220.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/220.txt",
       "enabled": true
     },
     {
       "id": 221,
       "name": "Polish Social Filters",
-      "url": "https://filters.adtidy.org/windows/filters/221.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/221.txt",
       "enabled": true
     },
     {
       "id": 224,
       "name": "AdGuard Chinese filter",
-      "url": "https://filters.adtidy.org/windows/filters/224.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/224.txt",
       "enabled": true
     },
     {
       "id": 225,
       "name": "Fanboy's Anti-Facebook List",
-      "url": "https://filters.adtidy.org/windows/filters/225.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/225.txt",
       "enabled": true
     },
     {
       "id": 227,
       "name": "filterslist-KO Classic filter list",
-      "url": "https://filters.adtidy.org/windows/filters/227.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/227.txt",
       "enabled": true
     },
     {
       "id": 228,
       "name": "xinggsf",
-      "url": "https://filters.adtidy.org/windows/filters/228.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/228.txt",
       "enabled": true
     },
     {
       "id": 231,
       "name": "EasyList Spanish",
-      "url": "https://filters.adtidy.org/windows/filters/231.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/231.txt",
       "enabled": true
     },
     {
       "id": 232,
       "name": "KAD - Anti-Scam",
-      "url": "https://filters.adtidy.org/windows/filters/232.txt",
-      "enabled": true
+      "url": "https://filters.adtidy.org/extension/chromium/filters/232.txt",
+      "enabled": false
     },
     {
       "id": 233,
       "name": "Adblock List for Finland",
-      "url": "https://filters.adtidy.org/windows/filters/233.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/233.txt",
       "enabled": true
     },
     {
       "id": 234,
       "name": "ROLIST2",
-      "url": "https://filters.adtidy.org/windows/filters/234.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/234.txt",
       "enabled": true
     },
     {
       "id": 235,
       "name": "Persian Blocker",
-      "url": "https://filters.adtidy.org/windows/filters/235.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/235.txt",
       "enabled": true
     },
     {
       "id": 236,
       "name": "road-block light",
-      "url": "https://filters.adtidy.org/windows/filters/236.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/236.txt",
       "enabled": true
     },
     {
       "id": 237,
       "name": "Polish Annoyances Filters",
-      "url": "https://filters.adtidy.org/windows/filters/237.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/237.txt",
       "enabled": true
     },
     {
       "id": 239,
       "name": "Fanboy's Anti-thirdparty Fonts",
-      "url": "https://filters.adtidy.org/windows/filters/239.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/239.txt",
       "enabled": true
     },
     {
       "id": 241,
       "name": "EasyList Cookie List",
-      "url": "https://filters.adtidy.org/windows/filters/241.txt",
-      "enabled": true
+      "url": "https://filters.adtidy.org/extension/chromium/filters/241.txt",
+      "enabled": false
     },
     {
       "id": 243,
       "name": "Frellwit's Swedish Filter",
-      "url": "https://filters.adtidy.org/windows/filters/243.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/243.txt",
       "enabled": true
     },
     {
       "id": 244,
       "name": "YousList",
-      "url": "https://filters.adtidy.org/windows/filters/244.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/244.txt",
       "enabled": true
     },
     {
       "id": 246,
       "name": "EasyList Polish",
-      "url": "https://filters.adtidy.org/windows/filters/246.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/246.txt",
       "enabled": true
     },
     {
       "id": 247,
       "name": "Polish Anti-Annoying Special Supplement",
-      "url": "https://filters.adtidy.org/windows/filters/247.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/247.txt",
       "enabled": true
     },
     {
       "id": 249,
       "name": "Dandelion Sprout's Nordic Filters",
-      "url": "https://filters.adtidy.org/windows/filters/249.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/249.txt",
       "enabled": true
     },
     {
       "id": 250,
       "name": "Dandelion Sprout's Annoyances List",
-      "url": "https://filters.adtidy.org/windows/filters/250.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/250.txt",
       "enabled": true
     },
     {
       "id": 251,
       "name": "Legitimate URL Shortener",
-      "url": "https://filters.adtidy.org/windows/filters/251.txt",
-      "enabled": true
+      "url": "https://filters.adtidy.org/extension/chromium/filters/251.txt",
+      "enabled": false
     },
     {
       "id": 252,
       "name": "Dandelion Sprout's Serbo-Croatian List",
-      "url": "https://filters.adtidy.org/windows/filters/252.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/252.txt",
       "enabled": true
     },
     {
       "id": 253,
       "name": "IndianList",
-      "url": "https://filters.adtidy.org/windows/filters/253.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/253.txt",
       "enabled": true
     },
     {
       "id": 254,
       "name": "Macedonian adBlock Filters",
-      "url": "https://filters.adtidy.org/windows/filters/254.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/254.txt",
       "enabled": true
     },
     {
       "id": 255,
       "name": "Phishing URL Blocklist",
-      "url": "https://filters.adtidy.org/windows/filters/255.txt",
-      "enabled": true
+      "url": "https://filters.adtidy.org/extension/chromium/filters/255.txt",
+      "enabled": false
     },
     {
       "id": 256,
       "name": "Scam Blocklist by DurableNapkin",
-      "url": "https://filters.adtidy.org/windows/filters/256.txt",
-      "enabled": true
+      "url": "https://filters.adtidy.org/extension/chromium/filters/256.txt",
+      "enabled": false
     },
     {
       "id": 257,
       "name": "uBlock Origin – Badware risks",
-      "url": "https://filters.adtidy.org/windows/filters/257.txt",
-      "enabled": true
+      "url": "https://filters.adtidy.org/extension/chromium/filters/257.txt",
+      "enabled": false
     },
     {
       "id": 259,
       "name": "Dandelion Sprout's Anti-Malware List",
-      "url": "https://filters.adtidy.org/windows/filters/259.txt",
-      "enabled": true
+      "url": "https://filters.adtidy.org/extension/chromium/filters/259.txt",
+      "enabled": false
     },
     {
       "id": 260,
       "name": "Stevo's AI Blocklist",
-      "url": "https://filters.adtidy.org/windows/filters/260.txt",
+      "url": "https://filters.adtidy.org/extension/chromium/filters/260.txt",
       "enabled": true
     }
   ]

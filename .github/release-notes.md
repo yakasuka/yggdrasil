@@ -1,6 +1,6 @@
 ## Ratatoskr 主配置
 
-Ratatoskr 是 Yggdrasil 项目的核心成品：一份面向 Mihomo / OpenClash 的主配置模板，把桌面级 AdGuard 广告拦截、GeoSite / GeoIP 精准分流与多策略出口编排，收敛进一份可持续自动更新的 YAML 配置。
+Ratatoskr 是 Yggdrasil 项目的核心成品：一份面向 Mihomo / OpenClash 的主配置模板，把浏览器插件版 AdGuard 广告拦截、GeoSite / GeoIP 精准分流与多策略出口编排，收敛进一份可持续自动更新的 YAML 配置。
 
 > 版本 `{{TAG}}` · 发布于 {{DATE}}
 
@@ -8,7 +8,7 @@ Ratatoskr 是 Yggdrasil 项目的核心成品：一份面向 Mihomo / OpenClash 
 
 ### 核心亮点
 
-- **桌面级广告拦截** — 内置 AdGuard Windows 桌面规则订阅，约 **31.6 万** 条拦截域名；由 GitHub Actions 懒加载同步，仅在上游规则变化时拉取正文，低资源占用、确定性输出。
+- **浏览器插件级广告拦截** — 内置 AdGuard 浏览器插件版规则订阅，约 **32.0 万** 条拦截域名；由 GitHub Actions 懒加载同步，仅在上游规则变化时拉取正文，低资源占用、确定性输出。
 - **Geo 轻量分流** — 域名交给 GeoSite、IP 交给 GeoIP，配置本体约 **28 KB**，规则编排清晰、易维护。
 - **五大出口策略** — 手动切换 / 自动选择 / 故障转移 / 一致性哈希负载均衡 / 轮询下载均衡，覆盖不同连接需求。
 - **应用与地区目录** — ChatGPT、Claude、Telegram、Spotify、Steam 等应用策略组，港 / 台 / 日 / 韩 / 新 / 美等地区节点分组，面板中配有专属图标。

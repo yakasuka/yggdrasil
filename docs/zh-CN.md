@@ -271,7 +271,7 @@ GitHub 侧栏的 Contributors 列表由提交作者与 `Co-authored-by` 共同�
 | :--- | :--- | :--- |
 | [Mihomo](https://github.com/MetaCubeX/mihomo) | [MetaCubeX](https://github.com/MetaCubeX) | 配置所面向的核心内核与文档 |
 | [Hysteria](https://github.com/apernet/hysteria) | [tobyxdd](https://github.com/tobyxdd) | Hysteria2 协议支持 |
-| [AdGuard Filters](https://github.com/AdguardTeam/AdguardFilters) | [AdGuardTeam](https://github.com/AdguardTeam) | 桌面级广告拦截规则来源 |
+| [AdGuard Filters](https://github.com/AdguardTeam/AdguardFilters) | [AdGuardTeam](https://github.com/AdguardTeam) | 浏览器插件版广告拦截规则来源 |
 | [zashboard](https://github.com/Zephyruso/zashboard) | [Zephyruso](https://github.com/Zephyruso) | 面板界面参考 |
 | [Custom OpenClash Rules](https://github.com/Aethersailor/Custom_OpenClash_Rules) | [Aethersailor](https://github.com/Aethersailor) | 自定义分流规则来源 |
 | [ACL4SSR](https://github.com/ACL4SSR/ACL4SSR) | [ACL4SSR](https://github.com/ACL4SSR) | README 版本对照、规则分类与组织方式参考 |

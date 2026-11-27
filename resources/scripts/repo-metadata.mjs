@@ -18,7 +18,7 @@ export const REPO = 'yakasuka/yggdrasil';
 export const HOMEPAGE = 'https://yggdrasil-afx.pages.dev/';
 
 export const DESCRIPTION =
-  'Yggdrasil 是面向 Mihomo / Clash / OpenClash 的配置与订阅工具，以 Ratatoskr 为核心模板：桌面级 AdGuard 广告拦截、GeoSite/GeoIP 精准分流、多策略出口编排与可视化配置工坊。Mihomo / Clash config builder with desktop-grade AdGuard filtering, Geo routing and auto-updating rules.';
+  'Yggdrasil 是面向 Mihomo / Clash / OpenClash 的配置与订阅工具，以 Ratatoskr 为核心模板：浏览器插件版 AdGuard 广告拦截、GeoSite/GeoIP 精准分流、多策略出口编排与可视化配置工坊。Mihomo / Clash config builder with browser-extension AdGuard filtering, Geo routing and auto-updating rules.';
 
 export const TOPICS = [
   'mihomo',

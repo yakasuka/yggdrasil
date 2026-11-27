@@ -170,6 +170,9 @@ rules:
   # ── 优先规则 / Priority ──
   - GEOSITE,adobe,🎨 Adobe
 
+  # ── 广告拦截白名单（必须前置，先于 AdGuard 命中，避免误伤正常服务）──
+  - DOMAIN-SUFFIX,adtidy.org,DIRECT
+  - DOMAIN-SUFFIX,adguard.com,DIRECT
   # ── 广告拦截 / AdGuard（随 ❎ 广告拦截 组；默认不拦截，手动切 REJECT 生效）──
   - RULE-SET,❎ AdGuard,❎ 广告拦截
   # ── 私网直连 ──

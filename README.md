@@ -20,7 +20,7 @@
 
 Yggdrasil 是一套面向 **Mihomo / Clash / OpenClash / Clash Verge** 的配置与订阅工具，以 **Ratatoskr** 为核心模板。它把节点订阅、规则源与出口策略分层组织，通过可视化配置工坊生成个人 YAML，并用 GitHub Actions 懒加载自动更新规则。
 
-- **桌面级广告拦截**：内置 AdGuard Windows 桌面规则订阅，约 **316,005** 条拦截域名，跟随官方上游自动更新。
+- **浏览器插件级广告拦截**：内置 AdGuard 浏览器插件版规则订阅，约 **26.4 万** 条拦截域名（已剔除零收益与整站级误伤源），跟随官方上游自动更新。
 - **Geo 轻量分流**：GeoSite / GeoIP 承载分类数据，主配置本体约 **28 KB**。
 - **五大出口策略**：手动切换、自动选择、故障转移、一致性哈希负载均衡、轮询下载均衡。
 - **应用与地区目录**：ChatGPT、Claude、Telegram、Spotify、Steam 等应用策略组，港 / 台 / 日 / 韩 / 新 / 美等地区分组。
@@ -152,7 +152,7 @@ _redirects / _routes.json                   CF 路由（根级，构建器配套
 | :--- | :--- | :--- |
 | [Mihomo](https://github.com/MetaCubeX/mihomo) | [MetaCubeX](https://github.com/MetaCubeX) | 配置所面向的核心内核 |
 | [Hysteria](https://github.com/apernet/hysteria) | [tobyxdd](https://github.com/tobyxdd) | Hysteria2 协议支持 |
-| [AdGuard Filters](https://github.com/AdguardTeam/AdguardFilters) | [AdGuardTeam](https://github.com/AdguardTeam) | 桌面级广告拦截规则来源 |
+| [AdGuard Filters](https://github.com/AdguardTeam/AdguardFilters) | [AdGuardTeam](https://github.com/AdguardTeam) | 浏览器插件版广告拦截规则来源 |
 | [zashboard](https://github.com/Zephyruso/zashboard) | [Zephyruso](https://github.com/Zephyruso) | 面板界面参考 |
 | [Custom OpenClash Rules](https://github.com/Aethersailor/Custom_OpenClash_Rules) | [Aethersailor](https://github.com/Aethersailor) | 自定义分流规则来源 |
 | [ACL4SSR](https://github.com/ACL4SSR/ACL4SSR) | [ACL4SSR](https://github.com/ACL4SSR) | 规则分类与组织方式参考 |

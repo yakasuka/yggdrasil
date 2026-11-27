@@ -1,6 +1,6 @@
 /**
- * Generate the AdGuard Desktop rule-provider for Clash/Mihomo from official
- * Windows-built filter subscriptions.
+ * Generate the AdGuard browser-extension rule-provider for Clash/Mihomo from
+ * official Chromium-extension filter subscriptions.
  *
  * Lazy by design:
  *   - each upstream filter is checked with a HEAD request (ETag / Last-Modified)
@@ -14,7 +14,7 @@
  *   node resources/scripts/rules/generate-adguard-rules.mjs
  *   node resources/scripts/rules/generate-adguard-rules.mjs --force
  *
- * Which desktop filters are included is controlled by adguard-filters.json.
+ * Which browser-extension filters are included is controlled by adguard-filters.json.
  * Flip "enabled" to false there to opt a filter out.
  *
  * In Actions, GITHUB_OUTPUT receives changed=true|false and files=...
@@ -23,7 +23,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 
-const BASE = 'https://filters.adtidy.org/windows/filters';
+const BASE = 'https://filters.adtidy.org/extension/chromium/filters';
 const ROOT = 'resources/rules/adguard';
 const FILTER_CONFIG = path.join(ROOT, 'adguard-filters.json');
 const STATE_FILE = path.join(ROOT, '.adguard-state.json');
@@ -33,7 +33,12 @@ const rawConfig = fs.readFileSync(FILTER_CONFIG, 'utf8');
 const FILTERS = JSON.parse(rawConfig)
   .filters.filter((f) => f.enabled !== false)
   .map((f) => Number(f.id));
-const CONFIG_HASH = createHash('sha256').update(JSON.stringify(FILTERS)).digest('hex').slice(0, 16);
+// Include the upstream base so switching platform (desktop -> extension)
+// invalidates cached ETags even if an ETag happens to match across sources.
+const CONFIG_HASH = createHash('sha256')
+  .update(JSON.stringify({ base: BASE, filters: FILTERS }))
+  .digest('hex')
+  .slice(0, 16);
 
 const force = process.argv.includes('--force');
 const hash = (s) => createHash('sha256').update(s).digest('hex');
@@ -178,13 +183,18 @@ for (const { block: b, allow: a } of parsed.values()) {
 // policy -- an Allow→DIRECT rule would override all later GEOSITE routing.
 for (const d of allow) block.delete(d);
 
+// Never block the upstream filter host itself. Some AdGuard lists include
+// adtidy.org; blocking it would make the rule provider unable to self-update
+// and lock the user out of fetching filters when REJECT is enabled.
+for (const d of ['adtidy.org', 'filters.adtidy.org']) block.delete(d);
+
 // No timestamp in the header: identical domains must produce byte-identical
 // files so Actions can skip commits and CDN purges when nothing really changed.
 const sorted = [...block].sort();
 const content =
-  '# GENERATED - DO NOT EDIT. Source: AdGuard Desktop filters.\n' +
+  '# GENERATED - DO NOT EDIT. Source: AdGuard browser-extension filters.\n' +
   `# config: adguard-filters.json (${FILTERS.length} enabled)\n` +
-  `# source: https://filters.adtidy.org/windows/filters/{id}.txt\n` +
+  `# source: ${BASE}/{id}.txt\n` +
   `# block domains: ${sorted.length}\n` +
   '\n' +
   `payload:\n${sorted.map((d) => `  - '${d}'`).join('\n')}\n`;
@@ -193,7 +203,7 @@ const contentChanged = fs.existsSync(BLOCK_FILE)
   : true;
 if (contentChanged) fs.writeFileSync(BLOCK_FILE, content);
 
-state.meta = { filters: CONFIG_HASH };
+state.meta = { base: BASE, filters: CONFIG_HASH };
 fs.writeFileSync(STATE_FILE, `${JSON.stringify(state, null, 2)}\n`);
 
 if (process.env.GITHUB_OUTPUT) {

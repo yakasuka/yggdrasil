@@ -1,4 +1,4 @@
-name: Update AdGuard desktop rule providers
+name: Update AdGuard browser-extension rule providers
 
 # Lazy by design: runs once a day, sends HEAD requests only, downloads a filter
 # only when its ETag/Last-Modified changed, and commits only when the generated
@@ -58,7 +58,7 @@ jobs:
           fi
           git -c user.name='github-actions[bot]' \
               -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \
-              commit -m 'chore(rules): update AdGuard desktop rule provider' \
+              commit -m 'chore(rules): update AdGuard browser-extension rule provider' \
               -m 'Changed filters: ${{ steps.gen.outputs.files }}' \
               -m 'Block: ${{ steps.gen.outputs.block }}'
           git push origin HEAD:main
