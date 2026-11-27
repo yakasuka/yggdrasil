@@ -1,7 +1,7 @@
 # GENERATED - DO NOT EDIT. Add your rules to overlays/Custom_Direct_Classical.yaml
 # upstream: Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Direct_Classical.yaml
-# upstream blob: 9694fe6b50220210884fdd3a9212f39e1b96418e
-# total: 1333 (upstream 1333, extra 0)
+# upstream blob: 9e67c0e1c6979861f898f9cd72a20f34469247c7
+# total: 1338 (upstream 1338, extra 0)
 payload:
   - 'DOMAIN-KEYWORD,m-team'
   - 'DOMAIN-KEYWORD,quickconnect'
@@ -97,6 +97,7 @@ payload:
   - 'DOMAIN-SUFFIX,888lm02.com'
   - 'DOMAIN-SUFFIX,88923531.com'
   - 'DOMAIN-SUFFIX,88996api.cloud'
+  - 'DOMAIN-SUFFIX,8dks.com'
   - 'DOMAIN-SUFFIX,8kc.top'
   - 'DOMAIN-SUFFIX,8x14khzwmi.com'
   - 'DOMAIN-SUFFIX,8z8dlsjkn2.com'
@@ -494,6 +495,7 @@ payload:
   - 'DOMAIN-SUFFIX,guyuns.asia'
   - 'DOMAIN-SUFFIX,gvgoo.com'
   - 'DOMAIN-SUFFIX,gwmapp-w.com'
+  - 'DOMAIN-SUFFIX,gxau.net'
   - 'DOMAIN-SUFFIX,gxcould.com'
   - 'DOMAIN-SUFFIX,gxnnjidingkeji.top'
   - 'DOMAIN-SUFFIX,gxnnxsqy.top'
@@ -1046,6 +1048,7 @@ payload:
   - 'DOMAIN-SUFFIX,tcp5.com'
   - 'DOMAIN-SUFFIX,tcy365.net'
   - 'DOMAIN-SUFFIX,tdrgame.top'
+  - 'DOMAIN-SUFFIX,teoyouth.com'
   - 'DOMAIN-SUFFIX,terra-master.com'
   - 'DOMAIN-SUFFIX,terrabbs.ink'
   - 'DOMAIN-SUFFIX,tggfl.com'
@@ -1065,6 +1068,7 @@ payload:
   - 'DOMAIN-SUFFIX,tianruo.xyz'
   - 'DOMAIN-SUFFIX,timbrd.com'
   - 'DOMAIN-SUFFIX,tixue.net'
+  - 'DOMAIN-SUFFIX,tjfuxinjia.com'
   - 'DOMAIN-SUFFIX,tjnhscgs.com'
   - 'DOMAIN-SUFFIX,tlkg.com'
   - 'DOMAIN-SUFFIX,tluyou.com'
@@ -1288,6 +1292,7 @@ payload:
   - 'DOMAIN-SUFFIX,zhi10.com'
   - 'DOMAIN-SUFFIX,zhidianmijin.top'
   - 'DOMAIN-SUFFIX,zhiexa.com'
+  - 'DOMAIN-SUFFIX,zhijiwenhua.xyz'
   - 'DOMAIN-SUFFIX,zhituwujie.com'
   - 'DOMAIN-SUFFIX,zhixingyunke.com'
   - 'DOMAIN-SUFFIX,zhongancloud.com'

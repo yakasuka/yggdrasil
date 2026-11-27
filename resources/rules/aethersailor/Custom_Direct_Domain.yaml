@@ -1,7 +1,7 @@
 # GENERATED - DO NOT EDIT. Add your rules to overlays/Custom_Direct_Domain.yaml
 # upstream: Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Direct_Domain.yaml
-# upstream blob: 3b134f68572a6095abe56c1e06f49141d71d4dd2
-# total: 1331 (upstream 1318, extra 13)
+# upstream blob: c015e9e4a405b1e66c41fdd330a5f7a0f5f68589
+# total: 1336 (upstream 1323, extra 13)
 payload:
   - '+.00333118.com'
   - '+.0044696.com'
@@ -94,6 +94,7 @@ payload:
   - '+.888lm02.com'
   - '+.88923531.com'
   - '+.88996api.cloud'
+  - '+.8dks.com'
   - '+.8kc.top'
   - '+.8x14khzwmi.com'
   - '+.8z8dlsjkn2.com'
@@ -491,6 +492,7 @@ payload:
   - '+.guyuns.asia'
   - '+.gvgoo.com'
   - '+.gwmapp-w.com'
+  - '+.gxau.net'
   - '+.gxcould.com'
   - '+.gxnnjidingkeji.top'
   - '+.gxnnxsqy.top'
@@ -1043,6 +1045,7 @@ payload:
   - '+.tcp5.com'
   - '+.tcy365.net'
   - '+.tdrgame.top'
+  - '+.teoyouth.com'
   - '+.terra-master.com'
   - '+.terrabbs.ink'
   - '+.tggfl.com'
@@ -1062,6 +1065,7 @@ payload:
   - '+.tianruo.xyz'
   - '+.timbrd.com'
   - '+.tixue.net'
+  - '+.tjfuxinjia.com'
   - '+.tjnhscgs.com'
   - '+.tlkg.com'
   - '+.tluyou.com'
@@ -1285,6 +1289,7 @@ payload:
   - '+.zhi10.com'
   - '+.zhidianmijin.top'
   - '+.zhiexa.com'
+  - '+.zhijiwenhua.xyz'
   - '+.zhituwujie.com'
   - '+.zhixingyunke.com'
   - '+.zhongancloud.com'
