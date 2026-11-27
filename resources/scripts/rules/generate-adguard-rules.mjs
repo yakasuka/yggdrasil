@@ -6,8 +6,11 @@
  *   - each upstream filter is checked with a HEAD request (ETag / Last-Modified)
  *   - the body is downloaded only when the upstream changed, the local state is
  *     missing, or the enabled-filter list changed
- *   - `@@` exceptions are subtracted from the block list at generation time,
+ *   - `@@` exceptions and `$badfilter` rules are subtracted at generation time,
  *     so no separate allow provider is needed
+ *   - only exact whole-domain rules (||domain^ / domain$) become blocks;
+ *     path-scoped and modifier-scoped rules are ignored to avoid blocking
+ *     legitimate main domains
  *   - if nothing changed, no file is rewritten and no commit is produced
  *
  * Usage:
@@ -33,10 +36,13 @@ const rawConfig = fs.readFileSync(FILTER_CONFIG, 'utf8');
 const FILTERS = JSON.parse(rawConfig)
   .filters.filter((f) => f.enabled !== false)
   .map((f) => Number(f.id));
+// Bump when the extraction logic changes so cached per-filter domain sets are
+// rebuilt with the new rules instead of being reused from the old parser.
+const PARSED_VERSION = 2;
 // Include the upstream base so switching platform (desktop -> extension)
 // invalidates cached ETags even if an ETag happens to match across sources.
 const CONFIG_HASH = createHash('sha256')
-  .update(JSON.stringify({ base: BASE, filters: FILTERS }))
+  .update(JSON.stringify({ base: BASE, version: PARSED_VERSION, filters: FILTERS }))
   .digest('hex')
   .slice(0, 16);
 
@@ -45,8 +51,19 @@ const hash = (s) => createHash('sha256').update(s).digest('hex');
 const short = (s) => hash(s).slice(0, 16);
 
 const DOMAIN_RE = /^(?=.{4,253}$)[a-z0-9_](?:[a-z0-9_-]*[a-z0-9_])?(?:\.[a-z0-9_](?:[a-z0-9_-]*[a-z0-9_])?)+$/;
-const URL_FILTER_RE = /^\|\|(?:https?:\/\/)?([A-Za-z0-9._-]+)(?:[\^/:]|$)/;
-const PLAIN_FILTER_RE = /^([A-Za-z0-9._-]+)\$/;
+// Only whole-domain rules are representable as a Clash DOMAIN-SUFFIX provider.
+// The whole line must be exactly `||domain^` / `||domain` / `domain$` with NO
+// modifiers and NO path. Anything else is a partial/block-with-conditions rule:
+//   ||example.com/path^        -> blocks one path, not the whole site
+//   ||example.com^$third-party -> blocks only third-party requests
+//   ||example.com^$removeparam -> strips a URL parameter, blocks nothing
+//   ||example.com^$popup       -> blocks popups, not the site
+// Treating those as whole-domain blocks errors out legitimate main domains
+// (e.g. stripchat.com, spotify.com, zhihu.com).
+const EXACT_BLOCK_RE = /^\|\|(?:https?:\/\/)?([A-Za-z0-9._-]+)\^?$/;
+const EXACT_PLAIN_RE = /^([A-Za-z0-9._-]+)\$$/;
+// `||domain^$badfilter` cancels another filter's `||domain^` rule entirely.
+const BADFILTER_RE = /^\|\|(?:https?:\/\/)?([A-Za-z0-9._-]+)\^\$badfilter$/;
 
 const state = JSON.parse(fs.existsSync(STATE_FILE) ? fs.readFileSync(STATE_FILE, 'utf8') : '{}');
 const changed = [];
@@ -61,28 +78,33 @@ function normalizeDomain(raw) {
   return d;
 }
 
-function extractDomain(line) {
-  // Cosmetic, scriptlet, HTML-filtering and regex rules cannot be represented
-  // by a Clash domain rule-provider, so they are intentionally ignored.
+// Return the domain only for an exact whole-domain rule; null for everything else.
+function exactDomain(line) {
   if (/##|#@#|#%#|#@%#|\$\$/.test(line) || line.startsWith('/')) return null;
-  const body = line.split('$')[0];
-  const m = URL_FILTER_RE.exec(body) || PLAIN_FILTER_RE.exec(body);
-  return normalizeDomain(m?.[1]);
+  return normalizeDomain((EXACT_BLOCK_RE.exec(line) || EXACT_PLAIN_RE.exec(line))?.[1]);
 }
 
 function parseRules(text) {
   const block = new Set();
   const allow = new Set();
+  const cancel = new Set();
   for (const rawLine of text.split(/\r?\n/)) {
     const line = rawLine.trim();
     if (!line || line.startsWith('!')) continue;
+    // $badfilter: this rule removes a whole-domain block, never adds one.
+    const badfilter = BADFILTER_RE.exec(line);
+    if (badfilter) {
+      const d = normalizeDomain(badfilter[1]);
+      if (d) cancel.add(d);
+      continue;
+    }
     const isAllow = line.startsWith('@@');
     const body = isAllow ? line.slice(2) : line;
-    const domain = extractDomain(body);
+    const domain = exactDomain(body);
     if (!domain) continue;
     (isAllow ? allow : block).add(domain);
   }
-  return { block, allow };
+  return { block, allow, cancel };
 }
 
 async function upstreamMarker(url) {
@@ -152,12 +174,19 @@ await mapLimit(todo, 8, async (p) => {
   if (!text.includes('! Title:') && !text.includes('! Checksum:')) {
     throw new Error(`${p.key}: upstream content does not look like an AdGuard filter, aborting`);
   }
-  parsed.set(p.key, parseRules(text));
+  const rules = parseRules(text);
+  parsed.set(p.key, rules);
   state[p.key] = {
     etag: p.marker?.etag || p.previous.etag || '',
     lastModified: p.marker?.lastModified || p.previous.lastModified || '',
     sha256: short(text),
     syncedAt: new Date().toISOString(),
+    // Persist the parsed domains so unchanged filters (skipped next runs) still
+    // contribute their rules to the merged provider. Without this, a run where
+    // only 9 filters changed emits only those 9 filters' domains.
+    block: [...rules.block],
+    allow: [...rules.allow],
+    cancel: [...rules.cancel],
   };
   changed.push(p.key);
   console.log(`+ ${p.key}: downloaded ${text.length} bytes`);
@@ -174,10 +203,26 @@ if (!changed.length) {
 
 const block = new Set();
 const allow = new Set();
-for (const { block: b, allow: a } of parsed.values()) {
-  for (const d of b) block.add(d);
-  for (const d of a) allow.add(d);
+const cancel = new Set();
+// Merge from state for EVERY enabled filter. `parsed` only holds filters that
+// were downloaded this run; skipped-but-unchanged filters live in state's
+// cached domain arrays and must still contribute their rules.
+let missingCache = 0;
+for (const fid of FILTERS) {
+  const key = `filter_${fid}`;
+  const rules = parsed.get(key) || state[key];
+  if (!rules || !rules.block) {
+    missingCache++;
+    continue;
+  }
+  for (const d of rules.block) block.add(d);
+  for (const d of rules.allow || []) allow.add(d);
+  for (const d of rules.cancel || []) cancel.add(d);
 }
+if (missingCache) console.log(`! ${missingCache} filters missing parsed cache (will rebuild next run)`);
+// $badfilter rules cancel a whole-domain block outright (they are AdGuard's
+// way of un-publishing a rule from another list).
+for (const d of cancel) block.delete(d);
 // Allow wins: drop `@@` exceptions from the block list. They are not emitted
 // as a separate provider because Clash has no "don't block, keep routing"
 // policy -- an Allow→DIRECT rule would override all later GEOSITE routing.
