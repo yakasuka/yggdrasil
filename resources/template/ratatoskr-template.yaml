@@ -1,7 +1,4 @@
-﻿# 【1】节点订阅（Proxy Providers）
-# 手动填写时取消注释并复制下面示例，name 保持唯一。
-
-# proxy-providers:
+﻿# proxy-providers:
 #   Ratatoskr:
 #     url: "https://example.com/sub?token=xxxxx"
 #     type: http
@@ -9,29 +6,17 @@
 #     health-check: {enable: true, lazy: true, url: "https://www.gstatic.com/generate_204", interval: 3600, timeout: 10000}
 #     proxy: DIRECT
 
-# 【2】基础设置（General）
-
-port: 7890  # HTTP 代理端口
-socks-port: 7891  # SOCKS5 端口
-allow-lan: true  # 允许局域网访问
-mode: "rule"  # 规则分流
-log-level: "info"  # 日志级别
-external-controller: 127.0.0.1:9090  # REST API，仅本机
-unified-delay: true  # 统一延迟测速
-
-# 【3】手动节点（Proxies）
-# 默认整段注释。启用时补全 type / server / port，name 保持唯一。
+port: 7890
+socks-port: 7891
+allow-lan: true
+mode: "rule"
+log-level: "info"
+external-controller: 127.0.0.1:9090
+unified-delay: true
 
 # proxies:
 #  - name: "手动节点1"
 #  - name: "手动节点2"
-
-# 【4】节点筛选（Node Filters）
-# 正则锚点供策略组 filter 引用。按节点名匹配、忽略大小写，排除 "=>" 落地节点；
-# 名称含多个地区标记时会进入多个组，以机场标注为准。
-
-# 【地区匹配】Regions
-# 支持国旗 / 中英文 / 地区代码，地区代码可带末尾数字。
 
 FilterRegions: &FilterRegions
   HK: &FilterHK '(?i)^(?!=>).*(?:🇭🇰|香港|Hong\s?Kong|\b(?:HK|HKG)\d*\b)'
@@ -41,54 +26,34 @@ FilterRegions: &FilterRegions
   SG: &FilterSG '(?i)^(?!=>).*(?:🇸🇬|新加坡|狮|Singapore|\b(?:SG|SGP)\d*\b)'
   US: &FilterUS '(?i)^(?!=>).*(?:🇺🇸|美国|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|拉斯维加斯|United States|\b(?:US|USA)\d*\b)'
 
-# 【节点净化】Clean Filter
-# 按名称排除广告 / 流量 / 到期等关键词及 => 标记。仅作用于引用此锚点的策略组。
 FilterAll: &FilterAll '^(?!.*(?:(?i)=>|群|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|剩余流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|超时|收藏|福利|失联|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author|Traffic|\d{4}-\d{2}-\d{2}|\d+G)).*$'
 
-# 【其他地区】Others
-# FilterAll 净化后再排除六大地区。改动锚点后运行
-# `node config-builder/scripts/generate-ratatoskr-filters.mjs` 同步本正则。
 FilterOthers: &FilterOthers '^(?!.*(?:(?i)=>|(?i:🇭🇰|香港|Hong\s?Kong|\b(?:HK|HKG)\d*\b)|(?i:🇹🇼|台湾|Tai(?:wan)?|\b(?:TW|TWN)\d*\b)|(?i:🇯🇵|日本|川日|东京|大阪|埼玉|Japan|\b(?:JP|JPN)\d*\b)|(?i:🇰🇷|韩国|韓|首尔|Korea|\b(?:KR|KOR)\d*\b)|(?i:🇸🇬|新加坡|狮|Singapore|\b(?:SG|SGP)\d*\b)|(?i:🇺🇸|美国|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|拉斯维加斯|United States|\b(?:US|USA)\d*\b)|群|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|剩余流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|超时|收藏|福利|失联|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author|Traffic|\d{4}-\d{2}-\d{2}|\d+G)).*$'
-
-# 【5】策略组（Proxy Groups）
-# include-all 汇入手动与订阅节点；filter 仅在本组按名称筛选。
-# select 首项为初始选项。
 
 proxy-groups:
 
-  # 【策略入口】Switch
   - {name: 🎚️ 节点选择, type: select, proxies: [🚀 手动切换, ⚡ 自动选择, 🔯 故障转移, 🔮 负载均衡, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others, DIRECT], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/switch.png"}
 
-  # 【全部节点】Proxy
   - {name: 🚀 手动切换, type: select, include-all: true, filter: *FilterAll, icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/proxy.png"}
 
-  # 【自动选择】Auto
   - {name: ⚡ 自动选择, type: url-test, include-all: true, filter: *FilterAll, url: "https://www.gstatic.com/generate_204", interval: 300, tolerance: 50, icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/yggdrasil.png"}
 
-  # 【故障转移】Fallback
   - {name: 🔯 故障转移, type: fallback, include-all: true, filter: *FilterAll, url: "https://www.gstatic.com/generate_204", interval: 300, icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/fallback.png"}
 
-  # 【负载均衡】Load Balance
   - {name: 🔮 负载均衡, type: load-balance, include-all: true, filter: *FilterAll, strategy: consistent-hashing, icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/global.png"}
 
-  # 【下载均衡】Download Balance
   - {name: 📦 下载均衡, type: load-balance, include-all: true, filter: *FilterAll, strategy: round-robin, icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/tracking.png"}
 
-  # 【应用分流】Proxy App
-
-  # 【AI 与开发】AI & Dev
   - {name: ⚡ OpenAI, type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/chatgpt.png"}
   - {name: 🪐 Anthropic, type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/claude.png"}
   - {name: ✨ Hermes, type: select, proxies: [🚀 手动切换, ⚡ 自动选择, 🔯 故障转移, 🔮 负载均衡, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others, DIRECT], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/hermes.png"}
   - {name: ✨ AI 服务, type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/ai.png"}
 
-  # 【加密货币】Crypto
   - {name: ⬛ OKX, type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/okx.png"}
   - {name: 🟨 Binance, type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/binance.png"}
   - {name: 🟧 Bybit, type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/bybit.png"}
   - {name: 🪙 Crypto, type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/crypto.png"}
 
-  # 【通用服务】General Services
   - {name: 📺 YouTube, type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/youtube.png"}
   - {name: ✨ Google, type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/google.png"}
   - {name: ☁️ Cloudflare, type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/cloudflare.png"}
@@ -98,7 +63,6 @@ proxy-groups:
   - {name: 🎨 Adobe, type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/adobe.png"}
   - {name: ⚪ Apple, type: select, proxies: [DIRECT, 🎚️ 节点选择, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/apple.png"}
 
-  # 【社交】Social
   - {name: 𝕏 X, type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/x.png"}
   - {name: ♾️ Meta, type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/meta.png"}
   - {name: 🪽 Telegram, type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/telegram.png"}
@@ -106,7 +70,6 @@ proxy-groups:
   - {name: 💬 Chat, type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/message.png"}
   - {name: 🫂 Social, type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/social.png"}
 
-  # 【流媒体】Streaming
   - {name: 🎶 TikTok, type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/tiktok.png"}
   - {name: 🍿 Netflix, type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/netflix.png"}
   - {name: 📺 Hulu, type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/hulu.png"}
@@ -119,25 +82,19 @@ proxy-groups:
   - {name: 📰 News, type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/news.png"}
   - {name: 📺 Bilibili, type: select, proxies: [DIRECT, 🎚️ 节点选择, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/bilibili.png"}
 
-  # 【游戏】Games
   - {name: 👾 Steam, type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/steam.png"}
   - {name: 🎁 Epic, type: select, proxies: [DIRECT, 🎚️ 节点选择, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/epic.png"}
   - {name: 🕹️ TapTap, type: select, proxies: [DIRECT, 🎚️ 节点选择, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/taptap.png"}
 
-  # 【工具与系统】Utilities
   - {name: ⚡ Speedtest, type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/speedtest.png"}
   - {name: 🔌 特殊端口, type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/port.png"}
   - {name: ❎ 广告拦截, type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/adguard.png"}
 
-  # 【补充应用】Extra Apps
   - {name: 😈 R18, type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/r18.png"}
 
-  # 【国内与兜底】CN & Final
   - {name: 🏯 China, type: select, proxies: [DIRECT, 🎚️ 节点选择, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/cn.png"}
   - {name: 🏁 Final, type: select, proxies: [🎚️ 节点选择, DIRECT, REJECT, 🌆 Hong Kong, 🧋 Taiwan, ⛩️ Japan, 🎤 South Korea, 🏙️ Singapore, 🗽 United States, 🌌 Others], icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/final.png"}
 
-  # 【地区节点】Regions
-  # 只应用各自地区正则，不叠加 FilterAll；地区组均使用地图类图标。
   - {name: 🧋 Taiwan, type: select, include-all: true, filter: *FilterTW, icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/tw.png"}
   - {name: 🌆 Hong Kong, type: select, include-all: true, filter: *FilterHK, icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/hk.png"}
   - {name: 🗽 United States, type: select, include-all: true, filter: *FilterUS, icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/us.png"}
@@ -146,44 +103,28 @@ proxy-groups:
   - {name: 🏙️ Singapore, type: select, include-all: true, filter: *FilterSG, icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/sg.png"}
   - {name: 🌌 Others, type: select, include-all: true, filter: *FilterOthers, icon: "https://cdn.jsdelivr.net/gh/yakasuka/yggdrasil@main/assets/icons/others.png"}
 
-# 【6】分流规则（Rules）
-# 自上而下匹配、首次命中即停止，故顺序决定出口；此段顺序不可打乱。
-# RULE-SET 引用第 7 节同名规则源；no-resolve 表示 IP 规则不主动解析域名。
-
 rules:
 
-  # 【优先规则】Priority
   - GEOSITE,adobe,🎨 Adobe
 
-  # 【广告拦截】AdGuard
-  # 随 ❎ 广告拦截 组；默认不拦截，手动切 REJECT 生效。
-  # 上游规则已在生成阶段排除 adtidy.org / filters.adtidy.org，无需额外白名单。
   - RULE-SET,❎ AdGuard,❎ 广告拦截
 
-  # 【私网直连】Private Network
   - GEOSITE,private,DIRECT
   - GEOIP,private,DIRECT,no-resolve
 
-  # 【自定义补充】Custom
   - RULE-SET,📦 Cargo Downloads,📦 下载均衡
 
-  # 【Aethersailor 直连补丁】Direct Patch
   - RULE-SET,🪐 Astra Domain,DIRECT
   - RULE-SET,🔮 Prism IP,DIRECT
 
-  # 【Aethersailor 代理补丁】Proxy Patch
-  # 仅兜底用，不越权。
   - RULE-SET,🪐 Orbit Domain,🎚️ 节点选择
   - RULE-SET,🚀 Voyager IP,🎚️ 节点选择
 
-  # 【国内流量直连】China Direct
   - GEOSITE,cn,DIRECT
   - GEOIP,cn,DIRECT,no-resolve
   - GEOIP,cn,DIRECT
   - GEOSITE,google-cn,DIRECT
 
-  # 【游戏与下载】Games
-  # steam@cn 直连避免海外缓存节点误走代理；category-games 整体直连。
   - GEOSITE,steam@cn,DIRECT
   - GEOSITE,steam,👾 Steam
   - GEOSITE,epicgames,🎁 Epic
@@ -191,7 +132,6 @@ rules:
   - GEOSITE,category-games,DIRECT
   - GEOSITE,category-public-tracker,DIRECT
 
-  # 【流媒体】Streaming
   - GEOSITE,netflix,🍿 Netflix
   - GEOSITE,hulu,📺 Hulu
   - GEOSITE,primevideo,📦 Prime Video
@@ -201,7 +141,6 @@ rules:
   - GEOSITE,spotify,💚 Spotify
   - GEOSITE,bilibili,📺 Bilibili
 
-  # 【应用与类目】Services
   - GEOSITE,telegram,🪽 Telegram
   - GEOSITE,openai,⚡ OpenAI
   - GEOSITE,anthropic,🪐 Anthropic
@@ -228,17 +167,11 @@ rules:
   - GEOSITE,category-media,📰 News
   - GEOSITE,category-entertainment,🍿 Entertainment
 
-  # 【端口补充】Ports
   - RULE-SET,⚡ Matrix Port,🔌 特殊端口
 
-  # 【通用代理】Proxy
   - GEOSITE,gfw,🎚️ 节点选择
 
-  # 【最终兜底】Final
   - MATCH,🏁 Final
-
-# 【7】规则源（Rule Providers）
-# domain = 域名匹配，classical = 域名 + IP；<< 复用上方锚点的公共字段。
 
 rule-anchor:
   domain:    &RP-domain    {type: http, behavior: domain,    format: yaml, interval: 28800}
