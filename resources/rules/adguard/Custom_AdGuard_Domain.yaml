@@ -1,7 +1,10 @@
-# GENERATED - DO NOT EDIT. Source: AdGuard browser-extension filters.
-# config: adguard-filters.json (61 enabled)
-# source: https://filters.adtidy.org/extension/chromium/filters/{id}.txt
-# block domains: 210438
+# GENERATED - DO NOT EDIT.
+# From AdGuard browser-extension (Chromium) filter subscriptions.
+# Filters: adguard-filters.json (61 enabled)
+# Upstream: https://filters.adtidy.org/extension/chromium/filters/<id>.txt
+#   <id> is a filter number (e.g. 2.txt), not a literal URL.
+# Scope: whole-domain blocks only; path/modifier rules and exceptions excluded.
+# Domains: 210438
 
 payload:
   - '0-02.net'

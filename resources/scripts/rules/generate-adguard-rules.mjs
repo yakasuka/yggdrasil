@@ -237,10 +237,13 @@ for (const d of ['adtidy.org', 'filters.adtidy.org']) block.delete(d);
 // files so Actions can skip commits and CDN purges when nothing really changed.
 const sorted = [...block].sort();
 const content =
-  '# GENERATED - DO NOT EDIT. Source: AdGuard browser-extension filters.\n' +
-  `# config: adguard-filters.json (${FILTERS.length} enabled)\n` +
-  `# source: ${BASE}/{id}.txt\n` +
-  `# block domains: ${sorted.length}\n` +
+  '# GENERATED - DO NOT EDIT.\n' +
+  '# From AdGuard browser-extension (Chromium) filter subscriptions.\n' +
+  `# Filters: adguard-filters.json (${FILTERS.length} enabled)\n` +
+  `# Upstream: ${BASE}/<id>.txt\n` +
+  '#   <id> is a filter number (e.g. 2.txt), not a literal URL.\n' +
+  '# Scope: whole-domain blocks only; path/modifier rules and exceptions excluded.\n' +
+  `# Domains: ${sorted.length}\n` +
   '\n' +
   `payload:\n${sorted.map((d) => `  - '${d}'`).join('\n')}\n`;
 const contentChanged = fs.existsSync(BLOCK_FILE)
