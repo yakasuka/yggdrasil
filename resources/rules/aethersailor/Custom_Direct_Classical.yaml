@@ -1,7 +1,7 @@
 # GENERATED - DO NOT EDIT. Add your rules to overlays/Custom_Direct_Classical.yaml
 # upstream: Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Direct_Classical.yaml
-# upstream blob: 12c2bed8212fb7d51964f717f73302931c89bd93
-# total: 1347 (upstream 1347, extra 0)
+# upstream blob: f1d03bdb974e1a0ccfe3eb59e22b13f2702d671a
+# total: 1351 (upstream 1351, extra 0)
 payload:
   - 'DOMAIN-KEYWORD,m-team'
   - 'DOMAIN-KEYWORD,quickconnect'
@@ -14,6 +14,7 @@ payload:
   - 'DOMAIN-SUFFIX,0734cn.top'
   - 'DOMAIN-SUFFIX,0759mall.com'
   - 'DOMAIN-SUFFIX,08137tabw.com'
+  - 'DOMAIN-SUFFIX,09517260.com'
   - 'DOMAIN-SUFFIX,10fuzhu.com'
   - 'DOMAIN-SUFFIX,10laodian.com'
   - 'DOMAIN-SUFFIX,112114.eu.org'
@@ -181,6 +182,7 @@ payload:
   - 'DOMAIN-SUFFIX,axuex.top'
   - 'DOMAIN-SUFFIX,azpromotion.com'
   - 'DOMAIN-SUFFIX,azurpromilia.com'
+  - 'DOMAIN-SUFFIX,b675211.com'
   - 'DOMAIN-SUFFIX,b7f3192.com'
   - 'DOMAIN-SUFFIX,ba-hospital.com'
   - 'DOMAIN-SUFFIX,babawar.com'
@@ -420,6 +422,7 @@ payload:
   - 'DOMAIN-SUFFIX,fuyinkeji.top'
   - 'DOMAIN-SUFFIX,fuziche.com'
   - 'DOMAIN-SUFFIX,fzedu.pub'
+  - 'DOMAIN-SUFFIX,fzhygame.com'
   - 'DOMAIN-SUFFIX,fzshouji.com'
   - 'DOMAIN-SUFFIX,fzvcolco.com'
   - 'DOMAIN-SUFFIX,fzwqq.com'
@@ -960,6 +963,7 @@ payload:
   - 'DOMAIN-SUFFIX,scratch5.com'
   - 'DOMAIN-SUFFIX,sct.ftqq.com'
   - 'DOMAIN-SUFFIX,scyol.com'
+  - 'DOMAIN-SUFFIX,sczhgx.com'
   - 'DOMAIN-SUFFIX,sdk-log-upload-os.hoyoverse.com'
   - 'DOMAIN-SUFFIX,sduc.cloud'
   - 'DOMAIN-SUFFIX,seaflysoft.com'

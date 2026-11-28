@@ -1,7 +1,7 @@
 # GENERATED - DO NOT EDIT. Add your rules to overlays/Custom_Direct_Domain.yaml
 # upstream: Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Direct_Domain.yaml
-# upstream blob: c09b1b147ebee04e25840497527d61a2997ecf3f
-# total: 1345 (upstream 1332, extra 13)
+# upstream blob: 8b806a63cf65c35ccaf117d4540616241c6e9cd3
+# total: 1349 (upstream 1336, extra 13)
 payload:
   - '+.00333118.com'
   - '+.0044696.com'
@@ -11,6 +11,7 @@ payload:
   - '+.0734cn.top'
   - '+.0759mall.com'
   - '+.08137tabw.com'
+  - '+.09517260.com'
   - '+.10fuzhu.com'
   - '+.10laodian.com'
   - '+.112114.eu.org'
@@ -178,6 +179,7 @@ payload:
   - '+.axuex.top'
   - '+.azpromotion.com'
   - '+.azurpromilia.com'
+  - '+.b675211.com'
   - '+.b7f3192.com'
   - '+.ba-hospital.com'
   - '+.babawar.com'
@@ -417,6 +419,7 @@ payload:
   - '+.fuyinkeji.top'
   - '+.fuziche.com'
   - '+.fzedu.pub'
+  - '+.fzhygame.com'
   - '+.fzshouji.com'
   - '+.fzvcolco.com'
   - '+.fzwqq.com'
@@ -957,6 +960,7 @@ payload:
   - '+.scratch5.com'
   - '+.sct.ftqq.com'
   - '+.scyol.com'
+  - '+.sczhgx.com'
   - '+.sdk-log-upload-os.hoyoverse.com'
   - '+.sduc.cloud'
   - '+.seaflysoft.com'
