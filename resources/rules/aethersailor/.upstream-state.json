@@ -1,8 +1,8 @@
 {
   "Custom_Direct_Domain.yaml": {
-    "upstream": "8b806a63cf65c35ccaf117d4540616241c6e9cd3",
+    "upstream": "508298a486ec18d73505a3278fceb952b5dcf93a",
     "overlay": "bb5d42d22604a9df",
-    "syncedAt": "2026-11-28T10:30:48.825Z"
+    "syncedAt": "2026-11-28T18:23:06.663Z"
   },
   "Custom_Direct_Classical_IP.yaml": {
     "upstream": "7dc3df345f4e8f68d28ecbf4eec408ac4e69a136",
@@ -25,9 +25,9 @@
     "syncedAt": "2026-11-06T08:35:56.677Z"
   },
   "Custom_Direct_Classical.yaml": {
-    "upstream": "f1d03bdb974e1a0ccfe3eb59e22b13f2702d671a",
+    "upstream": "96871d76be70e4a32d809a6dd6853b5bbeae2e3a",
     "overlay": "dfb0017df226aa41",
-    "syncedAt": "2026-11-28T10:30:48.220Z"
+    "syncedAt": "2026-11-28T18:23:06.308Z"
   },
   "Custom_Direct_Classical_Port.yaml": {
     "upstream": "84733761d0da0fa0bba9a9f744b74fe564c27d01",
