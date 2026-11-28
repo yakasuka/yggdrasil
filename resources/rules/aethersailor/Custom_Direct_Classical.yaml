@@ -1,7 +1,7 @@
 # GENERATED - DO NOT EDIT. Add your rules to overlays/Custom_Direct_Classical.yaml
 # upstream: Aethersailor/Custom_OpenClash_Rules@main/rule/Custom_Direct_Classical.yaml
-# upstream blob: 9e67c0e1c6979861f898f9cd72a20f34469247c7
-# total: 1338 (upstream 1338, extra 0)
+# upstream blob: 12c2bed8212fb7d51964f717f73302931c89bd93
+# total: 1347 (upstream 1347, extra 0)
 payload:
   - 'DOMAIN-KEYWORD,m-team'
   - 'DOMAIN-KEYWORD,quickconnect'
@@ -269,6 +269,7 @@ payload:
   - 'DOMAIN-SUFFIX,chushi.cool'
   - 'DOMAIN-SUFFIX,chyqaq.online'
   - 'DOMAIN-SUFFIX,ciallo.party'
+  - 'DOMAIN-SUFFIX,cilikongjian.com'
   - 'DOMAIN-SUFFIX,cilizhai.net'
   - 'DOMAIN-SUFFIX,cindy.app'
   - 'DOMAIN-SUFFIX,ciyuancenter.cc'
@@ -380,6 +381,7 @@ payload:
   - 'DOMAIN-SUFFIX,fb71ef91e1014.beer'
   - 'DOMAIN-SUFFIX,fdfinvoice.com'
   - 'DOMAIN-SUFFIX,feihengip.com'
+  - 'DOMAIN-SUFFIX,feiniaobt.com'
   - 'DOMAIN-SUFFIX,feiniugo.com'
   - 'DOMAIN-SUFFIX,feiyujiaju.com'
   - 'DOMAIN-SUFFIX,feizhiyi.com'
@@ -461,6 +463,7 @@ payload:
   - 'DOMAIN-SUFFIX,gjtool.com'
   - 'DOMAIN-SUFFIX,gmoj.net'
   - 'DOMAIN-SUFFIX,gmya.net'
+  - 'DOMAIN-SUFFIX,gny.net'
   - 'DOMAIN-SUFFIX,goalmapapp.com'
   - 'DOMAIN-SUFFIX,goka.top'
   - 'DOMAIN-SUFFIX,gongxiangjizhang.com'
@@ -562,6 +565,7 @@ payload:
   - 'DOMAIN-SUFFIX,htkgsx.com'
   - 'DOMAIN-SUFFIX,huabangshou.com'
   - 'DOMAIN-SUFFIX,huacheng2025.com'
+  - 'DOMAIN-SUFFIX,huajian.ink'
   - 'DOMAIN-SUFFIX,huangguoai.ai'
   - 'DOMAIN-SUFFIX,huangyusz.space'
   - 'DOMAIN-SUFFIX,hub.crdz.gq'
@@ -666,6 +670,7 @@ payload:
   - 'DOMAIN-SUFFIX,kaijiacloud.com'
   - 'DOMAIN-SUFFIX,kaijiejinrong.com'
   - 'DOMAIN-SUFFIX,kaipanhong.com'
+  - 'DOMAIN-SUFFIX,kaiqi.xin'
   - 'DOMAIN-SUFFIX,kamhing.net'
   - 'DOMAIN-SUFFIX,kancaibao.com'
   - 'DOMAIN-SUFFIX,kanv7k.live'
@@ -946,6 +951,7 @@ payload:
   - 'DOMAIN-SUFFIX,ruijie.com'
   - 'DOMAIN-SUFFIX,rxcrs.com'
   - 'DOMAIN-SUFFIX,saduck.top'
+  - 'DOMAIN-SUFFIX,safecaptcha.com'
   - 'DOMAIN-SUFFIX,sanligu.top'
   - 'DOMAIN-SUFFIX,sapphiretech.com'
   - 'DOMAIN-SUFFIX,sbtia.com'
@@ -1130,6 +1136,7 @@ payload:
   - 'DOMAIN-SUFFIX,volcanomob.com'
   - 'DOMAIN-SUFFIX,vpsjyz.com'
   - 'DOMAIN-SUFFIX,vryfh.top'
+  - 'DOMAIN-SUFFIX,vsoul.top'
   - 'DOMAIN-SUFFIX,vtools.online'
   - 'DOMAIN-SUFFIX,vv1865.com'
   - 'DOMAIN-SUFFIX,vvhan.com'
@@ -1207,6 +1214,7 @@ payload:
   - 'DOMAIN-SUFFIX,xingpaste.com'
   - 'DOMAIN-SUFFIX,xingyaozhilian.com'
   - 'DOMAIN-SUFFIX,xinstall.top'
+  - 'DOMAIN-SUFFIX,xinxinlan.ink'
   - 'DOMAIN-SUFFIX,xinyonghome.com'
   - 'DOMAIN-SUFFIX,xiqueer.com'
   - 'DOMAIN-SUFFIX,xiuxitong.com'
@@ -1241,6 +1249,7 @@ payload:
   - 'DOMAIN-SUFFIX,ycyct.com'
   - 'DOMAIN-SUFFIX,ydayc.com'
   - 'DOMAIN-SUFFIX,ydxian.xyz'
+  - 'DOMAIN-SUFFIX,yeguo-duanju.online'
   - 'DOMAIN-SUFFIX,yeguodj.com'
   - 'DOMAIN-SUFFIX,ygdj17.com'
   - 'DOMAIN-SUFFIX,yh29798.com'
